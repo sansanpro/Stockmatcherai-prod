@@ -15,9 +15,9 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
   // Sort by relevance to user profile
   const sortedStocks = sortStocksByRelevance(filteredStocks, profile);
   
-  // Ensure we have at least 5 recommendations, take up to 15
+  // Ensure we have at least 5 recommendations, take up to 50
   const minRecommendations = 5;
-  const maxRecommendations = 15;
+  const maxRecommendations = 50;
   const recommendationCount = Math.max(minRecommendations, Math.min(maxRecommendations, sortedStocks.length));
   const selectedStocks = sortedStocks.slice(0, recommendationCount);
 
@@ -37,3 +37,4 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
 
   return recommendations;
 };
+
