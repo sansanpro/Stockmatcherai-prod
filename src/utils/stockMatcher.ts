@@ -37,9 +37,9 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
     const sortedStocks = sortStocksByRelevance(filteredStocks, profile);
     console.log('Stocks sorted by relevance score');
 
-    // Ensure we provide comprehensive recommendations (50-60 stocks)
-    const minRecommendations = 50;
-    const maxRecommendations = Math.min(60, sortedStocks.length);
+    // Ensure we provide at least 30 recommendations (target 30-35)
+    const minRecommendations = 30;
+    const maxRecommendations = Math.min(35, sortedStocks.length);
     const recommendationCount = Math.max(
       Math.min(minRecommendations, sortedStocks.length), 
       Math.min(maxRecommendations, sortedStocks.length)
@@ -70,7 +70,7 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
       rec.ticker && rec.companyName && rec.whyItFits
     );
 
-    if (validRecommendations.length < 10) {
+    if (validRecommendations.length < 20) {
       console.warn('Insufficient valid recommendations generated');
     }
 
@@ -97,8 +97,8 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
   } catch (error) {
     console.error('Error generating stock recommendations:', error);
     
-    // Fallback: Return a basic set of diverse stocks
-    const fallbackStocks = stockDatabase.slice(0, 20).map(stock => ({
+    // Fallback: Return a basic set of diverse stocks (ensure at least 30)
+    const fallbackStocks = stockDatabase.slice(0, 30).map(stock => ({
       ...stock,
       whyItFits: 'Diversified investment option with solid market fundamentals.'
     }));

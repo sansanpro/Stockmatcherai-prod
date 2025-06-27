@@ -1,3 +1,4 @@
+
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 
 export const filterStocksByProfile = (
@@ -64,45 +65,46 @@ export const filterStocksByProfile = (
       case 'growth':
         return stock.oneYearReturn > 5; // Focus on growth stocks
       case 'short-term':
-        return Math.abs(stock.oneYearReturn) > 10; // High volatility for short-term
+        return Math.abs(stock.oneYearReturn) > 5; // Reduced threshold for short-term
       case 'retirement':
         return stock.riskLevel === 'low' || stock.dividendYield > 2;
       case 'balance':
-        return stock.dividendYield > 0.5 && stock.oneYearReturn > 0;
+        return stock.dividendYield > 0.5 && stock.oneYearReturn > -10;
       default:
         return true;
     }
   };
 
-  // Multi-tiered filtering approach
+  // Multi-tiered filtering approach with more lenient thresholds
   let filteredStocks = stocks;
   const affordabilityThreshold = getAffordabilityThreshold(profile.experience, profile.salary);
 
-  // Tier 1: Strict filtering
+  // Tier 1: Moderately strict filtering
   filteredStocks = stocks.filter(stock => {
-    // Sector preference (strict)
+    // Sector preference (allow if 'any' or matches)
     if (profile.sectorPreference !== 'any' && 
         stock.sector.toLowerCase() !== profile.sectorPreference.toLowerCase()) {
       return false;
     }
 
-    // Risk tolerance (strict)
-    if (!isRiskCompatible(stock.riskLevel, profile.riskTolerance, true)) {
+    // Risk tolerance (moderately strict)
+    if (!isRiskCompatible(stock.riskLevel, profile.riskTolerance, false)) {
       return false;
     }
 
-    // Experience appropriateness
-    if (!isExperienceAppropriate(stock, profile.experience)) {
+    // Experience appropriateness (relaxed)
+    if (profile.experience === 'none' && stock.riskLevel === 'high' && 
+        ['NKLA', 'SNAP'].includes(stock.ticker)) {
       return false;
     }
 
-    // Goal alignment
+    // Goal alignment (relaxed)
     if (!isGoalAligned(stock, profile.investmentGoal)) {
       return false;
     }
 
-    // Affordability
-    if (stock.pricePerShare > affordabilityThreshold) {
+    // Affordability (generous threshold)
+    if (stock.pricePerShare > affordabilityThreshold * 2) {
       return false;
     }
 
@@ -111,27 +113,26 @@ export const filterStocksByProfile = (
 
   console.log(`Tier 1 filtering: ${filteredStocks.length} stocks`);
 
-  // Tier 2: Relax goal alignment if not enough stocks
-  if (filteredStocks.length < 20) {
+  // Tier 2: Relax sector preference if needed
+  if (filteredStocks.length < 25) {
     filteredStocks = stocks.filter(stock => {
-      // Keep sector preference
-      if (profile.sectorPreference !== 'any' && 
-          stock.sector.toLowerCase() !== profile.sectorPreference.toLowerCase()) {
+      // More relaxed risk tolerance
+      if (profile.riskTolerance === 'low' && stock.riskLevel === 'high') {
+        return false;
+      }
+      if (profile.riskTolerance === 'high' && stock.riskLevel === 'low') {
+        // Allow some low-risk stocks for high-risk users for diversification
+        return Math.random() > 0.7; // Include 30% of low-risk stocks
+      }
+
+      // Basic experience safety
+      if (profile.experience === 'none' && stock.riskLevel === 'high' && 
+          stock.oneYearReturn < -30) {
         return false;
       }
 
-      // Relaxed risk tolerance
-      if (!isRiskCompatible(stock.riskLevel, profile.riskTolerance, false)) {
-        return false;
-      }
-
-      // Keep experience appropriateness
-      if (!isExperienceAppropriate(stock, profile.experience)) {
-        return false;
-      }
-
-      // Relaxed affordability (increase by 50%)
-      if (stock.pricePerShare > affordabilityThreshold * 1.5) {
+      // Very generous affordability
+      if (stock.pricePerShare > affordabilityThreshold * 3) {
         return false;
       }
 
@@ -140,23 +141,16 @@ export const filterStocksByProfile = (
     console.log(`Tier 2 filtering: ${filteredStocks.length} stocks`);
   }
 
-  // Tier 3: Relax risk tolerance further
-  if (filteredStocks.length < 15) {
+  // Tier 3: Basic safety only
+  if (filteredStocks.length < 20) {
     filteredStocks = stocks.filter(stock => {
-      // Keep sector preference
-      if (profile.sectorPreference !== 'any' && 
-          stock.sector.toLowerCase() !== profile.sectorPreference.toLowerCase()) {
+      // Only exclude extremely problematic stocks
+      if (stock.oneYearReturn < -50) {
         return false;
       }
 
-      // Very relaxed experience check - only filter out truly inappropriate stocks
-      if (profile.experience === 'none' && stock.riskLevel === 'high' && 
-          ['TSLA', 'NKLA', 'SNAP'].includes(stock.ticker)) {
-        return false;
-      }
-
-      // Double affordability threshold
-      if (stock.pricePerShare > affordabilityThreshold * 2) {
+      // Only exclude unaffordable stocks
+      if (stock.pricePerShare > profile.salary) {
         return false;
       }
 
@@ -165,31 +159,11 @@ export const filterStocksByProfile = (
     console.log(`Tier 3 filtering: ${filteredStocks.length} stocks`);
   }
 
-  // Tier 4: Keep only sector preference and basic safety
-  if (filteredStocks.length < 10) {
+  // Final fallback: Use most stocks with minimal filtering
+  if (filteredStocks.length < 15) {
     filteredStocks = stocks.filter(stock => {
-      // Keep sector preference if specified
-      if (profile.sectorPreference !== 'any' && 
-          stock.sector.toLowerCase() !== profile.sectorPreference.toLowerCase()) {
-        return false;
-      }
-
-      // Only exclude extremely risky stocks for complete beginners
-      if (profile.experience === 'none' && profile.riskTolerance === 'low' && 
-          stock.riskLevel === 'high' && stock.oneYearReturn < -20) {
-        return false;
-      }
-
-      return true;
-    });
-    console.log(`Tier 4 filtering: ${filteredStocks.length} stocks`);
-  }
-
-  // Final fallback: Use all stocks but prioritize safer ones
-  if (filteredStocks.length < 5) {
-    filteredStocks = stocks.filter(stock => {
-      // Only exclude stocks with major red flags
-      if (stock.oneYearReturn < -40 || stock.pricePerShare > profile.salary) {
+      // Only exclude stocks with severe issues
+      if (stock.peRatio < -50 || stock.pricePerShare > profile.salary * 2) {
         return false;
       }
       return true;
@@ -198,9 +172,9 @@ export const filterStocksByProfile = (
   }
 
   // Absolute last resort
-  if (filteredStocks.length === 0) {
-    filteredStocks = stocks.slice(0, 50); // Take first 50 stocks
-    console.warn('Using fallback stock selection');
+  if (filteredStocks.length < 10) {
+    filteredStocks = stocks.slice(0, Math.min(35, stocks.length));
+    console.warn('Using minimal filtering - taking first available stocks');
   }
 
   return filteredStocks;
