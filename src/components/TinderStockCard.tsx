@@ -57,11 +57,27 @@ const TinderStockCard = ({
     return `$${num.toFixed(2)}`;
   };
 
-  // Generate CEO avatar URL using the CEO name
-  const getCeoAvatarUrl = (ceoName: string) => {
-    // Use a placeholder image service with the CEO name as seed
-    const seed = ceoName.replace(/\s+/g, '-').toLowerCase();
-    return `https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=200&h=200&fit=crop&crop=face`;
+  // Generate CEO avatar URL using a more realistic approach
+  const getCeoAvatarUrl = (ceoName: string, companyName: string) => {
+    // Create a deterministic but varied avatar based on CEO name and company
+    const seed = `${ceoName}-${companyName}`.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const seedNumber = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    
+    // Use different professional avatar styles based on the seed
+    const avatarStyles = [
+      'adventurer',
+      'adventurer-neutral', 
+      'avataaars',
+      'big-smile',
+      'bottts',
+      'fun-emoji',
+      'micah',
+      'miniavs',
+      'personas'
+    ];
+    
+    const selectedStyle = avatarStyles[seedNumber % avatarStyles.length];
+    return `https://api.dicebear.com/7.x/${selectedStyle}/svg?seed=${encodeURIComponent(seed)}&size=200`;
   };
 
   const getCeoInitials = (ceoName: string) => {
@@ -269,9 +285,13 @@ const TinderStockCard = ({
             <div className="flex items-center gap-4 mb-3">
               <Avatar className="w-16 h-16 border-2 border-white shadow-lg ring-2 ring-blue-500/20">
                 <AvatarImage 
-                  src={getCeoAvatarUrl(stock.ceoName)} 
-                  alt={stock.ceoName}
+                  src={getCeoAvatarUrl(stock.ceoName, stock.companyName)} 
+                  alt={`${stock.ceoName} - CEO of ${stock.companyName}`}
                   className="object-cover"
+                  onError={(e) => {
+                    // If the avatar fails to load, we'll rely on the fallback
+                    console.log('Avatar failed to load for:', stock.ceoName);
+                  }}
                 />
                 <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg">
                   {getCeoInitials(stock.ceoName)}
@@ -280,6 +300,7 @@ const TinderStockCard = ({
               <div>
                 <h3 className="font-bold text-gray-900 dark:text-white text-lg">{stock.ceoName}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">Chief Executive Officer</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{stock.companyName}</p>
               </div>
             </div>
             <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
