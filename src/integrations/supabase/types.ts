@@ -9,7 +9,135 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_matches: {
+        Row: {
+          company_name: string
+          id: string
+          is_match: boolean
+          match_reason: string | null
+          matched_at: string
+          stock_data: Json | null
+          ticker: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          id?: string
+          is_match: boolean
+          match_reason?: string | null
+          matched_at?: string
+          stock_data?: Json | null
+          ticker: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          id?: string
+          is_match?: boolean
+          match_reason?: string | null
+          matched_at?: string
+          stock_data?: Json | null
+          ticker?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          age_range: string | null
+          created_at: string
+          id: string
+          income_level: string | null
+          investment_experience: string | null
+          investment_goals: string[] | null
+          risk_tolerance: string | null
+          sectors_of_interest: string[] | null
+          time_horizon: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age_range?: string | null
+          created_at?: string
+          id?: string
+          income_level?: string | null
+          investment_experience?: string | null
+          investment_goals?: string[] | null
+          risk_tolerance?: string | null
+          sectors_of_interest?: string[] | null
+          time_horizon?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age_range?: string | null
+          created_at?: string
+          id?: string
+          income_level?: string | null
+          investment_experience?: string | null
+          investment_goals?: string[] | null
+          risk_tolerance?: string | null
+          sectors_of_interest?: string[] | null
+          time_horizon?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_watchlists: {
+        Row: {
+          added_at: string
+          company_name: string
+          id: string
+          stock_data: Json | null
+          ticker: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          company_name: string
+          id?: string
+          stock_data?: Json | null
+          ticker: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          company_name?: string
+          id?: string
+          stock_data?: Json | null
+          ticker?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
