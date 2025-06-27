@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,11 +47,8 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                   value={profile.age || ''}
                   onChange={(e) => setProfile(prev => ({ ...prev, age: parseInt(e.target.value) }))}
                   placeholder="25"
-                  disabled={isUpdate}
-                  className={isUpdate ? "bg-gray-100 cursor-not-allowed" : ""}
                   required
                 />
-                {isUpdate && <p className="text-xs text-gray-500">Age cannot be changed</p>}
               </div>
 
               <div className="space-y-2">
@@ -60,9 +56,8 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                 <Select 
                   onValueChange={(value) => setProfile(prev => ({ ...prev, gender: value }))}
                   value={profile.gender}
-                  disabled={isUpdate}
                 >
-                  <SelectTrigger className={isUpdate ? "bg-gray-100 cursor-not-allowed" : ""}>
+                  <SelectTrigger>
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
                   <SelectContent>
@@ -72,7 +67,6 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                     <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
                   </SelectContent>
                 </Select>
-                {isUpdate && <p className="text-xs text-gray-500">Gender cannot be changed</p>}
               </div>
             </div>
 
