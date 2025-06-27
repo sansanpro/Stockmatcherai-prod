@@ -10,12 +10,23 @@ interface TinderStockCardProps {
   stock: StockRecommendation;
   onMatch: () => void;
   onPass: () => void;
+  isVisible?: boolean;
+  zIndex?: number;
+  scale?: number;
 }
 
-const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
+const TinderStockCard = ({ 
+  stock, 
+  onMatch, 
+  onPass, 
+  isVisible = true, 
+  zIndex = 1,
+  scale = 1 
+}: TinderStockCardProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [isExiting, setIsExiting] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const getRiskColor = (risk: string) => {
@@ -64,15 +75,19 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
     
     const threshold = 100;
     if (Math.abs(dragOffset.x) > threshold) {
-      if (dragOffset.x > 0) {
-        onMatch();
-      } else {
-        onPass();
-      }
+      setIsExiting(true);
+      setTimeout(() => {
+        if (dragOffset.x > 0) {
+          onMatch();
+        } else {
+          onPass();
+        }
+      }, 200);
+    } else {
+      setDragOffset({ x: 0, y: 0 });
     }
     
     setIsDragging(false);
-    setDragOffset({ x: 0, y: 0 });
   };
 
   // Mouse events
@@ -129,38 +144,48 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
   }, [isDragging, startPos]);
 
   const rotation = dragOffset.x * 0.1;
-  const opacity = Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300);
+  const opacity = isExiting ? 0 : Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300);
+  const cardScale = isExiting ? 0.8 : scale;
 
   return (
-    <div className="relative">
+    <div 
+      className={`absolute inset-0 transition-all duration-500 ease-out ${
+        isVisible ? 'opacity-100' : 'opacity-0'
+      }`}
+      style={{ 
+        zIndex,
+        transform: `scale(${cardScale})`,
+        filter: zIndex === 1 ? 'none' : 'brightness(0.9)',
+      }}
+    >
       {/* Overlay indicators */}
       {isDragging && (
         <>
           <div 
-            className={`absolute inset-0 rounded-3xl flex items-center justify-center z-10 transition-opacity ${
-              dragOffset.x > 50 ? 'opacity-100' : 'opacity-0'
+            className={`absolute inset-0 rounded-3xl flex items-center justify-center z-10 transition-all duration-200 ${
+              dragOffset.x > 50 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             style={{
               background: 'linear-gradient(45deg, rgba(34, 197, 94, 0.9), rgba(22, 163, 74, 0.9))'
             }}
           >
-            <div className="text-white text-center">
-              <Heart className="w-16 h-16 mx-auto mb-2 fill-current" />
-              <div className="text-2xl font-bold">MATCH!</div>
+            <div className="text-white text-center animate-pulse">
+              <Heart className="w-16 h-16 mx-auto mb-2 fill-current drop-shadow-lg" />
+              <div className="text-2xl font-bold drop-shadow-md">MATCH!</div>
             </div>
           </div>
           
           <div 
-            className={`absolute inset-0 rounded-3xl flex items-center justify-center z-10 transition-opacity ${
-              dragOffset.x < -50 ? 'opacity-100' : 'opacity-0'
+            className={`absolute inset-0 rounded-3xl flex items-center justify-center z-10 transition-all duration-200 ${
+              dragOffset.x < -50 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             style={{
               background: 'linear-gradient(45deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9))'
             }}
           >
-            <div className="text-white text-center">
-              <X className="w-16 h-16 mx-auto mb-2" />
-              <div className="text-2xl font-bold">PASS</div>
+            <div className="text-white text-center animate-pulse">
+              <X className="w-16 h-16 mx-auto mb-2 drop-shadow-lg" />
+              <div className="text-2xl font-bold drop-shadow-md">PASS</div>
             </div>
           </div>
         </>
@@ -168,11 +193,13 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
 
       <Card 
         ref={cardRef}
-        className="w-full max-w-sm mx-auto shadow-2xl border-0 bg-white dark:bg-gray-800 overflow-hidden cursor-grab active:cursor-grabbing"
+        className={`w-full max-w-sm mx-auto shadow-2xl border-0 bg-white dark:bg-gray-800 overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
+          isExiting ? 'animate-scale-out' : 'animate-scale-in'
+        }`}
         style={{
           transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
           opacity,
-          transition: isDragging ? 'none' : 'transform 0.3s ease-out, opacity 0.3s ease-out'
+          transition: isDragging || isExiting ? 'none' : 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out'
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -186,45 +213,45 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
           <div 
             className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-6 relative overflow-hidden`}
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16 animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12 animate-pulse delay-75"></div>
             
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
+                <div className="flex-1 animate-fade-in">
                   <h2 className="text-2xl font-bold leading-tight">{stock.companyName}</h2>
                   <p className="text-white/90 font-medium text-lg">({stock.ticker})</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-white/20 text-white border-white/30 font-semibold px-3 py-1">
+                <div className="flex items-center gap-2 animate-fade-in delay-100">
+                  <Badge className="bg-white/20 text-white border-white/30 font-semibold px-3 py-1 backdrop-blur-sm">
                     {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()}
                   </Badge>
                   <EducationalTooltip 
                     content={`Risk Level indicates volatility: Low = stable returns, Medium = some fluctuation, High = potential for large gains/losses`}
-                    className="text-white/70 hover:text-white"
+                    className="text-white/70 hover:text-white transition-colors"
                   />
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 text-white/90">
+              <div className="flex items-center gap-2 text-white/90 animate-fade-in delay-200">
                 <Building className="w-4 h-4" />
                 <span className="text-sm">{stock.sector}</span>
                 <TrendingUp className="w-4 h-4 ml-2" />
-                <span className={`text-sm font-semibold ${stock.oneYearReturn >= 0 ? 'text-green-200' : 'text-red-200'}`}>
+                <span className={`text-sm font-semibold transition-colors ${stock.oneYearReturn >= 0 ? 'text-green-200' : 'text-red-200'}`}>
                   {stock.oneYearReturn > 0 ? '+' : ''}{stock.oneYearReturn.toFixed(1)}%
                 </span>
                 <EducationalTooltip 
                   content="1-Year Return shows how much the stock price has changed over the past 12 months"
-                  className="text-white/70 hover:text-white"
+                  className="text-white/70 hover:text-white transition-colors"
                 />
               </div>
             </div>
           </div>
 
           {/* CEO Section */}
-          <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600">
+          <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-fade-in delay-300">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center transform hover:scale-110 transition-transform">
                 <User className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -238,13 +265,13 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
           </div>
 
           {/* Financials Grid */}
-          <div className="p-6 bg-white dark:bg-gray-800">
+          <div className="p-6 bg-white dark:bg-gray-800 animate-fade-in delay-400">
             <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
               <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
               Key Metrics
             </h4>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-xl text-center">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
                   <EducationalTooltip 
@@ -253,7 +280,7 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
                 </div>
                 <p className="text-xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
               </div>
-              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-4 rounded-xl text-center">
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
                   <EducationalTooltip 
@@ -262,7 +289,7 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
                 </div>
                 <p className="text-xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
               </div>
-              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-xl text-center">
+              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <p className="text-xs text-green-600 dark:text-green-400 font-medium">Price/Share</p>
                   <EducationalTooltip 
@@ -272,7 +299,7 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
                 <p className="text-xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
               </div>
               {stock.dividendYield > 0 && (
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-4 rounded-xl text-center">
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <p className="text-xs text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
                     <EducationalTooltip 
@@ -286,12 +313,12 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
           </div>
 
           {/* Why it fits section */}
-          <div className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
+          <div className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500">
             <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
               <span className="text-lg">💡</span>
               Why this matches you
             </h4>
-            <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-4 rounded-xl border border-white/50 dark:border-gray-600/50">
+            <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-4 rounded-xl border border-white/50 dark:border-gray-600/50 transform hover:scale-[1.02] transition-all duration-300">
               <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                 {stock.whyItFits}
               </p>
