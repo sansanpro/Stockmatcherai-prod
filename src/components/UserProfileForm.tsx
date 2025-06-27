@@ -9,10 +9,12 @@ import { UserProfile } from '@/types/stock-matcher';
 
 interface UserProfileFormProps {
   onComplete: (profile: UserProfile) => void;
+  existingProfile?: UserProfile;
+  isUpdate?: boolean;
 }
 
-const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
-  const [profile, setProfile] = useState<Partial<UserProfile>>({});
+const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: UserProfileFormProps) => {
+  const [profile, setProfile] = useState<Partial<UserProfile>>(existingProfile || {});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +32,7 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
       <Card className="shadow-xl">
         <CardHeader>
           <CardTitle className="text-2xl text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Tell us about yourself 📋
+            {isUpdate ? 'Update your profile 📝' : 'Tell us about yourself 📋'}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -46,14 +48,21 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
                   value={profile.age || ''}
                   onChange={(e) => setProfile(prev => ({ ...prev, age: parseInt(e.target.value) }))}
                   placeholder="25"
+                  disabled={isUpdate}
+                  className={isUpdate ? "bg-gray-100 cursor-not-allowed" : ""}
                   required
                 />
+                {isUpdate && <p className="text-xs text-gray-500">Age cannot be changed</p>}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="gender">Gender 👤</Label>
-                <Select onValueChange={(value) => setProfile(prev => ({ ...prev, gender: value }))}>
-                  <SelectTrigger>
+                <Select 
+                  onValueChange={(value) => setProfile(prev => ({ ...prev, gender: value }))}
+                  value={profile.gender}
+                  disabled={isUpdate}
+                >
+                  <SelectTrigger className={isUpdate ? "bg-gray-100 cursor-not-allowed" : ""}>
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
                   <SelectContent>
@@ -63,6 +72,7 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
                     <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
                   </SelectContent>
                 </Select>
+                {isUpdate && <p className="text-xs text-gray-500">Gender cannot be changed</p>}
               </div>
             </div>
 
@@ -81,7 +91,10 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
 
             <div className="space-y-2">
               <Label>Investment Experience 📚</Label>
-              <Select onValueChange={(value) => setProfile(prev => ({ ...prev, experience: value }))}>
+              <Select 
+                onValueChange={(value) => setProfile(prev => ({ ...prev, experience: value }))}
+                value={profile.experience}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select your experience level" />
                 </SelectTrigger>
@@ -96,7 +109,10 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
 
             <div className="space-y-2">
               <Label>Risk Tolerance ⚖️</Label>
-              <Select onValueChange={(value) => setProfile(prev => ({ ...prev, riskTolerance: value }))}>
+              <Select 
+                onValueChange={(value) => setProfile(prev => ({ ...prev, riskTolerance: value }))}
+                value={profile.riskTolerance}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="How much risk are you comfortable with?" />
                 </SelectTrigger>
@@ -110,7 +126,10 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
 
             <div className="space-y-2">
               <Label>Preferred Sector 🏢</Label>
-              <Select onValueChange={(value) => setProfile(prev => ({ ...prev, sectorPreference: value }))}>
+              <Select 
+                onValueChange={(value) => setProfile(prev => ({ ...prev, sectorPreference: value }))}
+                value={profile.sectorPreference}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Which sector interests you most?" />
                 </SelectTrigger>
@@ -129,7 +148,10 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
 
             <div className="space-y-2">
               <Label>Investment Goal 🎯</Label>
-              <Select onValueChange={(value) => setProfile(prev => ({ ...prev, investmentGoal: value }))}>
+              <Select 
+                onValueChange={(value) => setProfile(prev => ({ ...prev, investmentGoal: value }))}
+                value={profile.investmentGoal}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="What's your primary goal?" />
                 </SelectTrigger>
@@ -148,7 +170,7 @@ const UserProfileForm = ({ onComplete }: UserProfileFormProps) => {
               className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105"
               disabled={!isProfileComplete(profile)}
             >
-              Find My Stock Matches ✨
+              {isUpdate ? 'Update Profile ✨' : 'Find My Stock Matches ✨'}
             </Button>
           </form>
         </CardContent>

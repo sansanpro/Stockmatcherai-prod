@@ -9,15 +9,23 @@ import { UserProfile } from '@/types/stock-matcher';
 const Index = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching'>('welcome');
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
   const handleProfileComplete = (profile: UserProfile) => {
     setUserProfile(profile);
     setCurrentStep('matching');
+    setIsUpdatingProfile(false);
   };
 
   const resetApp = () => {
     setUserProfile(null);
     setCurrentStep('welcome');
+    setIsUpdatingProfile(false);
+  };
+
+  const handleUpdateProfile = () => {
+    setCurrentStep('profile');
+    setIsUpdatingProfile(true);
   };
 
   if (currentStep === 'welcome') {
@@ -65,14 +73,18 @@ const Index = () => {
   if (currentStep === 'profile') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-        <UserProfileForm onComplete={handleProfileComplete} />
+        <UserProfileForm 
+          onComplete={handleProfileComplete} 
+          existingProfile={userProfile || undefined}
+          isUpdate={isUpdatingProfile}
+        />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <StockMatcher userProfile={userProfile!} onReset={resetApp} />
+      <StockMatcher userProfile={userProfile!} onReset={handleUpdateProfile} />
     </div>
   );
 };
