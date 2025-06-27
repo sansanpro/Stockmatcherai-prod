@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,20 +6,22 @@ import StockMatcher from '@/components/StockMatcher';
 import Watchlist from '@/components/Watchlist';
 import Matches from '@/components/Matches';
 import Analytics from '@/components/Analytics';
+import Settings from '@/components/Settings';
 import NotificationSystem from '@/components/NotificationSystem';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import UserMenu from '@/components/UserMenu';
 import { AppProvider, useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserProfile } from '@/types/stock-matcher';
-import { Moon, BarChart, Eye, Heart, LogOut, User } from 'lucide-react';
+import { Moon, BarChart, Eye, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'matches' | 'watchlist' | 'analytics'>('welcome');
+  const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'matches' | 'watchlist' | 'analytics' | 'settings'>('welcome');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const { isDarkMode, toggleDarkMode } = useApp();
-  const { user, signOut, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   const handleProfileComplete = (profile: UserProfile) => {
     setUserProfile(profile);
@@ -39,9 +40,12 @@ const IndexContent = () => {
     setIsUpdatingProfile(true);
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    resetApp();
+  const handleOpenSettings = () => {
+    setCurrentStep('settings');
+  };
+
+  const handleBackFromSettings = () => {
+    setCurrentStep(userProfile ? 'matching' : 'welcome');
   };
 
   // Show loading while checking authentication
@@ -161,19 +165,7 @@ const IndexContent = () => {
           >
             <Moon className="w-4 h-4" />
           </Button>
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-            <User className="w-4 h-4" />
-            <span>{user.email}</span>
-          </div>
-          <Button
-            onClick={handleSignOut}
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </Button>
+          <UserMenu onOpenSettings={handleOpenSettings} />
         </div>
       </div>
     </div>
@@ -193,6 +185,19 @@ const IndexContent = () => {
             />
           </div>
         </div>
+      </ProtectedRoute>
+    );
+  }
+
+  // Show settings page
+  if (currentStep === 'settings') {
+    return (
+      <ProtectedRoute>
+        <Settings 
+          onBack={handleBackFromSettings}
+          userProfile={userProfile}
+          onProfileUpdate={handleProfileComplete}
+        />
       </ProtectedRoute>
     );
   }
