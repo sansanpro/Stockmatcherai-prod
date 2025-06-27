@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { StockRecommendation } from '@/types/stock-matcher';
 import { Heart, X, TrendingUp, DollarSign, Building, User } from 'lucide-react';
+import EducationalTooltip from '@/components/EducationalTooltip';
 
 interface TinderStockCardProps {
   stock: StockRecommendation;
@@ -167,7 +168,7 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
 
       <Card 
         ref={cardRef}
-        className="w-full max-w-sm mx-auto shadow-2xl border-0 bg-white overflow-hidden cursor-grab active:cursor-grabbing"
+        className="w-full max-w-sm mx-auto shadow-2xl border-0 bg-white dark:bg-gray-800 overflow-hidden cursor-grab active:cursor-grabbing"
         style={{
           transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
           opacity,
@@ -194,9 +195,15 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
                   <h2 className="text-2xl font-bold leading-tight">{stock.companyName}</h2>
                   <p className="text-white/90 font-medium text-lg">({stock.ticker})</p>
                 </div>
-                <Badge className="bg-white/20 text-white border-white/30 font-semibold px-3 py-1">
-                  {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-white/20 text-white border-white/30 font-semibold px-3 py-1">
+                    {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()}
+                  </Badge>
+                  <EducationalTooltip 
+                    content={`Risk Level indicates volatility: Low = stable returns, Medium = some fluctuation, High = potential for large gains/losses`}
+                    className="text-white/70 hover:text-white"
+                  />
+                </div>
               </div>
               
               <div className="flex items-center gap-2 text-white/90">
@@ -206,62 +213,86 @@ const TinderStockCard = ({ stock, onMatch, onPass }: TinderStockCardProps) => {
                 <span className={`text-sm font-semibold ${stock.oneYearReturn >= 0 ? 'text-green-200' : 'text-red-200'}`}>
                   {stock.oneYearReturn > 0 ? '+' : ''}{stock.oneYearReturn.toFixed(1)}%
                 </span>
+                <EducationalTooltip 
+                  content="1-Year Return shows how much the stock price has changed over the past 12 months"
+                  className="text-white/70 hover:text-white"
+                />
               </div>
             </div>
           </div>
 
           {/* CEO Section */}
-          <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50">
+          <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                 <User className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">{stock.ceoName}</h3>
-                <p className="text-sm text-gray-600">Chief Executive Officer</p>
+                <h3 className="font-bold text-gray-900 dark:text-white">{stock.ceoName}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Chief Executive Officer</p>
               </div>
             </div>
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
               {stock.ceoHighlights}
             </p>
           </div>
 
           {/* Financials Grid */}
-          <div className="p-6 bg-white">
-            <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-green-600" />
+          <div className="p-6 bg-white dark:bg-gray-800">
+            <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
               Key Metrics
             </h4>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-xl text-center">
-                <p className="text-xs text-blue-600 font-medium mb-1">P/E Ratio</p>
-                <p className="text-xl font-bold text-blue-700">{stock.peRatio}</p>
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-xl text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
+                  <EducationalTooltip 
+                    content="P/E Ratio compares a company's share price to its earnings per share. Lower values may indicate undervalued stocks."
+                  />
+                </div>
+                <p className="text-xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
               </div>
-              <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-xl text-center">
-                <p className="text-xs text-purple-600 font-medium mb-1">Market Cap</p>
-                <p className="text-xl font-bold text-purple-700">{stock.marketCap}</p>
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-4 rounded-xl text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
+                  <EducationalTooltip 
+                    content="Market Capitalization is the total value of all company shares. Larger caps are typically more stable."
+                  />
+                </div>
+                <p className="text-xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
               </div>
-              <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-xl text-center">
-                <p className="text-xs text-green-600 font-medium mb-1">Price/Share</p>
-                <p className="text-xl font-bold text-green-700">{formatNumber(stock.pricePerShare)}</p>
+              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-xl text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <p className="text-xs text-green-600 dark:text-green-400 font-medium">Price/Share</p>
+                  <EducationalTooltip 
+                    content="Current trading price per individual share of the company's stock."
+                  />
+                </div>
+                <p className="text-xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
               </div>
               {stock.dividendYield > 0 && (
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 p-4 rounded-xl text-center">
-                  <p className="text-xs text-orange-600 font-medium mb-1">Dividend</p>
-                  <p className="text-xl font-bold text-orange-700">{stock.dividendYield.toFixed(2)}%</p>
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-4 rounded-xl text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <p className="text-xs text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
+                    <EducationalTooltip 
+                      content="Dividend Yield shows the annual dividend payments as a percentage of the stock price. Higher yields provide more regular income."
+                    />
+                  </div>
+                  <p className="text-xl font-bold text-orange-700 dark:text-orange-300">{stock.dividendYield.toFixed(2)}%</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Why it fits section */}
-          <div className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50">
-            <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <div className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
+            <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
               <span className="text-lg">💡</span>
               Why this matches you
             </h4>
-            <div className="bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-white/50">
-              <p className="text-sm text-gray-700 leading-relaxed">
+            <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-4 rounded-xl border border-white/50 dark:border-gray-600/50">
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                 {stock.whyItFits}
               </p>
             </div>

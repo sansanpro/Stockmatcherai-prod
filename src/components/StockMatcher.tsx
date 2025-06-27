@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import TinderStockCard from '@/components/TinderStockCard';
 import { generateStockRecommendations } from '@/utils/stockMatcher';
-import { Heart, X, RotateCcw, TrendingUp } from 'lucide-react';
+import { useApp } from '@/contexts/AppContext';
+import { Heart, X, RotateCcw, TrendingUp, Plus } from 'lucide-react';
 
 interface StockMatcherProps {
   userProfile: UserProfile;
@@ -17,6 +17,8 @@ const StockMatcher = ({ userProfile, onReset }: StockMatcherProps) => {
   const [loading, setLoading] = useState(true);
   const [matches, setMatches] = useState<StockRecommendation[]>([]);
   const [passes, setPasses] = useState<StockRecommendation[]>([]);
+  
+  const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
 
   useEffect(() => {
     const loadRecommendations = async () => {
@@ -32,12 +34,25 @@ const StockMatcher = ({ userProfile, onReset }: StockMatcherProps) => {
   const handleMatch = () => {
     const currentStock = recommendations[currentIndex];
     setMatches(prev => [...prev, currentStock]);
+    
+    // Add to watchlist if not already there
+    if (!isInWatchlist(currentStock.ticker)) {
+      addToWatchlist(currentStock);
+    }
+    
+    // Update swipe statistics
+    updateSwipeStats(true);
+    
     nextCard();
   };
 
   const handlePass = () => {
     const currentStock = recommendations[currentIndex];
     setPasses(prev => [...prev, currentStock]);
+    
+    // Update swipe statistics
+    updateSwipeStats(false);
+    
     nextCard();
   };
 
@@ -83,7 +98,7 @@ const StockMatcher = ({ userProfile, onReset }: StockMatcherProps) => {
 
   if (isFinished) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4">
         <div className="max-w-md mx-auto pt-8">
           <div className="text-center mb-8">
             <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -93,7 +108,7 @@ const StockMatcher = ({ userProfile, onReset }: StockMatcherProps) => {
             <p className="text-white/80">You've reviewed all recommendations</p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6">
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 dark:bg-gray-800/50">
             <div className="grid grid-cols-2 gap-4 text-center">
               <div className="bg-green-500/20 rounded-xl p-4">
                 <Heart className="w-8 h-8 text-green-300 mx-auto mb-2 fill-current" />
@@ -109,10 +124,10 @@ const StockMatcher = ({ userProfile, onReset }: StockMatcherProps) => {
           </div>
 
           {matches.length > 0 && (
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 dark:bg-gray-800/50">
               <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
                 <Heart className="w-5 h-5 fill-current" />
-                Your Matches
+                Your Matches (Added to Watchlist)
               </h3>
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {matches.map((stock, index) => (
@@ -160,7 +175,7 @@ const StockMatcher = ({ userProfile, onReset }: StockMatcherProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-6 pt-4">
@@ -231,6 +246,20 @@ const StockMatcher = ({ userProfile, onReset }: StockMatcherProps) => {
             <Heart className="w-8 h-8 text-green-400 fill-current" />
           </Button>
         </div>
+
+        {/* Quick Add to Watchlist */}
+        {recommendations.length > 0 && !isInWatchlist(recommendations[currentIndex].ticker) && (
+          <div className="mt-6 text-center">
+            <Button
+              onClick={() => addToWatchlist(recommendations[currentIndex])}
+              variant="ghost"
+              className="text-white/70 hover:text-white hover:bg-white/10 flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add to Watchlist
+            </Button>
+          </div>
+        )}
 
         {/* Bottom Actions */}
         <div className="mt-8">
