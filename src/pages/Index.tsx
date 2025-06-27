@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import UserProfileForm from '@/components/UserProfileForm';
 import StockMatcher from '@/components/StockMatcher';
 import Watchlist from '@/components/Watchlist';
+import Matches from '@/components/Matches';
 import Analytics from '@/components/Analytics';
 import { AppProvider, useApp } from '@/contexts/AppContext';
 import { UserProfile } from '@/types/stock-matcher';
@@ -12,7 +13,7 @@ import { Moon, BarChart, Eye, Heart } from 'lucide-react';
 
 const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'watchlist' | 'analytics'>('welcome');
+  const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'matches' | 'watchlist' | 'analytics'>('welcome');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const { isDarkMode, toggleDarkMode } = useApp();
 
@@ -36,8 +37,8 @@ const IndexContent = () => {
   // Header for app navigation
   const AppHeader = () => (
     <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-      <div className="max-w-md mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="max-w-4xl mx-auto flex items-center justify-between">
+        <div className="flex items-center gap-2">
           <Button
             onClick={() => setCurrentStep('matching')}
             variant={currentStep === 'matching' ? 'default' : 'ghost'}
@@ -47,6 +48,16 @@ const IndexContent = () => {
           >
             <Heart className="w-4 h-4" />
             Match
+          </Button>
+          <Button
+            onClick={() => setCurrentStep('matches')}
+            variant={currentStep === 'matches' ? 'default' : 'ghost'}
+            size="sm"
+            disabled={!userProfile}
+            className="flex items-center gap-2"
+          >
+            <Heart className="w-4 h-4 fill-current" />
+            Matches
           </Button>
           <Button
             onClick={() => setCurrentStep('watchlist')}
@@ -149,6 +160,19 @@ const IndexContent = () => {
         <AppHeader />
         <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700">
           <StockMatcher userProfile={userProfile!} onReset={handleUpdateProfile} />
+        </div>
+      </>
+    );
+  }
+
+  if (currentStep === 'matches') {
+    return (
+      <>
+        <AppHeader />
+        <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 p-4">
+          <div className="max-w-6xl mx-auto pt-8">
+            <Matches />
+          </div>
         </div>
       </>
     );
