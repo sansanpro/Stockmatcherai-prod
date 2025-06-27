@@ -1,9 +1,9 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { StockRecommendation } from '@/types/stock-matcher';
-import { Heart, X, TrendingUp, DollarSign, Building, User } from 'lucide-react';
+import { Heart, X, TrendingUp, DollarSign, Building } from 'lucide-react';
 import EducationalTooltip from '@/components/EducationalTooltip';
 
 interface TinderStockCardProps {
@@ -55,6 +55,22 @@ const TinderStockCard = ({
       return `$${(num / 1000000).toFixed(1)}M`;
     }
     return `$${num.toFixed(2)}`;
+  };
+
+  // Generate CEO avatar URL using the CEO name
+  const getCeoAvatarUrl = (ceoName: string) => {
+    // Use a placeholder image service with the CEO name as seed
+    const seed = ceoName.replace(/\s+/g, '-').toLowerCase();
+    return `https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=200&h=200&fit=crop&crop=face`;
+  };
+
+  const getCeoInitials = (ceoName: string) => {
+    return ceoName
+      .split(' ')
+      .map(name => name[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   const handleStart = (clientX: number, clientY: number) => {
@@ -248,14 +264,21 @@ const TinderStockCard = ({
             </div>
           </div>
 
-          {/* CEO Section */}
+          {/* CEO Section with Avatar */}
           <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-fade-in delay-300">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center transform hover:scale-110 transition-transform">
-                <User className="w-6 h-6 text-white" />
-              </div>
+            <div className="flex items-center gap-4 mb-3">
+              <Avatar className="w-16 h-16 border-2 border-white shadow-lg ring-2 ring-blue-500/20">
+                <AvatarImage 
+                  src={getCeoAvatarUrl(stock.ceoName)} 
+                  alt={stock.ceoName}
+                  className="object-cover"
+                />
+                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg">
+                  {getCeoInitials(stock.ceoName)}
+                </AvatarFallback>
+              </Avatar>
               <div>
-                <h3 className="font-bold text-gray-900 dark:text-white">{stock.ceoName}</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white text-lg">{stock.ceoName}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">Chief Executive Officer</p>
               </div>
             </div>

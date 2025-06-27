@@ -1,6 +1,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { StockRecommendation } from '@/types/stock-matcher';
 
 interface StockCardProps {
@@ -36,6 +37,22 @@ const StockCard = ({ stock }: StockCardProps) => {
     return `$${num.toFixed(2)}`;
   };
 
+  // Generate CEO avatar URL using the CEO name
+  const getCeoAvatarUrl = (ceoName: string) => {
+    // Use a placeholder image service with the CEO name as seed
+    const seed = ceoName.replace(/\s+/g, '-').toLowerCase();
+    return `https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=200&h=200&fit=crop&crop=face`;
+  };
+
+  const getCeoInitials = (ceoName: string) => {
+    return ceoName
+      .split(' ')
+      .map(name => name[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <Card className="w-full shadow-xl border-0 bg-white overflow-hidden">
       <CardContent className="p-0">
@@ -57,12 +74,21 @@ const StockCard = ({ stock }: StockCardProps) => {
           </div>
         </div>
 
-        {/* CEO Section */}
+        {/* CEO Section with Avatar */}
         <div className="p-6 border-b bg-gray-50">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl">👤</span>
+          <div className="flex items-center gap-4 mb-3">
+            <Avatar className="w-16 h-16 border-2 border-white shadow-lg">
+              <AvatarImage 
+                src={getCeoAvatarUrl(stock.ceoName)} 
+                alt={stock.ceoName}
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg">
+                {getCeoInitials(stock.ceoName)}
+              </AvatarFallback>
+            </Avatar>
             <div>
-              <h3 className="font-semibold text-gray-900">{stock.ceoName}</h3>
+              <h3 className="font-semibold text-gray-900 text-lg">{stock.ceoName}</h3>
               <p className="text-sm text-gray-600">Chief Executive Officer</p>
             </div>
           </div>
