@@ -5,91 +5,185 @@ export const sortStocksByRelevance = (
   stocks: Omit<StockRecommendation, 'whyItFits'>[],
   profile: UserProfile
 ): Omit<StockRecommendation, 'whyItFits'>[] => {
+  if (!stocks || stocks.length === 0) {
+    return [];
+  }
+
   return stocks.sort((a, b) => {
     let scoreA = 0;
     let scoreB = 0;
 
-    // Perfect risk tolerance match gets high priority
-    if ((profile.riskTolerance === 'low' && a.riskLevel === 'low') ||
-        (profile.riskTolerance === 'medium' && a.riskLevel === 'medium') ||
-        (profile.riskTolerance === 'high' && a.riskLevel === 'high')) {
-      scoreA += 15;
-    }
-    if ((profile.riskTolerance === 'low' && b.riskLevel === 'low') ||
-        (profile.riskTolerance === 'medium' && b.riskLevel === 'medium') ||
-        (profile.riskTolerance === 'high' && b.riskLevel === 'high')) {
-      scoreB += 15;
-    }
+    // Perfect risk tolerance match (high priority)
+    const getRiskScore = (stock: any, userRisk: string) => {
+      if (stock.riskLevel === userRisk) return 20;
+      if (userRisk === 'medium') {
+        return stock.riskLevel === 'low' ? 15 : 12; // Prefer low risk for medium tolerance
+      }
+      if (userRisk === 'low' && stock.riskLevel === 'medium') return 8;
+      if (userRisk === 'high' && stock.riskLevel === 'medium') return 10;
+      return 0;
+    };
 
-    // Compatible risk tolerance (medium can accept low/high)
-    if (profile.riskTolerance === 'medium') {
-      if (a.riskLevel === 'low' || a.riskLevel === 'high') scoreA += 8;
-      if (b.riskLevel === 'low' || b.riskLevel === 'high') scoreB += 8;
-    }
+    scoreA += getRiskScore(a, profile.riskTolerance);
+    scoreB += getRiskScore(b, profile.riskTolerance);
 
-    // Sector preference match
+    // Sector preference matching
     if (profile.sectorPreference !== 'any') {
-      if (a.sector.toLowerCase() === profile.sectorPreference.toLowerCase()) scoreA += 12;
-      if (b.sector.toLowerCase() === profile.sectorPreference.toLowerCase()) scoreB += 12;
+      if (a.sector.toLowerCase() === profile.sectorPreference.toLowerCase()) scoreA += 18;
+      if (b.sector.toLowerCase() === profile.sectorPreference.toLowerCase()) scoreB += 18;
     }
 
-    // Investment goal alignment
-    if (profile.investmentGoal === 'income' || profile.investmentGoal === 'balance') {
-      scoreA += a.dividendYield * 3; // Higher weight for dividend yield
-      scoreB += b.dividendYield * 3;
-    }
+    // Investment goal alignment (enhanced)
+    const getGoalScore = (stock: any, goal: string) => {
+      switch (goal) {
+        case 'income':
+          if (stock.dividendYield > 4) return 15;
+          if (stock.dividendYield > 2) return 12;
+          if (stock.dividendYield > 1) return 8;
+          return 0;
+        case 'growth':
+          if (stock.oneYearReturn > 25) return 15;
+          if (stock.oneYearReturn > 15) return 12;
+          if (stock.oneYearReturn > 8) return 8;
+          return Math.max(0, stock.oneYearReturn * 0.3);
+        case 'short-term':
+          return Math.abs(stock.oneYearReturn) * 0.4; // Reward volatility
+        case 'retirement':
+          let retirementScore = 0;
+          if (stock.riskLevel === 'low') retirementScore += 10;
+          if (stock.dividendYield > 2) retirementScore += 8;
+          if (stock.oneYearReturn > 0 && stock.oneYearReturn < 15) retirementScore += 5;
+          return retirementScore;
+        case 'balance':
+          let balanceScore = 0;
+          if (stock.dividendYield > 1) balanceScore += 6;
+          if (stock.oneYearReturn > 5 && stock.oneYearReturn < 20) balanceScore += 8;
+          if (stock.riskLevel === 'medium') balanceScore += 4;
+          return balanceScore;
+        default:
+          return 0;
+      }
+    };
 
-    if (profile.investmentGoal === 'growth' || profile.investmentGoal === 'short-term') {
-      scoreA += Math.max(0, a.oneYearReturn) * 0.8; // Higher weight for positive returns
-      scoreB += Math.max(0, b.oneYearReturn) * 0.8;
-    }
+    scoreA += getGoalScore(a, profile.investmentGoal);
+    scoreB += getGoalScore(b, profile.investmentGoal);
 
-    // Age-based preferences
-    if (profile.age < 30) {
-      // Young investors prefer growth
-      scoreA += Math.max(0, a.oneYearReturn) * 0.6;
-      scoreB += Math.max(0, b.oneYearReturn) * 0.6;
+    // Age-based sophisticated scoring
+    const getAgeScore = (stock: any, age: number) => {
+      let ageScore = 0;
       
-      // Prefer tech sector for young investors
-      if (a.sector === 'Technology') scoreA += 5;
-      if (b.sector === 'Technology') scoreB += 5;
-    } else if (profile.age > 50) {
-      // Older investors prefer stability and income
-      scoreA += a.dividendYield * 2;
-      scoreB += b.dividendYield * 2;
+      if (age < 25) {
+        // Very young: aggressive growth
+        ageScore += Math.max(0, stock.oneYearReturn) * 0.8;
+        if (stock.sector === 'Technology') ageScore += 8;
+        if (stock.riskLevel === 'high') ageScore += 5;
+      } else if (age < 35) {
+        // Young: growth with some stability
+        ageScore += Math.max(0, stock.oneYearReturn) * 0.6;
+        if (stock.sector === 'Technology') ageScore += 6;
+        if (stock.dividendYield > 1) ageScore += 3;
+      } else if (age < 50) {
+        // Middle-aged: balanced approach
+        ageScore += Math.max(0, stock.oneYearReturn) * 0.4;
+        ageScore += stock.dividendYield * 2;
+        if (stock.riskLevel === 'medium') ageScore += 5;
+      } else {
+        // Older: stability and income
+        ageScore += stock.dividendYield * 3;
+        if (stock.riskLevel === 'low') ageScore += 10;
+        if (stock.oneYearReturn > 0 && stock.oneYearReturn < 12) ageScore += 6;
+      }
       
-      // Prefer low-risk stocks
-      if (a.riskLevel === 'low') scoreA += 8;
-      if (b.riskLevel === 'low') scoreB += 8;
-    }
+      return ageScore;
+    };
 
-    // Experience level considerations
-    if (profile.experience === 'none' || profile.experience === 'beginner') {
-      // Prefer well-known, stable companies
-      const blueChipTickers = ['AAPL', 'MSFT', 'JNJ', 'KO', 'PEP', 'WMT', 'JPM'];
-      if (blueChipTickers.includes(a.ticker)) scoreA += 10;
-      if (blueChipTickers.includes(b.ticker)) scoreB += 10;
+    scoreA += getAgeScore(a, profile.age);
+    scoreB += getAgeScore(b, profile.age);
+
+    // Experience level scoring (enhanced)
+    const getExperienceScore = (stock: any, experience: string) => {
+      const blueChipTickers = ['AAPL', 'MSFT', 'JNJ', 'KO', 'PEP', 'WMT', 'JPM', 'V', 'MA', 'UNH'];
+      const growthTickers = ['GOOGL', 'AMZN', 'TSLA', 'NVDA', 'NFLX', 'ADBE', 'CRM'];
       
-      // Prefer dividend-paying stocks for stability
-      if (a.dividendYield > 1) scoreA += 5;
-      if (b.dividendYield > 1) scoreB += 5;
-    } else if (profile.experience === 'advanced') {
-      // Advanced investors may prefer higher growth potential
-      scoreA += Math.max(0, a.oneYearReturn - 10) * 0.5; // Bonus for returns above 10%
-      scoreB += Math.max(0, b.oneYearReturn - 10) * 0.5;
-    }
+      switch (experience) {
+        case 'none':
+          if (blueChipTickers.includes(stock.ticker)) return 15;
+          if (stock.riskLevel === 'low') return 10;
+          if (stock.dividendYield > 2) return 8;
+          return 0;
+        case 'beginner':
+          if (blueChipTickers.includes(stock.ticker)) return 12;
+          if (stock.riskLevel === 'low') return 8;
+          if (stock.dividendYield > 1.5) return 6;
+          return 0;
+        case 'intermediate':
+          if (stock.riskLevel === 'medium') return 6;
+          if (growthTickers.includes(stock.ticker)) return 4;
+          return 0;
+        case 'advanced':
+          if (stock.oneYearReturn > 20) return 8;
+          if (stock.riskLevel === 'high') return 5;
+          if (growthTickers.includes(stock.ticker)) return 6;
+          return 0;
+        default:
+          return 0;
+      }
+    };
 
-    // Affordability consideration
-    const monthlyInvestmentCapacity = profile.salary / 12 * 0.1; // 10% of monthly income
-    if (a.pricePerShare <= monthlyInvestmentCapacity) scoreA += 5;
-    if (b.pricePerShare <= monthlyInvestmentCapacity) scoreB += 5;
+    scoreA += getExperienceScore(a, profile.experience);
+    scoreB += getExperienceScore(b, profile.experience);
 
-    // ESG score bonus for ethical investors (implied from young age + certain sectors)
-    if (profile.age < 40 && (profile.sectorPreference === 'any' || profile.sectorPreference === 'technology')) {
-      if (a.esgScore && a.esgScore > 75) scoreA += 3;
-      if (b.esgScore && b.esgScore > 75) scoreB += 3;
-    }
+    // Salary-based affordability scoring
+    const getAffordabilityScore = (stock: any, salary: number) => {
+      const monthlyIncome = salary / 12;
+      const investmentCapacity = monthlyIncome * 0.15; // 15% of monthly income
+      
+      if (stock.pricePerShare <= investmentCapacity * 0.5) return 8; // Very affordable
+      if (stock.pricePerShare <= investmentCapacity) return 5; // Affordable
+      if (stock.pricePerShare <= investmentCapacity * 2) return 2; // Somewhat affordable
+      return 0; // Expensive
+    };
 
+    scoreA += getAffordabilityScore(a, profile.salary);
+    scoreB += getAffordabilityScore(b, profile.salary);
+
+    // ESG and sustainability bonus
+    const getESGScore = (stock: any, age: number) => {
+      if (!stock.esgScore) return 0;
+      
+      // Younger investors care more about ESG
+      const ageFactor = age < 40 ? 1.5 : age < 55 ? 1.0 : 0.5;
+      
+      if (stock.esgScore > 80) return 6 * ageFactor;
+      if (stock.esgScore > 70) return 4 * ageFactor;
+      if (stock.esgScore > 60) return 2 * ageFactor;
+      return 0;
+    };
+
+    scoreA += getESGScore(a, profile.age);
+    scoreB += getESGScore(b, profile.age);
+
+    // Financial health indicators
+    const getFinancialHealthScore = (stock: any) => {
+      let healthScore = 0;
+      
+      // P/E ratio scoring (reasonable valuations)
+      if (stock.peRatio > 0 && stock.peRatio < 15) healthScore += 4;
+      else if (stock.peRatio >= 15 && stock.peRatio < 25) healthScore += 2;
+      else if (stock.peRatio >= 25 && stock.peRatio < 35) healthScore += 1;
+      
+      // Performance consistency
+      if (stock.oneYearReturn > 0 && stock.oneYearReturn < 30) healthScore += 3;
+      
+      return healthScore;
+    };
+
+    scoreA += getFinancialHealthScore(a);
+    scoreB += getFinancialHealthScore(b);
+
+    // Diversification bonus (prefer different sectors)
+    // This would require tracking already selected stocks, simplified for now
+    
     return scoreB - scoreA;
   });
 };
