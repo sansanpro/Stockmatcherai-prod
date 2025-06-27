@@ -7,6 +7,8 @@ import StockMatcher from '@/components/StockMatcher';
 import Watchlist from '@/components/Watchlist';
 import Matches from '@/components/Matches';
 import Analytics from '@/components/Analytics';
+import NotificationSystem from '@/components/NotificationSystem';
+import AchievementSystem from '@/components/AchievementSystem';
 import { AppProvider, useApp } from '@/contexts/AppContext';
 import { UserProfile } from '@/types/stock-matcher';
 import { Moon, BarChart, Eye, Heart } from 'lucide-react';
@@ -80,14 +82,18 @@ const IndexContent = () => {
             Analytics
           </Button>
         </div>
-        <Button
-          onClick={toggleDarkMode}
-          variant="ghost"
-          size="sm"
-          className="flex items-center gap-2"
-        >
-          <Moon className="w-4 h-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <NotificationSystem />
+          <AchievementSystem />
+          <Button
+            onClick={toggleDarkMode}
+            variant="ghost"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Moon className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );

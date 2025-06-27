@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useApp } from '@/contexts/AppContext';
 import { Heart, TrendingUp, TrendingDown, Eye, Star } from 'lucide-react';
+import SocialSharing from '@/components/SocialSharing';
 
 const Matches = () => {
   const { watchlist } = useApp();
@@ -61,15 +62,18 @@ const Matches = () => {
                     {stock.companyName}
                   </p>
                 </div>
-                <Badge 
-                  className={`${
-                    stock.riskLevel === 'low' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                    stock.riskLevel === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                  }`}
-                >
-                  {stock.riskLevel.toUpperCase()}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge 
+                    className={`${
+                      stock.riskLevel === 'low' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                      stock.riskLevel === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                      'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                    }`}
+                  >
+                    {stock.riskLevel.toUpperCase()}
+                  </Badge>
+                  <SocialSharing stock={stock} />
+                </div>
               </div>
             </CardHeader>
             
