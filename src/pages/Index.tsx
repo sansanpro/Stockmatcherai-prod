@@ -36,6 +36,7 @@ const IndexContent = () => {
       if (!user) {
         setIsLoadingProfile(false);
         setCurrentStep('welcome');
+        setUserProfile(null); // Clear profile when no user
         return;
       }
       
@@ -81,7 +82,10 @@ const IndexContent = () => {
         }
       } catch (error) {
         console.error('Error checking user profile:', error);
-        setCurrentStep('profile');
+        // Only show profile form if we have a user, otherwise stay on welcome
+        if (user) {
+          setCurrentStep('profile');
+        }
       } finally {
         setIsLoadingProfile(false);
       }
@@ -146,6 +150,8 @@ const IndexContent = () => {
     setUserProfile(null);
     setCurrentStep('welcome');
     setIsUpdatingProfile(false);
+    setSelectedStockForDetails(null);
+    setIsDetailsModalOpen(false);
   };
 
   const handleUpdateProfile = () => {
@@ -173,6 +179,13 @@ const IndexContent = () => {
   const handlePassFromModal = (stock: StockRecommendation) => {
     passStock(stock);
   };
+
+  // Clear state when user signs out
+  useEffect(() => {
+    if (!user && !loading) {
+      resetApp();
+    }
+  }, [user, loading]);
 
   // Show loading while checking authentication or profile
   if (loading || isLoadingProfile) {
