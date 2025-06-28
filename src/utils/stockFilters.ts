@@ -127,7 +127,7 @@ export const filterStocksByProfile = (
       // If not enough, include ALL sector stocks regardless of other filters
       if (sectorStocks.length > 0) {
         console.log(`Using all ${sectorStocks.length} sector stocks with minimal filtering`);
-        return sectorStocks.filter(stock => stock.pricePerShare < salary * 5); // Only exclude extremely expensive stocks
+        return sectorStocks.filter(stock => stock.pricePerShare < profile.salary * 5); // Only exclude extremely expensive stocks
       }
     }
 
