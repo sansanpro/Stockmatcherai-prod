@@ -75,18 +75,81 @@ export const filterStocksByProfile = (
     }
   };
 
-  // Multi-tiered filtering approach with more lenient thresholds
-  let filteredStocks = stocks;
   const affordabilityThreshold = getAffordabilityThreshold(profile.experience, profile.salary);
+
+  // STRICT SECTOR FILTERING: Always prioritize sector preference if not 'any'
+  if (profile.sectorPreference !== 'any') {
+    // First, get all stocks from the preferred sector
+    const sectorStocks = stocks.filter(stock => 
+      stock.sector.toLowerCase() === profile.sectorPreference.toLowerCase()
+    );
+    
+    console.log(`Found ${sectorStocks.length} stocks in preferred sector: ${profile.sectorPreference}`);
+    
+    if (sectorStocks.length > 0) {
+      // Apply other filters to sector-specific stocks
+      let filteredSectorStocks = sectorStocks.filter(stock => {
+        // Risk tolerance (moderately strict)
+        if (!isRiskCompatible(stock.riskLevel, profile.riskTolerance, false)) {
+          return false;
+        }
+
+        // Experience appropriateness (relaxed for sector preference)
+        if (profile.experience === 'none' && stock.riskLevel === 'high' && 
+            stock.oneYearReturn < -30) {
+          return false;
+        }
+
+        // Goal alignment (relaxed for sector preference)
+        if (!isGoalAligned(stock, profile.investmentGoal)) {
+          return false;
+        }
+
+        // Affordability (generous threshold for sector preference)
+        if (stock.pricePerShare > affordabilityThreshold * 3) {
+          return false;
+        }
+
+        return true;
+      });
+
+      console.log(`After filtering, ${filteredSectorStocks.length} sector stocks remain`);
+
+      // If we have enough filtered sector stocks, use them
+      if (filteredSectorStocks.length >= 15) {
+        return filteredSectorStocks;
+      }
+
+      // If not enough filtered sector stocks, be more lenient with sector stocks
+      filteredSectorStocks = sectorStocks.filter(stock => {
+        // Only exclude extremely problematic stocks from preferred sector
+        if (stock.oneYearReturn < -50) {
+          return false;
+        }
+        // Only exclude unaffordable stocks
+        if (stock.pricePerShare > profile.salary) {
+          return false;
+        }
+        return true;
+      });
+
+      console.log(`After lenient sector filtering: ${filteredSectorStocks.length} stocks`);
+
+      // If we still have sector stocks, return them (even if few)
+      if (filteredSectorStocks.length > 0) {
+        return filteredSectorStocks;
+      }
+    }
+
+    // Only if absolutely no sector stocks are available, log warning and continue to mixed filtering
+    console.warn(`No suitable stocks found in preferred sector: ${profile.sectorPreference}. Falling back to mixed portfolio.`);
+  }
+
+  // Fallback: Multi-tiered filtering approach for mixed portfolio
+  let filteredStocks = stocks;
 
   // Tier 1: Moderately strict filtering
   filteredStocks = stocks.filter(stock => {
-    // Sector preference (allow if 'any' or matches)
-    if (profile.sectorPreference !== 'any' && 
-        stock.sector.toLowerCase() !== profile.sectorPreference.toLowerCase()) {
-      return false;
-    }
-
     // Risk tolerance (moderately strict)
     if (!isRiskCompatible(stock.riskLevel, profile.riskTolerance, false)) {
       return false;
@@ -113,7 +176,7 @@ export const filterStocksByProfile = (
 
   console.log(`Tier 1 filtering: ${filteredStocks.length} stocks`);
 
-  // Tier 2: Relax sector preference if needed
+  // Tier 2: Relax filters if needed
   if (filteredStocks.length < 25) {
     filteredStocks = stocks.filter(stock => {
       // More relaxed risk tolerance
