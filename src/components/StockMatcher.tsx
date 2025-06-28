@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
@@ -13,40 +14,38 @@ interface StockMatcherProps {
 }
 
 const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps) => {
-  const [recommendations, setRecommendations] = useState<StockRecommendation[]>([]);
+  const [allRecommendations, setAllRecommendations] = useState<StockRecommendation[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [matches, setMatches] = useState<StockRecommendation[]>([]);
   const [passes, setPasses] = useState<StockRecommendation[]>([]);
-  const [seenStocks, setSeenStocks] = useState<string[]>([]); // Track all seen stock tickers
   const [animatingCard, setAnimatingCard] = useState(false);
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
 
+  // Pre-load all recommendations once
   useEffect(() => {
-    const loadRecommendations = async () => {
+    const loadAllRecommendations = async () => {
       setLoading(true);
-      // Pass excluded stocks to avoid showing duplicates
-      const stocks = await generateStockRecommendations(userProfile, seenStocks);
+      // Load a large batch of recommendations upfront (no exclusions needed initially)
+      const stocks = await generateStockRecommendations(userProfile, []);
+      
       // Add staggered entrance animation
       setTimeout(() => {
-        setRecommendations(stocks);
+        setAllRecommendations(stocks);
         setLoading(false);
       }, 300);
     };
     
-    loadRecommendations();
-  }, [userProfile, seenStocks]);
+    loadAllRecommendations();
+  }, [userProfile]);
 
   const handleMatch = () => {
-    if (animatingCard) return;
+    if (animatingCard || currentIndex >= allRecommendations.length) return;
     
     setAnimatingCard(true);
-    const currentStock = recommendations[currentIndex];
+    const currentStock = allRecommendations[currentIndex];
     setMatches(prev => [...prev, currentStock]);
-    
-    // Add to seen stocks to prevent future duplicates
-    setSeenStocks(prev => [...prev, currentStock.ticker]);
     
     // Add to watchlist if not already there
     if (!isInWatchlist(currentStock.ticker)) {
@@ -58,51 +57,58 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     
     // Delay to allow exit animation
     setTimeout(() => {
-      nextCard();
+      setCurrentIndex(prev => prev + 1);
       setAnimatingCard(false);
     }, 400);
   };
 
   const handlePass = () => {
-    if (animatingCard) return;
+    if (animatingCard || currentIndex >= allRecommendations.length) return;
     
     setAnimatingCard(true);
-    const currentStock = recommendations[currentIndex];
+    const currentStock = allRecommendations[currentIndex];
     setPasses(prev => [...prev, currentStock]);
-    
-    // Add to seen stocks to prevent future duplicates
-    setSeenStocks(prev => [...prev, currentStock.ticker]);
     
     // Update swipe statistics
     updateSwipeStats(false);
     
     // Delay to allow exit animation
     setTimeout(() => {
-      nextCard();
+      setCurrentIndex(prev => prev + 1);
       setAnimatingCard(false);
     }, 400);
   };
 
-  const nextCard = () => {
-    if (currentIndex < recommendations.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
+  const handleUndo = () => {
+    if (currentIndex === 0 || animatingCard) return;
+    
+    const previousIndex = currentIndex - 1;
+    const previousStock = allRecommendations[previousIndex];
+    
+    // Remove from matches or passes
+    setMatches(prev => prev.filter(stock => stock.ticker !== previousStock.ticker));
+    setPasses(prev => prev.filter(stock => stock.ticker !== previousStock.ticker));
+    
+    setCurrentIndex(previousIndex);
   };
 
-  const handleUndo = () => {
-    if (currentIndex > 0 && !animatingCard) {
-      const previousIndex = currentIndex - 1;
-      const previousStock = recommendations[previousIndex];
-      
-      // Remove from matches or passes
-      setMatches(prev => prev.filter(stock => stock.ticker !== previousStock.ticker));
-      setPasses(prev => prev.filter(stock => stock.ticker !== previousStock.ticker));
-      
-      // Remove from seen stocks so it can appear again
-      setSeenStocks(prev => prev.filter(ticker => ticker !== previousStock.ticker));
-      
-      setCurrentIndex(previousIndex);
-    }
+  const loadMoreRecommendations = async () => {
+    setLoading(true);
+    
+    // Get all previously seen stock tickers
+    const seenTickers = allRecommendations.map(stock => stock.ticker);
+    
+    // Load fresh recommendations excluding all previously seen stocks
+    const newStocks = await generateStockRecommendations(userProfile, seenTickers);
+    
+    setTimeout(() => {
+      // Reset to beginning with new stocks
+      setAllRecommendations(newStocks);
+      setCurrentIndex(0);
+      setMatches([]);
+      setPasses([]);
+      setLoading(false);
+    }, 300);
   };
 
   if (loading) {
@@ -129,7 +135,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     );
   }
 
-  const isFinished = currentIndex >= recommendations.length;
+  const isFinished = currentIndex >= allRecommendations.length;
 
   if (isFinished) {
     return (
@@ -186,13 +192,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
           <div className="space-y-3 animate-fade-in delay-400">
             <Button 
-              onClick={() => {
-                // Load fresh recommendations excluding all seen stocks
-                setCurrentIndex(0);
-                setMatches([]);
-                setPasses([]);
-                // Keep seenStocks to avoid duplicates across sessions
-              }}
+              onClick={loadMoreRecommendations}
               className="w-full bg-white/20 hover:bg-white/30 text-white border-0 h-12 rounded-xl backdrop-blur-lg transform hover:scale-105 transition-all duration-200"
             >
               <RotateCcw className="w-5 h-5 mr-2" />
@@ -212,7 +212,8 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   }
 
   // Calculate visible cards for stacking effect
-  const visibleCards = recommendations.slice(currentIndex, currentIndex + 3);
+  const visibleCards = allRecommendations.slice(currentIndex, currentIndex + 3);
+  const currentStock = allRecommendations[currentIndex];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4">
@@ -240,7 +241,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
         </div>
 
         {/* Stock Cards Stack */}
-        {recommendations.length > 0 && (
+        {allRecommendations.length > 0 && currentStock && (
           <div className="mb-8 relative h-[600px] animate-fade-in delay-300">
             {visibleCards.map((stock, stackIndex) => {
               const cardIndex = currentIndex + stackIndex;
@@ -295,10 +296,10 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
         </div>
 
         {/* Quick Add to Watchlist */}
-        {recommendations.length > 0 && !isInWatchlist(recommendations[currentIndex].ticker) && (
+        {currentStock && !isInWatchlist(currentStock.ticker) && (
           <div className="mt-6 text-center animate-fade-in delay-500">
             <Button
-              onClick={() => addToWatchlist(recommendations[currentIndex])}
+              onClick={() => addToWatchlist(currentStock)}
               variant="ghost"
               className="text-white/70 hover:text-white hover:bg-white/10 flex items-center gap-2 transform hover:scale-105 transition-all duration-200"
             >
