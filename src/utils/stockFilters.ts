@@ -83,7 +83,9 @@ export const filterStocksByProfile = (
 
   const affordabilityThreshold = getAffordabilityThreshold(profile.experience, profile.salary);
 
-  // SECTOR PREFERENCE HANDLING - Much more lenient
+  // SECTOR PREFERENCE HANDLING - More balanced approach
+  let filteredStocks: Omit<StockRecommendation, 'whyItFits'>[] = [];
+  
   if (profile.sectorPreference !== 'any') {
     const normalizedUserSector = normalizeSector(profile.sectorPreference);
     console.log(`Looking for normalized sector: ${normalizedUserSector} (original: ${profile.sectorPreference})`);
@@ -101,80 +103,114 @@ export const filterStocksByProfile = (
     
     console.log(`Found ${sectorStocks.length} stocks in preferred sector: ${profile.sectorPreference}`);
     
-    if (sectorStocks.length > 0) {
-      // Apply VERY lenient filtering to sector stocks
-      let filteredSectorStocks = sectorStocks.filter(stock => {
-        // Only exclude stocks that are completely unaffordable (more than 3x threshold)
-        if (stock.pricePerShare > affordabilityThreshold * 3) {
-          return false;
-        }
-        
-        // Only exclude stocks with catastrophic performance (worse than -80%)
-        if (stock.oneYearReturn < -80) {
-          return false;
-        }
-        
-        return true;
-      });
-
-      console.log(`After very lenient sector filtering: ${filteredSectorStocks.length} stocks`);
-
-      // If we have enough sector stocks, return them
-      if (filteredSectorStocks.length >= 15) {
-        return filteredSectorStocks;
+    // Apply lenient filtering to sector stocks
+    const filteredSectorStocks = sectorStocks.filter(stock => {
+      // Only exclude stocks that are completely unaffordable (more than 3x threshold)
+      if (stock.pricePerShare > affordabilityThreshold * 3) {
+        return false;
       }
       
-      // If not enough, include ALL sector stocks regardless of other filters
-      if (sectorStocks.length > 0) {
-        console.log(`Using all ${sectorStocks.length} sector stocks with minimal filtering`);
-        return sectorStocks.filter(stock => stock.pricePerShare < profile.salary * 5); // Only exclude extremely expensive stocks
+      // Only exclude stocks with catastrophic performance (worse than -80%)
+      if (stock.oneYearReturn < -80) {
+        return false;
       }
-    }
+      
+      return true;
+    });
 
-    console.warn(`No suitable stocks found in preferred sector: ${profile.sectorPreference}`);
+    console.log(`After sector filtering: ${filteredSectorStocks.length} stocks`);
+
+    // If we have enough sector stocks, use them as primary recommendations
+    if (filteredSectorStocks.length >= 20) {
+      filteredStocks = filteredSectorStocks;
+    } else {
+      // Not enough sector stocks - create a mixed portfolio with sector preference
+      console.log(`Only ${filteredSectorStocks.length} stocks in preferred sector, creating mixed portfolio`);
+      
+      // Start with all available sector stocks
+      filteredStocks = [...filteredSectorStocks];
+      
+      // Add stocks from other sectors to reach target count
+      const otherSectorStocks = stocks.filter(stock => {
+        const normalizedStockSector = normalizeSector(stock.sector);
+        const isPreferredSector = normalizedStockSector === normalizedUserSector || 
+                                 normalizedStockSector.includes(normalizedUserSector) ||
+                                 normalizedUserSector.includes(normalizedStockSector);
+        
+        return !isPreferredSector && 
+               stock.pricePerShare <= affordabilityThreshold * 5 && 
+               stock.oneYearReturn > -80;
+      });
+      
+      // Add other sector stocks to reach at least 40 total recommendations
+      const targetCount = 40;
+      const remainingSlots = Math.max(0, targetCount - filteredStocks.length);
+      
+      if (otherSectorStocks.length > 0) {
+        // Prioritize stocks with good fundamentals from other sectors
+        const sortedOtherStocks = otherSectorStocks.sort((a, b) => {
+          let scoreA = 0, scoreB = 0;
+          
+          // Prefer lower risk for beginners
+          if (profile.experience === 'beginner' || profile.experience === 'none') {
+            if (a.riskLevel === 'low') scoreA += 10;
+            if (b.riskLevel === 'low') scoreB += 10;
+          }
+          
+          // Prefer positive returns
+          if (a.oneYearReturn > 0) scoreA += a.oneYearReturn * 0.1;
+          if (b.oneYearReturn > 0) scoreB += b.oneYearReturn * 0.1;
+          
+          // Prefer dividend-paying stocks for income
+          scoreA += a.dividendYield * 2;
+          scoreB += b.dividendYield * 2;
+          
+          return scoreB - scoreA;
+        });
+        
+        filteredStocks = filteredStocks.concat(sortedOtherStocks.slice(0, remainingSlots));
+      }
+      
+      console.log(`Mixed portfolio created: ${filteredStocks.length} total stocks (${filteredSectorStocks.length} from preferred sector)`);
+    }
+  } else {
+    // No sector preference - apply minimal filtering for diverse portfolio
+    console.log('No sector preference - creating diverse portfolio');
+    
+    filteredStocks = stocks.filter(stock => {
+      // Only exclude stocks that are completely unaffordable (more than 5x salary)
+      if (stock.pricePerShare > profile.salary * 5) {
+        return false;
+      }
+      
+      // Only exclude stocks with catastrophic performance (worse than -90%)
+      if (stock.oneYearReturn < -90) {
+        return false;
+      }
+      
+      // Only exclude stocks with extreme negative P/E ratios (data quality issues)
+      if (stock.peRatio < -100) {
+        return false;
+      }
+      
+      return true;
+    });
   }
 
-  // MIXED PORTFOLIO APPROACH - Very lenient filtering
-  console.log('Applying mixed portfolio filtering with lenient criteria');
+  console.log(`Final filtered result: ${filteredStocks.length} stocks from ${stocks.length} total`);
 
-  // Apply minimal filtering to get a large diverse set
-  let filteredStocks = stocks.filter(stock => {
-    // Only exclude stocks that are completely unaffordable (more than 5x salary)
-    if (stock.pricePerShare > profile.salary * 5) {
-      return false;
-    }
-    
-    // Only exclude stocks with catastrophic performance (worse than -90%)
-    if (stock.oneYearReturn < -90) {
-      return false;
-    }
-    
-    // Only exclude stocks with extreme negative P/E ratios (data quality issues)
-    if (stock.peRatio < -100) {
-      return false;
-    }
-    
-    return true;
-  });
-
-  console.log(`After minimal filtering: ${filteredStocks.length} stocks from ${stocks.length} total`);
-
-  // If we still don't have enough stocks, be even more lenient
-  if (filteredStocks.length < 50) {
+  // Final safety net - ensure minimum variety
+  if (filteredStocks.length < 30) {
+    console.log('Applying final safety net to ensure minimum stock variety');
     filteredStocks = stocks.filter(stock => {
       // Only exclude stocks that cost more than entire salary
       if (stock.pricePerShare > profile.salary * 10) {
         return false;
       }
       return true;
-    });
-    console.log(`After ultra-lenient filtering: ${filteredStocks.length} stocks`);
-  }
-
-  // Final safety net - if we still don't have enough, use most of the stocks
-  if (filteredStocks.length < 30) {
-    filteredStocks = stocks.slice(0, Math.min(100, stocks.length));
-    console.log(`Using fallback selection: ${filteredStocks.length} stocks`);
+    }).slice(0, Math.min(50, stocks.length));
+    
+    console.log(`Safety net result: ${filteredStocks.length} stocks`);
   }
 
   return filteredStocks;
