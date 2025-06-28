@@ -98,67 +98,65 @@ export class AlphaVantageService {
 
   async getMultipleQuotes(symbols: string[]): Promise<Map<string, AlphaVantageQuote>> {
     const quotes = new Map<string, AlphaVantageQuote>();
-    const batchSize = 5; // Alpha Vantage free tier has rate limits
     
-    console.log(`Fetching quotes for ${symbols.length} symbols in batches of ${batchSize}`);
+    // Limit to 20 requests per day for free tier, leaving 5 for overviews
+    const maxQuoteRequests = 20;
+    const limitedSymbols = symbols.slice(0, maxQuoteRequests);
     
-    for (let i = 0; i < symbols.length; i += batchSize) {
-      const batch = symbols.slice(i, i + batchSize);
-      const promises = batch.map(symbol => this.getQuote(symbol));
-      
+    console.log(`Fetching quotes for ${limitedSymbols.length} symbols (limited for free tier)`);
+    
+    for (const symbol of limitedSymbols) {
       try {
-        const results = await Promise.all(promises);
-        results.forEach((quote, index) => {
-          if (quote) {
-            quotes.set(batch[index], quote);
-          }
-        });
-        
-        console.log(`Processed batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(symbols.length/batchSize)} - ${quotes.size} successful quotes so far`);
-        
-        // Rate limiting - wait 1 second between batches for free tier
-        if (i + batchSize < symbols.length) {
-          await new Promise(resolve => setTimeout(resolve, 1200)); // Slightly longer delay for safety
+        const quote = await this.getQuote(symbol);
+        if (quote) {
+          quotes.set(symbol, quote);
         }
+        
+        // Increased delay to 15 seconds to respect free tier limits (25 requests/day)
+        await new Promise(resolve => setTimeout(resolve, 15000));
       } catch (error) {
-        console.error(`Batch quote fetch error for batch starting at index ${i}:`, error);
+        console.error(`Quote fetch error for ${symbol}:`, error);
+        // If we hit rate limit, stop trying
+        if (error.message.includes('rate limit')) {
+          console.log('Rate limit hit, stopping quote requests');
+          break;
+        }
       }
     }
     
-    console.log(`Completed fetching quotes: ${quotes.size}/${symbols.length} successful`);
+    console.log(`Completed fetching quotes: ${quotes.size}/${limitedSymbols.length} successful`);
     return quotes;
   }
 
   async getMultipleOverviews(symbols: string[]): Promise<Map<string, AlphaVantageOverview>> {
     const overviews = new Map<string, AlphaVantageOverview>();
-    const batchSize = 5;
     
-    console.log(`Fetching overviews for ${symbols.length} symbols in batches of ${batchSize}`);
+    // Only fetch overviews for symbols we got quotes for, limit to 5 for free tier
+    const maxOverviewRequests = 5;
+    const limitedSymbols = symbols.slice(0, maxOverviewRequests);
     
-    for (let i = 0; i < symbols.length; i += batchSize) {
-      const batch = symbols.slice(i, i + batchSize);
-      const promises = batch.map(symbol => this.getCompanyOverview(symbol));
-      
+    console.log(`Fetching overviews for ${limitedSymbols.length} symbols (limited for free tier)`);
+    
+    for (const symbol of limitedSymbols) {
       try {
-        const results = await Promise.all(promises);
-        results.forEach((overview, index) => {
-          if (overview) {
-            overviews.set(batch[index], overview);
-          }
-        });
-        
-        console.log(`Processed overview batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(symbols.length/batchSize)} - ${overviews.size} successful overviews so far`);
-        
-        // Rate limiting
-        if (i + batchSize < symbols.length) {
-          await new Promise(resolve => setTimeout(resolve, 1200));
+        const overview = await this.getCompanyOverview(symbol);
+        if (overview) {
+          overviews.set(symbol, overview);
         }
+        
+        // 15 second delay between overview requests
+        await new Promise(resolve => setTimeout(resolve, 15000));
       } catch (error) {
-        console.error(`Batch overview fetch error for batch starting at index ${i}:`, error);
+        console.error(`Overview fetch error for ${symbol}:`, error);
+        // If we hit rate limit, stop trying
+        if (error.message.includes('rate limit')) {
+          console.log('Rate limit hit, stopping overview requests');
+          break;
+        }
       }
     }
     
-    console.log(`Completed fetching overviews: ${overviews.size}/${symbols.length} successful`);
+    console.log(`Completed fetching overviews: ${overviews.size}/${limitedSymbols.length} successful`);
     return overviews;
   }
 }

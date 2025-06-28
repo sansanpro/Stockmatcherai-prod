@@ -227,15 +227,6 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
           </div>
         </div>
 
-        {/* Progress */}
-        <div className="flex justify-center mb-6 animate-fade-in delay-100">
-          <div className="bg-white/20 backdrop-blur-lg rounded-full px-4 py-2 border border-white/30">
-            <span className="text-white font-medium">
-              {currentIndex + 1} / {recommendations.length}
-            </span>
-          </div>
-        </div>
-
         {/* Stats */}
         <div className="flex justify-center gap-4 mb-6 animate-fade-in delay-200">
           <div className="bg-green-500/20 backdrop-blur-lg rounded-xl px-4 py-2 flex items-center gap-2 border border-green-400/30 transform hover:scale-105 transition-all duration-200">
