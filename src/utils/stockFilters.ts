@@ -27,6 +27,20 @@ export const filterStocksByProfile = (
     }
   };
 
+  // Normalize sector names for better matching
+  const normalizeSector = (sector: string): string => {
+    return sector.toLowerCase()
+      .replace(/[-_\s]/g, '') // Remove hyphens, underscores, spaces
+      .replace('realestate', 'realestate')
+      .replace('real-estate', 'realestate')
+      .replace('reits', 'realestate')
+      .replace('property', 'realestate')
+      .replace('info', 'technology')
+      .replace('tech', 'technology')
+      .replace('it', 'technology')
+      .replace('software', 'technology');
+  };
+
   // Risk compatibility scoring
   const isRiskCompatible = (stockRisk: string, userRisk: string, strict: boolean = true) => {
     if (userRisk === 'medium') return true; // Medium risk accepts all
@@ -77,12 +91,29 @@ export const filterStocksByProfile = (
 
   const affordabilityThreshold = getAffordabilityThreshold(profile.experience, profile.salary);
 
-  // STRICT SECTOR FILTERING: Always prioritize sector preference if not 'any'
+  // IMPROVED SECTOR FILTERING: Better sector matching with normalized names
   if (profile.sectorPreference !== 'any') {
-    // First, get all stocks from the preferred sector
-    const sectorStocks = stocks.filter(stock => 
-      stock.sector.toLowerCase() === profile.sectorPreference.toLowerCase()
-    );
+    const normalizedUserSector = normalizeSector(profile.sectorPreference);
+    console.log(`Looking for normalized sector: ${normalizedUserSector} (original: ${profile.sectorPreference})`);
+    
+    // Log all available sectors for debugging
+    const availableSectors = [...new Set(stocks.map(stock => stock.sector))];
+    console.log('Available sectors in database:', availableSectors);
+    console.log('Normalized available sectors:', availableSectors.map(s => normalizeSector(s)));
+    
+    // First, get all stocks from the preferred sector using normalized matching
+    const sectorStocks = stocks.filter(stock => {
+      const normalizedStockSector = normalizeSector(stock.sector);
+      const isMatch = normalizedStockSector === normalizedUserSector || 
+                     normalizedStockSector.includes(normalizedUserSector) ||
+                     normalizedUserSector.includes(normalizedStockSector);
+      
+      if (isMatch) {
+        console.log(`Sector match found: ${stock.sector} (${normalizedStockSector}) matches ${profile.sectorPreference} (${normalizedUserSector})`);
+      }
+      
+      return isMatch;
+    });
     
     console.log(`Found ${sectorStocks.length} stocks in preferred sector: ${profile.sectorPreference}`);
     
@@ -116,7 +147,7 @@ export const filterStocksByProfile = (
       console.log(`After filtering, ${filteredSectorStocks.length} sector stocks remain`);
 
       // If we have enough filtered sector stocks, use them
-      if (filteredSectorStocks.length >= 15) {
+      if (filteredSectorStocks.length >= 10) {
         return filteredSectorStocks;
       }
 
@@ -142,7 +173,7 @@ export const filterStocksByProfile = (
     }
 
     // Only if absolutely no sector stocks are available, log warning and continue to mixed filtering
-    console.warn(`No suitable stocks found in preferred sector: ${profile.sectorPreference}. Falling back to mixed portfolio.`);
+    console.warn(`No suitable stocks found in preferred sector: ${profile.sectorPreference}. Available sectors: ${availableSectors.join(', ')}`);
   }
 
   // Fallback: Multi-tiered filtering approach for mixed portfolio
