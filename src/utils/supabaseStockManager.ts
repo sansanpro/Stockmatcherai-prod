@@ -27,6 +27,8 @@ export interface SupabaseStock {
   updated_at?: string;
 }
 
+type SectorTableName = 'technology_stocks' | 'healthcare_stocks' | 'finance_stocks' | 'energy_stocks' | 'consumer_stocks' | 'utilities_stocks';
+
 const convertToSupabaseFormat = (stock: Omit<StockRecommendation, 'whyItFits'>): SupabaseStock => ({
   id: stock.id,
   ticker: stock.ticker,
@@ -43,7 +45,7 @@ const convertToSupabaseFormat = (stock: Omit<StockRecommendation, 'whyItFits'>):
 });
 
 const insertStocksToSectorTable = async (
-  tableName: string,
+  tableName: SectorTableName,
   stocks: Omit<StockRecommendation, 'whyItFits'>[]
 ): Promise<boolean> => {
   try {
@@ -96,11 +98,11 @@ export const syncStaticDataToSupabase = async (): Promise<boolean> => {
 
 export const getStocksFromSupabase = async (sector?: string): Promise<Omit<StockRecommendation, 'whyItFits'>[]> => {
   try {
-    let allStocks: SupabaseStock[] = [];
+    let allStocks: any[] = [];
     
     if (sector) {
       // Get stocks from specific sector table
-      const tableName = `${sector.toLowerCase()}_stocks`;
+      const tableName = `${sector.toLowerCase()}_stocks` as SectorTableName;
       const { data, error } = await supabase
         .from(tableName)
         .select('*');
@@ -113,7 +115,7 @@ export const getStocksFromSupabase = async (sector?: string): Promise<Omit<Stock
       allStocks = data || [];
     } else {
       // Get stocks from all sector tables
-      const sectorTables = [
+      const sectorTables: SectorTableName[] = [
         'technology_stocks',
         'healthcare_stocks', 
         'finance_stocks',
@@ -135,7 +137,7 @@ export const getStocksFromSupabase = async (sector?: string): Promise<Omit<Stock
       }
     }
     
-    // Convert back to our internal format
+    // Convert back to our internal format with proper type casting
     return allStocks.map(stock => ({
       id: stock.id,
       companyName: stock.company_name,
@@ -146,10 +148,10 @@ export const getStocksFromSupabase = async (sector?: string): Promise<Omit<Stock
       peRatio: stock.pe_ratio,
       marketCap: stock.market_cap,
       oneYearReturn: stock.one_year_return,
-      riskLevel: stock.risk_level,
+      riskLevel: stock.risk_level as 'low' | 'medium' | 'high',
       pricePerShare: stock.price_per_share,
       dividendYield: stock.dividend_yield,
-      esgScore: stock.esg_score
+      esgScore: stock.esg_score || 75
     }));
   } catch (error) {
     console.error('Error in getStocksFromSupabase:', error);
@@ -159,7 +161,7 @@ export const getStocksFromSupabase = async (sector?: string): Promise<Omit<Stock
 
 export const getStockCountsByType = async (): Promise<Record<string, number>> => {
   try {
-    const sectorTables = [
+    const sectorTables: SectorTableName[] = [
       'technology_stocks',
       'healthcare_stocks', 
       'finance_stocks',
@@ -196,5 +198,5 @@ export const getStockCountsByType = async (): Promise<Record<string, number>> =>
   }
 };
 
-// Legacy function names for backward compatibility
+// Legacy function names for backward compatibility 
 export const insertStocksToSupabase = syncStaticDataToSupabase;
