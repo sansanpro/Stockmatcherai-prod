@@ -57,27 +57,30 @@ const TinderStockCard = ({
     return `$${num.toFixed(2)}`;
   };
 
-  // Generate CEO avatar URL using a more realistic approach
+  // Generate professional CEO avatar URL using Unsplash with business professional photos
   const getCeoAvatarUrl = (ceoName: string, companyName: string) => {
-    // Create a deterministic but varied avatar based on CEO name and company
+    // Create a deterministic seed for consistent avatars
     const seed = `${ceoName}-${companyName}`.toLowerCase().replace(/[^a-z0-9]/g, '');
     const seedNumber = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     
-    // Use different professional avatar styles based on the seed
-    const avatarStyles = [
-      'adventurer',
-      'adventurer-neutral', 
-      'avataaars',
-      'big-smile',
-      'bottts',
-      'fun-emoji',
-      'micah',
-      'miniavs',
-      'personas'
+    // Use a curated list of professional business headshot photo IDs from Unsplash
+    const professionalPhotoIds = [
+      'photo-1507003211169-0a1dd7228f2d', // Professional man in suit
+      'photo-1560250097-0b93528c311a', // Business professional
+      'photo-1519085360753-af0119f7cbe7', // Corporate headshot
+      'photo-1472099645785-5658abf4ff4e', // Business executive
+      'photo-1507591064344-4c6ce005b128', // Professional portrait
+      'photo-1581091226825-a6a2a5aee158', // Business woman
+      'photo-1581092795360-fd1ca04f0952', // Professional man
+      'photo-1506794778202-cad84cf45f1d', // Executive portrait
+      'photo-1500648767791-00dcc994a43e', // Business professional
+      'photo-1573496359142-b8d87734a5a2', // Corporate headshot
+      'photo-1566492031773-4f4e44671d66', // Professional portrait
+      'photo-1559548331-f9cb98fa6d1c', // Business executive
     ];
     
-    const selectedStyle = avatarStyles[seedNumber % avatarStyles.length];
-    return `https://api.dicebear.com/7.x/${selectedStyle}/svg?seed=${encodeURIComponent(seed)}&size=200`;
+    const selectedPhotoId = professionalPhotoIds[seedNumber % professionalPhotoIds.length];
+    return `https://images.unsplash.com/${selectedPhotoId}?w=200&h=200&fit=crop&crop=face&auto=format&q=80`;
   };
 
   const getCeoInitials = (ceoName: string) => {
@@ -280,20 +283,19 @@ const TinderStockCard = ({
             </div>
           </div>
 
-          {/* CEO Section with Avatar */}
+          {/* CEO Section with Professional Avatar */}
           <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-fade-in delay-300">
             <div className="flex items-center gap-4 mb-3">
               <Avatar className="w-16 h-16 border-2 border-white shadow-lg ring-2 ring-blue-500/20">
                 <AvatarImage 
                   src={getCeoAvatarUrl(stock.ceoName, stock.companyName)} 
-                  alt={`${stock.ceoName} - CEO of ${stock.companyName}`}
+                  alt={`Professional headshot representing ${stock.ceoName}, CEO of ${stock.companyName}`}
                   className="object-cover"
                   onError={(e) => {
-                    // If the avatar fails to load, we'll rely on the fallback
-                    console.log('Avatar failed to load for:', stock.ceoName);
+                    console.log('Professional avatar failed to load for:', stock.ceoName);
                   }}
                 />
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg">
+                <AvatarFallback className="bg-gradient-to-r from-slate-600 to-slate-800 text-white font-semibold text-lg">
                   {getCeoInitials(stock.ceoName)}
                 </AvatarFallback>
               </Avatar>

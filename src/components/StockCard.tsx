@@ -37,27 +37,13 @@ const StockCard = ({ stock }: StockCardProps) => {
     return `$${num.toFixed(2)}`;
   };
 
-  // Generate CEO avatar URL using a more realistic approach
+  // Generate professional CEO avatar URL
   const getCeoAvatarUrl = (ceoName: string, companyName: string) => {
-    // Create a deterministic but varied avatar based on CEO name and company
+    // Create a deterministic seed based on CEO name and company
     const seed = `${ceoName}-${companyName}`.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const seedNumber = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     
-    // Use different professional avatar styles based on the seed
-    const avatarStyles = [
-      'adventurer',
-      'adventurer-neutral', 
-      'avataaars',
-      'big-smile',
-      'bottts',
-      'fun-emoji',
-      'micah',
-      'miniavs',
-      'personas'
-    ];
-    
-    const selectedStyle = avatarStyles[seedNumber % avatarStyles.length];
-    return `https://api.dicebear.com/7.x/${selectedStyle}/svg?seed=${encodeURIComponent(seed)}&size=200`;
+    // Use a professional portrait service that generates realistic business headshots
+    return `https://api.generated.photos/api/v1/faces?age=45-55&gender=male&emotion=neutral&hair_color=brown&hair_length=short&ethnicity=white&order_by=random&api_key=demo&per_page=1&seed=${encodeURIComponent(seed)}`;
   };
 
   const getCeoInitials = (ceoName: string) => {
@@ -90,20 +76,19 @@ const StockCard = ({ stock }: StockCardProps) => {
           </div>
         </div>
 
-        {/* CEO Section with Avatar */}
+        {/* CEO Section with Professional Avatar */}
         <div className="p-6 border-b bg-gray-50">
           <div className="flex items-center gap-4 mb-3">
             <Avatar className="w-16 h-16 border-2 border-white shadow-lg">
               <AvatarImage 
-                src={getCeoAvatarUrl(stock.ceoName, stock.companyName)} 
-                alt={`${stock.ceoName} - CEO of ${stock.companyName}`}
+                src={`https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face&auto=format&q=80`}
+                alt={`Professional headshot representing ${stock.ceoName}, CEO of ${stock.companyName}`}
                 className="object-cover"
                 onError={(e) => {
-                  // If the avatar fails to load, we'll rely on the fallback
-                  console.log('Avatar failed to load for:', stock.ceoName);
+                  console.log('Professional avatar failed to load for:', stock.ceoName);
                 }}
               />
-              <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg">
+              <AvatarFallback className="bg-gradient-to-r from-slate-600 to-slate-800 text-white font-semibold text-lg">
                 {getCeoInitials(stock.ceoName)}
               </AvatarFallback>
             </Avatar>
