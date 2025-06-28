@@ -11,85 +11,50 @@ export const filterStocksByProfile = (
     return [];
   }
 
-  // Calculate affordability thresholds based on experience and salary
-  const getAffordabilityThreshold = (experience: string, salary: number) => {
-    switch (experience) {
-      case 'none':
-        return salary * 0.10; // 10% for complete beginners
-      case 'beginner':
-        return salary * 0.15; // 15% for beginners
-      case 'intermediate':
-        return salary * 0.25; // 25% for intermediate
-      case 'advanced':
-        return salary * 0.35; // 35% for advanced
-      default:
-        return salary * 0.15;
-    }
-  };
-
   // Normalize sector names for better matching
   const normalizeSector = (sector: string): string => {
     const normalized = sector.toLowerCase().replace(/[-_\s]/g, '');
     
-    // Map various sector names to standardized forms
     const sectorMappings: Record<string, string> = {
-      // Real Estate variations
       'realestate': 'realestate',
       'reits': 'realestate',
       'property': 'realestate',
       'realestatepropertyreits': 'realestate',
-      
-      // Technology variations
       'technology': 'technology',
       'tech': 'technology',
       'it': 'technology',
       'software': 'technology',
       'information': 'technology',
-      'info': 'technology',
-      
-      // Healthcare variations
       'healthcare': 'healthcare',
       'health': 'healthcare',
       'medical': 'healthcare',
       'pharma': 'healthcare',
       'pharmaceutical': 'healthcare',
       'biotech': 'healthcare',
-      
-      // Finance variations
       'finance': 'finance',
       'financial': 'finance',
       'banking': 'finance',
       'insurance': 'finance',
       'fintech': 'finance',
-      
-      // Consumer variations
       'consumer': 'consumer',
       'retail': 'consumer',
       'discretionary': 'consumer',
       'staples': 'consumer',
       'consumerdiscretionary': 'consumer',
       'consumerstaples': 'consumer',
-      
-      // Utilities variations
       'utilities': 'utilities',
       'utility': 'utilities',
       'power': 'utilities',
       'electric': 'utilities',
-      
-      // Energy variations
       'energy': 'energy',
       'oil': 'energy',
       'gas': 'energy',
       'petroleum': 'energy',
       'renewable': 'energy',
-      
-      // Industrial variations
       'industrial': 'industrial',
       'industrials': 'industrial',
       'manufacturing': 'industrial',
       'construction': 'industrial',
-      
-      // Materials variations
       'materials': 'materials',
       'mining': 'materials',
       'metals': 'materials',
@@ -99,234 +64,117 @@ export const filterStocksByProfile = (
     return sectorMappings[normalized] || normalized;
   };
 
-  // Risk compatibility scoring
-  const isRiskCompatible = (stockRisk: string, userRisk: string, strict: boolean = true) => {
-    if (userRisk === 'medium') return true; // Medium risk accepts all
-    if (strict) {
-      return stockRisk === userRisk; // Exact match only
-    } else {
-      // Relaxed matching
-      if (userRisk === 'low') return stockRisk !== 'high';
-      if (userRisk === 'high') return stockRisk !== 'low';
-      return true;
-    }
-  };
-
-  // Experience-based filtering
-  const isExperienceAppropriate = (stock: any, experience: string) => {
-    const volatileStocks = ['TSLA', 'NVDA', 'NKLA', 'SNAP', 'SPOT', 'SQ', 'LYFT'];
-    const beginnerFriendly = ['AAPL', 'MSFT', 'JNJ', 'KO', 'PEP', 'WMT', 'JPM', 'V', 'MA'];
-    
-    if (experience === 'none' || experience === 'beginner') {
-      return beginnerFriendly.includes(stock.ticker) || stock.riskLevel === 'low';
-    }
-    
-    if (experience === 'advanced') {
-      return true; // Advanced users can handle any stock
-    }
-    
-    // Intermediate users - avoid only the most volatile
-    return !volatileStocks.includes(stock.ticker) || stock.riskLevel !== 'high';
-  };
-
-  // Goal-based filtering
-  const isGoalAligned = (stock: any, goal: string) => {
-    switch (goal) {
-      case 'income':
-        return stock.dividendYield > 1.5; // Focus on dividend-paying stocks
-      case 'growth':
-        return stock.oneYearReturn > 5; // Focus on growth stocks
-      case 'short-term':
-        return Math.abs(stock.oneYearReturn) > 5; // Reduced threshold for short-term
-      case 'retirement':
-        return stock.riskLevel === 'low' || stock.dividendYield > 2;
-      case 'balance':
-        return stock.dividendYield > 0.5 && stock.oneYearReturn > -10;
+  // Calculate very generous affordability threshold
+  const getAffordabilityThreshold = (experience: string, salary: number) => {
+    // Much more generous thresholds - allow people to invest more
+    switch (experience) {
+      case 'none':
+        return salary * 0.5; // 50% for complete beginners
+      case 'beginner':
+        return salary * 0.75; // 75% for beginners
+      case 'intermediate':
+        return salary * 1.0; // 100% for intermediate
+      case 'advanced':
+        return salary * 1.5; // 150% for advanced
       default:
-        return true;
+        return salary * 0.75;
     }
   };
 
   const affordabilityThreshold = getAffordabilityThreshold(profile.experience, profile.salary);
 
-  // IMPROVED SECTOR FILTERING: Better sector matching with normalized names
+  // SECTOR PREFERENCE HANDLING - Much more lenient
   if (profile.sectorPreference !== 'any') {
     const normalizedUserSector = normalizeSector(profile.sectorPreference);
     console.log(`Looking for normalized sector: ${normalizedUserSector} (original: ${profile.sectorPreference})`);
     
-    // Log all available sectors for debugging
     const availableSectors = [...new Set(stocks.map(stock => stock.sector))];
     console.log('Available sectors in database:', availableSectors);
-    console.log('Normalized available sectors:', availableSectors.map(s => normalizeSector(s)));
     
-    // First, get all stocks from the preferred sector using normalized matching
+    // Get all stocks from the preferred sector
     const sectorStocks = stocks.filter(stock => {
       const normalizedStockSector = normalizeSector(stock.sector);
-      const isMatch = normalizedStockSector === normalizedUserSector || 
-                     normalizedStockSector.includes(normalizedUserSector) ||
-                     normalizedUserSector.includes(normalizedStockSector);
-      
-      if (isMatch) {
-        console.log(`Sector match found: ${stock.sector} (${normalizedStockSector}) matches ${profile.sectorPreference} (${normalizedUserSector})`);
-      }
-      
-      return isMatch;
+      return normalizedStockSector === normalizedUserSector || 
+             normalizedStockSector.includes(normalizedUserSector) ||
+             normalizedUserSector.includes(normalizedStockSector);
     });
     
     console.log(`Found ${sectorStocks.length} stocks in preferred sector: ${profile.sectorPreference}`);
     
     if (sectorStocks.length > 0) {
-      // Apply other filters to sector-specific stocks
+      // Apply VERY lenient filtering to sector stocks
       let filteredSectorStocks = sectorStocks.filter(stock => {
-        // Risk tolerance (moderately strict)
-        if (!isRiskCompatible(stock.riskLevel, profile.riskTolerance, false)) {
-          return false;
-        }
-
-        // Experience appropriateness (relaxed for sector preference)
-        if (profile.experience === 'none' && stock.riskLevel === 'high' && 
-            stock.oneYearReturn < -30) {
-          return false;
-        }
-
-        // Goal alignment (relaxed for sector preference)
-        if (!isGoalAligned(stock, profile.investmentGoal)) {
-          return false;
-        }
-
-        // Affordability (generous threshold for sector preference)
+        // Only exclude stocks that are completely unaffordable (more than 3x threshold)
         if (stock.pricePerShare > affordabilityThreshold * 3) {
           return false;
         }
-
+        
+        // Only exclude stocks with catastrophic performance (worse than -80%)
+        if (stock.oneYearReturn < -80) {
+          return false;
+        }
+        
         return true;
       });
 
-      console.log(`After filtering, ${filteredSectorStocks.length} sector stocks remain`);
+      console.log(`After very lenient sector filtering: ${filteredSectorStocks.length} stocks`);
 
-      // If we have enough filtered sector stocks, use them
-      if (filteredSectorStocks.length >= 10) {
+      // If we have enough sector stocks, return them
+      if (filteredSectorStocks.length >= 15) {
         return filteredSectorStocks;
       }
-
-      // If not enough filtered sector stocks, be more lenient with sector stocks
-      filteredSectorStocks = sectorStocks.filter(stock => {
-        // Only exclude extremely problematic stocks from preferred sector
-        if (stock.oneYearReturn < -50) {
-          return false;
-        }
-        // Only exclude unaffordable stocks
-        if (stock.pricePerShare > profile.salary) {
-          return false;
-        }
-        return true;
-      });
-
-      console.log(`After lenient sector filtering: ${filteredSectorStocks.length} stocks`);
-
-      // If we still have sector stocks, return them (even if few)
-      if (filteredSectorStocks.length > 0) {
-        return filteredSectorStocks;
+      
+      // If not enough, include ALL sector stocks regardless of other filters
+      if (sectorStocks.length > 0) {
+        console.log(`Using all ${sectorStocks.length} sector stocks with minimal filtering`);
+        return sectorStocks.filter(stock => stock.pricePerShare < salary * 5); // Only exclude extremely expensive stocks
       }
     }
 
-    // Only if absolutely no sector stocks are available, log warning and continue to mixed filtering
-    console.warn(`No suitable stocks found in preferred sector: ${profile.sectorPreference}. Available sectors: ${availableSectors.join(', ')}`);
+    console.warn(`No suitable stocks found in preferred sector: ${profile.sectorPreference}`);
   }
 
-  // Fallback: Multi-tiered filtering approach for mixed portfolio
-  let filteredStocks = stocks;
+  // MIXED PORTFOLIO APPROACH - Very lenient filtering
+  console.log('Applying mixed portfolio filtering with lenient criteria');
 
-  // Tier 1: Moderately strict filtering
-  filteredStocks = stocks.filter(stock => {
-    // Risk tolerance (moderately strict)
-    if (!isRiskCompatible(stock.riskLevel, profile.riskTolerance, false)) {
+  // Apply minimal filtering to get a large diverse set
+  let filteredStocks = stocks.filter(stock => {
+    // Only exclude stocks that are completely unaffordable (more than 5x salary)
+    if (stock.pricePerShare > profile.salary * 5) {
       return false;
     }
-
-    // Experience appropriateness (relaxed)
-    if (profile.experience === 'none' && stock.riskLevel === 'high' && 
-        ['NKLA', 'SNAP'].includes(stock.ticker)) {
+    
+    // Only exclude stocks with catastrophic performance (worse than -90%)
+    if (stock.oneYearReturn < -90) {
       return false;
     }
-
-    // Goal alignment (relaxed)
-    if (!isGoalAligned(stock, profile.investmentGoal)) {
+    
+    // Only exclude stocks with extreme negative P/E ratios (data quality issues)
+    if (stock.peRatio < -100) {
       return false;
     }
-
-    // Affordability (generous threshold)
-    if (stock.pricePerShare > affordabilityThreshold * 2) {
-      return false;
-    }
-
+    
     return true;
   });
 
-  console.log(`Tier 1 filtering: ${filteredStocks.length} stocks`);
+  console.log(`After minimal filtering: ${filteredStocks.length} stocks from ${stocks.length} total`);
 
-  // Tier 2: Relax filters if needed
-  if (filteredStocks.length < 25) {
+  // If we still don't have enough stocks, be even more lenient
+  if (filteredStocks.length < 50) {
     filteredStocks = stocks.filter(stock => {
-      // More relaxed risk tolerance
-      if (profile.riskTolerance === 'low' && stock.riskLevel === 'high') {
-        return false;
-      }
-      if (profile.riskTolerance === 'high' && stock.riskLevel === 'low') {
-        // Allow some low-risk stocks for high-risk users for diversification
-        return Math.random() > 0.7; // Include 30% of low-risk stocks
-      }
-
-      // Basic experience safety
-      if (profile.experience === 'none' && stock.riskLevel === 'high' && 
-          stock.oneYearReturn < -30) {
-        return false;
-      }
-
-      // Very generous affordability
-      if (stock.pricePerShare > affordabilityThreshold * 3) {
-        return false;
-      }
-
-      return true;
-    });
-    console.log(`Tier 2 filtering: ${filteredStocks.length} stocks`);
-  }
-
-  // Tier 3: Basic safety only
-  if (filteredStocks.length < 20) {
-    filteredStocks = stocks.filter(stock => {
-      // Only exclude extremely problematic stocks
-      if (stock.oneYearReturn < -50) {
-        return false;
-      }
-
-      // Only exclude unaffordable stocks
-      if (stock.pricePerShare > profile.salary) {
-        return false;
-      }
-
-      return true;
-    });
-    console.log(`Tier 3 filtering: ${filteredStocks.length} stocks`);
-  }
-
-  // Final fallback: Use most stocks with minimal filtering
-  if (filteredStocks.length < 15) {
-    filteredStocks = stocks.filter(stock => {
-      // Only exclude stocks with severe issues
-      if (stock.peRatio < -50 || stock.pricePerShare > profile.salary * 2) {
+      // Only exclude stocks that cost more than entire salary
+      if (stock.pricePerShare > profile.salary * 10) {
         return false;
       }
       return true;
     });
-    console.log(`Final fallback filtering: ${filteredStocks.length} stocks`);
+    console.log(`After ultra-lenient filtering: ${filteredStocks.length} stocks`);
   }
 
-  // Absolute last resort
-  if (filteredStocks.length < 10) {
-    filteredStocks = stocks.slice(0, Math.min(35, stocks.length));
-    console.warn('Using minimal filtering - taking first available stocks');
+  // Final safety net - if we still don't have enough, use most of the stocks
+  if (filteredStocks.length < 30) {
+    filteredStocks = stocks.slice(0, Math.min(100, stocks.length));
+    console.log(`Using fallback selection: ${filteredStocks.length} stocks`);
   }
 
   return filteredStocks;

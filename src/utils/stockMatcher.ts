@@ -1,3 +1,4 @@
+
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import { createStockDataService } from '@/services/stockDataService';
 import { filterStocksByProfile } from '@/utils/stockFilters';
@@ -46,7 +47,7 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
       throw new Error('Invalid profile or stock database');
     }
 
-    // Filter stocks based on user preferences with robust fallback strategies
+    // Filter stocks based on user preferences with much more lenient criteria
     const filteredStocks = filterStocksByProfile(stockData, profile);
     console.log(`Filtered ${filteredStocks.length} stocks from ${stockData.length} total stocks`);
 
@@ -55,13 +56,13 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
       throw new Error('No suitable stocks found for profile');
     }
 
-    // Sort by relevance to user profile using sophisticated scoring
+    // Sort by relevance to user profile
     const sortedStocks = sortStocksByRelevance(filteredStocks, profile);
     console.log('Stocks sorted by relevance score');
 
-    // Ensure we provide at least 30 recommendations (target 30-35)
-    const minRecommendations = 30;
-    const maxRecommendations = Math.min(35, sortedStocks.length);
+    // Target 50-100 recommendations for much better variety
+    const minRecommendations = 50;
+    const maxRecommendations = Math.min(100, sortedStocks.length);
     const recommendationCount = Math.max(
       Math.min(minRecommendations, sortedStocks.length), 
       Math.min(maxRecommendations, sortedStocks.length)
@@ -70,7 +71,7 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
     const selectedStocks = sortedStocks.slice(0, recommendationCount);
     console.log(`Selected ${selectedStocks.length} stocks for recommendations`);
 
-    // Generate personalized explanations for each recommendation with unique catchy phrases
+    // Generate personalized explanations for each recommendation
     const recommendations = selectedStocks.map((stock, index) => {
       try {
         const explanation = generatePersonalizedExplanation(stock, profile, index === 0);
@@ -92,8 +93,8 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
       rec.ticker && rec.companyName && rec.whyItFits
     );
 
-    if (validRecommendations.length < 20) {
-      console.warn('Insufficient valid recommendations generated');
+    if (validRecommendations.length < 30) {
+      console.warn('Lower than target recommendations generated, but proceeding');
     }
 
     console.log(`Successfully generated ${validRecommendations.length} personalized recommendations`);
@@ -110,6 +111,7 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
       total: validRecommendations.length,
       riskDistribution,
       sectorsIncluded: sectorsIncluded.length,
+      sectors: sectorsIncluded,
       avgDividendYield: (validRecommendations.reduce((sum, rec) => sum + rec.dividendYield, 0) / validRecommendations.length).toFixed(2),
       avgReturn: (validRecommendations.reduce((sum, rec) => sum + rec.oneYearReturn, 0) / validRecommendations.length).toFixed(2),
       dataSource: stockData === stockDatabase ? 'Static' : 'Alpha Vantage API'
@@ -120,13 +122,13 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
   } catch (error) {
     console.error('Error generating stock recommendations:', error);
     
-    // Fallback: Return a basic set of diverse stocks from static data
-    const fallbackStocks = stockDatabase.slice(0, 30).map((stock, index) => ({
+    // Fallback: Return a large set of diverse stocks from static data
+    const fallbackStocks = stockDatabase.slice(0, 80).map((stock, index) => ({
       ...stock,
       whyItFits: generatePersonalizedExplanation(stock, profile, index === 0)
     }));
     
-    console.log('Returning fallback recommendations from static data');
+    console.log('Returning expanded fallback recommendations from static data');
     return fallbackStocks;
   }
 };
