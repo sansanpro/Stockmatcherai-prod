@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import UserProfileForm from '@/components/UserProfileForm';
@@ -15,6 +14,7 @@ import StockDetailsModal from '@/components/StockDetailsModal';
 import StockComparison from '@/components/StockComparison';
 import { AppProvider, useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import { Moon, BarChart, Eye, Heart, Scale } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -23,12 +23,85 @@ const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'matches' | 'watchlist' | 'analytics' | 'settings'>('welcome');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [selectedStockForDetails, setSelectedStockForDetails] = useState<StockRecommendation | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const { isDarkMode, toggleDarkMode, addToWatchlist, passStock } = useApp();
   const { user, loading } = useAuth();
 
-  const handleProfileComplete = (profile: UserProfile) => {
+  // Check for existing user profile when user logs in
+  useEffect(() => {
+    const checkExistingProfile = async () => {
+      if (!user) return;
+      
+      setIsLoadingProfile(true);
+      try {
+        const { data: profileData, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error fetching user profile:', error);
+          return;
+        }
+
+        if (profileData) {
+          // Convert database format to UserProfile format
+          const profile: UserProfile = {
+            age: 25, // Default age since it's not in the database schema
+            gender: 'other', // Default gender since it's not in the database schema
+            salary: parseInt(profileData.income_level?.replace(/[^\d]/g, '') || '0'),
+            experience: profileData.investment_experience || 'beginner',
+            riskTolerance: profileData.risk_tolerance || 'medium',
+            sectorPreference: profileData.sectors_of_interest?.[0] || 'any',
+            investmentGoal: profileData.investment_goals?.[0] || 'growth'
+          };
+          
+          setUserProfile(profile);
+          setCurrentStep('matching');
+        } else {
+          // No profile found, show profile form
+          setCurrentStep('profile');
+        }
+      } catch (error) {
+        console.error('Error checking user profile:', error);
+        setCurrentStep('profile');
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    };
+
+    if (user && !loading) {
+      checkExistingProfile();
+    }
+  }, [user, loading]);
+
+  const handleProfileComplete = async (profile: UserProfile) => {
+    if (!user) return;
+
+    try {
+      // Save profile to database
+      const { error } = await supabase
+        .from('user_profiles')
+        .upsert({
+          user_id: user.id,
+          age_range: `${profile.age}-${profile.age + 10}`,
+          investment_experience: profile.experience,
+          risk_tolerance: profile.riskTolerance,
+          sectors_of_interest: [profile.sectorPreference],
+          investment_goals: [profile.investmentGoal],
+          income_level: profile.salary.toString()
+        });
+
+      if (error) {
+        console.error('Error saving user profile:', error);
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
+
     setUserProfile(profile);
     setCurrentStep('matching');
     setIsUpdatingProfile(false);
@@ -66,8 +139,8 @@ const IndexContent = () => {
     passStock(stock);
   };
 
-  // Show loading while checking authentication
-  if (loading) {
+  // Show loading while checking authentication or profile
+  if (loading || isLoadingProfile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
