@@ -42,38 +42,48 @@ const IndexContent = () => {
       setIsLoadingProfile(true);
       
       try {
+        // First, let's see what data exists in the user_profiles table
+        const { data: allProfiles, error: debugError } = await supabase
+          .from('user_profiles')
+          .select('*');
+        
+        console.log('All profiles in database:', allProfiles);
+        console.log('Debug error:', debugError);
+
         const { data: profileData, error } = await supabase
           .from('user_profiles')
           .select('*')
           .eq('user_id', user.id)
-          .maybeSingle();
+          .single();
 
-        if (error) {
-          console.error('Error fetching user profile:', error);
-          // If there's an error, assume no profile exists and show profile form
+        console.log('Profile query result:', { profileData, error });
+
+        if (error && error.code !== 'PGRST116') {
+          // PGRST116 is "no rows returned" - that's expected for new users
+          console.error('Unexpected error fetching user profile:', error);
           setCurrentStep('profile');
           setIsLoadingProfile(false);
           return;
         }
 
         if (profileData) {
-          console.log('Found existing profile:', profileData);
+          console.log('Found existing profile, converting to UserProfile format:', profileData);
           // Convert database format to UserProfile format
           const profile: UserProfile = {
             age: 25, // Default age since it's not in the database schema
             gender: 'other', // Default gender since it's not in the database schema
-            salary: parseInt(profileData.income_level?.replace(/[^\d]/g, '') || '0'),
+            salary: parseInt(profileData.income_level?.replace(/[^\d]/g, '') || '50000'),
             experience: profileData.investment_experience || 'beginner',
             riskTolerance: profileData.risk_tolerance || 'medium',
             sectorPreference: profileData.sectors_of_interest?.[0] || 'any',
             investmentGoal: profileData.investment_goals?.[0] || 'growth'
           };
           
+          console.log('Converted profile:', profile);
           setUserProfile(profile);
           setCurrentStep('matching');
         } else {
-          console.log('No profile found, showing profile form');
-          // No profile found, show profile form
+          console.log('No profile found for user, showing profile form');
           setCurrentStep('profile');
         }
       } catch (error) {
