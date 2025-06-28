@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +24,7 @@ const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'matches' | 'watchlist' | 'analytics' | 'settings'>('welcome');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true); // Start as true to prevent showing profile form
   const [selectedStockForDetails, setSelectedStockForDetails] = useState<StockRecommendation | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const { isDarkMode, toggleDarkMode, addToWatchlist, passStock } = useApp();
@@ -32,7 +33,11 @@ const IndexContent = () => {
   // Check for existing user profile when user logs in
   useEffect(() => {
     const checkExistingProfile = async () => {
-      if (!user) return;
+      if (!user) {
+        setIsLoadingProfile(false);
+        setCurrentStep('welcome');
+        return;
+      }
       
       setIsLoadingProfile(true);
       try {
@@ -44,6 +49,7 @@ const IndexContent = () => {
 
         if (error) {
           console.error('Error fetching user profile:', error);
+          setCurrentStep('profile');
           return;
         }
 
@@ -73,7 +79,7 @@ const IndexContent = () => {
       }
     };
 
-    if (user && !loading) {
+    if (!loading) {
       checkExistingProfile();
     }
   }, [user, loading]);
