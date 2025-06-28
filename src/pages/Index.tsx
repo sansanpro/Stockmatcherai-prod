@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,7 +23,7 @@ const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'matches' | 'watchlist' | 'analytics' | 'settings'>('welcome');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true); // Start as true to prevent showing profile form
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [selectedStockForDetails, setSelectedStockForDetails] = useState<StockRecommendation | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const { isDarkMode, toggleDarkMode, addToWatchlist, passStock } = useApp();
@@ -39,7 +38,9 @@ const IndexContent = () => {
         return;
       }
       
+      console.log('Checking profile for user:', user.id);
       setIsLoadingProfile(true);
+      
       try {
         const { data: profileData, error } = await supabase
           .from('user_profiles')
@@ -49,11 +50,14 @@ const IndexContent = () => {
 
         if (error) {
           console.error('Error fetching user profile:', error);
+          // If there's an error, assume no profile exists and show profile form
           setCurrentStep('profile');
+          setIsLoadingProfile(false);
           return;
         }
 
         if (profileData) {
+          console.log('Found existing profile:', profileData);
           // Convert database format to UserProfile format
           const profile: UserProfile = {
             age: 25, // Default age since it's not in the database schema
@@ -68,6 +72,7 @@ const IndexContent = () => {
           setUserProfile(profile);
           setCurrentStep('matching');
         } else {
+          console.log('No profile found, showing profile form');
           // No profile found, show profile form
           setCurrentStep('profile');
         }
