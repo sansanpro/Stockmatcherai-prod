@@ -14,6 +14,7 @@ interface AppContextType {
   addToWatchlist: (stock: StockRecommendation) => void;
   removeFromWatchlist: (ticker: string) => void;
   isInWatchlist: (ticker: string) => boolean;
+  passStock: (stock: StockRecommendation) => void;
   swipeStats: SwipeStats;
   updateSwipeStats: (isMatch: boolean) => void;
   isDarkMode: boolean;
@@ -82,6 +83,11 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     return watchlist.some(stock => stock.ticker === ticker);
   };
 
+  const passStock = (stock: StockRecommendation) => {
+    // This function can be used to track passed stocks if needed
+    console.log('Passed stock:', stock.ticker);
+  };
+
   const updateSwipeStats = (isMatch: boolean) => {
     const newStats = {
       totalSwipes: swipeStats.totalSwipes + 1,
@@ -107,6 +113,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       addToWatchlist,
       removeFromWatchlist,
       isInWatchlist,
+      passStock,
       swipeStats,
       updateSwipeStats,
       isDarkMode,

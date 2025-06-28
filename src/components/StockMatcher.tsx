@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
@@ -10,9 +9,10 @@ import { Heart, X, RotateCcw, TrendingUp, Plus } from 'lucide-react';
 interface StockMatcherProps {
   userProfile: UserProfile;
   onReset: () => void;
+  onViewDetails?: (stock: StockRecommendation) => void;
 }
 
-const StockMatcher = ({ userProfile, onReset }: StockMatcherProps) => {
+const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps) => {
   const [recommendations, setRecommendations] = useState<StockRecommendation[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -250,6 +250,7 @@ const StockMatcher = ({ userProfile, onReset }: StockMatcherProps) => {
                   stock={stock} 
                   onMatch={isActiveCard ? handleMatch : () => {}}
                   onPass={isActiveCard ? handlePass : () => {}}
+                  onViewDetails={isActiveCard && onViewDetails ? onViewDetails : undefined}
                   isVisible={true}
                   zIndex={zIndex}
                   scale={scale}

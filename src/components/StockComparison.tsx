@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -184,7 +183,7 @@ const StockComparison = ({ availableStocks }: StockComparisonProps) => {
                           <td className="py-2 text-gray-600 dark:text-gray-300">Risk Level</td>
                           {selectedStocks.map(stock => (
                             <td key={stock.id} className="text-center py-2">
-                              <Badge className={getRiskColor(stock.riskLevel)} size="sm">
+                              <Badge className={getRiskColor(stock.riskLevel)}>
                                 {stock.riskLevel.toUpperCase()}
                               </Badge>
                             </td>
