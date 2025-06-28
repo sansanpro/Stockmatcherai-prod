@@ -3,13 +3,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { StockRecommendation } from '@/types/stock-matcher';
-import { Heart, X, TrendingUp, DollarSign, Building } from 'lucide-react';
+import { Heart, X, TrendingUp, DollarSign, Building, Eye } from 'lucide-react';
 import EducationalTooltip from '@/components/EducationalTooltip';
 
 interface TinderStockCardProps {
   stock: StockRecommendation;
   onMatch: () => void;
   onPass: () => void;
+  onViewDetails?: (stock: StockRecommendation) => void;
   isVisible?: boolean;
   zIndex?: number;
   scale?: number;
@@ -19,6 +20,7 @@ const TinderStockCard = ({
   stock, 
   onMatch, 
   onPass, 
+  onViewDetails,
   isVisible = true, 
   zIndex = 1,
   scale = 1 
@@ -97,6 +99,12 @@ const TinderStockCard = ({
     }
     
     setIsDragging(false);
+  };
+
+  const handleViewDetails = () => {
+    if (onViewDetails) {
+      onViewDetails(stock);
+    }
   };
 
   // Mouse events
@@ -239,6 +247,14 @@ const TinderStockCard = ({
                     content={`Risk Level indicates volatility: Low = stable returns, Medium = some fluctuation, High = potential for large gains/losses`}
                     className="text-white/70 hover:text-white transition-colors"
                   />
+                  {onViewDetails && (
+                    <button
+                      onClick={handleViewDetails}
+                      className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-colors"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
               
