@@ -9,6 +9,210 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      consumer_stocks: {
+        Row: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at: string | null
+          dividend_yield: number
+          esg_score: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at?: string | null
+          dividend_yield: number
+          esg_score?: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string
+          ceo_name?: string
+          company_name?: string
+          created_at?: string | null
+          dividend_yield?: number
+          esg_score?: number | null
+          id?: string
+          market_cap?: string
+          one_year_return?: number
+          pe_ratio?: number
+          price_per_share?: number
+          risk_level?: string
+          ticker?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      energy_stocks: {
+        Row: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at: string | null
+          dividend_yield: number
+          esg_score: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at?: string | null
+          dividend_yield: number
+          esg_score?: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string
+          ceo_name?: string
+          company_name?: string
+          created_at?: string | null
+          dividend_yield?: number
+          esg_score?: number | null
+          id?: string
+          market_cap?: string
+          one_year_return?: number
+          pe_ratio?: number
+          price_per_share?: number
+          risk_level?: string
+          ticker?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      finance_stocks: {
+        Row: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at: string | null
+          dividend_yield: number
+          esg_score: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at?: string | null
+          dividend_yield: number
+          esg_score?: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string
+          ceo_name?: string
+          company_name?: string
+          created_at?: string | null
+          dividend_yield?: number
+          esg_score?: number | null
+          id?: string
+          market_cap?: string
+          one_year_return?: number
+          pe_ratio?: number
+          price_per_share?: number
+          risk_level?: string
+          ticker?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      healthcare_stocks: {
+        Row: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at: string | null
+          dividend_yield: number
+          esg_score: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at?: string | null
+          dividend_yield: number
+          esg_score?: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string
+          ceo_name?: string
+          company_name?: string
+          created_at?: string | null
+          dividend_yield?: number
+          esg_score?: number | null
+          id?: string
+          market_cap?: string
+          one_year_return?: number
+          pe_ratio?: number
+          price_per_share?: number
+          risk_level?: string
+          ticker?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -33,6 +237,57 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      technology_stocks: {
+        Row: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at: string | null
+          dividend_yield: number
+          esg_score: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at?: string | null
+          dividend_yield: number
+          esg_score?: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string
+          ceo_name?: string
+          company_name?: string
+          created_at?: string | null
+          dividend_yield?: number
+          esg_score?: number | null
+          id?: string
+          market_cap?: string
+          one_year_return?: number
+          pe_ratio?: number
+          price_per_share?: number
+          risk_level?: string
+          ticker?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -135,6 +390,57 @@ export type Database = {
           stock_data?: Json | null
           ticker?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      utilities_stocks: {
+        Row: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at: string | null
+          dividend_yield: number
+          esg_score: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights: string
+          ceo_name: string
+          company_name: string
+          created_at?: string | null
+          dividend_yield: number
+          esg_score?: number | null
+          id: string
+          market_cap: string
+          one_year_return: number
+          pe_ratio: number
+          price_per_share: number
+          risk_level: string
+          ticker: string
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string
+          ceo_name?: string
+          company_name?: string
+          created_at?: string | null
+          dividend_yield?: number
+          esg_score?: number | null
+          id?: string
+          market_cap?: string
+          one_year_return?: number
+          pe_ratio?: number
+          price_per_share?: number
+          risk_level?: string
+          ticker?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

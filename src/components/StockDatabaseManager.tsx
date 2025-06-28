@@ -4,16 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Upload, Database, RefreshCw, AlertCircle } from 'lucide-react';
+import { Upload, Database, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
 import { stockDatabase } from '@/data/stockDatabase';
-import { syncStaticDataToSupabase, getStocksFromSupabase } from '@/utils/supabaseStockManager';
+import { syncStaticDataToSupabase, getStockCountsByType } from '@/utils/supabaseStockManager';
 import StockDataImporter from './StockDataImporter';
 import { useToast } from '@/hooks/use-toast';
 import { StockRecommendation } from '@/types/stock-matcher';
 
 const StockDatabaseManager = () => {
   const [loading, setLoading] = useState(false);
-  const [supabaseCount, setSupabaseCount] = useState<number | null>(null);
+  const [supabaseCounts, setSupabaseCounts] = useState<Record<string, number>>({});
+  const [synced, setSynced] = useState(false);
   const { toast } = useToast();
 
   const handleSyncToSupabase = async () => {
@@ -23,13 +24,14 @@ const StockDatabaseManager = () => {
       if (success) {
         toast({
           title: "Sync Successful",
-          description: `Synced ${stockDatabase.length} stocks to Supabase`,
+          description: `Synced ${stockDatabase.length} stocks to Supabase sector tables`,
         });
-        await loadSupabaseCount();
+        setSynced(true);
+        await loadSupabaseCounts();
       } else {
         toast({
           title: "Sync Failed",
-          description: "Please create the stocks table in Supabase first using the SQL migration",
+          description: "Failed to sync some data to Supabase",
           variant: "destructive",
         });
       }
@@ -45,13 +47,19 @@ const StockDatabaseManager = () => {
     }
   };
 
-  const loadSupabaseCount = async () => {
+  const loadSupabaseCounts = async () => {
     try {
-      const stocks = await getStocksFromSupabase();
-      setSupabaseCount(stocks.length);
+      const counts = await getStockCountsByType();
+      setSupabaseCounts(counts);
+      
+      // Check if any data exists
+      const totalCount = Object.values(counts).reduce((sum, count) => sum + count, 0);
+      if (totalCount > 0) {
+        setSynced(true);
+      }
     } catch (error) {
-      console.error('Error loading Supabase count:', error);
-      setSupabaseCount(0);
+      console.error('Error loading Supabase counts:', error);
+      setSupabaseCounts({});
     }
   };
 
@@ -61,12 +69,14 @@ const StockDatabaseManager = () => {
       title: "Import Successful",
       description: `Imported ${importedStocks.length} stocks`,
     });
-    // In a real implementation, you'd add these to your database
-    // For now, we just log them and show a success message
+  };
+
+  const getTotalSupabaseCount = () => {
+    return Object.values(supabaseCounts).reduce((sum, count) => sum + count, 0);
   };
 
   React.useEffect(() => {
-    loadSupabaseCount();
+    loadSupabaseCounts();
   }, []);
 
   return (
@@ -90,8 +100,8 @@ const StockDatabaseManager = () => {
             <p className="text-xs text-muted-foreground">stocks in local files</p>
             <div className="flex flex-wrap gap-1 mt-2">
               <Badge variant="secondary">Technology: 10</Badge>
-              <Badge variant="secondary">Healthcare: 10</Badge>
-              <Badge variant="secondary">Finance: 10</Badge>
+              <Badge variant="secondary">Healthcare: 8</Badge>
+              <Badge variant="secondary">Finance: 5</Badge>
               <Badge variant="secondary">Energy: 3</Badge>
               <Badge variant="secondary">Consumer: 4</Badge>
               <Badge variant="secondary">Utilities: 3</Badge>
@@ -102,28 +112,88 @@ const StockDatabaseManager = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Supabase Database</CardTitle>
-            <RefreshCw className="h-4 w-4 text-muted-foreground" />
+            {synced ? (
+              <CheckCircle className="h-4 w-4 text-green-500" />
+            ) : (
+              <RefreshCw className="h-4 w-4 text-muted-foreground" />
+            )}
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {supabaseCount !== null ? supabaseCount : '...'}
+              {getTotalSupabaseCount()}
             </div>
-            <p className="text-xs text-muted-foreground">stocks in Supabase</p>
-            {supabaseCount === 0 && (
+            <p className="text-xs text-muted-foreground">stocks in sector tables</p>
+            {Object.keys(supabaseCounts).length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {Object.entries(supabaseCounts).map(([sector, count]) => (
+                  <Badge key={sector} variant="outline">
+                    {sector.charAt(0).toUpperCase() + sector.slice(1)}: {count}
+                  </Badge>
+                ))}
+              </div>
+            )}
+            {getTotalSupabaseCount() === 0 && (
               <div className="flex items-center gap-2 mt-2 text-amber-600">
                 <AlertCircle className="h-4 w-4" />
-                <span className="text-xs">Table not created yet</span>
+                <span className="text-xs">No data synced yet</span>
               </div>
             )}
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="import" className="w-full">
+      <Tabs defaultValue="sync" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="import">Import Data</TabsTrigger>
           <TabsTrigger value="sync">Supabase Sync</TabsTrigger>
+          <TabsTrigger value="import">Import Data</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="sync" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <RefreshCw className="h-5 w-5" />
+                Supabase Sector Tables
+              </CardTitle>
+              <CardDescription>
+                Sync your static stock data with Supabase sector-specific tables for better organization
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {synced && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-green-800">
+                    <CheckCircle className="h-4 w-4" />
+                    <span className="font-medium">Data Successfully Synced</span>
+                  </div>
+                  <p className="text-sm text-green-700 mt-1">
+                    Stock data has been organized into sector-specific tables in Supabase.
+                  </p>
+                </div>
+              )}
+
+              <Button 
+                onClick={handleSyncToSupabase}
+                disabled={loading}
+                className="w-full"
+              >
+                {loading ? 'Syncing...' : `Sync ${stockDatabase.length} Stocks to Sector Tables`}
+              </Button>
+
+              <div className="text-sm text-muted-foreground">
+                This will organize all static stock data into sector-specific tables in Supabase:
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>Technology stocks → technology_stocks table</li>
+                  <li>Healthcare stocks → healthcare_stocks table</li>
+                  <li>Finance stocks → finance_stocks table</li>
+                  <li>Energy stocks → energy_stocks table</li>
+                  <li>Consumer stocks → consumer_stocks table</li>
+                  <li>Utilities stocks → utilities_stocks table</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="import" className="space-y-4">
           <Card>
@@ -138,63 +208,6 @@ const StockDatabaseManager = () => {
             </CardHeader>
             <CardContent>
               <StockDataImporter onImport={handleImportStocks} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="sync" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <RefreshCw className="h-5 w-5" />
-                Supabase Integration
-              </CardTitle>
-              <CardDescription>
-                Sync your static stock data with Supabase for dynamic updates
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                <div className="flex items-center gap-2 text-amber-800">
-                  <AlertCircle className="h-4 w-4" />
-                  <span className="font-medium">Setup Required</span>
-                </div>
-                <p className="text-sm text-amber-700 mt-1">
-                  You need to create the stocks table in Supabase first. Run this SQL migration:
-                </p>
-                <pre className="bg-amber-100 p-2 rounded mt-2 text-xs overflow-x-auto">
-{`CREATE TABLE public.stocks (
-  id TEXT PRIMARY KEY,
-  ticker TEXT UNIQUE NOT NULL,
-  company_name TEXT NOT NULL,
-  sector TEXT NOT NULL,
-  ceo_name TEXT NOT NULL,
-  ceo_highlights TEXT NOT NULL,
-  pe_ratio DECIMAL NOT NULL,
-  market_cap TEXT NOT NULL,
-  one_year_return DECIMAL NOT NULL,
-  risk_level TEXT CHECK (risk_level IN ('low', 'medium', 'high')),
-  price_per_share DECIMAL NOT NULL,
-  dividend_yield DECIMAL NOT NULL,
-  esg_score INTEGER DEFAULT 75,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
-);`}
-                </pre>
-              </div>
-
-              <Button 
-                onClick={handleSyncToSupabase}
-                disabled={loading}
-                className="w-full"
-              >
-                {loading ? 'Syncing...' : `Sync ${stockDatabase.length} Stocks to Supabase`}
-              </Button>
-
-              <div className="text-sm text-muted-foreground">
-                This will sync all static stock data to your Supabase database,
-                allowing for dynamic updates and better performance.
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
