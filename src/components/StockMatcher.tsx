@@ -18,6 +18,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [loading, setLoading] = useState(true);
   const [matches, setMatches] = useState<StockRecommendation[]>([]);
   const [passes, setPasses] = useState<StockRecommendation[]>([]);
+  const [seenStocks, setSeenStocks] = useState<string[]>([]); // Track all seen stock tickers
   const [animatingCard, setAnimatingCard] = useState(false);
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
@@ -25,7 +26,8 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   useEffect(() => {
     const loadRecommendations = async () => {
       setLoading(true);
-      const stocks = await generateStockRecommendations(userProfile);
+      // Pass excluded stocks to avoid showing duplicates
+      const stocks = await generateStockRecommendations(userProfile, seenStocks);
       // Add staggered entrance animation
       setTimeout(() => {
         setRecommendations(stocks);
@@ -34,7 +36,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     };
     
     loadRecommendations();
-  }, [userProfile]);
+  }, [userProfile, seenStocks]);
 
   const handleMatch = () => {
     if (animatingCard) return;
@@ -42,6 +44,9 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     setAnimatingCard(true);
     const currentStock = recommendations[currentIndex];
     setMatches(prev => [...prev, currentStock]);
+    
+    // Add to seen stocks to prevent future duplicates
+    setSeenStocks(prev => [...prev, currentStock.ticker]);
     
     // Add to watchlist if not already there
     if (!isInWatchlist(currentStock.ticker)) {
@@ -64,6 +69,9 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     setAnimatingCard(true);
     const currentStock = recommendations[currentIndex];
     setPasses(prev => [...prev, currentStock]);
+    
+    // Add to seen stocks to prevent future duplicates
+    setSeenStocks(prev => [...prev, currentStock.ticker]);
     
     // Update swipe statistics
     updateSwipeStats(false);
@@ -89,6 +97,9 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       // Remove from matches or passes
       setMatches(prev => prev.filter(stock => stock.ticker !== previousStock.ticker));
       setPasses(prev => prev.filter(stock => stock.ticker !== previousStock.ticker));
+      
+      // Remove from seen stocks so it can appear again
+      setSeenStocks(prev => prev.filter(ticker => ticker !== previousStock.ticker));
       
       setCurrentIndex(previousIndex);
     }
@@ -176,14 +187,16 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
           <div className="space-y-3 animate-fade-in delay-400">
             <Button 
               onClick={() => {
+                // Load fresh recommendations excluding all seen stocks
                 setCurrentIndex(0);
                 setMatches([]);
                 setPasses([]);
+                // Keep seenStocks to avoid duplicates across sessions
               }}
               className="w-full bg-white/20 hover:bg-white/30 text-white border-0 h-12 rounded-xl backdrop-blur-lg transform hover:scale-105 transition-all duration-200"
             >
               <RotateCcw className="w-5 h-5 mr-2" />
-              Review Again
+              Get More Recommendations
             </Button>
             <Button 
               onClick={onReset}

@@ -4,11 +4,15 @@ import { createStockDataService } from '@/services/stockDataService';
 import { filterStocksByProfile } from '@/utils/stockFilters';
 import { sortStocksByRelevance } from '@/utils/stockScoring';
 import { generatePersonalizedExplanation } from '@/utils/explanationGenerator';
+import { supabase } from '@/integrations/supabase/client';
 
 // Fallback to static data if API fails
 import { stockDatabase } from '@/data/stockDatabase';
 
-export const generateStockRecommendations = async (profile: UserProfile): Promise<StockRecommendation[]> => {
+export const generateStockRecommendations = async (
+  profile: UserProfile, 
+  excludedTickers: string[] = []
+): Promise<StockRecommendation[]> => {
   try {
     console.log('Starting stock recommendation generation for profile:', {
       age: profile.age,
@@ -16,7 +20,8 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
       riskTolerance: profile.riskTolerance,
       sector: profile.sectorPreference,
       goal: profile.investmentGoal,
-      salary: profile.salary
+      salary: profile.salary,
+      excludedTickers: excludedTickers.length
     });
 
     // Simulate API delay for realistic UX
@@ -24,17 +29,29 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
 
     let stockData: Omit<StockRecommendation, 'whyItFits'>[] = [];
 
-    // Try to get live data from Alpha Vantage
+    // Try to get live data from Alpha Vantage using Supabase secrets
     try {
-      const alphaVantageApiKey = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY;
+      console.log('Attempting to fetch Alpha Vantage API key from Supabase secrets...');
+      
+      // Get the API key from Supabase secrets
+      const { data: secretData, error: secretError } = await supabase.functions.invoke('get-secret', {
+        body: { name: 'VITE_ALPHA_VANTAGE_API_KEY' }
+      });
+
+      if (secretError) {
+        console.warn('Error fetching API key from Supabase secrets:', secretError);
+        throw new Error('API key not available');
+      }
+
+      const alphaVantageApiKey = secretData?.value;
       
       if (alphaVantageApiKey) {
-        console.log('Using Alpha Vantage API for live stock data');
+        console.log('Alpha Vantage API key found, fetching live data...');
         const stockDataService = createStockDataService(alphaVantageApiKey);
         stockData = await stockDataService.getStockData();
         console.log(`Retrieved ${stockData.length} live stocks from Alpha Vantage`);
       } else {
-        console.warn('Alpha Vantage API key not found, using static data');
+        console.warn('Alpha Vantage API key not found in secrets, using static data');
         stockData = stockDatabase;
       }
     } catch (error) {
@@ -42,12 +59,19 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
       stockData = stockDatabase;
     }
 
+    // Remove excluded stocks (previously matched/passed)
+    if (excludedTickers.length > 0) {
+      const originalCount = stockData.length;
+      stockData = stockData.filter(stock => !excludedTickers.includes(stock.ticker));
+      console.log(`Excluded ${originalCount - stockData.length} previously seen stocks`);
+    }
+
     // Validate input
     if (!profile || !stockData || stockData.length === 0) {
       throw new Error('Invalid profile or stock database');
     }
 
-    // Filter stocks based on user preferences with much more lenient criteria
+    // Filter stocks based on user preferences with sector prioritization
     const filteredStocks = filterStocksByProfile(stockData, profile);
     console.log(`Filtered ${filteredStocks.length} stocks from ${stockData.length} total stocks`);
 
@@ -60,7 +84,7 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
     const sortedStocks = sortStocksByRelevance(filteredStocks, profile);
     console.log('Stocks sorted by relevance score');
 
-    // Target 50-100 recommendations for much better variety
+    // Target 50-100 recommendations for better variety
     const minRecommendations = 50;
     const maxRecommendations = Math.min(100, sortedStocks.length);
     const recommendationCount = Math.max(
@@ -122,13 +146,15 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
   } catch (error) {
     console.error('Error generating stock recommendations:', error);
     
-    // Fallback: Return a large set of diverse stocks from static data
-    const fallbackStocks = stockDatabase.slice(0, 80).map((stock, index) => ({
+    // Fallback: Return a large set of diverse stocks from static data, excluding seen ones
+    let fallbackStocks = stockDatabase.filter(stock => !excludedTickers.includes(stock.ticker));
+    
+    const fallbackRecommendations = fallbackStocks.slice(0, 80).map((stock, index) => ({
       ...stock,
       whyItFits: generatePersonalizedExplanation(stock, profile, index === 0)
     }));
     
     console.log('Returning expanded fallback recommendations from static data');
-    return fallbackStocks;
+    return fallbackRecommendations;
   }
 };

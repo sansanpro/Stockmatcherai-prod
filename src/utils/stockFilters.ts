@@ -1,4 +1,3 @@
-
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 
 export const filterStocksByProfile = (
@@ -83,95 +82,105 @@ export const filterStocksByProfile = (
 
   const affordabilityThreshold = getAffordabilityThreshold(profile.experience, profile.salary);
 
-  // SECTOR PREFERENCE HANDLING - More balanced approach
+  // ENHANCED SECTOR PREFERENCE HANDLING - Strict healthcare prioritization
   let filteredStocks: Omit<StockRecommendation, 'whyItFits'>[] = [];
   
   if (profile.sectorPreference !== 'any') {
     const normalizedUserSector = normalizeSector(profile.sectorPreference);
-    console.log(`Looking for normalized sector: ${normalizedUserSector} (original: ${profile.sectorPreference})`);
+    console.log(`STRICT SECTOR FILTERING: Looking for ${normalizedUserSector} (original: ${profile.sectorPreference})`);
     
     const availableSectors = [...new Set(stocks.map(stock => stock.sector))];
     console.log('Available sectors in database:', availableSectors);
     
-    // Get all stocks from the preferred sector
+    // Get ALL stocks from the preferred sector with very lenient filtering
     const sectorStocks = stocks.filter(stock => {
       const normalizedStockSector = normalizeSector(stock.sector);
-      return normalizedStockSector === normalizedUserSector || 
-             normalizedStockSector.includes(normalizedUserSector) ||
-             normalizedUserSector.includes(normalizedStockSector);
+      const isMatch = normalizedStockSector === normalizedUserSector || 
+                     normalizedStockSector.includes(normalizedUserSector) ||
+                     normalizedUserSector.includes(normalizedStockSector);
+      
+      if (isMatch) {
+        console.log(`SECTOR MATCH: ${stock.ticker} (${stock.sector}) matches ${profile.sectorPreference}`);
+      }
+      return isMatch;
     });
     
     console.log(`Found ${sectorStocks.length} stocks in preferred sector: ${profile.sectorPreference}`);
     
-    // Apply lenient filtering to sector stocks
-    const filteredSectorStocks = sectorStocks.filter(stock => {
-      // Only exclude stocks that are completely unaffordable (more than 3x threshold)
-      if (stock.pricePerShare > affordabilityThreshold * 3) {
-        return false;
-      }
-      
-      // Only exclude stocks with catastrophic performance (worse than -80%)
-      if (stock.oneYearReturn < -80) {
-        return false;
-      }
-      
-      return true;
-    });
-
-    console.log(`After sector filtering: ${filteredSectorStocks.length} stocks`);
-
-    // If we have enough sector stocks, use them as primary recommendations
-    if (filteredSectorStocks.length >= 20) {
-      filteredStocks = filteredSectorStocks;
-    } else {
-      // Not enough sector stocks - create a mixed portfolio with sector preference
-      console.log(`Only ${filteredSectorStocks.length} stocks in preferred sector, creating mixed portfolio`);
-      
-      // Start with all available sector stocks
-      filteredStocks = [...filteredSectorStocks];
-      
-      // Add stocks from other sectors to reach target count
-      const otherSectorStocks = stocks.filter(stock => {
-        const normalizedStockSector = normalizeSector(stock.sector);
-        const isPreferredSector = normalizedStockSector === normalizedUserSector || 
-                                 normalizedStockSector.includes(normalizedUserSector) ||
-                                 normalizedUserSector.includes(normalizedStockSector);
-        
-        return !isPreferredSector && 
-               stock.pricePerShare <= affordabilityThreshold * 5 && 
-               stock.oneYearReturn > -80;
+    // For healthcare specifically, be even more aggressive
+    if (normalizedUserSector === 'healthcare') {
+      const healthcareStocks = sectorStocks.filter(stock => {
+        // Only exclude if completely unaffordable or catastrophic performance
+        return stock.pricePerShare <= affordabilityThreshold * 10 && stock.oneYearReturn > -90;
       });
       
-      // Add other sector stocks to reach at least 40 total recommendations
-      const targetCount = 40;
-      const remainingSlots = Math.max(0, targetCount - filteredStocks.length);
+      console.log(`HEALTHCARE PRIORITY: ${healthcareStocks.length} healthcare stocks after lenient filtering`);
       
-      if (otherSectorStocks.length > 0) {
-        // Prioritize stocks with good fundamentals from other sectors
-        const sortedOtherStocks = otherSectorStocks.sort((a, b) => {
-          let scoreA = 0, scoreB = 0;
+      if (healthcareStocks.length >= 10) {
+        // Prioritize healthcare stocks heavily
+        filteredStocks = [...healthcareStocks];
+        
+        // Add a few other stocks for diversity, but healthcare first
+        const otherStocks = stocks.filter(stock => {
+          const normalizedStockSector = normalizeSector(stock.sector);
+          return normalizedStockSector !== 'healthcare' && 
+                 stock.pricePerShare <= affordabilityThreshold * 5 && 
+                 stock.oneYearReturn > -70;
+        }).slice(0, 20); // Maximum 20 non-healthcare stocks
+        
+        filteredStocks = [...healthcareStocks, ...otherStocks];
+        console.log(`HEALTHCARE FOCUSED PORTFOLIO: ${healthcareStocks.length} healthcare + ${otherStocks.length} others`);
+      } else {
+        // Fallback if very few healthcare stocks
+        filteredStocks = sectorStocks;
+      }
+    } else {
+      // For other sectors, use existing logic
+      const filteredSectorStocks = sectorStocks.filter(stock => {
+        return stock.pricePerShare <= affordabilityThreshold * 3 && stock.oneYearReturn > -80;
+      });
+
+      if (filteredSectorStocks.length >= 20) {
+        filteredStocks = filteredSectorStocks;
+      } else {
+        // Mixed portfolio approach for other sectors
+        filteredStocks = [...filteredSectorStocks];
+        
+        const otherSectorStocks = stocks.filter(stock => {
+          const normalizedStockSector = normalizeSector(stock.sector);
+          const isPreferredSector = normalizedStockSector === normalizedUserSector || 
+                                   normalizedStockSector.includes(normalizedUserSector) ||
+                                   normalizedUserSector.includes(normalizedStockSector);
           
-          // Prefer lower risk for beginners
-          if (profile.experience === 'beginner' || profile.experience === 'none') {
-            if (a.riskLevel === 'low') scoreA += 10;
-            if (b.riskLevel === 'low') scoreB += 10;
-          }
-          
-          // Prefer positive returns
-          if (a.oneYearReturn > 0) scoreA += a.oneYearReturn * 0.1;
-          if (b.oneYearReturn > 0) scoreB += b.oneYearReturn * 0.1;
-          
-          // Prefer dividend-paying stocks for income
-          scoreA += a.dividendYield * 2;
-          scoreB += b.dividendYield * 2;
-          
-          return scoreB - scoreA;
+          return !isPreferredSector && 
+                 stock.pricePerShare <= affordabilityThreshold * 5 && 
+                 stock.oneYearReturn > -80;
         });
         
-        filteredStocks = filteredStocks.concat(sortedOtherStocks.slice(0, remainingSlots));
+        const targetCount = 40;
+        const remainingSlots = Math.max(0, targetCount - filteredStocks.length);
+        
+        if (otherSectorStocks.length > 0) {
+          const sortedOtherStocks = otherSectorStocks.sort((a, b) => {
+            let scoreA = 0, scoreB = 0;
+            
+            if (profile.experience === 'beginner' || profile.experience === 'none') {
+              if (a.riskLevel === 'low') scoreA += 10;
+              if (b.riskLevel === 'low') scoreB += 10;
+            }
+            
+            if (a.oneYearReturn > 0) scoreA += a.oneYearReturn * 0.1;
+            if (b.oneYearReturn > 0) scoreB += b.oneYearReturn * 0.1;
+            
+            scoreA += a.dividendYield * 2;
+            scoreB += b.dividendYield * 2;
+            
+            return scoreB - scoreA;
+          });
+          
+          filteredStocks = filteredStocks.concat(sortedOtherStocks.slice(0, remainingSlots));
+        }
       }
-      
-      console.log(`Mixed portfolio created: ${filteredStocks.length} total stocks (${filteredSectorStocks.length} from preferred sector)`);
     }
   } else {
     // No sector preference - apply minimal filtering for diverse portfolio
@@ -197,7 +206,8 @@ export const filterStocksByProfile = (
     });
   }
 
-  console.log(`Final filtered result: ${filteredStocks.length} stocks from ${stocks.length} total`);
+  console.log(`FINAL FILTERING RESULT: ${filteredStocks.length} stocks from ${stocks.length} total`);
+  console.log('Final stock sectors:', [...new Set(filteredStocks.map(s => s.sector))]);
 
   // Final safety net - ensure minimum variety
   if (filteredStocks.length < 30) {
