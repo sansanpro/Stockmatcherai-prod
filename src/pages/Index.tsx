@@ -18,6 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import { Moon, BarChart, Eye, Heart, Scale } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -42,14 +43,6 @@ const IndexContent = () => {
       setIsLoadingProfile(true);
       
       try {
-        // First, let's see what data exists in the user_profiles table
-        const { data: allProfiles, error: debugError } = await supabase
-          .from('user_profiles')
-          .select('*');
-        
-        console.log('All profiles in database:', allProfiles);
-        console.log('Debug error:', debugError);
-
         const { data: profileData, error } = await supabase
           .from('user_profiles')
           .select('*')
@@ -100,32 +93,53 @@ const IndexContent = () => {
   }, [user, loading]);
 
   const handleProfileComplete = async (profile: UserProfile) => {
-    if (!user) return;
+    if (!user) {
+      console.error('No user found when trying to save profile');
+      toast.error('Please log in to save your profile');
+      return;
+    }
+
+    console.log('Saving profile for user:', user.id, profile);
 
     try {
-      // Save profile to database
-      const { error } = await supabase
+      const profileData = {
+        user_id: user.id,
+        age_range: `${profile.age}-${profile.age + 10}`,
+        investment_experience: profile.experience,
+        risk_tolerance: profile.riskTolerance,
+        sectors_of_interest: [profile.sectorPreference],
+        investment_goals: [profile.investmentGoal],
+        income_level: profile.salary.toString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('Profile data to save:', profileData);
+
+      const { data, error } = await supabase
         .from('user_profiles')
-        .upsert({
-          user_id: user.id,
-          age_range: `${profile.age}-${profile.age + 10}`,
-          investment_experience: profile.experience,
-          risk_tolerance: profile.riskTolerance,
-          sectors_of_interest: [profile.sectorPreference],
-          investment_goals: [profile.investmentGoal],
-          income_level: profile.salary.toString()
-        });
+        .upsert(profileData, {
+          onConflict: 'user_id'
+        })
+        .select()
+        .single();
 
       if (error) {
         console.error('Error saving user profile:', error);
+        toast.error('Failed to save profile. Please try again.');
+        return;
       }
+
+      console.log('Profile saved successfully:', data);
+      toast.success('Profile saved successfully!');
+      
+      setUserProfile(profile);
+      setCurrentStep('matching');
+      setIsUpdatingProfile(false);
     } catch (error) {
       console.error('Error saving profile:', error);
+      toast.error('Failed to save profile. Please try again.');
     }
-
-    setUserProfile(profile);
-    setCurrentStep('matching');
-    setIsUpdatingProfile(false);
   };
 
   const resetApp = () => {
