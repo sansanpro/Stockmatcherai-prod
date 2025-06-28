@@ -2,7 +2,7 @@
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import { stockDatabase } from '@/data/stockDatabase';
 import { filterStocksByProfile } from './stockFilters';
-import { generateExplanation } from './explanationGenerator';
+import { generatePersonalizedExplanation } from './explanationGenerator';
 
 export const generateStockRecommendations = async (
   userProfile: UserProfile,
@@ -28,9 +28,9 @@ export const generateStockRecommendations = async (
     const selectedStocks = shuffled.slice(0, 50);
 
     // Convert to full recommendations with explanations
-    const recommendations: StockRecommendation[] = selectedStocks.map(stock => ({
+    const recommendations: StockRecommendation[] = selectedStocks.map((stock, index) => ({
       ...stock,
-      whyItFits: generateExplanation(stock, userProfile)
+      whyItFits: generatePersonalizedExplanation(stock, userProfile, index === 0)
     }));
 
     console.log(`Returning ${recommendations.length} stock recommendations`);
@@ -45,9 +45,9 @@ export const generateStockRecommendations = async (
       .sort(() => Math.random() - 0.5)
       .slice(0, 20);
 
-    return fallbackStocks.map(stock => ({
+    return fallbackStocks.map((stock, index) => ({
       ...stock,
-      whyItFits: generateExplanation(stock, userProfile)
+      whyItFits: generatePersonalizedExplanation(stock, userProfile, index === 0)
     }));
   }
 };
