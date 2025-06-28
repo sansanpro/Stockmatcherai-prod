@@ -13,10 +13,10 @@ interface StockCardProps {
 const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'low': return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-700';
+      case 'high': return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
     }
   };
 
@@ -49,25 +49,25 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
   };
 
   const getESGRating = (score: number) => {
-    if (score >= 80) return { rating: 'A+', color: 'text-green-600' };
-    if (score >= 70) return { rating: 'A', color: 'text-green-600' };
-    if (score >= 60) return { rating: 'B+', color: 'text-blue-600' };
-    if (score >= 50) return { rating: 'B', color: 'text-yellow-600' };
-    return { rating: 'C', color: 'text-red-600' };
+    if (score >= 80) return { rating: 'A+', color: 'text-green-600 dark:text-green-400' };
+    if (score >= 70) return { rating: 'A', color: 'text-green-600 dark:text-green-400' };
+    if (score >= 60) return { rating: 'B+', color: 'text-blue-600 dark:text-blue-400' };
+    if (score >= 50) return { rating: 'B', color: 'text-yellow-600 dark:text-yellow-400' };
+    return { rating: 'C', color: 'text-red-600 dark:text-red-400' };
   };
 
   const analystRating = stock.oneYearReturn > 15 ? 'Strong Buy' : stock.oneYearReturn > 5 ? 'Buy' : stock.oneYearReturn > -5 ? 'Hold' : 'Sell';
   const esgRating = getESGRating(stock.esgScore || 70);
 
   return (
-    <Card className="w-full shadow-xl border-0 bg-white overflow-hidden">
+    <Card className="w-full shadow-xl border-0 bg-white dark:bg-gray-800 overflow-hidden">
       <CardContent className="p-0">
         {/* Header with company info */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
+        <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 text-white p-6">
           <div className="flex justify-between items-start mb-4">
             <div>
               <h2 className="text-xl font-bold">{stock.companyName}</h2>
-              <p className="text-blue-100 font-medium">({stock.ticker})</p>
+              <p className="text-blue-100 dark:text-blue-200 font-medium">({stock.ticker})</p>
             </div>
             <div className="flex items-center gap-2">
               <Badge className={`${getRiskColor(stock.riskLevel)} font-semibold`}>
@@ -89,25 +89,25 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
           
           <div className="flex items-center gap-2 text-sm">
             <span>🏢</span>
-            <span className="text-blue-100">{stock.sector}</span>
+            <span className="text-blue-100 dark:text-blue-200">{stock.sector}</span>
           </div>
         </div>
 
         {/* Expert Insights Banner */}
-        <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 border-b">
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-4 border-b dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Star className="w-4 h-4 text-yellow-500" />
-                <span className="text-sm font-semibold text-gray-700">Analyst Rating:</span>
-                <Badge className={`${analystRating.includes('Buy') ? 'bg-green-100 text-green-800' : 
-                  analystRating === 'Hold' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'} text-xs`}>
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Analyst Rating:</span>
+                <Badge className={`${analystRating.includes('Buy') ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 
+                  analystRating === 'Hold' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'} text-xs`}>
                   {analystRating}
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
                 <Leaf className="w-4 h-4 text-green-500" />
-                <span className="text-sm font-semibold text-gray-700">ESG:</span>
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">ESG:</span>
                 <span className={`font-bold text-sm ${esgRating.color}`}>{esgRating.rating}</span>
               </div>
             </div>
@@ -115,66 +115,66 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
         </div>
 
         {/* CEO Section with Stylish Initials */}
-        <div className="p-6 border-b bg-gray-50">
+        <div className="p-6 border-b bg-gray-50 dark:bg-gray-700/50 dark:border-gray-700">
           <div className="flex items-center gap-4 mb-3">
-            <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+            <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-800 dark:from-slate-500 dark:to-slate-700 rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-gray-600">
               <span className="text-white font-bold text-xl tracking-wide">
                 {getCeoInitials(stock.ceoName)}
               </span>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-lg">{stock.ceoName}</h3>
-              <p className="text-sm text-gray-600">Chief Executive Officer</p>
-              <p className="text-xs text-gray-500">{stock.companyName}</p>
+              <h3 className="font-semibold text-gray-900 dark:text-white text-lg">{stock.ceoName}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Chief Executive Officer</p>
+              <p className="text-xs text-gray-500 dark:text-gray-500">{stock.companyName}</p>
             </div>
           </div>
-          <p className="text-sm text-gray-700 leading-relaxed">
+          <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
             {stock.ceoHighlights}
           </p>
         </div>
 
         {/* Financials */}
-        <div className="p-6 border-b">
-          <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="p-6 border-b dark:border-gray-700">
+          <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <span>💰</span>
             Key Financials
           </h4>
           <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-blue-50 rounded-lg">
-              <p className="text-xs text-gray-600 mb-1">P/E Ratio</p>
-              <p className="font-bold text-blue-600">{stock.peRatio}</p>
+            <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">P/E Ratio</p>
+              <p className="font-bold text-blue-600 dark:text-blue-400">{stock.peRatio}</p>
             </div>
-            <div className="text-center p-3 bg-purple-50 rounded-lg">
-              <p className="text-xs text-gray-600 mb-1">Market Cap</p>
-              <p className="font-bold text-purple-600">{stock.marketCap}</p>
+            <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Market Cap</p>
+              <p className="font-bold text-purple-600 dark:text-purple-400">{stock.marketCap}</p>
             </div>
-            <div className="text-center p-3 bg-green-50 rounded-lg">
-              <p className="text-xs text-gray-600 mb-1">1-Year Return</p>
-              <p className={`font-bold ${stock.oneYearReturn >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">1-Year Return</p>
+              <p className={`font-bold ${stock.oneYearReturn >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                 {stock.oneYearReturn > 0 ? '+' : ''}{stock.oneYearReturn.toFixed(1)}%
               </p>
             </div>
-            <div className="text-center p-3 bg-orange-50 rounded-lg">
-              <p className="text-xs text-gray-600 mb-1">Price/Share</p>
-              <p className="font-bold text-orange-600">{formatNumber(stock.pricePerShare)}</p>
+            <div className="text-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Price/Share</p>
+              <p className="font-bold text-orange-600 dark:text-orange-400">{formatNumber(stock.pricePerShare)}</p>
             </div>
           </div>
           
           {stock.dividendYield > 0 && (
-            <div className="mt-4 text-center p-3 bg-yellow-50 rounded-lg">
-              <p className="text-xs text-gray-600 mb-1">Dividend Yield</p>
-              <p className="font-bold text-yellow-600">{stock.dividendYield.toFixed(2)}%</p>
+            <div className="mt-4 text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Dividend Yield</p>
+              <p className="font-bold text-yellow-600 dark:text-yellow-400">{stock.dividendYield.toFixed(2)}%</p>
             </div>
           )}
         </div>
 
         {/* Why it fits */}
         <div className="p-6">
-          <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <h4 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
             <span>💡</span>
             Why this fits you
           </h4>
-          <p className="text-sm text-gray-700 leading-relaxed bg-blue-50 p-4 rounded-lg">
+          <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
             {stock.whyItFits}
           </p>
         </div>
