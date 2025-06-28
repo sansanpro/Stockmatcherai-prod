@@ -100,6 +100,8 @@ export class AlphaVantageService {
     const quotes = new Map<string, AlphaVantageQuote>();
     const batchSize = 5; // Alpha Vantage free tier has rate limits
     
+    console.log(`Fetching quotes for ${symbols.length} symbols in batches of ${batchSize}`);
+    
     for (let i = 0; i < symbols.length; i += batchSize) {
       const batch = symbols.slice(i, i + batchSize);
       const promises = batch.map(symbol => this.getQuote(symbol));
@@ -112,21 +114,26 @@ export class AlphaVantageService {
           }
         });
         
-        // Rate limiting - wait 1 second between batches
+        console.log(`Processed batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(symbols.length/batchSize)} - ${quotes.size} successful quotes so far`);
+        
+        // Rate limiting - wait 1 second between batches for free tier
         if (i + batchSize < symbols.length) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, 1200)); // Slightly longer delay for safety
         }
       } catch (error) {
-        console.error('Batch quote fetch error:', error);
+        console.error(`Batch quote fetch error for batch starting at index ${i}:`, error);
       }
     }
     
+    console.log(`Completed fetching quotes: ${quotes.size}/${symbols.length} successful`);
     return quotes;
   }
 
   async getMultipleOverviews(symbols: string[]): Promise<Map<string, AlphaVantageOverview>> {
     const overviews = new Map<string, AlphaVantageOverview>();
     const batchSize = 5;
+    
+    console.log(`Fetching overviews for ${symbols.length} symbols in batches of ${batchSize}`);
     
     for (let i = 0; i < symbols.length; i += batchSize) {
       const batch = symbols.slice(i, i + batchSize);
@@ -140,15 +147,18 @@ export class AlphaVantageService {
           }
         });
         
+        console.log(`Processed overview batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(symbols.length/batchSize)} - ${overviews.size} successful overviews so far`);
+        
         // Rate limiting
         if (i + batchSize < symbols.length) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, 1200));
         }
       } catch (error) {
-        console.error('Batch overview fetch error:', error);
+        console.error(`Batch overview fetch error for batch starting at index ${i}:`, error);
       }
     }
     
+    console.log(`Completed fetching overviews: ${overviews.size}/${symbols.length} successful`);
     return overviews;
   }
 }

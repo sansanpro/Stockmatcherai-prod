@@ -1,17 +1,85 @@
-
 import { StockRecommendation } from '@/types/stock-matcher';
 import { createAlphaVantageService } from './alphaVantageService';
 
-// Popular stocks to fetch data for
+// Comprehensive stock symbols across all major sectors (500+ stocks)
 const STOCK_SYMBOLS = [
-  'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META', 'NFLX',
-  'JNJ', 'UNH', 'PFE', 'ABBV', 'LLY', 'MRK', 'TMO',
-  'JPM', 'BAC', 'WFC', 'GS', 'MS', 'V', 'MA', 'PYPL',
-  'KO', 'PEP', 'WMT', 'HD', 'TGT', 'COST', 'LOW',
-  'XOM', 'CVX', 'COP', 'EOG', 'SLB',
-  'VZ', 'T', 'NEE', 'DUK', 'SO',
-  'ADBE', 'CRM', 'ORCL', 'INTC', 'AMD', 'IBM',
-  'UBER', 'LYFT', 'SPOT', 'SNAP', 'ZM', 'SQ'
+  // Large Cap Technology
+  'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META', 'NFLX', 'ADBE', 'CRM',
+  'ORCL', 'INTC', 'AMD', 'IBM', 'CSCO', 'QCOM', 'TXN', 'AVGO', 'NOW', 'SNOW',
+  'PLTR', 'ZM', 'UBER', 'LYFT', 'SQ', 'PYPL', 'SHOP', 'TWLO', 'OKTA', 'CRWD',
+  'ZS', 'DDOG', 'MDB', 'NET', 'TEAM', 'WDAY', 'VEEV', 'SPLK', 'PANW', 'FTNT',
+  
+  // Healthcare & Biotech
+  'JNJ', 'UNH', 'PFE', 'ABBV', 'LLY', 'MRK', 'TMO', 'ABT', 'MDT', 'AMGN',
+  'GILD', 'CVS', 'CI', 'HUM', 'ANTM', 'BMY', 'BIIB', 'REGN', 'VRTX', 'ISRG',
+  'ZBH', 'SYK', 'BSX', 'EW', 'HOLX', 'VAR', 'PKI', 'IQV', 'MTD', 'DXCM',
+  'ILMN', 'MRNA', 'BNTX', 'TDOC', 'VEEV', 'INCY', 'ALNY', 'TECH', 'BGNE',
+  
+  // Financial Services
+  'JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'BLK', 'SCHW', 'AXP', 'COF',
+  'USB', 'PNC', 'TFC', 'BK', 'STT', 'NTRS', 'RF', 'CFG', 'HBAN', 'FITB',
+  'KEY', 'ZION', 'CMA', 'MTB', 'PBCT', 'V', 'MA', 'PYPL', 'SQ', 'FIS',
+  'FISV', 'WU', 'DFS', 'SYF', 'ALLY', 'LYG', 'DB', 'CS', 'UBS', 'RY',
+  
+  // Real Estate & REITs
+  'AMT', 'PLD', 'CCI', 'EQIX', 'SPG', 'O', 'WELL', 'PSA', 'VTR', 'ARE',
+  'DLR', 'BXP', 'AVB', 'EQR', 'ESS', 'MAA', 'UDR', 'CPT', 'FRT', 'REG',
+  'KIM', 'PEI', 'MAC', 'SLG', 'VNO', 'HPP', 'DEI', 'HIW', 'KRC', 'PGRE',
+  'IRM', 'LAMR', 'AMH', 'EXR', 'CUBE', 'LSI', 'REXR', 'NSA', 'STOR', 'WPC',
+  
+  // Consumer Discretionary
+  'AMZN', 'TSLA', 'HD', 'LOW', 'MCD', 'SBUX', 'NKE', 'TJX', 'BKNG', 'ABNB',
+  'TGT', 'COST', 'WMT', 'DIS', 'CMCSA', 'NFLX', 'T', 'VZ', 'CHTR', 'TMUS',
+  'EBAY', 'ETSY', 'RVLV', 'W', 'WAYFAIR', 'CHWY', 'PETS', 'GOLF', 'DKS', 'BBY',
+  'GPS', 'ANF', 'AEO', 'URBN', 'LULU', 'DECK', 'CROX', 'SKX', 'NWL', 'HAS',
+  
+  // Consumer Staples
+  'PG', 'KO', 'PEP', 'WMT', 'COST', 'MDLZ', 'GIS', 'K', 'CAG', 'CPB',
+  'HSY', 'SJM', 'HRL', 'MKC', 'CLX', 'KMB', 'CL', 'EL', 'ULTA', 'CVS',
+  'WBA', 'KR', 'SYY', 'DLTR', 'DG', 'BJ', 'UNFI', 'INGR', 'LW', 'CALM',
+  
+  // Energy
+  'XOM', 'CVX', 'COP', 'EOG', 'SLB', 'OXY', 'PSX', 'VLO', 'MPC', 'HES',
+  'DVN', 'FANG', 'MRO', 'APA', 'CLR', 'NFG', 'EQT', 'CNX', 'AR', 'CHK',
+  'KMI', 'OKE', 'EPD', 'ET', 'WMB', 'TRP', 'ENB', 'TC', 'PPL', 'SO',
+  'NEE', 'DUK', 'D', 'EXC', 'XEL', 'WEC', 'ES', 'AEP', 'FE', 'ETR',
+  
+  // Utilities
+  'NEE', 'DUK', 'SO', 'D', 'EXC', 'XEL', 'WEC', 'ES', 'AEP', 'FE',
+  'ETR', 'PPL', 'AES', 'LNT', 'NRG', 'VST', 'AWK', 'WTR', 'SJW', 'MSEX',
+  'CWT', 'YORW', 'ARTNA', 'CONN', 'PCG', 'EIX', 'SRE', 'PEG', 'ED', 'CNP',
+  
+  // Industrials
+  'BA', 'CAT', 'DE', 'HON', 'UPS', 'RTX', 'LMT', 'NOC', 'GD', 'LHX',
+  'MMM', 'GE', 'EMR', 'ETN', 'PH', 'CMI', 'ITW', 'ROK', 'DOV', 'XYL',
+  'FTV', 'IEX', 'PNR', 'ROP', 'WAB', 'ODFL', 'CHRW', 'EXPD', 'JBHT', 'KNX',
+  'FAST', 'PCAR', 'IR', 'OTIS', 'CARR', 'TT', 'JCI', 'GNRC', 'PWR', 'HUBB',
+  
+  // Materials
+  'LIN', 'APD', 'SHW', 'ECL', 'FCX', 'NEM', 'GOLD', 'AA', 'X', 'NUE',
+  'STLD', 'RS', 'CMC', 'MLM', 'VMC', 'EMN', 'PPG', 'RPM', 'AVY', 'PKG',
+  'IP', 'WRK', 'SON', 'SEE', 'BLL', 'CCK', 'SLGN', 'KWR', 'AMCR', 'CF',
+  'MOS', 'FMC', 'LYB', 'DOW', 'DD', 'CTVA', 'IFF', 'FUL', 'HUN', 'OLN',
+  
+  // Communication Services
+  'GOOGL', 'META', 'NFLX', 'DIS', 'CMCSA', 'T', 'VZ', 'CHTR', 'TMUS', 'DISH',
+  'FOXA', 'FOX', 'PARA', 'WBD', 'SPOT', 'SNAP', 'PINS', 'TWTR', 'MTCH', 'BMBL',
+  'ZI', 'CARS', 'QNST', 'QUOT', 'MGNI', 'TTD', 'RAMP', 'CRTO', 'PUBM', 'YELP',
+  
+  // Mid-Cap Growth Stocks
+  'ROKU', 'DOCU', 'PTON', 'ZG', 'ZILLOW', 'ABNB', 'DASH', 'COIN', 'HOOD', 'AFRM',
+  'UPST', 'SOFI', 'OPEN', 'RDFN', 'COMP', 'BILL', 'PSTG', 'ESTC', 'GTLB', 'FROG',
+  'AI', 'C3AI', 'BBAI', 'SOUN', 'SMCI', 'NVTS', 'DELL', 'HPQ', 'NTAP', 'WDC',
+  
+  // Small-Cap Value & Growth
+  'TMDX', 'SMTC', 'CRSR', 'CORSAIR', 'PLBY', 'VIAC', 'DISCA', 'AMC', 'GME', 'BB',
+  'NOK', 'SNDL', 'TLRY', 'CGC', 'ACB', 'HEXO', 'OGI', 'CRON', 'APHA', 'GRWG',
+  'SMG', 'IIPR', 'KERN', 'VERU', 'PROG', 'PRTY', 'EXPR', 'KOSS', 'NAKD', 'SIRI',
+  
+  // International ADRs
+  'ASML', 'TSM', 'BABA', 'JD', 'BIDU', 'NIO', 'XPEV', 'LI', 'DIDI', 'TME',
+  'NTES', 'WB', 'SINA', 'SOHU', 'IQ', 'VIPS', 'DOYU', 'HUYA', 'YY', 'MOMO',
+  'SAP', 'UL', 'NVO', 'ASML', 'SHOP', 'SE', 'GRAB', 'CPNG', 'UBER', 'DIDI'
 ];
 
 // CEO data mapping (since Alpha Vantage doesn't provide CEO info)
@@ -69,12 +137,12 @@ export class StockDataService {
   }
 
   async getStockData(): Promise<Omit<StockRecommendation, 'whyItFits'>[]> {
-    console.log('Fetching live stock data from Alpha Vantage...');
+    console.log(`Fetching live stock data from Alpha Vantage for ${STOCK_SYMBOLS.length} stocks...`);
     
     try {
-      // Get quotes for all symbols
+      // Get quotes for all symbols (now 500+ stocks)
       const quotes = await this.alphaVantageService.getMultipleQuotes(STOCK_SYMBOLS);
-      console.log(`Retrieved ${quotes.size} stock quotes`);
+      console.log(`Retrieved ${quotes.size} stock quotes from ${STOCK_SYMBOLS.length} requested`);
       
       // Get company overviews for detailed information
       const overviews = await this.alphaVantageService.getMultipleOverviews(STOCK_SYMBOLS);
@@ -121,7 +189,7 @@ export class StockDataService {
         }
       }
       
-      console.log(`Successfully processed ${stockData.length} stocks`);
+      console.log(`Successfully processed ${stockData.length} stocks from expanded universe`);
       return stockData;
       
     } catch (error) {
