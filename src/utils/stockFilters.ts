@@ -29,16 +29,74 @@ export const filterStocksByProfile = (
 
   // Normalize sector names for better matching
   const normalizeSector = (sector: string): string => {
-    return sector.toLowerCase()
-      .replace(/[-_\s]/g, '') // Remove hyphens, underscores, spaces
-      .replace('realestate', 'realestate')
-      .replace('real-estate', 'realestate')
-      .replace('reits', 'realestate')
-      .replace('property', 'realestate')
-      .replace('info', 'technology')
-      .replace('tech', 'technology')
-      .replace('it', 'technology')
-      .replace('software', 'technology');
+    const normalized = sector.toLowerCase().replace(/[-_\s]/g, '');
+    
+    // Map various sector names to standardized forms
+    const sectorMappings: Record<string, string> = {
+      // Real Estate variations
+      'realestate': 'realestate',
+      'reits': 'realestate',
+      'property': 'realestate',
+      'realestatepropertyreits': 'realestate',
+      
+      // Technology variations
+      'technology': 'technology',
+      'tech': 'technology',
+      'it': 'technology',
+      'software': 'technology',
+      'information': 'technology',
+      'info': 'technology',
+      
+      // Healthcare variations
+      'healthcare': 'healthcare',
+      'health': 'healthcare',
+      'medical': 'healthcare',
+      'pharma': 'healthcare',
+      'pharmaceutical': 'healthcare',
+      'biotech': 'healthcare',
+      
+      // Finance variations
+      'finance': 'finance',
+      'financial': 'finance',
+      'banking': 'finance',
+      'insurance': 'finance',
+      'fintech': 'finance',
+      
+      // Consumer variations
+      'consumer': 'consumer',
+      'retail': 'consumer',
+      'discretionary': 'consumer',
+      'staples': 'consumer',
+      'consumerdiscretionary': 'consumer',
+      'consumerstaples': 'consumer',
+      
+      // Utilities variations
+      'utilities': 'utilities',
+      'utility': 'utilities',
+      'power': 'utilities',
+      'electric': 'utilities',
+      
+      // Energy variations
+      'energy': 'energy',
+      'oil': 'energy',
+      'gas': 'energy',
+      'petroleum': 'energy',
+      'renewable': 'energy',
+      
+      // Industrial variations
+      'industrial': 'industrial',
+      'industrials': 'industrial',
+      'manufacturing': 'industrial',
+      'construction': 'industrial',
+      
+      // Materials variations
+      'materials': 'materials',
+      'mining': 'materials',
+      'metals': 'materials',
+      'chemicals': 'materials'
+    };
+
+    return sectorMappings[normalized] || normalized;
   };
 
   // Risk compatibility scoring
