@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,17 +11,21 @@ import Settings from '@/components/Settings';
 import NotificationSystem from '@/components/NotificationSystem';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UserMenu from '@/components/UserMenu';
+import StockDetailsModal from '@/components/StockDetailsModal';
+import StockComparison from '@/components/StockComparison';
 import { AppProvider, useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserProfile } from '@/types/stock-matcher';
-import { Moon, BarChart, Eye, Heart } from 'lucide-react';
+import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
+import { Moon, BarChart, Eye, Heart, Scale } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'matches' | 'watchlist' | 'analytics' | 'settings'>('welcome');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-  const { isDarkMode, toggleDarkMode } = useApp();
+  const [selectedStockForDetails, setSelectedStockForDetails] = useState<StockRecommendation | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const { isDarkMode, toggleDarkMode, addToWatchlist, passStock } = useApp();
   const { user, loading } = useAuth();
 
   const handleProfileComplete = (profile: UserProfile) => {
@@ -46,6 +51,19 @@ const IndexContent = () => {
 
   const handleBackFromSettings = () => {
     setCurrentStep(userProfile ? 'matching' : 'welcome');
+  };
+
+  const handleViewStockDetails = (stock: StockRecommendation) => {
+    setSelectedStockForDetails(stock);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleMatchFromModal = (stock: StockRecommendation) => {
+    addToWatchlist(stock);
+  };
+
+  const handlePassFromModal = (stock: StockRecommendation) => {
+    passStock(stock);
   };
 
   // Show loading while checking authentication
@@ -156,6 +174,7 @@ const IndexContent = () => {
           </Button>
         </div>
         <div className="flex items-center gap-2">
+          <StockComparison availableStocks={[]} />
           <NotificationSystem />
           <Button
             onClick={toggleDarkMode}
@@ -208,8 +227,19 @@ const IndexContent = () => {
       <ProtectedRoute>
         <AppHeader />
         <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700">
-          <StockMatcher userProfile={userProfile!} onReset={handleUpdateProfile} />
+          <StockMatcher 
+            userProfile={userProfile!} 
+            onReset={handleUpdateProfile}
+            onViewDetails={handleViewStockDetails}
+          />
         </div>
+        <StockDetailsModal
+          stock={selectedStockForDetails}
+          isOpen={isDetailsModalOpen}
+          onClose={() => setIsDetailsModalOpen(false)}
+          onMatch={handleMatchFromModal}
+          onPass={handlePassFromModal}
+        />
       </ProtectedRoute>
     );
   }
@@ -220,9 +250,16 @@ const IndexContent = () => {
         <AppHeader />
         <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 p-4">
           <div className="max-w-6xl mx-auto pt-8">
-            <Matches />
+            <Matches onViewDetails={handleViewStockDetails} />
           </div>
         </div>
+        <StockDetailsModal
+          stock={selectedStockForDetails}
+          isOpen={isDetailsModalOpen}
+          onClose={() => setIsDetailsModalOpen(false)}
+          onMatch={handleMatchFromModal}
+          onPass={handlePassFromModal}
+        />
       </ProtectedRoute>
     );
   }
@@ -233,9 +270,16 @@ const IndexContent = () => {
         <AppHeader />
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
           <div className="max-w-4xl mx-auto pt-8">
-            <Watchlist />
+            <Watchlist onViewDetails={handleViewStockDetails} />
           </div>
         </div>
+        <StockDetailsModal
+          stock={selectedStockForDetails}
+          isOpen={isDetailsModalOpen}
+          onClose={() => setIsDetailsModalOpen(false)}
+          onMatch={handleMatchFromModal}
+          onPass={handlePassFromModal}
+        />
       </ProtectedRoute>
     );
   }

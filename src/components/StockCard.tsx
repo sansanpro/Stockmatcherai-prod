@@ -1,13 +1,16 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { StockRecommendation } from '@/types/stock-matcher';
+import { Eye, Star, Leaf } from 'lucide-react';
 
 interface StockCardProps {
   stock: StockRecommendation;
+  onViewDetails?: (stock: StockRecommendation) => void;
 }
 
-const StockCard = ({ stock }: StockCardProps) => {
+const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
   const getRiskColor = (risk: string) => {
     switch (risk) {
       case 'low': return 'bg-green-100 text-green-800 border-green-200';
@@ -45,6 +48,17 @@ const StockCard = ({ stock }: StockCardProps) => {
       .slice(0, 2);
   };
 
+  const getESGRating = (score: number) => {
+    if (score >= 80) return { rating: 'A+', color: 'text-green-600' };
+    if (score >= 70) return { rating: 'A', color: 'text-green-600' };
+    if (score >= 60) return { rating: 'B+', color: 'text-blue-600' };
+    if (score >= 50) return { rating: 'B', color: 'text-yellow-600' };
+    return { rating: 'C', color: 'text-red-600' };
+  };
+
+  const analystRating = stock.oneYearReturn > 15 ? 'Strong Buy' : stock.oneYearReturn > 5 ? 'Buy' : stock.oneYearReturn > -5 ? 'Hold' : 'Sell';
+  const esgRating = getESGRating(stock.esgScore || 70);
+
   return (
     <Card className="w-full shadow-xl border-0 bg-white overflow-hidden">
       <CardContent className="p-0">
@@ -55,14 +69,48 @@ const StockCard = ({ stock }: StockCardProps) => {
               <h2 className="text-xl font-bold">{stock.companyName}</h2>
               <p className="text-blue-100 font-medium">({stock.ticker})</p>
             </div>
-            <Badge className={`${getRiskColor(stock.riskLevel)} font-semibold`}>
-              {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge className={`${getRiskColor(stock.riskLevel)} font-semibold`}>
+                {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()}
+              </Badge>
+              {onViewDetails && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => onViewDetails(stock)}
+                  className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white border-0"
+                >
+                  <Eye className="w-3 h-3" />
+                  Details
+                </Button>
+              )}
+            </div>
           </div>
           
           <div className="flex items-center gap-2 text-sm">
             <span>🏢</span>
             <span className="text-blue-100">{stock.sector}</span>
+          </div>
+        </div>
+
+        {/* Expert Insights Banner */}
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 border-b">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-yellow-500" />
+                <span className="text-sm font-semibold text-gray-700">Analyst Rating:</span>
+                <Badge className={`${analystRating.includes('Buy') ? 'bg-green-100 text-green-800' : 
+                  analystRating === 'Hold' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'} text-xs`}>
+                  {analystRating}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <Leaf className="w-4 h-4 text-green-500" />
+                <span className="text-sm font-semibold text-gray-700">ESG:</span>
+                <span className={`font-bold text-sm ${esgRating.color}`}>{esgRating.rating}</span>
+              </div>
+            </div>
           </div>
         </div>
 
