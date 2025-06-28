@@ -1,4 +1,3 @@
-
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import { createStockDataService } from '@/services/stockDataService';
 import { filterStocksByProfile } from '@/utils/stockFilters';
@@ -71,10 +70,10 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
     const selectedStocks = sortedStocks.slice(0, recommendationCount);
     console.log(`Selected ${selectedStocks.length} stocks for recommendations`);
 
-    // Generate personalized explanations for each recommendation
+    // Generate personalized explanations for each recommendation with unique catchy phrases
     const recommendations = selectedStocks.map((stock, index) => {
       try {
-        const explanation = generatePersonalizedExplanation(stock, profile);
+        const explanation = generatePersonalizedExplanation(stock, profile, index === 0);
         return {
           ...stock,
           whyItFits: explanation
@@ -122,9 +121,9 @@ export const generateStockRecommendations = async (profile: UserProfile): Promis
     console.error('Error generating stock recommendations:', error);
     
     // Fallback: Return a basic set of diverse stocks from static data
-    const fallbackStocks = stockDatabase.slice(0, 30).map(stock => ({
+    const fallbackStocks = stockDatabase.slice(0, 30).map((stock, index) => ({
       ...stock,
-      whyItFits: 'Diversified investment option with solid market fundamentals.'
+      whyItFits: generatePersonalizedExplanation(stock, profile, index === 0)
     }));
     
     console.log('Returning fallback recommendations from static data');

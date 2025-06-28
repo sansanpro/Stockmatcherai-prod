@@ -1,9 +1,18 @@
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 
+// Track used catchy phrases to ensure uniqueness
+const usedCatchyPhrases = new Set<string>();
+
 export const generatePersonalizedExplanation = (
   stock: Omit<StockRecommendation, 'whyItFits'>,
-  profile: UserProfile
+  profile: UserProfile,
+  isFirstInBatch: boolean = false
 ): string => {
+  // Reset used phrases for new batch of recommendations
+  if (isFirstInBatch) {
+    usedCatchyPhrases.clear();
+  }
+
   const reasons: string[] = [];
 
   // Stock-specific characteristics first
@@ -51,16 +60,16 @@ export const generatePersonalizedExplanation = (
     uniqueReasons.push(...fallbackReasons);
   }
 
-  // Select the best reasons and format them with catchy hooks first
+  // Select the best reasons and format them with unique catchy hooks first
   const selectedReasons = uniqueReasons.slice(0, 3);
-  const reformattedReasons = selectedReasons.map(reason => reformatWithCatchyHook(reason, stock));
+  const reformattedReasons = selectedReasons.map(reason => reformatWithUniqueCatchyHook(reason, stock));
   
   return reformattedReasons.join(' ') + '.';
 };
 
-const reformatWithCatchyHook = (reason: string, stock: Omit<StockRecommendation, 'whyItFits'>): string => {
+const reformatWithUniqueCatchyHook = (reason: string, stock: Omit<StockRecommendation, 'whyItFits'>): string => {
   // Extract the catchiest part and put it first, followed by stats
-  const catchyHooks = extractCatchyElements(reason);
+  const catchyHooks = extractUniqueCatchyElements(reason, stock);
   const stats = extractStatistics(reason, stock);
   const context = extractContextualInfo(reason);
   
@@ -72,46 +81,136 @@ const reformatWithCatchyHook = (reason: string, stock: Omit<StockRecommendation,
   return reformatted;
 };
 
-const extractCatchyElements = (text: string): string => {
-  // Find the most engaging phrases and put them first
-  const catchyPatterns = [
-    /like finding a \$20 bill in your old jeans/,
-    /basically the landlord of the internet/,
-    /stronger than your Wi-Fi password/,
-    /like owning a toll booth/,
-    /like dating Elon Musk's brain/,
-    /save the planet while making money/,
-    /like being the house in Vegas/,
-    /betting on Skynet, but profitable/,
-    /they know what you're thinking before you do/,
-    /like having your cake and eating it too/,
-    /finding a designer handbag at a thrift store/,
-    /getting paid to hold hands with a reliable partner/,
-    /like learning to drive in your neighborhood/,
-    /choosing a cozy coffee shop over a loud nightclub/,
-    /ordering the spiciest dish on the menu/,
-    /ecosystem dominance/,
-    /money printer/,
-    /digital real estate/,
-    /cool kid of the stock market/,
-    /always winning/
-  ];
+const extractUniqueCatchyElements = (text: string, stock: Omit<StockRecommendation, 'whyItFits'>): string => {
+  // Define unique catchy phrases for each stock ticker
+  const uniqueStockPhrases: Record<string, string[]> = {
+    'AAPL': [
+      `The fruit that never spoils financially`,
+      `Your iPhone's parent company wants to share profits`,
+      `The bitten apple that bites back with returns`,
+      `Steve Jobs' legacy machine keeps printing money`
+    ],
+    'MSFT': [
+      `The office suite of financial success`,
+      `Windows to wealth creation`,
+      `The cloud castle everyone rents from`,
+      `Bill Gates' gift that keeps on giving`
+    ],
+    'GOOGL': [
+      `The search engine for your financial future`,
+      `They know your secrets AND your investment potential`,
+      `The alphabet soup of stock returns`,
+      `Where 'I'm feeling lucky' actually pays off`
+    ],
+    'AMZN': [
+      `The everything store includes everything profits`,
+      `Prime delivery for your retirement fund`,
+      `Jeff's rocket ship for your portfolio`,
+      `The warehouse of wealth accumulation`
+    ],
+    'TSLA': [
+      `Electric dreams meet electric returns`,
+      `Elon's rollercoaster with potentially massive rewards`,
+      `The future drives itself to your bank account`,
+      `Space-age gains from earthbound innovation`
+    ],
+    'JNJ': [
+      `Band-Aids for market wounds, aspirin for volatility`,
+      `The family medicine cabinet of investments`,
+      `Healing portfolios since before your grandparents`,
+      `Medical magic for your financial health`
+    ],
+    'V': [
+      `Every swipe is a slice of the profits`,
+      `The plastic fantastic revenue machine`,
+      `Your credit card's parent wants to pay you back`,
+      `The toll booth on the highway of commerce`
+    ],
+    'MA': [
+      `The other half of the credit card empire`,
+      `Priceless returns from priceless transactions`,
+      `The payment twin that doubles your opportunities`,
+      `What's in your wallet could be in your portfolio`
+    ],
+    'NVDA': [
+      `The brains behind every smart machine`,
+      `Graphics that paint profit pictures`,
+      `AI's favorite hardware supplier`,
+      `The chip that powers the future`
+    ],
+    'JPM': [
+      `The money vault with an open door policy`,
+      `Wall Street's landlord collecting rent`,
+      `The banker's bank banking on your success`,
+      `Too big to fail, just right to profit`
+    ],
+    'KO': [
+      `The fizz that never goes flat`,
+      `Santa's favorite stock pick`,
+      `Happiness in a bottle, wealth in a share`,
+      `The pause that refreshes your portfolio`
+    ],
+    'PEP': [
+      `Snack attack on market mediocrity`,
+      `The crunch heard 'round the stock exchange`,
+      `Thirsty for profits, hungry for growth`,
+      `Pop, fizz, clink of dividend coins`
+    ],
+    'WMT': [
+      `Always low prices, always high possibilities`,
+      `The smiley face of steady returns`,
+      `Everyday low risk, everyday steady growth`,
+      `Where America shops for both groceries and gains`
+    ],
+    'UNH': [
+      `Healthcare's heavyweight champion`,
+      `The pulse of profitable medicine`,
+      `Wellness for your wealth`,
+      `The stethoscope that listens to money`
+    ]
+  };
 
-  for (const pattern of catchyPatterns) {
-    const match = text.match(pattern);
-    if (match) {
-      // Extract the sentence containing the catchy phrase
-      const sentences = text.split(/[.!]/);
-      const catchySentence = sentences.find(s => pattern.test(s));
-      if (catchySentence) {
-        return catchySentence.trim();
-      }
+  // Get available phrases for this stock
+  const stockPhrases = uniqueStockPhrases[stock.ticker] || [];
+  
+  // Find an unused phrase for this stock
+  let selectedPhrase = '';
+  for (const phrase of stockPhrases) {
+    if (!usedCatchyPhrases.has(phrase)) {
+      selectedPhrase = phrase;
+      usedCatchyPhrases.add(phrase);
+      break;
     }
   }
 
-  // If no specific catchy pattern, return the first impactful phrase
-  const impactfulStart = text.match(/^[^-]*(?=\s-|\swith\s|\sdelivering\s|\sat\s)/);
-  return impactfulStart ? impactfulStart[0].trim() : text.split('.')[0].trim();
+  // If no unique phrase available, create a unique one based on company characteristics
+  if (!selectedPhrase) {
+    selectedPhrase = generateUniquePhrase(stock);
+    usedCatchyPhrases.add(selectedPhrase);
+  }
+
+  return selectedPhrase;
+};
+
+const generateUniquePhrase = (stock: Omit<StockRecommendation, 'whyItFits'>): string => {
+  const uniqueId = Math.random().toString(36).substr(2, 3);
+  
+  const phrases = [
+    `The ${stock.sector.toLowerCase()} maverick of market success`,
+    `${stock.companyName}'s secret sauce for financial flavor`,
+    `The ${stock.ticker} express to profit town`,
+    `Market magic from the ${stock.sector.toLowerCase()} wizard`,
+    `The golden goose wearing a ${stock.ticker} name tag`,
+    `Your portfolio's new best friend named ${stock.ticker}`,
+    `The ${stock.sector.toLowerCase()} champion of your dreams`,
+    `${stock.companyName}: where innovation meets compensation`
+  ];
+  
+  // Select a phrase and make it unique with the ID if needed
+  const basePhrase = phrases[Math.floor(Math.random() * phrases.length)];
+  const uniquePhrase = usedCatchyPhrases.has(basePhrase) ? `${basePhrase} (${uniqueId})` : basePhrase;
+  
+  return uniquePhrase;
 };
 
 const extractStatistics = (text: string, stock: Omit<StockRecommendation, 'whyItFits'>): string => {
