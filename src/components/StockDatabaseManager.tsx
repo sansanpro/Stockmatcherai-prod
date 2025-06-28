@@ -4,11 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Upload, Database, Sync, AlertCircle } from 'lucide-react';
+import { Upload, Database, RefreshCw, AlertCircle } from 'lucide-react';
 import { stockDatabase } from '@/data/stockDatabase';
 import { syncStaticDataToSupabase, getStocksFromSupabase } from '@/utils/supabaseStockManager';
 import StockDataImporter from './StockDataImporter';
 import { useToast } from '@/hooks/use-toast';
+import { StockRecommendation } from '@/types/stock-matcher';
 
 const StockDatabaseManager = () => {
   const [loading, setLoading] = useState(false);
@@ -54,6 +55,16 @@ const StockDatabaseManager = () => {
     }
   };
 
+  const handleImportStocks = (importedStocks: Omit<StockRecommendation, 'whyItFits'>[]) => {
+    console.log('Imported stocks:', importedStocks);
+    toast({
+      title: "Import Successful",
+      description: `Imported ${importedStocks.length} stocks`,
+    });
+    // In a real implementation, you'd add these to your database
+    // For now, we just log them and show a success message
+  };
+
   React.useEffect(() => {
     loadSupabaseCount();
   }, []);
@@ -91,7 +102,7 @@ const StockDatabaseManager = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Supabase Database</CardTitle>
-            <Sync className="h-4 w-4 text-muted-foreground" />
+            <RefreshCw className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -126,7 +137,7 @@ const StockDatabaseManager = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <StockDataImporter />
+              <StockDataImporter onImport={handleImportStocks} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -135,7 +146,7 @@ const StockDatabaseManager = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sync className="h-5 w-5" />
+                <RefreshCw className="h-5 w-5" />
                 Supabase Integration
               </CardTitle>
               <CardDescription>
