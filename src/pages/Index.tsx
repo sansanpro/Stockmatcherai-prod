@@ -3,9 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import UserProfileForm from '@/components/UserProfileForm';
 import StockMatcher from '@/components/StockMatcher';
-import Watchlist from '@/components/Watchlist';
 import Matches from '@/components/Matches';
-import Analytics from '@/components/Analytics';
 import Settings from '@/components/Settings';
 import NotificationSystem from '@/components/NotificationSystem';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -16,13 +14,13 @@ import { AppProvider, useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
-import { Moon, BarChart, Eye, Heart, Scale, Database } from 'lucide-react';
+import { Moon, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'matches' | 'watchlist' | 'analytics' | 'settings'>('welcome');
+  const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'matches' | 'settings'>('welcome');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [selectedStockForDetails, setSelectedStockForDetails] = useState<StockRecommendation | null>(null);
@@ -273,26 +271,6 @@ const IndexContent = () => {
             <Heart className="w-4 h-4 fill-current" />
             Matches
           </Button>
-          <Button
-            onClick={() => setCurrentStep('watchlist')}
-            variant={currentStep === 'watchlist' ? 'default' : 'ghost'}
-            size="sm"
-            disabled={!userProfile}
-            className="flex items-center gap-2"
-          >
-            <Eye className="w-4 h-4" />
-            Watchlist
-          </Button>
-          <Button
-            onClick={() => setCurrentStep('analytics')}
-            variant={currentStep === 'analytics' ? 'default' : 'ghost'}
-            size="sm"
-            disabled={!userProfile}
-            className="flex items-center gap-2"
-          >
-            <BarChart className="w-4 h-4" />
-            Analytics
-          </Button>
         </div>
         <div className="flex items-center gap-2">
           <StockComparison availableStocks={[]} />
@@ -381,39 +359,6 @@ const IndexContent = () => {
           onMatch={handleMatchFromModal}
           onPass={handlePassFromModal}
         />
-      </ProtectedRoute>
-    );
-  }
-
-  if (currentStep === 'watchlist') {
-    return (
-      <ProtectedRoute>
-        <AppHeader />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-          <div className="max-w-4xl mx-auto pt-8">
-            <Watchlist onViewDetails={handleViewStockDetails} />
-          </div>
-        </div>
-        <StockDetailsModal
-          stock={selectedStockForDetails}
-          isOpen={isDetailsModalOpen}
-          onClose={() => setIsDetailsModalOpen(false)}
-          onMatch={handleMatchFromModal}
-          onPass={handlePassFromModal}
-        />
-      </ProtectedRoute>
-    );
-  }
-
-  if (currentStep === 'analytics') {
-    return (
-      <ProtectedRoute>
-        <AppHeader />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-          <div className="max-w-4xl mx-auto pt-8">
-            <Analytics />
-          </div>
-        </div>
       </ProtectedRoute>
     );
   }
