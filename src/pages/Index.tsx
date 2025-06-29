@@ -250,13 +250,15 @@ const IndexContent = () => {
   const AppHeader = () => (
     <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
       <div className="max-w-4xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex-1"></div>
+        
+        <div className="flex items-center gap-4 justify-center">
           <Button
             onClick={() => setCurrentStep('matching')}
             variant={currentStep === 'matching' ? 'default' : 'ghost'}
             size="sm"
             disabled={!userProfile}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 px-6"
           >
             <Heart className="w-4 h-4" />
             Match
@@ -266,13 +268,14 @@ const IndexContent = () => {
             variant={currentStep === 'matches' ? 'default' : 'ghost'}
             size="sm"
             disabled={!userProfile}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 px-6"
           >
             <Heart className="w-4 h-4 fill-current" />
             Your Likes
           </Button>
         </div>
-        <div className="flex items-center gap-2">
+        
+        <div className="flex items-center gap-2 flex-1 justify-end">
           <StockComparison availableStocks={[]} />
           <NotificationSystem />
           <Button
