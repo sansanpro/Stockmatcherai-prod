@@ -7,7 +7,6 @@ import Watchlist from '@/components/Watchlist';
 import Matches from '@/components/Matches';
 import Analytics from '@/components/Analytics';
 import Settings from '@/components/Settings';
-import StockDatabaseManager from '@/components/StockDatabaseManager';
 import NotificationSystem from '@/components/NotificationSystem';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UserMenu from '@/components/UserMenu';
@@ -23,7 +22,7 @@ import { toast } from 'sonner';
 
 const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'matches' | 'watchlist' | 'analytics' | 'database' | 'settings'>('welcome');
+  const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | 'matching' | 'matches' | 'watchlist' | 'analytics' | 'settings'>('welcome');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [selectedStockForDetails, setSelectedStockForDetails] = useState<StockRecommendation | null>(null);
@@ -168,10 +167,6 @@ const IndexContent = () => {
     setCurrentStep(userProfile ? 'matching' : 'welcome');
   };
 
-  const handleBackFromDatabase = () => {
-    setCurrentStep(userProfile ? 'matching' : 'welcome');
-  };
-
   const handleViewStockDetails = (stock: StockRecommendation) => {
     setSelectedStockForDetails(stock);
     setIsDetailsModalOpen(true);
@@ -298,15 +293,6 @@ const IndexContent = () => {
             <BarChart className="w-4 h-4" />
             Analytics
           </Button>
-          <Button
-            onClick={() => setCurrentStep('database')}
-            variant={currentStep === 'database' ? 'default' : 'ghost'}
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <Database className="w-4 h-4" />
-            Database
-          </Button>
         </div>
         <div className="flex items-center gap-2">
           <StockComparison availableStocks={[]} />
@@ -427,17 +413,6 @@ const IndexContent = () => {
           <div className="max-w-4xl mx-auto pt-8">
             <Analytics />
           </div>
-        </div>
-      </ProtectedRoute>
-    );
-  }
-
-  if (currentStep === 'database') {
-    return (
-      <ProtectedRoute>
-        <AppHeader />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-          <StockDatabaseManager />
         </div>
       </ProtectedRoute>
     );
