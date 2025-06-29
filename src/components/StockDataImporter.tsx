@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { parseCSVStockData, parseJSONStockData, downloadSampleCSV } from '@/utils/csvImporter';
+import { addImportedStocks } from '@/utils/supabaseStockManager';
 import { StockRecommendation } from '@/types/stock-matcher';
 import { Upload, Download, FileText, Database } from 'lucide-react';
 
@@ -35,6 +36,10 @@ const StockDataImporter = ({ onImport }: StockDataImporterProps) => {
       }
       
       if (stocks.length > 0) {
+        // Add to global imported stocks storage
+        addImportedStocks(stocks);
+        
+        // Call the callback to update UI
         onImport(stocks);
         setImportedCount(stocks.length);
       } else {
@@ -84,7 +89,7 @@ const StockDataImporter = ({ onImport }: StockDataImporterProps) => {
           )}
           {importedCount > 0 && (
             <p className="text-sm text-green-600">
-              Successfully imported {importedCount} stocks!
+              Successfully imported {importedCount} stocks! Now go to the Sync tab to add them to Supabase.
             </p>
           )}
         </div>

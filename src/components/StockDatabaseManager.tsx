@@ -15,6 +15,7 @@ const StockDatabaseManager = () => {
   const [loading, setLoading] = useState(false);
   const [supabaseCounts, setSupabaseCounts] = useState<Record<string, number>>({});
   const [synced, setSynced] = useState(false);
+  const [importedStocks, setImportedStocks] = useState<Omit<StockRecommendation, 'whyItFits'>[]>([]);
   const { toast } = useToast();
 
   const handleSyncToSupabase = async () => {
@@ -22,9 +23,10 @@ const StockDatabaseManager = () => {
     try {
       const success = await syncStaticDataToSupabase();
       if (success) {
+        const totalStocks = stockDatabase.length + importedStocks.length;
         toast({
           title: "Sync Successful",
-          description: `Synced ${stockDatabase.length} stocks to Supabase sector tables`,
+          description: `Synced ${totalStocks} stocks to Supabase sector tables`,
         });
         setSynced(true);
         await loadSupabaseCounts();
@@ -63,16 +65,21 @@ const StockDatabaseManager = () => {
     }
   };
 
-  const handleImportStocks = (importedStocks: Omit<StockRecommendation, 'whyItFits'>[]) => {
-    console.log('Imported stocks:', importedStocks);
+  const handleImportStocks = (newImportedStocks: Omit<StockRecommendation, 'whyItFits'>[]) => {
+    console.log('Imported stocks:', newImportedStocks);
+    setImportedStocks(prev => [...prev, ...newImportedStocks]);
     toast({
       title: "Import Successful",
-      description: `Imported ${importedStocks.length} stocks`,
+      description: `Imported ${newImportedStocks.length} stocks. Click sync to add them to Supabase.`,
     });
   };
 
   const getTotalSupabaseCount = () => {
     return Object.values(supabaseCounts).reduce((sum, count) => sum + count, 0);
+  };
+
+  const getTotalAvailableStocks = () => {
+    return stockDatabase.length + importedStocks.length;
   };
 
   React.useEffect(() => {
@@ -92,19 +99,19 @@ const StockDatabaseManager = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Static Database</CardTitle>
+            <CardTitle className="text-sm font-medium">Available Stocks</CardTitle>
             <Database className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stockDatabase.length}</div>
-            <p className="text-xs text-muted-foreground">stocks in local files</p>
+            <div className="text-2xl font-bold">{getTotalAvailableStocks()}</div>
+            <p className="text-xs text-muted-foreground">
+              {stockDatabase.length} static + {importedStocks.length} imported
+            </p>
             <div className="flex flex-wrap gap-1 mt-2">
-              <Badge variant="secondary">Technology: 10</Badge>
-              <Badge variant="secondary">Healthcare: 8</Badge>
-              <Badge variant="secondary">Finance: 5</Badge>
-              <Badge variant="secondary">Energy: 3</Badge>
-              <Badge variant="secondary">Consumer: 4</Badge>
-              <Badge variant="secondary">Utilities: 3</Badge>
+              <Badge variant="secondary">Static: {stockDatabase.length}</Badge>
+              {importedStocks.length > 0 && (
+                <Badge variant="outline">Imported: {importedStocks.length}</Badge>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -156,7 +163,7 @@ const StockDatabaseManager = () => {
                 Supabase Sector Tables
               </CardTitle>
               <CardDescription>
-                Sync your static stock data with Supabase sector-specific tables for better organization
+                Sync your stock data (static + imported) with Supabase sector-specific tables
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -172,16 +179,28 @@ const StockDatabaseManager = () => {
                 </div>
               )}
 
+              {importedStocks.length > 0 && (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-blue-800">
+                    <Upload className="h-4 w-4" />
+                    <span className="font-medium">Ready to Sync</span>
+                  </div>
+                  <p className="text-sm text-blue-700 mt-1">
+                    You have {importedStocks.length} imported stocks ready to sync to Supabase.
+                  </p>
+                </div>
+              )}
+
               <Button 
                 onClick={handleSyncToSupabase}
                 disabled={loading}
                 className="w-full"
               >
-                {loading ? 'Syncing...' : `Sync ${stockDatabase.length} Stocks to Sector Tables`}
+                {loading ? 'Syncing...' : `Sync ${getTotalAvailableStocks()} Stocks to Sector Tables`}
               </Button>
 
               <div className="text-sm text-muted-foreground">
-                This will organize all static stock data into sector-specific tables in Supabase:
+                This will organize all stock data into sector-specific tables in Supabase:
                 <ul className="list-disc list-inside mt-2 space-y-1">
                   <li>Technology stocks → technology_stocks table</li>
                   <li>Healthcare stocks → healthcare_stocks table</li>

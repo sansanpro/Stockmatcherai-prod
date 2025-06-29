@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { StockRecommendation } from '@/types/stock-matcher';
 import { 
@@ -28,6 +27,20 @@ export interface SupabaseStock {
 }
 
 type SectorTableName = 'technology_stocks' | 'healthcare_stocks' | 'finance_stocks' | 'energy_stocks' | 'consumer_stocks' | 'utilities_stocks';
+
+// Global storage for imported stocks
+let importedStocks: Omit<StockRecommendation, 'whyItFits'>[] = [];
+
+export const addImportedStocks = (stocks: Omit<StockRecommendation, 'whyItFits'>[]) => {
+  importedStocks = [...importedStocks, ...stocks];
+  console.log(`Added ${stocks.length} imported stocks. Total imported: ${importedStocks.length}`);
+};
+
+export const getImportedStocks = () => importedStocks;
+
+export const clearImportedStocks = () => {
+  importedStocks = [];
+};
 
 const convertToSupabaseFormat = (stock: Omit<StockRecommendation, 'whyItFits'>): SupabaseStock => ({
   id: stock.id,
@@ -68,23 +81,47 @@ const insertStocksToSectorTable = async (
   }
 };
 
+const getSectorStocks = (sector: string): Omit<StockRecommendation, 'whyItFits'>[] => {
+  const staticStocks = {
+    technology: technologyStocks,
+    healthcare: healthcareStocks,
+    finance: financeStocks,
+    energy: energyStocks,
+    consumer: consumerStocks,
+    utilities: utilitiesStocks
+  };
+
+  const sectorKey = sector.toLowerCase() as keyof typeof staticStocks;
+  const static_stocks = staticStocks[sectorKey] || [];
+  
+  // Add imported stocks that match this sector
+  const imported_stocks = importedStocks.filter(stock => 
+    stock.sector.toLowerCase() === sector.toLowerCase()
+  );
+  
+  console.log(`Sector ${sector}: ${static_stocks.length} static + ${imported_stocks.length} imported = ${static_stocks.length + imported_stocks.length} total`);
+  
+  return [...static_stocks, ...imported_stocks];
+};
+
 export const syncStaticDataToSupabase = async (): Promise<boolean> => {
   try {
-    console.log('Starting sync of static data to Supabase sector tables...');
+    console.log('Starting sync of static + imported data to Supabase sector tables...');
+    console.log(`Total imported stocks available: ${importedStocks.length}`);
     
     const syncResults = await Promise.all([
-      insertStocksToSectorTable('technology_stocks', technologyStocks),
-      insertStocksToSectorTable('healthcare_stocks', healthcareStocks),
-      insertStocksToSectorTable('finance_stocks', financeStocks),
-      insertStocksToSectorTable('energy_stocks', energyStocks),
-      insertStocksToSectorTable('consumer_stocks', consumerStocks),
-      insertStocksToSectorTable('utilities_stocks', utilitiesStocks)
+      insertStocksToSectorTable('technology_stocks', getSectorStocks('technology')),
+      insertStocksToSectorTable('healthcare_stocks', getSectorStocks('healthcare')),
+      insertStocksToSectorTable('finance_stocks', getSectorStocks('finance')),
+      insertStocksToSectorTable('energy_stocks', getSectorStocks('energy')),
+      insertStocksToSectorTable('consumer_stocks', getSectorStocks('consumer')),
+      insertStocksToSectorTable('utilities_stocks', getSectorStocks('utilities'))
     ]);
 
     const allSuccessful = syncResults.every(result => result);
     
     if (allSuccessful) {
-      console.log('All stock data synced successfully to Supabase!');
+      console.log('All stock data (static + imported) synced successfully to Supabase!');
     } else {
       console.log('Some stock data failed to sync to Supabase');
     }
