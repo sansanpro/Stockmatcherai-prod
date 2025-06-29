@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
@@ -20,6 +19,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [matches, setMatches] = useState<StockRecommendation[]>([]);
   const [passes, setPasses] = useState<StockRecommendation[]>([]);
   const [animatingCard, setAnimatingCard] = useState(false);
+  const [seenStockTickers, setSeenStockTickers] = useState<Set<string>>(new Set());
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
 
@@ -27,24 +27,45 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   useEffect(() => {
     const loadAllRecommendations = async () => {
       setLoading(true);
-      // Load a large batch of recommendations upfront (no exclusions needed initially)
-      const stocks = await generateStockRecommendations(userProfile, []);
+      // Convert Set to Array for the exclusions parameter
+      const exclusionsArray = Array.from(seenStockTickers);
+      console.log(`Loading recommendations, excluding ${exclusionsArray.length} previously seen stocks:`, exclusionsArray);
+      
+      const stocks = await generateStockRecommendations(userProfile, exclusionsArray);
+      
+      // Filter out any stocks with "Unknown Company" or missing data
+      const validStocks = stocks.filter(stock => {
+        if (!stock.companyName || stock.companyName.trim() === '' || stock.companyName === 'Unknown Company') {
+          console.log(`Filtering out stock with invalid company name: ${stock.ticker} - "${stock.companyName}"`);
+          return false;
+        }
+        if (!stock.ticker || stock.ticker.trim() === '') {
+          console.log(`Filtering out stock with invalid ticker: ${stock.companyName}`);
+          return false;
+        }
+        return true;
+      });
+      
+      console.log(`Filtered ${stocks.length} stocks to ${validStocks.length} valid stocks`);
       
       // Add staggered entrance animation
       setTimeout(() => {
-        setAllRecommendations(stocks);
+        setAllRecommendations(validStocks);
         setLoading(false);
       }, 300);
     };
     
     loadAllRecommendations();
-  }, [userProfile]);
+  }, [userProfile, seenStockTickers]);
 
   const handleMatch = () => {
     if (animatingCard || currentIndex >= allRecommendations.length) return;
     
     setAnimatingCard(true);
     const currentStock = allRecommendations[currentIndex];
+    
+    // Add to seen stocks
+    setSeenStockTickers(prev => new Set(prev).add(currentStock.ticker));
     setMatches(prev => [...prev, currentStock]);
     
     // Add to watchlist if not already there
@@ -54,6 +75,8 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     
     // Update swipe statistics
     updateSwipeStats(true);
+    
+    console.log(`Matched ${currentStock.ticker}, adding to seen stocks`);
     
     // Delay to allow exit animation
     setTimeout(() => {
@@ -67,10 +90,15 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     
     setAnimatingCard(true);
     const currentStock = allRecommendations[currentIndex];
+    
+    // Add to seen stocks
+    setSeenStockTickers(prev => new Set(prev).add(currentStock.ticker));
     setPasses(prev => [...prev, currentStock]);
     
     // Update swipe statistics
     updateSwipeStats(false);
+    
+    console.log(`Passed ${currentStock.ticker}, adding to seen stocks`);
     
     // Delay to allow exit animation
     setTimeout(() => {
@@ -85,9 +113,18 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     const previousIndex = currentIndex - 1;
     const previousStock = allRecommendations[previousIndex];
     
+    // Remove from seen stocks
+    setSeenStockTickers(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(previousStock.ticker);
+      return newSet;
+    });
+    
     // Remove from matches or passes
     setMatches(prev => prev.filter(stock => stock.ticker !== previousStock.ticker));
     setPasses(prev => prev.filter(stock => stock.ticker !== previousStock.ticker));
+    
+    console.log(`Undoing ${previousStock.ticker}, removing from seen stocks`);
     
     setCurrentIndex(previousIndex);
   };
@@ -95,18 +132,27 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const loadMoreRecommendations = async () => {
     setLoading(true);
     
-    // Get all previously seen stock tickers
-    const seenTickers = allRecommendations.map(stock => stock.ticker);
+    // Keep all seen stock tickers for exclusion
+    const exclusionsArray = Array.from(seenStockTickers);
+    console.log(`Loading more recommendations, excluding ${exclusionsArray.length} seen stocks`);
     
     // Load fresh recommendations excluding all previously seen stocks
-    const newStocks = await generateStockRecommendations(userProfile, seenTickers);
+    const newStocks = await generateStockRecommendations(userProfile, exclusionsArray);
+    
+    // Filter out invalid stocks
+    const validStocks = newStocks.filter(stock => {
+      if (!stock.companyName || stock.companyName.trim() === '' || stock.companyName === 'Unknown Company') {
+        console.log(`Filtering out stock with invalid company name: ${stock.ticker} - "${stock.companyName}"`);
+        return false;
+      }
+      return true;
+    });
     
     setTimeout(() => {
-      // Reset to beginning with new stocks
-      setAllRecommendations(newStocks);
+      // Reset to beginning with new stocks, but keep seen stocks memory
+      setAllRecommendations(validStocks);
       setCurrentIndex(0);
-      setMatches([]);
-      setPasses([]);
+      // Don't reset matches and passes - keep the user's history
       setLoading(false);
     }, 300);
   };
@@ -146,7 +192,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
               <Heart className="w-10 h-10 text-white fill-current" />
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">All Done! 🎉</h1>
-            <p className="text-white/80">You've reviewed all recommendations</p>
+            <p className="text-white/80">You've reviewed all available recommendations</p>
           </div>
 
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6 dark:bg-gray-800/50 animate-fade-in delay-200 border border-white/20">

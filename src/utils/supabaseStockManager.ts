@@ -45,9 +45,9 @@ export const clearImportedStocks = () => {
 const convertToSupabaseFormat = (stock: Omit<StockRecommendation, 'whyItFits'>): SupabaseStock => ({
   id: stock.id,
   ticker: stock.ticker,
-  company_name: stock.companyName,
-  ceo_name: stock.ceoName,
-  ceo_highlights: stock.ceoHighlights,
+  company_name: stock.companyName || stock.ticker, // Fallback to ticker if company name is missing
+  ceo_name: stock.ceoName || 'Management Team',
+  ceo_highlights: stock.ceoHighlights || 'Experienced leadership driving company growth and strategic initiatives.',
   pe_ratio: stock.peRatio,
   market_cap: stock.marketCap,
   one_year_return: stock.oneYearReturn,
@@ -204,26 +204,54 @@ export const getStocksFromSupabase = async (sector?: string): Promise<Omit<Stock
       }
     }
     
-    // Convert back to our internal format with proper type casting
-    return allStocks.map(stock => ({
-      id: stock.id,
-      companyName: stock.company_name,
-      ticker: stock.ticker,
-      sector: sector || 'Mixed', // Will be overridden by actual sector logic
-      ceoName: stock.ceo_name,
-      ceoHighlights: stock.ceo_highlights,
-      peRatio: stock.pe_ratio,
-      marketCap: stock.market_cap,
-      oneYearReturn: stock.one_year_return,
-      riskLevel: stock.risk_level as 'low' | 'medium' | 'high',
-      pricePerShare: stock.price_per_share,
-      dividendYield: stock.dividend_yield,
-      esgScore: stock.esg_score || 75
-    }));
+    // Convert back to our internal format with proper type casting and data validation
+    const validStocks = allStocks
+      .filter(stock => {
+        // Filter out stocks with missing essential data
+        if (!stock.ticker || !stock.company_name || stock.company_name.trim() === '') {
+          console.log(`Filtering out invalid stock: ${stock.ticker} - "${stock.company_name}"`);
+          return false;
+        }
+        return true;
+      })
+      .map(stock => ({
+        id: stock.id,
+        companyName: stock.company_name || stock.ticker,
+        ticker: stock.ticker,
+        sector: getSectorFromTableContext(sector) || 'Mixed',
+        ceoName: stock.ceo_name || 'Management Team',
+        ceoHighlights: stock.ceo_highlights || 'Experienced leadership driving company growth and strategic initiatives.',
+        peRatio: stock.pe_ratio,
+        marketCap: stock.market_cap,
+        oneYearReturn: stock.one_year_return,
+        riskLevel: stock.risk_level as 'low' | 'medium' | 'high',
+        pricePerShare: stock.price_per_share,
+        dividendYield: stock.dividend_yield,
+        esgScore: stock.esg_score || 75
+      }));
+    
+    console.log(`Retrieved ${validStocks.length} valid stocks from Supabase (filtered from ${allStocks.length} total)`);
+    return validStocks;
   } catch (error) {
     console.error('Error in getStocksFromSupabase:', error);
     return [];
   }
+};
+
+// Helper function to determine sector from context
+const getSectorFromTableContext = (sector?: string): string => {
+  if (!sector) return 'Mixed';
+  
+  const sectorMap: Record<string, string> = {
+    'technology': 'Technology',
+    'healthcare': 'Healthcare',
+    'finance': 'Finance',
+    'energy': 'Energy',
+    'consumer': 'Consumer',
+    'utilities': 'Utilities'
+  };
+  
+  return sectorMap[sector.toLowerCase()] || sector;
 };
 
 export const getStockCountsByType = async (): Promise<Record<string, number>> => {
