@@ -62,7 +62,22 @@ const insertStocksToSectorTable = async (
   stocks: Omit<StockRecommendation, 'whyItFits'>[]
 ): Promise<boolean> => {
   try {
-    const supabaseStocks = stocks.map(convertToSupabaseFormat);
+    // Remove duplicates by ticker within the input array
+    const uniqueStocks = stocks.reduce((acc, stock) => {
+      const existingIndex = acc.findIndex(s => s.ticker === stock.ticker);
+      if (existingIndex === -1) {
+        acc.push(stock);
+      } else {
+        // Keep the imported stock over static stock (imported stocks usually have more recent data)
+        console.log(`Duplicate ticker ${stock.ticker} found, keeping the imported version`);
+        acc[existingIndex] = stock;
+      }
+      return acc;
+    }, [] as Omit<StockRecommendation, 'whyItFits'>[]);
+
+    console.log(`Inserting ${uniqueStocks.length} unique stocks to ${tableName} (removed ${stocks.length - uniqueStocks.length} duplicates)`);
+    
+    const supabaseStocks = uniqueStocks.map(convertToSupabaseFormat);
     
     const { error } = await supabase
       .from(tableName)
@@ -73,7 +88,7 @@ const insertStocksToSectorTable = async (
       return false;
     }
 
-    console.log(`Successfully inserted ${stocks.length} stocks to ${tableName}`);
+    console.log(`Successfully inserted ${uniqueStocks.length} stocks to ${tableName}`);
     return true;
   } catch (error) {
     console.error(`Error in insertStocksToSectorTable for ${tableName}:`, error);
@@ -99,9 +114,24 @@ const getSectorStocks = (sector: string): Omit<StockRecommendation, 'whyItFits'>
     stock.sector.toLowerCase() === sector.toLowerCase()
   );
   
-  console.log(`Sector ${sector}: ${static_stocks.length} static + ${imported_stocks.length} imported = ${static_stocks.length + imported_stocks.length} total`);
+  // Combine and remove duplicates (imported stocks take precedence)
+  const allStocks = [...static_stocks, ...imported_stocks];
+  const uniqueStocks = allStocks.reduce((acc, stock) => {
+    const existingIndex = acc.findIndex(s => s.ticker === stock.ticker);
+    if (existingIndex === -1) {
+      acc.push(stock);
+    } else {
+      // If it's an imported stock, it takes precedence
+      if (imported_stocks.some(imp => imp.ticker === stock.ticker)) {
+        acc[existingIndex] = stock;
+      }
+    }
+    return acc;
+  }, [] as Omit<StockRecommendation, 'whyItFits'>[]);
   
-  return [...static_stocks, ...imported_stocks];
+  console.log(`Sector ${sector}: ${static_stocks.length} static + ${imported_stocks.length} imported = ${uniqueStocks.length} unique total`);
+  
+  return uniqueStocks;
 };
 
 export const syncStaticDataToSupabase = async (): Promise<boolean> => {
