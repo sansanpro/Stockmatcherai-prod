@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,6 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserProfile } from '@/types/stock-matcher';
+import { useAuth } from '@/contexts/AuthContext';
+import { saveUserProfile } from '@/utils/profileManager';
+import { toast } from 'sonner';
 
 interface UserProfileFormProps {
   onComplete: (profile: UserProfile) => void;
@@ -13,12 +17,39 @@ interface UserProfileFormProps {
 }
 
 const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: UserProfileFormProps) => {
+  const { user } = useAuth();
   const [profile, setProfile] = useState<Partial<UserProfile>>(existingProfile || {});
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isProfileComplete(profile)) {
-      onComplete(profile as UserProfile);
+    
+    if (!user?.id) {
+      toast.error('You must be logged in to save your profile');
+      return;
+    }
+
+    if (!isProfileComplete(profile)) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const success = await saveUserProfile(profile as UserProfile, user.id);
+      
+      if (success) {
+        toast.success(isUpdate ? 'Profile updated successfully!' : 'Profile saved successfully!');
+        onComplete(profile as UserProfile);
+      } else {
+        toast.error('Failed to save profile. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast.error('An error occurred while saving your profile');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -162,9 +193,9 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
             <Button 
               type="submit" 
               className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105"
-              disabled={!isProfileComplete(profile)}
+              disabled={!isProfileComplete(profile) || loading}
             >
-              {isUpdate ? 'Update Profile ✨' : 'Find My Stock Matches ✨'}
+              {loading ? 'Saving...' : (isUpdate ? 'Update Profile ✨' : 'Find My Stock Matches ✨')}
             </Button>
           </form>
         </CardContent>

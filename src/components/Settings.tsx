@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { UserProfile } from '@/types/stock-matcher';
 import { toast } from 'sonner';
 import { User, Save, ArrowLeft } from 'lucide-react';
+import { saveUserProfile, getUserProfile } from '@/utils/profileManager';
 
 interface SettingsProps {
   onBack: () => void;
@@ -25,17 +26,40 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
   useEffect(() => {
     if (userProfile) {
       setProfile(userProfile);
+    } else if (user?.id) {
+      // Load profile from database if not provided
+      loadUserProfile();
     }
-  }, [userProfile]);
+  }, [userProfile, user?.id]);
+
+  const loadUserProfile = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const loadedProfile = await getUserProfile(user.id);
+      if (loadedProfile) {
+        setProfile(loadedProfile);
+        onProfileUpdate(loadedProfile);
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    }
+  };
 
   const handleProfileSave = async () => {
-    if (!profile) return;
+    if (!profile || !user?.id) return;
     
     setLoading(true);
     try {
-      onProfileUpdate(profile);
-      toast.success('Profile updated successfully!');
+      const success = await saveUserProfile(profile, user.id);
+      if (success) {
+        onProfileUpdate(profile);
+        toast.success('Profile updated successfully!');
+      } else {
+        toast.error('Failed to update profile');
+      }
     } catch (error) {
+      console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
     } finally {
       setLoading(false);
