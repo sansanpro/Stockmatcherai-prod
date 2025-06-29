@@ -269,7 +269,7 @@ const IndexContent = () => {
             className="flex items-center gap-2"
           >
             <Heart className="w-4 h-4 fill-current" />
-            Matches
+            Your Likes
           </Button>
         </div>
         <div className="flex items-center gap-2">
