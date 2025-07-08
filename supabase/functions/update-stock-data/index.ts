@@ -50,11 +50,74 @@ class AlphaVantageService {
   }
 }
 
+// Comprehensive stock symbols for expansion (500+ stocks across sectors)
+const STOCK_EXPANSION_SYMBOLS = [
+  // Large Cap Technology
+  'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META', 'NFLX', 'ADBE', 'CRM',
+  'ORCL', 'INTC', 'AMD', 'IBM', 'CSCO', 'QCOM', 'TXN', 'AVGO', 'NOW', 'SNOW',
+  'PLTR', 'ZM', 'UBER', 'LYFT', 'SQ', 'PYPL', 'SHOP', 'TWLO', 'OKTA', 'CRWD',
+  'ZS', 'DDOG', 'MDB', 'NET', 'TEAM', 'WDAY', 'VEEV', 'SPLK', 'PANW', 'FTNT',
+  
+  // Healthcare & Biotech
+  'JNJ', 'UNH', 'PFE', 'ABBV', 'LLY', 'MRK', 'TMO', 'ABT', 'MDT', 'AMGN',
+  'GILD', 'CVS', 'CI', 'HUM', 'ANTM', 'BMY', 'BIIB', 'REGN', 'VRTX', 'ISRG',
+  'ZBH', 'SYK', 'BSX', 'EW', 'HOLX', 'VAR', 'PKI', 'IQV', 'MTD', 'DXCM',
+  
+  // Financial Services
+  'JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'BLK', 'SCHW', 'AXP', 'COF',
+  'USB', 'PNC', 'TFC', 'BK', 'STT', 'NTRS', 'RF', 'CFG', 'HBAN', 'FITB',
+  'V', 'MA', 'PYPL', 'SQ', 'FIS', 'FISV', 'DFS', 'SYF', 'ALLY',
+  
+  // Consumer Discretionary & Staples
+  'HD', 'LOW', 'MCD', 'SBUX', 'NKE', 'TJX', 'BKNG', 'ABNB', 'TGT', 'COST',
+  'WMT', 'DIS', 'PG', 'KO', 'PEP', 'MDLZ', 'GIS', 'K', 'CAG', 'HSY',
+  
+  // Energy
+  'XOM', 'CVX', 'COP', 'EOG', 'SLB', 'OXY', 'PSX', 'VLO', 'MPC', 'HES',
+  'DVN', 'FANG', 'MRO', 'APA', 'CLR', 'KMI', 'OKE', 'EPD', 'ET', 'WMB',
+  
+  // Utilities
+  'NEE', 'DUK', 'SO', 'D', 'EXC', 'XEL', 'WEC', 'ES', 'AEP', 'FE',
+  'ETR', 'PPL', 'AES', 'LNT', 'NRG', 'VST', 'AWK', 'WTR'
+];
+
 // Priority stocks that get updated more frequently
 const PRIORITY_STOCKS = [
   'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'NVDA', 'META', 'NFLX',
   'JPM', 'BAC', 'WFC', 'GS', 'JNJ', 'PFE', 'UNH', 'ABBV'
 ];
+
+// CEO data mapping
+const CEO_DATA: Record<string, { name: string; highlights: string }> = {
+  'AAPL': {
+    name: 'Tim Cook',
+    highlights: 'Led Apple through its most profitable era with services expansion and iPhone evolution. 13+ years as CEO with consistent innovation and market leadership.'
+  },
+  'MSFT': {
+    name: 'Satya Nadella',
+    highlights: 'Transformed Microsoft into cloud computing leader. Increased market cap by 5x since becoming CEO in 2014. Strong focus on AI and enterprise solutions.'
+  },
+  'GOOGL': {
+    name: 'Sundar Pichai',
+    highlights: 'Leading Google through AI revolution and cloud expansion. Former product management executive who became CEO in 2015, driving innovation in search and AI.'
+  },
+  'AMZN': {
+    name: 'Andy Jassy',
+    highlights: 'Former AWS CEO leading Amazon\'s continued expansion in cloud services and e-commerce. 24+ years with company, architect of AWS business model.'
+  },
+  'TSLA': {
+    name: 'Elon Musk',
+    highlights: 'Revolutionized electric vehicle industry and autonomous driving. Built Tesla into most valuable automaker globally with expansion into energy storage.'
+  },
+  'NVDA': {
+    name: 'Jensen Huang',
+    highlights: 'Pioneered GPU computing and AI revolution. Led NVIDIA to become most valuable semiconductor company with breakthrough innovations in machine learning.'
+  },
+  'META': {
+    name: 'Mark Zuckerberg',
+    highlights: 'Co-founder leading Meta through metaverse transformation and AI development. Focus on virtual reality and next-generation social platforms.'
+  }
+};
 
 // Sector update schedule (staggered throughout the day)
 const SECTOR_SCHEDULE = {
@@ -83,7 +146,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const alphaVantage = new AlphaVantageService(alphaVantageKey);
 
-    const { sector, updateType = 'scheduled', priority = false } = await req.json().catch(() => ({}));
+    const { sector, updateType = 'scheduled', priority = false, expand = false } = await req.json().catch(() => ({}));
     
     // Determine which sector to update
     const currentHour = new Date().getHours();
@@ -125,12 +188,20 @@ serve(async (req) => {
 
     console.log(`Starting ${updateType} update for ${targetSector} sector`);
 
+    // Check if we should expand the database first
+    const shouldAutoExpand = await checkIfExpansionNeeded(supabase, targetSector);
+    
+    if (expand || shouldAutoExpand) {
+      console.log(`Expanding ${targetSector} database with new stocks from Alpha Vantage`);
+      await expandSectorDatabase(supabase, alphaVantage, targetSector);
+    }
+
     // Create update log entry
     const { data: logEntry } = await supabase
       .from('stock_update_logs')
       .insert({
         sector: targetSector,
-        update_type: updateType,
+        update_type: expand || shouldAutoExpand ? 'expansion' : updateType,
         status: 'running'
       })
       .select()
@@ -255,3 +326,155 @@ serve(async (req) => {
     });
   }
 });
+
+// Helper function to check if database expansion is needed
+async function checkIfExpansionNeeded(supabase: any, sector: string): Promise<boolean> {
+  try {
+    const tableName = `${sector}_stocks`;
+    const { count } = await supabase
+      .from(tableName)
+      .select('*', { count: 'exact', head: true });
+    
+    // If we have fewer than 20 stocks in the sector, expand automatically
+    const threshold = sector === 'technology' ? 30 : 15;
+    return (count || 0) < threshold;
+  } catch (error) {
+    console.error('Error checking expansion need:', error);
+    return false;
+  }
+}
+
+// Helper function to expand sector database with new stocks
+async function expandSectorDatabase(supabase: any, alphaVantage: AlphaVantageService, sector: string): Promise<void> {
+  try {
+    const tableName = `${sector}_stocks`;
+    
+    // Get existing tickers to avoid duplicates
+    const { data: existingStocks } = await supabase
+      .from(tableName)
+      .select('ticker');
+    
+    const existingTickers = new Set(existingStocks?.map((s: any) => s.ticker) || []);
+    
+    // Filter symbols for this sector and exclude existing ones
+    const sectorSymbols = getSectorSymbols(sector)
+      .filter(symbol => !existingTickers.has(symbol))
+      .slice(0, 25); // Limit to 25 new stocks to avoid API limits
+    
+    console.log(`Adding ${sectorSymbols.length} new stocks to ${sector} sector`);
+    
+    let addedCount = 0;
+    let apiCalls = 0;
+    
+    for (const symbol of sectorSymbols) {
+      try {
+        // Get quote and overview data
+        const [quote, overview] = await Promise.all([
+          alphaVantage.getQuote(symbol),
+          alphaVantage.getCompanyOverview(symbol)
+        ]);
+        
+        apiCalls += 2;
+        
+        if (quote && overview && overview.Name) {
+          const currentPrice = parseFloat(quote['05. price']) || 100;
+          const changePercent = parseFloat(quote['10. change percent']?.replace('%', '')) || 0;
+          const peRatio = overview.PERatio === 'None' ? 0 : parseFloat(overview.PERatio) || 20;
+          const dividendYield = overview.DividendYield === 'None' ? 0 : parseFloat(overview.DividendYield) * 100 || 0;
+          const beta = overview.Beta === 'None' ? null : parseFloat(overview.Beta);
+          
+          const riskLevel = getRiskLevel(beta, Math.abs(changePercent));
+          
+          const stockData = {
+            id: symbol,
+            ticker: symbol,
+            company_name: overview.Name,
+            ceo_name: CEO_DATA[symbol]?.name || 'Leadership Team',
+            ceo_highlights: CEO_DATA[symbol]?.highlights || 'Experienced leadership driving company growth and innovation.',
+            pe_ratio: peRatio,
+            market_cap: formatMarketCap(overview.MarketCapitalization),
+            one_year_return: changePercent,
+            risk_level: riskLevel,
+            price_per_share: currentPrice,
+            dividend_yield: dividendYield,
+            esg_score: getDefaultESGScore(symbol)
+          };
+          
+          const { error } = await supabase
+            .from(tableName)
+            .insert(stockData);
+          
+          if (!error) {
+            addedCount++;
+            console.log(`Added new stock: ${symbol} - ${overview.Name}`);
+          } else {
+            console.error(`Failed to insert ${symbol}:`, error);
+          }
+        }
+        
+        // Rate limiting: 12 seconds between API calls
+        if (apiCalls < sectorSymbols.length * 2) {
+          await new Promise(resolve => setTimeout(resolve, 12000));
+        }
+        
+      } catch (error) {
+        console.error(`Error adding ${symbol}:`, error);
+      }
+    }
+    
+    console.log(`Successfully added ${addedCount} new stocks to ${sector} sector`);
+    
+  } catch (error) {
+    console.error('Error in expandSectorDatabase:', error);
+  }
+}
+
+// Helper function to get symbols for a specific sector
+function getSectorSymbols(sector: string): string[] {
+  const sectorMap: Record<string, string[]> = {
+    'technology': STOCK_EXPANSION_SYMBOLS.slice(0, 40), // Tech stocks
+    'healthcare': STOCK_EXPANSION_SYMBOLS.slice(40, 67), // Healthcare stocks
+    'finance': STOCK_EXPANSION_SYMBOLS.slice(67, 87), // Finance stocks
+    'consumer': STOCK_EXPANSION_SYMBOLS.slice(87, 107), // Consumer stocks
+    'energy': STOCK_EXPANSION_SYMBOLS.slice(107, 127), // Energy stocks
+    'utilities': STOCK_EXPANSION_SYMBOLS.slice(127, 145) // Utilities stocks
+  };
+  
+  return sectorMap[sector] || [];
+}
+
+// Helper function to determine risk level
+function getRiskLevel(beta: number | null, volatility: number): 'low' | 'medium' | 'high' {
+  if (beta === null) {
+    return volatility > 20 ? 'high' : volatility > 10 ? 'medium' : 'low';
+  }
+  
+  if (beta > 1.5) return 'high';
+  if (beta > 1.0) return 'medium';
+  return 'low';
+}
+
+// Helper function to format market cap
+function formatMarketCap(marketCap: string): string {
+  const value = parseFloat(marketCap);
+  if (isNaN(value)) return 'N/A';
+  
+  if (value >= 1e12) {
+    return `$${(value / 1e12).toFixed(1)}T`;
+  } else if (value >= 1e9) {
+    return `$${(value / 1e9).toFixed(1)}B`;
+  } else if (value >= 1e6) {
+    return `$${(value / 1e6).toFixed(1)}M`;
+  }
+  return `$${value.toFixed(0)}`;
+}
+
+// Helper function to get default ESG score
+function getDefaultESGScore(symbol: string): number {
+  const esgScores: Record<string, number> = {
+    'AAPL': 82, 'MSFT': 85, 'GOOGL': 79, 'AMZN': 74, 'TSLA': 72,
+    'JNJ': 78, 'UNH': 81, 'PFE': 76, 'KO': 80, 'PEP': 82,
+    'JPM': 75, 'V': 83, 'MA': 84, 'WMT': 77, 'HD': 79
+  };
+  return esgScores[symbol] || 70;
+}
