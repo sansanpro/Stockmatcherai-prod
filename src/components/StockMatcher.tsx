@@ -27,11 +27,8 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   useEffect(() => {
     const loadAllRecommendations = async () => {
       setLoading(true);
-      // Convert Set to Array for the exclusions parameter
-      const exclusionsArray = Array.from(seenStockTickers);
-      console.log(`Loading recommendations, excluding ${exclusionsArray.length} previously seen stocks:`, exclusionsArray);
       
-      const stocks = await generateStockRecommendations(userProfile, exclusionsArray);
+      const stocks = await generateStockRecommendations(userProfile, []);
       
       // Filter out any stocks with "Unknown Company" or missing data
       const validStocks = stocks.filter(stock => {
@@ -56,7 +53,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     };
     
     loadAllRecommendations();
-  }, [userProfile, seenStockTickers]);
+  }, [userProfile]);
 
   const handleMatch = () => {
     if (animatingCard || currentIndex >= allRecommendations.length) return;
