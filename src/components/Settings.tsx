@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAuth } from '@/contexts/AuthContext';
 import { UserProfile } from '@/types/stock-matcher';
 import { toast } from 'sonner';
-import { User, Save, ArrowLeft } from 'lucide-react';
+import { User, Save, ArrowLeft, Database } from 'lucide-react';
 import { saveUserProfile, getUserProfile } from '@/utils/profileManager';
+import StockDatabaseManager from './StockDatabaseManager';
 
 interface SettingsProps {
   onBack: () => void;
@@ -22,6 +23,7 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
   const [profile, setProfile] = useState<UserProfile | null>(userProfile);
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'profile' | 'database'>('profile');
 
   useEffect(() => {
     if (userProfile) {
@@ -90,8 +92,37 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
         </div>
 
-        <div className="space-y-6">
-          {/* User Information */}
+        {/* Navigation Tabs */}
+        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg mb-6">
+          <button
+            onClick={() => setActiveTab('profile')}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-colors ${
+              activeTab === 'profile'
+                ? 'bg-white dark:bg-gray-700 shadow-sm'
+                : 'hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            <User className="w-4 h-4" />
+            Profile Settings
+          </button>
+          <button
+            onClick={() => setActiveTab('database')}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-colors ${
+              activeTab === 'database'
+                ? 'bg-white dark:bg-gray-700 shadow-sm'
+                : 'hover:bg-gray-200 dark:hover:bg-gray-700'
+            }`}
+          >
+            <Database className="w-4 h-4" />
+            Stock Database
+          </button>
+        </div>
+
+        {activeTab === 'database' ? (
+          <StockDatabaseManager />
+        ) : (
+          <div className="space-y-6">
+            {/* User Information */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -256,7 +287,8 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
               {loading ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
