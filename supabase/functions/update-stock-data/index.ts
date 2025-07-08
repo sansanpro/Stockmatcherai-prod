@@ -74,7 +74,7 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const alphaVantageKey = Deno.env.get('VITE_ALPHA_VANTAGE_API_KEY');
+    const alphaVantageKey = Deno.env.get('ALPHA_VANTAGE_API_KEY');
 
     if (!alphaVantageKey) {
       throw new Error('Alpha Vantage API key not configured');
