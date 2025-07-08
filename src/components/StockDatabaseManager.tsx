@@ -8,6 +8,7 @@ import { Upload, Database, RefreshCw, AlertCircle, CheckCircle } from 'lucide-re
 import { stockDatabase } from '@/data/stockDatabase';
 import { syncStaticDataToSupabase, getStockCountsByType } from '@/utils/supabaseStockManager';
 import StockDataImporter from './StockDataImporter';
+import AlphaVantageDataExpander from './AlphaVantageDataExpander';
 import { useToast } from '@/hooks/use-toast';
 import { StockRecommendation } from '@/types/stock-matcher';
 
@@ -149,11 +150,16 @@ const StockDatabaseManager = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="sync" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs defaultValue="expand" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="expand">Expand Stocks</TabsTrigger>
           <TabsTrigger value="sync">Supabase Sync</TabsTrigger>
           <TabsTrigger value="import">Import Data</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="expand" className="space-y-4">
+          <AlphaVantageDataExpander />
+        </TabsContent>
 
         <TabsContent value="sync" className="space-y-4">
           <Card>
