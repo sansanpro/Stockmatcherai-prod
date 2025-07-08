@@ -9,6 +9,7 @@ import { stockDatabase } from '@/data/stockDatabase';
 import { syncStaticDataToSupabase, getStockCountsByType } from '@/utils/supabaseStockManager';
 import StockDataImporter from './StockDataImporter';
 import AlphaVantageDataExpander from './AlphaVantageDataExpander';
+import StockExpansionTrigger from './StockExpansionTrigger';
 import { useToast } from '@/hooks/use-toast';
 import { StockRecommendation } from '@/types/stock-matcher';
 
@@ -158,7 +159,7 @@ const StockDatabaseManager = () => {
         </TabsList>
 
         <TabsContent value="expand" className="space-y-4">
-          <AlphaVantageDataExpander />
+          <StockExpansionTrigger />
         </TabsContent>
 
         <TabsContent value="sync" className="space-y-4">

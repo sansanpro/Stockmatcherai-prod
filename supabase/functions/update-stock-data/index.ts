@@ -335,8 +335,8 @@ async function checkIfExpansionNeeded(supabase: any, sector: string): Promise<bo
       .from(tableName)
       .select('*', { count: 'exact', head: true });
     
-    // If we have fewer than 20 stocks in the sector, expand automatically
-    const threshold = sector === 'technology' ? 30 : 15;
+    // Each sector should have at least 50 stocks for good variety
+    const threshold = 50;
     return (count || 0) < threshold;
   } catch (error) {
     console.error('Error checking expansion need:', error);
@@ -359,7 +359,7 @@ async function expandSectorDatabase(supabase: any, alphaVantage: AlphaVantageSer
     // Filter symbols for this sector and exclude existing ones
     const sectorSymbols = getSectorSymbols(sector)
       .filter(symbol => !existingTickers.has(symbol))
-      .slice(0, 25); // Limit to 25 new stocks to avoid API limits
+      .slice(0, 50); // Increase to 50 new stocks for better variety
     
     console.log(`Adding ${sectorSymbols.length} new stocks to ${sector} sector`);
     
@@ -432,12 +432,12 @@ async function expandSectorDatabase(supabase: any, alphaVantage: AlphaVantageSer
 // Helper function to get symbols for a specific sector
 function getSectorSymbols(sector: string): string[] {
   const sectorMap: Record<string, string[]> = {
-    'technology': STOCK_EXPANSION_SYMBOLS.slice(0, 40), // Tech stocks
-    'healthcare': STOCK_EXPANSION_SYMBOLS.slice(40, 67), // Healthcare stocks
-    'finance': STOCK_EXPANSION_SYMBOLS.slice(67, 87), // Finance stocks
-    'consumer': STOCK_EXPANSION_SYMBOLS.slice(87, 107), // Consumer stocks
-    'energy': STOCK_EXPANSION_SYMBOLS.slice(107, 127), // Energy stocks
-    'utilities': STOCK_EXPANSION_SYMBOLS.slice(127, 145) // Utilities stocks
+    'technology': STOCK_EXPANSION_SYMBOLS.slice(0, 60), // More tech stocks
+    'healthcare': STOCK_EXPANSION_SYMBOLS.slice(40, 90), // More healthcare stocks  
+    'finance': STOCK_EXPANSION_SYMBOLS.slice(67, 105), // More finance stocks
+    'consumer': STOCK_EXPANSION_SYMBOLS.slice(87, 125), // More consumer stocks
+    'energy': STOCK_EXPANSION_SYMBOLS.slice(107, 140), // More energy stocks
+    'utilities': STOCK_EXPANSION_SYMBOLS.slice(127, 150) // More utilities stocks
   };
   
   return sectorMap[sector] || [];
