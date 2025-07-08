@@ -229,8 +229,8 @@ serve(async (req) => {
       );
     }
 
-    // Limit number of stocks to update based on API limits
-    const maxStocks = priority ? 10 : 15; // Fewer for priority to allow more frequent updates
+    // Limit number of stocks to update based on API limits and timeout constraints
+    const maxStocks = priority ? 5 : 8; // Reduced to prevent timeouts
     stocksToUpdate = stocksToUpdate.slice(0, maxStocks);
 
     console.log(`Updating ${stocksToUpdate.length} stocks from ${targetSector} sector`);
@@ -272,9 +272,9 @@ serve(async (req) => {
           failedCount++;
         }
 
-        // Rate limiting: wait 12 seconds between API calls (5 calls per minute)
+        // Rate limiting: wait 3 seconds between API calls (20 calls per minute for faster processing)
         if (apiCallsUsed < stocksToUpdate.length) {
-          await new Promise(resolve => setTimeout(resolve, 12000));
+          await new Promise(resolve => setTimeout(resolve, 3000));
         }
 
       } catch (error) {
@@ -359,7 +359,7 @@ async function expandSectorDatabase(supabase: any, alphaVantage: AlphaVantageSer
     // Filter symbols for this sector and exclude existing ones
     const sectorSymbols = getSectorSymbols(sector)
       .filter(symbol => !existingTickers.has(symbol))
-      .slice(0, 50); // Increase to 50 new stocks for better variety
+      .slice(0, 25); // Reduced to 25 to prevent timeouts
     
     console.log(`Adding ${sectorSymbols.length} new stocks to ${sector} sector`);
     
@@ -412,9 +412,9 @@ async function expandSectorDatabase(supabase: any, alphaVantage: AlphaVantageSer
           }
         }
         
-        // Rate limiting: 12 seconds between API calls
+        // Rate limiting: 3 seconds between API calls for faster processing
         if (apiCalls < sectorSymbols.length * 2) {
-          await new Promise(resolve => setTimeout(resolve, 12000));
+          await new Promise(resolve => setTimeout(resolve, 3000));
         }
         
       } catch (error) {
