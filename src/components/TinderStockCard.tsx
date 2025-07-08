@@ -5,6 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { StockRecommendation } from '@/types/stock-matcher';
 import { Heart, X, TrendingUp, DollarSign, Building, Eye } from 'lucide-react';
 import EducationalTooltip from '@/components/EducationalTooltip';
+import DataFreshnessIndicator from '@/components/DataFreshnessIndicator';
 
 interface TinderStockCardProps {
   stock: StockRecommendation;
@@ -268,6 +269,14 @@ const TinderStockCard = ({
                 <EducationalTooltip 
                   content="1-Year Return shows how much the stock price has changed over the past 12 months"
                   className="text-white/70 hover:text-white transition-colors"
+                />
+              </div>
+              
+              <div className="mt-2 animate-fade-in delay-300">
+                <DataFreshnessIndicator 
+                  lastUpdated={(stock as any).lastUpdated} 
+                  variant="inline"
+                  className="text-white/60"
                 />
               </div>
             </div>

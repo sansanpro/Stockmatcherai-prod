@@ -23,6 +23,7 @@ export type Database = {
           dividend_yield: number
           esg_score: number | null
           id: string
+          last_updated: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -39,6 +40,7 @@ export type Database = {
           dividend_yield: number
           esg_score?: number | null
           id: string
+          last_updated?: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -55,6 +57,7 @@ export type Database = {
           dividend_yield?: number
           esg_score?: number | null
           id?: string
+          last_updated?: string | null
           market_cap?: string
           one_year_return?: number
           pe_ratio?: number
@@ -74,6 +77,7 @@ export type Database = {
           dividend_yield: number
           esg_score: number | null
           id: string
+          last_updated: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -90,6 +94,7 @@ export type Database = {
           dividend_yield: number
           esg_score?: number | null
           id: string
+          last_updated?: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -106,6 +111,7 @@ export type Database = {
           dividend_yield?: number
           esg_score?: number | null
           id?: string
+          last_updated?: string | null
           market_cap?: string
           one_year_return?: number
           pe_ratio?: number
@@ -125,6 +131,7 @@ export type Database = {
           dividend_yield: number
           esg_score: number | null
           id: string
+          last_updated: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -141,6 +148,7 @@ export type Database = {
           dividend_yield: number
           esg_score?: number | null
           id: string
+          last_updated?: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -157,6 +165,7 @@ export type Database = {
           dividend_yield?: number
           esg_score?: number | null
           id?: string
+          last_updated?: string | null
           market_cap?: string
           one_year_return?: number
           pe_ratio?: number
@@ -176,6 +185,7 @@ export type Database = {
           dividend_yield: number
           esg_score: number | null
           id: string
+          last_updated: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -192,6 +202,7 @@ export type Database = {
           dividend_yield: number
           esg_score?: number | null
           id: string
+          last_updated?: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -208,6 +219,7 @@ export type Database = {
           dividend_yield?: number
           esg_score?: number | null
           id?: string
+          last_updated?: string | null
           market_cap?: string
           one_year_return?: number
           pe_ratio?: number
@@ -245,6 +257,48 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_update_logs: {
+        Row: {
+          api_calls_used: number | null
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          sector: string
+          started_at: string | null
+          status: string | null
+          stocks_failed: number | null
+          stocks_updated: number | null
+          update_type: string
+        }
+        Insert: {
+          api_calls_used?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          sector: string
+          started_at?: string | null
+          status?: string | null
+          stocks_failed?: number | null
+          stocks_updated?: number | null
+          update_type?: string
+        }
+        Update: {
+          api_calls_used?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          sector?: string
+          started_at?: string | null
+          status?: string | null
+          stocks_failed?: number | null
+          stocks_updated?: number | null
+          update_type?: string
+        }
+        Relationships: []
+      }
       technology_stocks: {
         Row: {
           ceo_highlights: string
@@ -254,6 +308,7 @@ export type Database = {
           dividend_yield: number
           esg_score: number | null
           id: string
+          last_updated: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -270,6 +325,7 @@ export type Database = {
           dividend_yield: number
           esg_score?: number | null
           id: string
+          last_updated?: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -286,6 +342,7 @@ export type Database = {
           dividend_yield?: number
           esg_score?: number | null
           id?: string
+          last_updated?: string | null
           market_cap?: string
           one_year_return?: number
           pe_ratio?: number
@@ -407,6 +464,7 @@ export type Database = {
           dividend_yield: number
           esg_score: number | null
           id: string
+          last_updated: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -423,6 +481,7 @@ export type Database = {
           dividend_yield: number
           esg_score?: number | null
           id: string
+          last_updated?: string | null
           market_cap: string
           one_year_return: number
           pe_ratio: number
@@ -439,6 +498,7 @@ export type Database = {
           dividend_yield?: number
           esg_score?: number | null
           id?: string
+          last_updated?: string | null
           market_cap?: string
           one_year_return?: number
           pe_ratio?: number
