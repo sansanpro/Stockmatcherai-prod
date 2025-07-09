@@ -139,11 +139,16 @@ export const syncStaticDataToSupabase = async (): Promise<boolean> => {
     console.log('Starting sync of static + imported data to Supabase sector tables...');
     console.log(`Total imported stocks available: ${importedStocks.length}`);
     
-    // Only sync imported stocks if there are any, otherwise preserve existing Supabase data
-    if (importedStocks.length === 0) {
-      console.log('No imported stocks to sync. Preserving existing Supabase data.');
+    // Check if Supabase already has stocks (from expansion)
+    const existingStocks = await getStocksFromSupabase();
+    
+    // If no imported stocks and Supabase has expanded data, preserve it
+    if (importedStocks.length === 0 && existingStocks.length > 100) {
+      console.log(`Preserving ${existingStocks.length} existing expanded stocks in Supabase.`);
       return true;
     }
+    
+    console.log('Proceeding with sync (either have imported stocks or Supabase is mostly empty)...');
     
     const syncResults = await Promise.all([
       insertStocksToSectorTable('technology_stocks', getSectorStocks('technology')),
