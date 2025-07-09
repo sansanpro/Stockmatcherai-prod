@@ -9,7 +9,18 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const alphaVantageKey = Deno.env.get('ALPHA_VANTAGE_API_KEY')!;
+const alphaVantageKey = Deno.env.get('ALPHA_VANTAGE_API_KEY');
+
+// Add debugging for environment variables
+console.log('Environment check:', {
+  hasSupabaseUrl: !!supabaseUrl,
+  hasSupabaseKey: !!supabaseKey,
+  hasAlphaVantageKey: !!alphaVantageKey
+});
+
+if (!alphaVantageKey) {
+  throw new Error('ALPHA_VANTAGE_API_KEY environment variable is not set');
+}
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
