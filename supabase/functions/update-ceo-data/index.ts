@@ -101,12 +101,18 @@ serve(async (req) => {
             continue;
           }
           
+          console.log(`Alpha Vantage response for ${stock.ticker}:`, {
+            symbol: data.Symbol,
+            ceo: data.CEO,
+            hasDescription: !!data.Description
+          });
+          
           // Extract CEO name and create highlights from description
           const ceoName = data.CEO || 'Leadership Team';
           let ceoHighlights = stock.ceo_highlights;
           
           // If we got a valid CEO name, create better highlights
-          if (data.CEO && data.CEO !== 'N/A' && data.CEO.trim() !== '') {
+          if (data.CEO && data.CEO !== 'N/A' && data.CEO.trim() !== '' && data.CEO !== 'NULL') {
             const description = data.Description || '';
             const industry = data.Industry || '';
             const sector = data.Sector || '';
