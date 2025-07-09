@@ -96,59 +96,28 @@ const insertStocksToSectorTable = async (
   }
 };
 
+// Remove this function since we no longer need static data integration
 const getSectorStocks = (sector: string): Omit<StockRecommendation, 'whyItFits'>[] => {
-  const staticStocks = {
-    technology: technologyStocks,
-    healthcare: healthcareStocks,
-    finance: financeStocks,
-    energy: energyStocks,
-    consumer: consumerStocks,
-    utilities: utilitiesStocks
-  };
-
-  const sectorKey = sector.toLowerCase() as keyof typeof staticStocks;
-  const static_stocks = staticStocks[sectorKey] || [];
-  
-  // Add imported stocks that match this sector
+  // Only return imported stocks that match this sector
   const imported_stocks = importedStocks.filter(stock => 
     stock.sector.toLowerCase() === sector.toLowerCase()
   );
   
-  // Combine and remove duplicates (imported stocks take precedence)
-  const allStocks = [...static_stocks, ...imported_stocks];
-  const uniqueStocks = allStocks.reduce((acc, stock) => {
-    const existingIndex = acc.findIndex(s => s.ticker === stock.ticker);
-    if (existingIndex === -1) {
-      acc.push(stock);
-    } else {
-      // If it's an imported stock, it takes precedence
-      if (imported_stocks.some(imp => imp.ticker === stock.ticker)) {
-        acc[existingIndex] = stock;
-      }
-    }
-    return acc;
-  }, [] as Omit<StockRecommendation, 'whyItFits'>[]);
-  
-  console.log(`Sector ${sector}: ${static_stocks.length} static + ${imported_stocks.length} imported = ${uniqueStocks.length} unique total`);
-  
-  return uniqueStocks;
+  console.log(`Sector ${sector}: ${imported_stocks.length} imported stocks`);
+  return imported_stocks;
 };
 
-export const syncStaticDataToSupabase = async (): Promise<boolean> => {
+export const syncImportedDataToSupabase = async (): Promise<boolean> => {
   try {
-    console.log('Starting sync of static + imported data to Supabase sector tables...');
+    console.log('Starting sync of imported data to Supabase sector tables...');
     console.log(`Total imported stocks available: ${importedStocks.length}`);
     
-    // Check if Supabase already has stocks (from expansion)
-    const existingStocks = await getStocksFromSupabase();
-    
-    // If no imported stocks and Supabase has expanded data, preserve it
-    if (importedStocks.length === 0 && existingStocks.length > 100) {
-      console.log(`Preserving ${existingStocks.length} existing expanded stocks in Supabase.`);
+    if (importedStocks.length === 0) {
+      console.log('No imported stocks to sync.');
       return true;
     }
     
-    console.log('Proceeding with sync (either have imported stocks or Supabase is mostly empty)...');
+    console.log('Proceeding with imported stock sync...');
     
     const syncResults = await Promise.all([
       insertStocksToSectorTable('technology_stocks', getSectorStocks('technology')),
@@ -162,14 +131,14 @@ export const syncStaticDataToSupabase = async (): Promise<boolean> => {
     const allSuccessful = syncResults.every(result => result);
     
     if (allSuccessful) {
-      console.log('All stock data (static + imported) synced successfully to Supabase!');
+      console.log('All imported stock data synced successfully to Supabase!');
     } else {
-      console.log('Some stock data failed to sync to Supabase');
+      console.log('Some imported stock data failed to sync to Supabase');
     }
     
     return allSuccessful;
   } catch (error) {
-    console.error('Error in syncStaticDataToSupabase:', error);
+    console.error('Error in syncImportedDataToSupabase:', error);
     return false;
   }
 };
@@ -306,4 +275,5 @@ export const getStockCountsByType = async (): Promise<Record<string, number>> =>
 };
 
 // Legacy function names for backward compatibility 
-export const insertStocksToSupabase = syncStaticDataToSupabase;
+export const insertStocksToSupabase = syncImportedDataToSupabase;
+export const syncStaticDataToSupabase = syncImportedDataToSupabase;
