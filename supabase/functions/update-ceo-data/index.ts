@@ -68,7 +68,7 @@ serve(async (req) => {
       const { data: stocks, error: fetchError } = await supabase
         .from(table)
         .select('*')
-        .or('ceo_name.eq.Management Team,ceo_name.eq.Leadership Team,ceo_highlights.ilike.%Experienced leadership driving company growth%');
+        .or('ceo_name.eq.Leadership Team,ceo_name.eq.Management Team,ceo_highlights.ilike.%Experienced leadership driving company growth%');
 
       if (fetchError) {
         console.error(`Error fetching from ${table}:`, fetchError);
