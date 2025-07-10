@@ -64,11 +64,11 @@ serve(async (req) => {
     for (const table of sectorTables) {
       console.log(`Processing ${table}...`);
       
-      // Get stocks with generic CEO data
+      // Get stocks with generic CEO data - be more comprehensive
       const { data: stocks, error: fetchError } = await supabase
         .from(table)
         .select('*')
-        .or('ceo_name.eq.Leadership Team,ceo_name.eq.Management Team,ceo_highlights.ilike.%Experienced leadership driving company growth%');
+        .or('ceo_name.eq.Leadership Team,ceo_name.eq.Management Team,ceo_name.eq.Executive Team,ceo_highlights.ilike.%Experienced leadership driving company growth%,ceo_highlights.ilike.%Experienced leadership driving%,ceo_highlights.ilike.%driving company growth%');
 
       if (fetchError) {
         console.error(`Error fetching from ${table}:`, fetchError);
