@@ -33,9 +33,29 @@ export const saveUserProfile = async (profile: UserProfile, userId: string): Pro
   try {
     const supabaseProfile = mapToSupabaseProfile(profile, userId);
     
-    const { error } = await supabase
+    // First, try to check if profile exists
+    const { data: existingProfile } = await supabase
       .from('user_profiles')
-      .upsert(supabaseProfile, { onConflict: 'user_id' });
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
+    
+    let error;
+    
+    if (existingProfile) {
+      // Update existing profile
+      const result = await supabase
+        .from('user_profiles')
+        .update(supabaseProfile)
+        .eq('user_id', userId);
+      error = result.error;
+    } else {
+      // Insert new profile
+      const result = await supabase
+        .from('user_profiles')
+        .insert(supabaseProfile);
+      error = result.error;
+    }
 
     if (error) {
       console.error('Error saving user profile:', error);
