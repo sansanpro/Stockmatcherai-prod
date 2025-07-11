@@ -147,20 +147,41 @@ export const getStocksFromSupabase = async (sector?: string): Promise<Omit<Stock
   try {
     let allStocks: any[] = [];
     
-    if (sector) {
-      // Get stocks from specific sector table
-      const tableName = `${sector.toLowerCase()}_stocks` as SectorTableName;
-      const { data, error } = await supabase
-        .from(tableName)
-        .select('*');
+    if (sector && sector !== 'any') {
+      // Map sector preferences to actual table names
+      const sectorTableMap: Record<string, SectorTableName> = {
+        'technology': 'technology_stocks',
+        'healthcare': 'healthcare_stocks',
+        'finance': 'finance_stocks',
+        'energy': 'energy_stocks',
+        'consumer': 'consumer_stocks',
+        'utilities': 'utilities_stocks',
+        'real-estate': 'finance_stocks' // Map real estate to finance as fallback
+      };
       
-      if (error) {
-        console.error(`Error fetching from ${tableName}:`, error);
-        return [];
+      const tableName = sectorTableMap[sector.toLowerCase()];
+      
+      if (!tableName) {
+        console.warn(`No table found for sector: ${sector}, falling back to all sectors`);
+        // Fall back to getting all stocks if sector not found
+        sector = undefined;
+      } else {
+        console.log(`Fetching from ${tableName} for sector preference: ${sector}`);
+        const { data, error } = await supabase
+          .from(tableName)
+          .select('*');
+        
+        if (error) {
+          console.error(`Error fetching from ${tableName}:`, error);
+          return [];
+        }
+        
+        allStocks = data || [];
+        console.log(`Found ${allStocks.length} stocks in ${tableName}`);
       }
-      
-      allStocks = data || [];
-    } else {
+    }
+    
+    if (!sector || sector === 'any') {
       // Get stocks from all sector tables
       const sectorTables: SectorTableName[] = [
         'technology_stocks',

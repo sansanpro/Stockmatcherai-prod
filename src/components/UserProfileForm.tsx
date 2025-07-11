@@ -164,7 +164,6 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                   <SelectItem value="finance">Finance</SelectItem>
                   <SelectItem value="energy">Energy</SelectItem>
                   <SelectItem value="consumer">Consumer Goods</SelectItem>
-                  <SelectItem value="real-estate">Real Estate</SelectItem>
                   <SelectItem value="utilities">Utilities</SelectItem>
                   <SelectItem value="any">No preference</SelectItem>
                 </SelectContent>
