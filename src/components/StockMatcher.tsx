@@ -27,6 +27,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   useEffect(() => {
     const loadAllRecommendations = async () => {
       setLoading(true);
+      console.log('StockMatcher: Loading recommendations for profile:', userProfile);
       
       const stocks = await generateStockRecommendations(userProfile, []);
       
