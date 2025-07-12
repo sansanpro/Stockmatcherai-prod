@@ -40,13 +40,14 @@ export const filterStocksByProfile = (
       return false;
     }
 
-    // Risk tolerance filter
+    // Risk tolerance filter - be more permissive for high risk tolerance users
     if (profile.riskTolerance === 'low' && stock.riskLevel === 'high') {
       return false;
     }
     if (profile.riskTolerance === 'medium' && stock.riskLevel === 'high' && stock.oneYearReturn < -30) {
       return false;
     }
+    // For high risk tolerance, don't filter out any risk levels - let them see everything
 
     // Performance filter - exclude stocks with catastrophic performance
     if (stock.oneYearReturn < -80) {
@@ -67,12 +68,30 @@ export const filterStocksByProfile = (
   filteredStocks = filteredStocks.sort((a, b) => {
     let scoreA = 0, scoreB = 0;
 
-    // Favor low-risk stocks for beginners
+    // Risk tolerance preference scoring
     if (profile.experience === 'beginner' || profile.experience === 'none') {
       if (a.riskLevel === 'low') scoreA += 20;
       if (b.riskLevel === 'low') scoreB += 20;
       if (a.riskLevel === 'medium') scoreA += 10;
       if (b.riskLevel === 'medium') scoreB += 10;
+    } else if (profile.riskTolerance === 'high' && profile.experience === 'advanced') {
+      // Favor high-risk stocks for advanced users with high risk tolerance
+      if (a.riskLevel === 'high') scoreA += 25;
+      if (b.riskLevel === 'high') scoreB += 25;
+      if (a.riskLevel === 'medium') scoreA += 15;
+      if (b.riskLevel === 'medium') scoreB += 15;
+    } else if (profile.riskTolerance === 'high') {
+      // Still favor high-risk for high tolerance users, but less aggressively
+      if (a.riskLevel === 'high') scoreA += 20;
+      if (b.riskLevel === 'high') scoreB += 20;
+      if (a.riskLevel === 'medium') scoreA += 10;
+      if (b.riskLevel === 'medium') scoreB += 10;
+    } else if (profile.riskTolerance === 'medium') {
+      // Favor medium risk for medium tolerance
+      if (a.riskLevel === 'medium') scoreA += 15;
+      if (b.riskLevel === 'medium') scoreB += 15;
+      if (a.riskLevel === 'low') scoreA += 10;
+      if (b.riskLevel === 'low') scoreB += 10;
     }
 
     // Investment goal preferences
