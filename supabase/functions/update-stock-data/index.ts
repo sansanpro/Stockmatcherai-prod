@@ -21,8 +21,18 @@ class AlphaVantageService {
       const response = await fetch(url);
       const data = await response.json();
       
-      if (data['Error Message'] || data['Note']) {
-        throw new Error(data['Error Message'] || data['Note']);
+      // Handle rate limit errors
+      if (data['Note'] && data['Note'].includes('API call frequency')) {
+        console.log(`Rate limit hit for ${symbol}, waiting 60 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 60000)); // Wait 1 minute
+        // Retry once after rate limit
+        const retryResponse = await fetch(url);
+        const retryData = await retryResponse.json();
+        return retryData['Global Quote'] || null;
+      }
+      
+      if (data['Error Message']) {
+        throw new Error(data['Error Message']);
       }
       
       return data['Global Quote'] || null;
@@ -312,9 +322,10 @@ serve(async (req) => {
               sectorFailed++;
             }
 
-            // Faster rate limiting: 1.5 seconds between calls (40 calls per minute)
+            // Conservative rate limiting for Alpha Vantage: 15 seconds between calls (4 calls per minute)
+            // This ensures we stay well within free tier limits (5 calls/minute)
             if (totalApiCalls < stocksToUpdate.length) {
-              await new Promise(resolve => setTimeout(resolve, 1500));
+              await new Promise(resolve => setTimeout(resolve, 15000));
             }
 
           } catch (error) {
