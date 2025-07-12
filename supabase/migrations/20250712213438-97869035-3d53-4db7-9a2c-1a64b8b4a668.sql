@@ -1,7 +1,7 @@
--- Create a cron job to update stock data every 24 hours
+-- Create a cron job to update stock data every 6 hours
 SELECT cron.schedule(
-  'daily-stock-update',
-  '0 2 * * *', -- Run at 2 AM UTC every day
+  'stock-update-every-6h',
+  '0 */6 * * *', -- Run every 6 hours (00:00, 06:00, 12:00, 18:00 UTC)
   $$
   SELECT
     net.http_post(
