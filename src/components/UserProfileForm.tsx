@@ -37,17 +37,25 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
     setLoading(true);
     
     try {
-      const success = await saveUserProfile(profile as UserProfile, user.id);
-      
-      if (success) {
-        toast.success(isUpdate ? 'Profile updated successfully!' : 'Profile saved successfully!');
-        onComplete(profile as UserProfile);
-      } else {
-        toast.error('Failed to save profile. Please try again.');
-      }
+      await saveUserProfile(profile as UserProfile, user.id);
+      toast.success(isUpdate ? 'Profile updated successfully!' : 'Profile saved successfully!');
+      onComplete(profile as UserProfile);
     } catch (error) {
       console.error('Error saving profile:', error);
-      toast.error('An error occurred while saving your profile');
+      
+      // Provide more specific error messages
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      if (errorMessage.includes('Validation failed')) {
+        toast.error(`Please check your inputs: ${errorMessage.replace('Validation failed: ', '')}`);
+      } else if (errorMessage.includes('row-level security')) {
+        toast.error('Permission denied. Please refresh the page and try again.');
+      } else if (errorMessage.includes('duplicate')) {
+        toast.error('Profile already exists. Refreshing page...');
+        window.location.reload();
+      } else {
+        toast.error(`Failed to update profile: ${errorMessage}`);
+      }
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile } from '@/types/stock-matcher';
+import { validateUserProfile, sanitizeProfileData } from './profileValidation';
 
 // Map our internal UserProfile type to Supabase user_profiles table structure
 const mapToSupabaseProfile = (profile: UserProfile, userId: string) => ({
@@ -31,52 +32,37 @@ const mapFromSupabaseProfile = (data: any): UserProfile | null => {
 
 export const saveUserProfile = async (profile: UserProfile, userId: string): Promise<boolean> => {
   try {
-    const supabaseProfile = mapToSupabaseProfile(profile, userId);
-    console.log('Saving profile for user:', userId, 'Profile data:', supabaseProfile);
-    
-    // First, try to check if profile exists
-    const { data: existingProfile, error: fetchError } = await supabase
-      .from('user_profiles')
-      .select('id')
-      .eq('user_id', userId)
-      .maybeSingle();
-    
-    if (fetchError) {
-      console.error('Error checking existing profile:', fetchError);
-      return false;
-    }
-    
-    console.log('Existing profile check:', existingProfile ? 'Found' : 'Not found');
-    
-    let result;
-    
-    if (existingProfile) {
-      // Update existing profile - remove user_id from update data to avoid RLS issues
-      const { user_id, ...updateData } = supabaseProfile;
-      console.log('Updating existing profile with data:', updateData);
-      
-      result = await supabase
-        .from('user_profiles')
-        .update(updateData)
-        .eq('user_id', userId);
-    } else {
-      // Insert new profile
-      console.log('Inserting new profile');
-      result = await supabase
-        .from('user_profiles')
-        .insert(supabaseProfile);
+    // Validate the profile data first
+    const validation = validateUserProfile(profile);
+    if (!validation.isValid) {
+      console.error('Profile validation failed:', validation.errors);
+      throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
     }
 
-    if (result.error) {
-      console.error('Error saving user profile:', result.error);
-      return false;
+    // Sanitize the data to ensure it's within valid ranges
+    const sanitizedProfile = sanitizeProfileData(profile);
+    const supabaseProfile = mapToSupabaseProfile(sanitizedProfile, userId);
+    
+    console.log('Saving profile for user:', userId);
+    
+    // Use upsert operation - this handles both insert and update automatically
+    const { error } = await supabase
+      .from('user_profiles')
+      .upsert(supabaseProfile, {
+        onConflict: 'user_id',
+        ignoreDuplicates: false
+      });
+
+    if (error) {
+      console.error('Error saving user profile:', error);
+      throw new Error(`Database error: ${error.message}`);
     }
 
     console.log('Profile saved successfully');
     return true;
   } catch (error) {
     console.error('Error in saveUserProfile:', error);
-    return false;
+    throw error; // Re-throw to let the UI handle the specific error
   }
 };
 
