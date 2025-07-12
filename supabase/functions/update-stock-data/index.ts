@@ -288,9 +288,18 @@ serve(async (req) => {
         let sectorUpdated = 0;
         let sectorFailed = 0;
 
-        // Update stocks with optimized rate limiting (1.5 seconds for faster processing)
-        for (const stock of stocksToUpdate) {
+        // Update stocks with proper rate limiting - wait BEFORE each API call
+        for (let i = 0; i < stocksToUpdate.length; i++) {
+          const stock = stocksToUpdate[i];
+          
           try {
+            // Rate limit BEFORE making API call (except for first call)
+            if (totalApiCalls > 0) {
+              console.log(`Rate limiting: waiting 12 seconds before API call ${totalApiCalls + 1}...`);
+              await new Promise(resolve => setTimeout(resolve, 12000));
+            }
+            
+            console.log(`Updating ${stock.ticker} (${i + 1}/${stocksToUpdate.length})...`);
             const quote = await alphaVantage.getQuote(stock.ticker);
             totalApiCalls++;
             
@@ -315,13 +324,8 @@ serve(async (req) => {
                 console.log(`Updated ${stock.ticker}: $${currentPrice} (${changePercent}%)`);
               }
             } else {
+              console.log(`No quote data received for ${stock.ticker}`);
               sectorFailed++;
-            }
-
-            // Proper rate limiting: 12 seconds between calls (5 calls per minute max)
-            // This respects Alpha Vantage free tier: 5 API calls per minute, 500 per day
-            if (totalApiCalls < stocksToUpdate.length) {
-              await new Promise(resolve => setTimeout(resolve, 12000));
             }
 
           } catch (error) {
