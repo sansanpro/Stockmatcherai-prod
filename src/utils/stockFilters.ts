@@ -13,19 +13,22 @@ export const filterStocksByProfile = (
 
   console.log(`Starting with ${stocks.length} stocks for sector: ${profile.sectorPreference}`);
 
-  // Calculate affordability threshold based on experience
+  // Calculate affordability threshold - much more conservative for salary protection
   const getAffordabilityThreshold = (experience: string, salary: number) => {
+    // Base affordability on annual salary divided by reasonable investment amounts
+    const maxStockPrice = Math.min(salary * 0.02, 200); // Max 2% of annual salary per stock, capped at $200
+    
     switch (experience) {
       case 'none':
-        return salary * 0.3; // 30% for complete beginners
+        return Math.min(maxStockPrice, 50); // Very conservative for beginners
       case 'beginner':
-        return salary * 0.5; // 50% for beginners
+        return Math.min(maxStockPrice, 100); // Conservative
       case 'intermediate':
-        return salary * 0.75; // 75% for intermediate
+        return maxStockPrice;
       case 'advanced':
-        return salary * 1.0; // 100% for advanced
+        return maxStockPrice * 1.5; // Slightly more flexible for advanced
       default:
-        return salary * 0.5;
+        return Math.min(maxStockPrice, 100);
     }
   };
 
@@ -40,14 +43,19 @@ export const filterStocksByProfile = (
       return false;
     }
 
-    // Risk tolerance filter - be more permissive for high risk tolerance users
-    if (profile.riskTolerance === 'low' && stock.riskLevel === 'high') {
-      return false;
+    // AGGRESSIVE Risk tolerance filtering - risk preference is the PRIMARY factor
+    if (profile.riskTolerance === 'low') {
+      // Low risk users: ONLY see low-risk stocks
+      if (stock.riskLevel !== 'low') {
+        return false;
+      }
+    } else if (profile.riskTolerance === 'medium') {
+      // Medium risk users: see low and medium risk stocks, no high risk
+      if (stock.riskLevel === 'high') {
+        return false;
+      }
     }
-    if (profile.riskTolerance === 'medium' && stock.riskLevel === 'high' && stock.oneYearReturn < -30) {
-      return false;
-    }
-    // For high risk tolerance, don't filter out any risk levels - let them see everything
+    // High risk users see all stocks, but scoring will heavily favor high-risk stocks
 
     // Performance filter - exclude stocks with catastrophic performance
     if (stock.oneYearReturn < -80) {
@@ -68,36 +76,36 @@ export const filterStocksByProfile = (
   filteredStocks = filteredStocks.sort((a, b) => {
     let scoreA = 0, scoreB = 0;
 
-    // Risk tolerance preference scoring
-    if (profile.experience === 'beginner' || profile.experience === 'none') {
+    // PRIORITY 1: Risk tolerance preference scoring (HIGHEST weight)
+    if (profile.riskTolerance === 'high') {
+      // Heavily favor high-risk stocks for high tolerance users
+      if (a.riskLevel === 'high') scoreA += 50;
+      if (b.riskLevel === 'high') scoreB += 50;
+      if (a.riskLevel === 'medium') scoreA += 15;
+      if (b.riskLevel === 'medium') scoreB += 15;
+      if (a.riskLevel === 'low') scoreA += 5;
+      if (b.riskLevel === 'low') scoreB += 5;
+    } else if (profile.riskTolerance === 'medium') {
+      // Heavily favor medium risk for medium tolerance
+      if (a.riskLevel === 'medium') scoreA += 50;
+      if (b.riskLevel === 'medium') scoreB += 50;
       if (a.riskLevel === 'low') scoreA += 20;
       if (b.riskLevel === 'low') scoreB += 20;
-      if (a.riskLevel === 'medium') scoreA += 10;
-      if (b.riskLevel === 'medium') scoreB += 10;
-    } else if (profile.riskTolerance === 'high' && profile.experience === 'advanced') {
-      // Favor high-risk stocks for advanced users with high risk tolerance
-      if (a.riskLevel === 'high') scoreA += 25;
-      if (b.riskLevel === 'high') scoreB += 25;
-      if (a.riskLevel === 'medium') scoreA += 15;
-      if (b.riskLevel === 'medium') scoreB += 15;
-    } else if (profile.riskTolerance === 'high') {
-      // Still favor high-risk for high tolerance users, but less aggressively
-      if (a.riskLevel === 'high') scoreA += 20;
-      if (b.riskLevel === 'high') scoreB += 20;
-      if (a.riskLevel === 'medium') scoreA += 10;
-      if (b.riskLevel === 'medium') scoreB += 10;
-    } else if (profile.riskTolerance === 'medium') {
-      // Favor medium risk for medium tolerance
-      if (a.riskLevel === 'medium') scoreA += 15;
-      if (b.riskLevel === 'medium') scoreB += 15;
+    } else if (profile.riskTolerance === 'low') {
+      // Heavily favor low-risk stocks for low risk tolerance users
+      if (a.riskLevel === 'low') scoreA += 50;
+      if (b.riskLevel === 'low') scoreB += 50;
+    }
+
+    // PRIORITY 2: Experience-based adjustments (lower weight)
+    if (profile.experience === 'beginner' || profile.experience === 'none') {
+      // Extra boost for low-risk regardless of tolerance for beginners
       if (a.riskLevel === 'low') scoreA += 10;
       if (b.riskLevel === 'low') scoreB += 10;
-    } else if (profile.riskTolerance === 'low') {
-      // Favor low-risk stocks for low risk tolerance users
-      if (a.riskLevel === 'low') scoreA += 20;
-      if (b.riskLevel === 'low') scoreB += 20;
-      if (a.riskLevel === 'medium') scoreA += 5;
-      if (b.riskLevel === 'medium') scoreB += 5;
+    } else if (profile.experience === 'advanced' && profile.riskTolerance === 'high') {
+      // Extra boost for high-risk stocks for advanced + high tolerance
+      if (a.riskLevel === 'high') scoreA += 15;
+      if (b.riskLevel === 'high') scoreB += 15;
     }
 
     // Investment goal preferences
