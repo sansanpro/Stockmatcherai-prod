@@ -151,7 +151,7 @@ serve(async (req) => {
     let targetSector = sector;
     let sectorsToUpdate: string[] = [];
     
-    // Smart scheduling: check all sectors for stale data (6+ hours old) and update ALL stale sectors
+    // Smart scheduling: check all sectors for stale data (12+ hours old) and update ALL stale sectors
     if (smartScheduling) {
       const sectors = ['technology', 'healthcare', 'finance', 'energy', 'consumer', 'utilities'];
       
@@ -161,34 +161,21 @@ serve(async (req) => {
         try {
           const tableName = `${sectorName}_stocks`;
           
-          // Get the oldest last_updated timestamp for this sector
-          const { data, error } = await supabase
+          // Count stocks that need updating (older than 12 hours)
+          const { data: staleStocks, error } = await supabase
             .from(tableName)
-            .select('last_updated')
-            .order('last_updated', { ascending: true })
-            .limit(1);
+            .select('ticker, last_updated')
+            .lt('last_updated', new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString());
 
           if (error) {
             console.error(`Error checking ${sectorName} sector:`, error);
             continue;
           }
 
-          const oldestUpdate = data?.[0]?.last_updated;
-          let hoursOld = 0;
-          let needsUpdate = false;
+          const staleCount = staleStocks?.length || 0;
+          const needsUpdate = staleCount > 0;
 
-          if (oldestUpdate) {
-            const lastUpdateTime = new Date(oldestUpdate);
-            const now = new Date();
-            hoursOld = (now.getTime() - lastUpdateTime.getTime()) / (1000 * 60 * 60);
-            needsUpdate = hoursOld >= 6; // Update if data is 6+ hours old (more frequent updates)
-          } else {
-            // No last_updated data, definitely needs update
-            needsUpdate = true;
-            hoursOld = 999;
-          }
-
-          console.log(`${sectorName.toUpperCase()}: ${hoursOld.toFixed(1)}h old, needs update: ${needsUpdate}`);
+          console.log(`${sectorName.toUpperCase()}: ${staleCount} stocks older than 12h, needs update: ${needsUpdate}`);
 
           if (needsUpdate) {
             sectorsToUpdate.push(sectorName);
@@ -201,7 +188,7 @@ serve(async (req) => {
       if (sectorsToUpdate.length === 0) {
         return new Response(JSON.stringify({ 
           success: true,
-          message: 'All sectors have fresh data (< 6 hours old)',
+          message: 'All sectors have fresh data (< 12 hours old)',
           timestamp: new Date().toISOString()
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -209,7 +196,7 @@ serve(async (req) => {
       }
       
       console.log(`Smart scheduler found ${sectorsToUpdate.length} sectors needing updates: ${sectorsToUpdate.join(', ')}`);
-      // Process ALL sectors that need updating, not just the first one
+      // Process ALL sectors that need updating
       targetSector = 'all_stale_sectors';
     }
     
@@ -276,10 +263,11 @@ serve(async (req) => {
         
         const tableName = `${sectorName}_stocks`;
         
-        // Get all stocks from this sector, prioritize stalest data
+        // Get ONLY stocks that need updating (older than 12 hours)
         const { data: sectorStocks, error: fetchError } = await supabase
           .from(tableName)
           .select('ticker, last_updated')
+          .lt('last_updated', new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString())
           .order('last_updated', { ascending: true });
 
         if (fetchError) {
@@ -287,9 +275,9 @@ serve(async (req) => {
           continue;
         }
 
-        // Update ALL stocks in the sector (no artificial limits for comprehensive refresh)
+        // Update ONLY stocks that are stale (12+ hours old)
         const stocksToUpdate = sectorStocks || [];
-        console.log(`Updating ALL ${stocksToUpdate.length} stocks in ${sectorName} sector`);
+        console.log(`Updating ${stocksToUpdate.length} stale stocks (>12h old) in ${sectorName} sector`);
 
         let sectorUpdated = 0;
         let sectorFailed = 0;
