@@ -92,6 +92,12 @@ export const filterStocksByProfile = (
       if (b.riskLevel === 'medium') scoreB += 15;
       if (a.riskLevel === 'low') scoreA += 10;
       if (b.riskLevel === 'low') scoreB += 10;
+    } else if (profile.riskTolerance === 'low') {
+      // Favor low-risk stocks for low risk tolerance users
+      if (a.riskLevel === 'low') scoreA += 20;
+      if (b.riskLevel === 'low') scoreB += 20;
+      if (a.riskLevel === 'medium') scoreA += 5;
+      if (b.riskLevel === 'medium') scoreB += 5;
     }
 
     // Investment goal preferences
