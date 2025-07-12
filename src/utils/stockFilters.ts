@@ -43,23 +43,8 @@ export const filterStocksByProfile = (
       return false;
     }
 
-    // BALANCED Risk tolerance filtering - allow some adjacent risk levels
-    if (profile.riskTolerance === 'low') {
-      // Low risk users: mostly low-risk stocks, some medium risk
-      if (stock.riskLevel === 'high') {
-        return false; // Never show high risk to low tolerance users
-      }
-    } else if (profile.riskTolerance === 'medium') {
-      // Medium risk users: mostly medium, some low risk, exclude high risk
-      if (stock.riskLevel === 'high') {
-        return false; // Never show high risk to medium tolerance users
-      }
-    } else if (profile.riskTolerance === 'high') {
-      // High risk users: mostly high, some medium risk, exclude low risk
-      if (stock.riskLevel === 'low') {
-        return false; // Never show low risk to high tolerance users
-      }
-    }
+    // FLEXIBLE Risk tolerance filtering - prefer user's risk level but don't be too restrictive
+    // This ensures good variety while still prioritizing preferences
 
     // Performance filter - exclude stocks with catastrophic performance
     if (stock.oneYearReturn < -80) {

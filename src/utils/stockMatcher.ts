@@ -14,19 +14,27 @@ export const generateStockRecommendations = async (
   try {
     let stocksToFilter: Omit<StockRecommendation, 'whyItFits'>[] = [];
     
-    // Get stocks from Supabase - single source of truth
+    // Get stocks from preferred sector first
     if (userProfile.sectorPreference && userProfile.sectorPreference !== 'any') {
       console.log(`Fetching stocks from ${userProfile.sectorPreference} sector table`);
       stocksToFilter = await getStocksFromSupabase(userProfile.sectorPreference);
       console.log(`Found ${stocksToFilter.length} stocks in ${userProfile.sectorPreference} sector`);
-    } else {
-      // Get all stocks from all sector tables
-      console.log('No specific sector preference, fetching from all sectors');
-      stocksToFilter = await getStocksFromSupabase();
-      console.log(`Found ${stocksToFilter.length} total stocks from all sectors`);
+    }
+    
+    // If we don't have enough stocks from preferred sector, add from other sectors
+    if (stocksToFilter.length < 20) {
+      console.log('Not enough stocks from preferred sector, adding from other sectors');
+      const allStocks = await getStocksFromSupabase();
+      console.log(`Found ${allStocks.length} total stocks from all sectors`);
+      
+      // Add stocks from other sectors that aren't already included
+      const existingTickers = new Set(stocksToFilter.map(s => s.ticker));
+      const additionalStocks = allStocks.filter(stock => !existingTickers.has(stock.ticker));
+      stocksToFilter = [...stocksToFilter, ...additionalStocks];
+      console.log(`Total stocks after adding from other sectors: ${stocksToFilter.length}`);
     }
 
-    // If no stocks found, return empty array
+    // If still no stocks found, return empty array
     if (stocksToFilter.length === 0) {
       console.log('No stocks found in Supabase. Database may need expansion.');
       return [];
