@@ -32,36 +32,47 @@ const mapFromSupabaseProfile = (data: any): UserProfile | null => {
 export const saveUserProfile = async (profile: UserProfile, userId: string): Promise<boolean> => {
   try {
     const supabaseProfile = mapToSupabaseProfile(profile, userId);
+    console.log('Saving profile for user:', userId, 'Profile data:', supabaseProfile);
     
     // First, try to check if profile exists
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile, error: fetchError } = await supabase
       .from('user_profiles')
       .select('id')
       .eq('user_id', userId)
       .maybeSingle();
     
-    let error;
+    if (fetchError) {
+      console.error('Error checking existing profile:', fetchError);
+      return false;
+    }
+    
+    console.log('Existing profile check:', existingProfile ? 'Found' : 'Not found');
+    
+    let result;
     
     if (existingProfile) {
-      // Update existing profile
-      const result = await supabase
+      // Update existing profile - remove user_id from update data to avoid RLS issues
+      const { user_id, ...updateData } = supabaseProfile;
+      console.log('Updating existing profile with data:', updateData);
+      
+      result = await supabase
         .from('user_profiles')
-        .update(supabaseProfile)
+        .update(updateData)
         .eq('user_id', userId);
-      error = result.error;
     } else {
       // Insert new profile
-      const result = await supabase
+      console.log('Inserting new profile');
+      result = await supabase
         .from('user_profiles')
         .insert(supabaseProfile);
-      error = result.error;
     }
 
-    if (error) {
-      console.error('Error saving user profile:', error);
+    if (result.error) {
+      console.error('Error saving user profile:', result.error);
       return false;
     }
 
+    console.log('Profile saved successfully');
     return true;
   } catch (error) {
     console.error('Error in saveUserProfile:', error);
