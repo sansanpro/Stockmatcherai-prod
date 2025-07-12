@@ -377,6 +377,14 @@ async function expandSectorDatabase(supabase: any, alphaVantage: AlphaVantageSer
         apiCalls += 2;
         
         if (quote && overview && overview.Name) {
+          // Validate that this stock belongs to the target sector
+          const isCorrectSector = validateSectorMatch(sector, overview.Sector, overview.Industry);
+          
+          if (!isCorrectSector) {
+            console.log(`Skipping ${symbol} - doesn't match ${sector} sector (API Sector: ${overview.Sector}, Industry: ${overview.Industry})`);
+            continue;
+          }
+          
           const currentPrice = parseFloat(quote['05. price']) || 100;
           const changePercent = parseFloat(quote['10. change percent']?.replace('%', '')) || 0;
           const peRatio = overview.PERatio === 'None' ? 0 : parseFloat(overview.PERatio) || 20;
@@ -406,7 +414,7 @@ async function expandSectorDatabase(supabase: any, alphaVantage: AlphaVantageSer
           
           if (!error) {
             addedCount++;
-            console.log(`Added new stock: ${symbol} - ${overview.Name}`);
+            console.log(`Added new stock: ${symbol} - ${overview.Name} (${overview.Sector})`);
           } else {
             console.error(`Failed to insert ${symbol}:`, error);
           }
@@ -432,12 +440,43 @@ async function expandSectorDatabase(supabase: any, alphaVantage: AlphaVantageSer
 // Helper function to get symbols for a specific sector
 function getSectorSymbols(sector: string): string[] {
   const sectorMap: Record<string, string[]> = {
-    'technology': STOCK_EXPANSION_SYMBOLS.slice(0, 60), // More tech stocks
-    'healthcare': STOCK_EXPANSION_SYMBOLS.slice(40, 90), // More healthcare stocks  
-    'finance': STOCK_EXPANSION_SYMBOLS.slice(67, 105), // More finance stocks
-    'consumer': STOCK_EXPANSION_SYMBOLS.slice(87, 125), // More consumer stocks
-    'energy': STOCK_EXPANSION_SYMBOLS.slice(107, 140), // More energy stocks
-    'utilities': STOCK_EXPANSION_SYMBOLS.slice(127, 150) // More utilities stocks
+    'technology': [
+      // Major Tech Companies
+      'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'NFLX', 'ADBE', 'CRM',
+      'ORCL', 'INTC', 'AMD', 'IBM', 'CSCO', 'QCOM', 'TXN', 'AVGO', 'NOW', 'SNOW',
+      'PLTR', 'ZM', 'UBER', 'LYFT', 'SHOP', 'TWLO', 'OKTA', 'CRWD', 'ZS', 'DDOG',
+      'MDB', 'NET', 'TEAM', 'WDAY', 'VEEV', 'PANW', 'FTNT', 'SPLK', 'DOCU', 'ZOOM'
+    ],
+    'healthcare': [
+      // Healthcare & Biotech Companies
+      'JNJ', 'UNH', 'PFE', 'ABBV', 'LLY', 'MRK', 'TMO', 'ABT', 'MDT', 'AMGN',
+      'GILD', 'CVS', 'CI', 'HUM', 'BMY', 'BIIB', 'REGN', 'VRTX', 'ISRG', 'ZBH',
+      'SYK', 'BSX', 'EW', 'HOLX', 'IQV', 'MTD', 'DXCM', 'MRNA', 'BNTX', 'ANTM'
+    ],
+    'finance': [
+      // Financial Services Companies
+      'JPM', 'BAC', 'WFC', 'GS', 'MS', 'C', 'BLK', 'SCHW', 'AXP', 'COF',
+      'USB', 'PNC', 'TFC', 'BK', 'STT', 'NTRS', 'RF', 'CFG', 'HBAN', 'FITB',
+      'V', 'MA', 'FIS', 'FISV', 'DFS', 'SYF', 'ALLY', 'TRV', 'ALL', 'PGR'
+    ],
+    'consumer': [
+      // Consumer Discretionary & Staples
+      'HD', 'LOW', 'MCD', 'SBUX', 'NKE', 'TJX', 'BKNG', 'ABNB', 'TGT', 'COST',
+      'WMT', 'DIS', 'PG', 'KO', 'PEP', 'MDLZ', 'GIS', 'K', 'CAG', 'HSY',
+      'F', 'GM', 'YUM', 'CMG', 'LULU', 'RCL', 'CCL', 'MAR', 'HLT'
+    ],
+    'energy': [
+      // Energy Companies
+      'XOM', 'CVX', 'COP', 'EOG', 'SLB', 'OXY', 'PSX', 'VLO', 'MPC', 'HES',
+      'DVN', 'FANG', 'MRO', 'APA', 'CLR', 'KMI', 'OKE', 'EPD', 'ET', 'WMB',
+      'HAL', 'BKR', 'FTI', 'NOV', 'RIG', 'CNX', 'AR', 'EQT', 'MTDR', 'SM'
+    ],
+    'utilities': [
+      // Utilities Companies
+      'NEE', 'DUK', 'SO', 'D', 'EXC', 'XEL', 'WEC', 'ES', 'AEP', 'FE',
+      'ETR', 'PPL', 'AES', 'LNT', 'NRG', 'VST', 'AWK', 'WTR', 'SRE', 'PEG',
+      'T', 'VZ', 'CMS', 'DTE', 'ED', 'PCG', 'EIX', 'NI', 'CNP', 'ATO'
+    ]
   };
   
   return sectorMap[sector] || [];
@@ -467,6 +506,53 @@ function formatMarketCap(marketCap: string): string {
     return `$${(value / 1e6).toFixed(1)}M`;
   }
   return `$${value.toFixed(0)}`;
+}
+
+// Helper function to validate that a stock belongs to the target sector
+function validateSectorMatch(targetSector: string, apiSector: string, apiIndustry: string): boolean {
+  if (!apiSector && !apiIndustry) return true; // If no sector data available, allow it
+  
+  const sector = apiSector?.toLowerCase() || '';
+  const industry = apiIndustry?.toLowerCase() || '';
+  
+  const sectorMappings: Record<string, string[]> = {
+    'technology': [
+      'technology', 'software', 'semiconductors', 'electronic technology', 'telecommunications',
+      'internet', 'information technology', 'computer', 'tech hardware', 'cloud computing',
+      'artificial intelligence', 'cybersecurity', 'social media', 'e-commerce', 'fintech'
+    ],
+    'healthcare': [
+      'healthcare', 'health care', 'pharmaceuticals', 'biotechnology', 'biotech', 'medical',
+      'health technology', 'life sciences', 'medical devices', 'pharmaceutical preparations',
+      'health services', 'hospital', 'drug', 'therapeutic', 'clinical', 'diagnostic'
+    ],
+    'finance': [
+      'financial', 'finance', 'banking', 'insurance', 'investment', 'asset management',
+      'credit', 'payments', 'financial services', 'capital markets', 'real estate investment',
+      'mortgage', 'lending', 'wealth management', 'brokerage', 'fintech'
+    ],
+    'consumer': [
+      'consumer', 'retail', 'food', 'beverage', 'restaurant', 'apparel', 'automotive',
+      'entertainment', 'media', 'travel', 'leisure', 'hospitality', 'discretionary',
+      'staples', 'goods', 'personal care', 'household', 'gaming'
+    ],
+    'energy': [
+      'energy', 'oil', 'gas', 'petroleum', 'renewable energy', 'utilities', 'power',
+      'coal', 'solar', 'wind', 'nuclear', 'electric', 'pipeline', 'refining',
+      'exploration', 'drilling', 'fossil', 'alternative energy'
+    ],
+    'utilities': [
+      'utilities', 'utility', 'electric', 'power', 'water', 'gas distribution',
+      'telecommunications', 'telecom', 'wireless', 'broadband', 'infrastructure'
+    ]
+  };
+  
+  const targetKeywords = sectorMappings[targetSector] || [];
+  
+  // Check if any target keywords match the API sector or industry
+  return targetKeywords.some(keyword => 
+    sector.includes(keyword) || industry.includes(keyword)
+  );
 }
 
 // Helper function to get default ESG score
