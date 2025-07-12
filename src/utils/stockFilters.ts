@@ -54,8 +54,12 @@ export const filterStocksByProfile = (
       if (stock.riskLevel === 'high') {
         return false; // Never show high risk to medium tolerance users
       }
+    } else if (profile.riskTolerance === 'high') {
+      // High risk users: mostly high, some medium risk, exclude low risk
+      if (stock.riskLevel === 'low') {
+        return false; // Never show low risk to high tolerance users
+      }
     }
-    // High risk users: see all stocks (mostly high, some medium)
 
     // Performance filter - exclude stocks with catastrophic performance
     if (stock.oneYearReturn < -80) {
