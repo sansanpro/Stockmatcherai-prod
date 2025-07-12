@@ -21,14 +21,10 @@ class AlphaVantageService {
       const response = await fetch(url);
       const data = await response.json();
       
-      // Handle rate limit errors
+      // Handle rate limit errors - don't retry, just skip
       if (data['Note'] && data['Note'].includes('API call frequency')) {
-        console.log(`Rate limit hit for ${symbol}, waiting 60 seconds...`);
-        await new Promise(resolve => setTimeout(resolve, 60000)); // Wait 1 minute
-        // Retry once after rate limit
-        const retryResponse = await fetch(url);
-        const retryData = await retryResponse.json();
-        return retryData['Global Quote'] || null;
+        console.log(`Rate limit hit for ${symbol}, skipping...`);
+        throw new Error('Rate limit exceeded');
       }
       
       if (data['Error Message']) {
@@ -322,10 +318,10 @@ serve(async (req) => {
               sectorFailed++;
             }
 
-            // Conservative rate limiting for Alpha Vantage: 15 seconds between calls (4 calls per minute)
-            // This ensures we stay well within free tier limits (5 calls/minute)
+            // Proper rate limiting: 12 seconds between calls (5 calls per minute max)
+            // This respects Alpha Vantage free tier: 5 API calls per minute, 500 per day
             if (totalApiCalls < stocksToUpdate.length) {
-              await new Promise(resolve => setTimeout(resolve, 15000));
+              await new Promise(resolve => setTimeout(resolve, 12000));
             }
 
           } catch (error) {
