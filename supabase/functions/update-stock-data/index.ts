@@ -21,19 +21,20 @@ class AlphaVantageService {
       const response = await fetch(url);
       const data = await response.json();
       
-      // Handle rate limit errors - don't retry, just skip
+      // Handle rate limit errors - log and return null instead of throwing
       if (data['Note'] && data['Note'].includes('API call frequency')) {
-        console.log(`Rate limit hit for ${symbol}, skipping...`);
-        throw new Error('Rate limit exceeded');
+        console.log(`Rate limit hit for ${symbol}, skipping this call...`);
+        return null;
       }
       
       if (data['Error Message']) {
-        throw new Error(data['Error Message']);
+        console.log(`API error for ${symbol}: ${data['Error Message']}`);
+        return null;
       }
       
       return data['Global Quote'] || null;
     } catch (error) {
-      console.error(`Failed to get quote for ${symbol}:`, error);
+      console.error(`Network error for ${symbol}:`, error);
       return null;
     }
   }
@@ -293,10 +294,11 @@ serve(async (req) => {
           const stock = stocksToUpdate[i];
           
           try {
-            // Rate limit BEFORE making API call (except for first call)
+            // CRITICAL: Rate limit BEFORE making API call 
+            // Alpha Vantage free tier: 5 calls per minute = 12+ second intervals
             if (totalApiCalls > 0) {
-              console.log(`Rate limiting: waiting 12 seconds before API call ${totalApiCalls + 1}...`);
-              await new Promise(resolve => setTimeout(resolve, 12000));
+              console.log(`Rate limiting: waiting 13 seconds before API call ${totalApiCalls + 1}...`);
+              await new Promise(resolve => setTimeout(resolve, 13000));
             }
             
             console.log(`Updating ${stock.ticker} (${i + 1}/${stocksToUpdate.length})...`);
@@ -422,10 +424,18 @@ serve(async (req) => {
     let failedCount = 0;
     let apiCallsUsed = 0;
 
-    // Update stocks with rate limiting
-    for (const stock of stocksToUpdate) {
+    // Update stocks with proper rate limiting
+    for (let i = 0; i < stocksToUpdate.length; i++) {
+      const stock = stocksToUpdate[i];
+      
       try {
-        // Get quote data
+        // Rate limit BEFORE making API call
+        if (apiCallsUsed > 0) {
+          console.log(`Rate limiting: waiting 13 seconds before API call ${apiCallsUsed + 1}...`);
+          await new Promise(resolve => setTimeout(resolve, 13000));
+        }
+        
+        console.log(`Updating ${stock.ticker} (${i + 1}/${stocksToUpdate.length})...`);
         const quote = await alphaVantage.getQuote(stock.ticker);
         apiCallsUsed++;
         
@@ -452,12 +462,8 @@ serve(async (req) => {
             console.log(`Updated ${stock.ticker}: $${currentPrice} (${changePercent}%)`);
           }
         } else {
+          console.log(`No quote data received for ${stock.ticker} (likely rate limited or API error)`);
           failedCount++;
-        }
-
-        // Rate limiting: wait 3 seconds between API calls (20 calls per minute for faster processing)
-        if (apiCallsUsed < stocksToUpdate.length) {
-          await new Promise(resolve => setTimeout(resolve, 3000));
         }
 
       } catch (error) {
