@@ -151,7 +151,7 @@ serve(async (req) => {
     let targetSector = sector;
     let sectorsToUpdate: string[] = [];
     
-    // Smart scheduling: check all sectors for stale data (18+ hours old)
+    // Smart scheduling: check all sectors for stale data (6+ hours old) and update ALL stale sectors
     if (smartScheduling) {
       const sectors = ['technology', 'healthcare', 'finance', 'energy', 'consumer', 'utilities'];
       
@@ -181,7 +181,7 @@ serve(async (req) => {
             const lastUpdateTime = new Date(oldestUpdate);
             const now = new Date();
             hoursOld = (now.getTime() - lastUpdateTime.getTime()) / (1000 * 60 * 60);
-            needsUpdate = hoursOld >= 18; // Update if data is 18+ hours old
+            needsUpdate = hoursOld >= 6; // Update if data is 6+ hours old (more frequent updates)
           } else {
             // No last_updated data, definitely needs update
             needsUpdate = true;
@@ -201,7 +201,7 @@ serve(async (req) => {
       if (sectorsToUpdate.length === 0) {
         return new Response(JSON.stringify({ 
           success: true,
-          message: 'All sectors have fresh data (< 18 hours old)',
+          message: 'All sectors have fresh data (< 6 hours old)',
           timestamp: new Date().toISOString()
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -209,7 +209,8 @@ serve(async (req) => {
       }
       
       console.log(`Smart scheduler found ${sectorsToUpdate.length} sectors needing updates: ${sectorsToUpdate.join(', ')}`);
-      targetSector = sectorsToUpdate[0]; // Start with first sector needing update
+      // Process ALL sectors that need updating, not just the first one
+      targetSector = 'all_stale_sectors';
     }
     
     // If no sector specified and not smart scheduling, determine based on schedule
@@ -247,8 +248,130 @@ serve(async (req) => {
       }
     }
 
-    console.log(`Starting ${updateType} update for ${targetSector} sector`);
+    console.log(`Starting ${updateType} update for ${targetSector}`);
 
+    // Handle multi-sector updates when using smart scheduling
+    if (targetSector === 'all_stale_sectors' && sectorsToUpdate.length > 0) {
+      console.log(`Processing ${sectorsToUpdate.length} stale sectors: ${sectorsToUpdate.join(', ')}`);
+      
+      // Create update log entry for multi-sector update
+      const { data: logEntry } = await supabase
+        .from('stock_update_logs')
+        .insert({
+          sector: sectorsToUpdate.join(', '),
+          update_type: updateType,
+          status: 'running'
+        })
+        .select()
+        .single();
+
+      const logId = logEntry?.id;
+      let totalUpdated = 0;
+      let totalFailed = 0;
+      let totalApiCalls = 0;
+
+      // Process each stale sector
+      for (const sectorName of sectorsToUpdate) {
+        console.log(`\n--- Processing ${sectorName.toUpperCase()} sector ---`);
+        
+        const tableName = `${sectorName}_stocks`;
+        
+        // Get all stocks from this sector, prioritize stalest data
+        const { data: sectorStocks, error: fetchError } = await supabase
+          .from(tableName)
+          .select('ticker, last_updated')
+          .order('last_updated', { ascending: true });
+
+        if (fetchError) {
+          console.error(`Failed to fetch ${sectorName} stocks:`, fetchError);
+          continue;
+        }
+
+        // Update ALL stocks in the sector (no artificial limits for comprehensive refresh)
+        const stocksToUpdate = sectorStocks || [];
+        console.log(`Updating ALL ${stocksToUpdate.length} stocks in ${sectorName} sector`);
+
+        let sectorUpdated = 0;
+        let sectorFailed = 0;
+
+        // Update stocks with optimized rate limiting (1.5 seconds for faster processing)
+        for (const stock of stocksToUpdate) {
+          try {
+            const quote = await alphaVantage.getQuote(stock.ticker);
+            totalApiCalls++;
+            
+            if (quote) {
+              const currentPrice = parseFloat(quote['05. price']);
+              const changePercent = parseFloat(quote['10. change percent'].replace('%', ''));
+              
+              const { error: updateError } = await supabase
+                .from(tableName)
+                .update({
+                  price_per_share: currentPrice,
+                  one_year_return: changePercent,
+                  last_updated: new Date().toISOString()
+                })
+                .eq('ticker', stock.ticker);
+
+              if (updateError) {
+                console.error(`Failed to update ${stock.ticker}:`, updateError);
+                sectorFailed++;
+              } else {
+                sectorUpdated++;
+                console.log(`Updated ${stock.ticker}: $${currentPrice} (${changePercent}%)`);
+              }
+            } else {
+              sectorFailed++;
+            }
+
+            // Faster rate limiting: 1.5 seconds between calls (40 calls per minute)
+            if (totalApiCalls < stocksToUpdate.length) {
+              await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+
+          } catch (error) {
+            console.error(`Error updating ${stock.ticker}:`, error);
+            sectorFailed++;
+          }
+        }
+        
+        totalUpdated += sectorUpdated;
+        totalFailed += sectorFailed;
+        console.log(`${sectorName.toUpperCase()} complete: ${sectorUpdated} updated, ${sectorFailed} failed`);
+      }
+
+      // Update log entry with totals
+      if (logId) {
+        await supabase
+          .from('stock_update_logs')
+          .update({
+            stocks_updated: totalUpdated,
+            stocks_failed: totalFailed,
+            api_calls_used: totalApiCalls,
+            completed_at: new Date().toISOString(),
+            status: totalFailed > totalUpdated ? 'partial' : 'completed'
+          })
+          .eq('id', logId);
+      }
+
+      const response = {
+        success: true,
+        sector: `${sectorsToUpdate.length} sectors: ${sectorsToUpdate.join(', ')}`,
+        updateType,
+        priority: false,
+        stocksUpdated: totalUpdated,
+        stocksFailed: totalFailed,
+        apiCallsUsed: totalApiCalls,
+        message: `Smart update complete: ${totalUpdated} stocks updated across ${sectorsToUpdate.length} sectors`
+      };
+
+      console.log('Multi-sector update completed:', response);
+      return new Response(JSON.stringify(response), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Single sector update logic (existing behavior)
     // Check if we should expand the database first
     const shouldAutoExpand = await checkIfExpansionNeeded(supabase, targetSector);
     
