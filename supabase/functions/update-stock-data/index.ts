@@ -146,16 +146,77 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const alphaVantage = new AlphaVantageService(alphaVantageKey);
 
-    const { sector, updateType = 'scheduled', priority = false, expand = false } = await req.json().catch(() => ({}));
-    
-    // Determine which sector to update
-    const currentHour = new Date().getHours();
-    const currentMinute = new Date().getMinutes();
+    const { sector, updateType = 'scheduled', priority = false, expand = false, smartScheduling = false } = await req.json().catch(() => ({}));
     
     let targetSector = sector;
+    let sectorsToUpdate: string[] = [];
     
-    // If no sector specified, determine based on schedule
-    if (!targetSector) {
+    // Smart scheduling: check all sectors for stale data (18+ hours old)
+    if (smartScheduling) {
+      const sectors = ['technology', 'healthcare', 'finance', 'energy', 'consumer', 'utilities'];
+      
+      console.log('Running smart scheduler - checking data age for all sectors...');
+      
+      for (const sectorName of sectors) {
+        try {
+          const tableName = `${sectorName}_stocks`;
+          
+          // Get the oldest last_updated timestamp for this sector
+          const { data, error } = await supabase
+            .from(tableName)
+            .select('last_updated')
+            .order('last_updated', { ascending: true })
+            .limit(1);
+
+          if (error) {
+            console.error(`Error checking ${sectorName} sector:`, error);
+            continue;
+          }
+
+          const oldestUpdate = data?.[0]?.last_updated;
+          let hoursOld = 0;
+          let needsUpdate = false;
+
+          if (oldestUpdate) {
+            const lastUpdateTime = new Date(oldestUpdate);
+            const now = new Date();
+            hoursOld = (now.getTime() - lastUpdateTime.getTime()) / (1000 * 60 * 60);
+            needsUpdate = hoursOld >= 18; // Update if data is 18+ hours old
+          } else {
+            // No last_updated data, definitely needs update
+            needsUpdate = true;
+            hoursOld = 999;
+          }
+
+          console.log(`${sectorName.toUpperCase()}: ${hoursOld.toFixed(1)}h old, needs update: ${needsUpdate}`);
+
+          if (needsUpdate) {
+            sectorsToUpdate.push(sectorName);
+          }
+        } catch (error) {
+          console.error(`Error processing ${sectorName}:`, error);
+        }
+      }
+      
+      if (sectorsToUpdate.length === 0) {
+        return new Response(JSON.stringify({ 
+          success: true,
+          message: 'All sectors have fresh data (< 18 hours old)',
+          timestamp: new Date().toISOString()
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
+      console.log(`Smart scheduler found ${sectorsToUpdate.length} sectors needing updates: ${sectorsToUpdate.join(', ')}`);
+      targetSector = sectorsToUpdate[0]; // Start with first sector needing update
+    }
+    
+    // If no sector specified and not smart scheduling, determine based on schedule
+    if (!targetSector && !smartScheduling) {
+      const currentHour = new Date().getHours();
+      const currentMinute = new Date().getMinutes();
+      
       // Check if it's market hours (9:30 AM to 4:00 PM ET)
       const isMarketHours = (currentHour >= 9 && currentHour < 16) || 
                            (currentHour === 9 && currentMinute >= 30);
