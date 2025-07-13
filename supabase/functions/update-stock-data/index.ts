@@ -277,9 +277,21 @@ serve(async (req) => {
         }
 
         // Update ONLY stocks that are stale (12+ hours old)
-        // Limit to 30 stocks per run to avoid timeouts
-        const stocksToUpdate = sectorStocks?.slice(0, 30) || [];
-        console.log(`Updating ${stocksToUpdate.length} stale stocks (max 30 per run) in ${sectorName} sector`);
+        // Smart batching: Prioritize most stale stocks first
+        const sortedStocks = sectorStocks?.sort((a, b) => {
+          const aTime = new Date(a.last_updated || a.created_at).getTime();
+          const bTime = new Date(b.last_updated || b.created_at).getTime();
+          return aTime - bTime; // Oldest first
+        }) || [];
+        
+        // Batch size: 30 stocks max per run to prevent timeouts
+        const BATCH_SIZE = 30;
+        const stocksToUpdate = sortedStocks.slice(0, BATCH_SIZE);
+        
+        console.log(`📦 BATCH UPDATE: Processing ${stocksToUpdate.length}/${sortedStocks.length} stocks in ${sectorName} sector`);
+        if (sortedStocks.length > BATCH_SIZE) {
+          console.log(`⏳ Remaining ${sortedStocks.length - BATCH_SIZE} stocks will be processed in next run`);
+        }
 
         let sectorUpdated = 0;
         let sectorFailed = 0;
@@ -410,9 +422,9 @@ serve(async (req) => {
       );
     }
 
-    // Limit number of stocks to update based on API limits and timeout constraints
-    const maxStocks = priority ? 5 : 8; // Reduced to prevent timeouts
-    stocksToUpdate = stocksToUpdate.slice(0, maxStocks);
+    // Smart batching for single sector updates
+    const BATCH_SIZE = 30;
+    stocksToUpdate = stocksToUpdate.slice(0, BATCH_SIZE);
 
     console.log(`Background update: Processing ${stocksToUpdate.length} stocks from ${targetSector} sector`);
 
