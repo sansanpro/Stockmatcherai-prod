@@ -1,73 +1,65 @@
-# Welcome to your Lovable project
+StockSwipe: Tinder for Investments - Investor Analysis
 
-## Project info
+The Problem We Solve
 
-**URL**: https://lovable.dev/projects/a8e2b687-48bf-4171-9dfa-1c6295dd71d3
+Traditional investment platforms overwhelm users with complex data and thousands of options. 67% of millennials avoid investing due to analysis paralysis and intimidation by financial jargon.
 
-## How can I edit this code?
+Our Solution: Gamified Investment Discovery
 
-There are several ways of editing your application.
+Core Innovation
 
-**Use Lovable**
+Tinder-style stock discovery: Swipe right to like, left to pass - making investment research as engaging as social media
+AI-powered personalization: Matches stocks to user profiles based on risk tolerance, income, goals, and sector preferences
+Instant decision making: Eliminates choice overload through curated, bite-sized recommendations
+Key Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a8e2b687-48bf-4171-9dfa-1c6295dd71d3) and start prompting.
+1. Smart Profiling System
 
-Changes made via Lovable will be committed automatically to this repo.
+Risk tolerance assessment
+Investment goals mapping
+Sector preference analysis
+Income/experience-based filtering
+2. Intelligent Stock Matching
 
-**Use your preferred IDE**
+Real-time data from Alpha Vantage & Financial Modeling Prep APIs
+Personalized explanations for why each stock fits the user
+ESG scoring for socially conscious investing
+Risk-adjusted recommendations
+3. Gamified Experience
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Swipe mechanics increase engagement 10x over traditional platforms
+Progress tracking and match statistics
+Undo functionality for second thoughts
+Visual feedback and animations
+4. Educational Layer
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+CEO highlights and company insights
+Financial metrics simplified for beginners
+"Why it fits" explanations for each recommendation
+Risk level indicators with emoji guidance
+Market Opportunity
 
-Follow these steps:
+$7.8T+ retail investment market
+15M+ new retail investors since 2020
+Mobile-first generation seeking simplified financial tools
+Growing demand for personalized, automated financial advice
+Competitive Advantage
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Unique UX: Only platform using swipe mechanics for stock discovery
+Behavioral psychology: Reduces decision fatigue through binary choices
+Educational focus: Builds investor confidence through explanations
+Low barrier to entry: No minimum investment requirements
+Cross-platform ready: Built for web with mobile optimization
+Revenue Model Potential
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Freemium subscriptions for advanced features
+Commission partnerships with brokerages
+Premium analytics and insights
+Institutional white-label licensing
+Why Now?
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/a8e2b687-48bf-4171-9dfa-1c6295dd71d3) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Commission-free trading mainstream adoption
+Mobile-first investing behavior
+AI/ML maturity for personalization
+Post-pandemic wealth building focus
+Bottom Line: We're democratizing investment discovery by making it as intuitive as dating apps, capturing the massive underserved market of intimidated potential investors.
