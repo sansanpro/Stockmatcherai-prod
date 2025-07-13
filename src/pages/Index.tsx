@@ -12,6 +12,7 @@ import StockDetailsModal from '@/components/StockDetailsModal';
 import StockComparison from '@/components/StockComparison';
 import { AppProvider, useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import { Moon, Heart } from 'lucide-react';
@@ -372,7 +373,9 @@ const IndexContent = () => {
 const Index = () => {
   return (
     <AppProvider>
-      <IndexContent />
+      <SubscriptionProvider>
+        <IndexContent />
+      </SubscriptionProvider>
     </AppProvider>
   );
 };

@@ -4,7 +4,10 @@ import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import TinderStockCard from '@/components/TinderStockCard';
 import { generateStockRecommendations } from '@/utils/stockMatcher';
 import { useApp } from '@/contexts/AppContext';
-import { Heart, X, RotateCcw, TrendingUp, Plus } from 'lucide-react';
+import { useSubscription } from '@/contexts/SubscriptionContext';
+import SubscriptionBanner from '@/components/SubscriptionBanner';
+import { Heart, X, RotateCcw, TrendingUp, Plus, Crown } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface StockMatcherProps {
   userProfile: UserProfile;
@@ -22,6 +25,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [seenStockTickers, setSeenStockTickers] = useState<Set<string>>(new Set());
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
+  const { canSwipe, incrementSwipeCount, upgradeToPremi } = useSubscription();
 
   // Pre-load all recommendations once
   useEffect(() => {
@@ -56,11 +60,20 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     loadAllRecommendations();
   }, [userProfile]);
 
-  const handleMatch = () => {
+  const handleMatch = async () => {
     if (animatingCard || currentIndex >= allRecommendations.length) return;
+    
+    // Check swipe limit
+    if (!canSwipe) {
+      toast.error('You\'ve reached your daily swipe limit. Upgrade to Premium for unlimited swipes!');
+      return;
+    }
     
     setAnimatingCard(true);
     const currentStock = allRecommendations[currentIndex];
+    
+    // Increment swipe count for free users
+    await incrementSwipeCount();
     
     // Add to seen stocks
     setSeenStockTickers(prev => new Set(prev).add(currentStock.ticker));
@@ -83,11 +96,20 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     }, 400);
   };
 
-  const handlePass = () => {
+  const handlePass = async () => {
     if (animatingCard || currentIndex >= allRecommendations.length) return;
+    
+    // Check swipe limit
+    if (!canSwipe) {
+      toast.error('You\'ve reached your daily swipe limit. Upgrade to Premium for unlimited swipes!');
+      return;
+    }
     
     setAnimatingCard(true);
     const currentStock = allRecommendations[currentIndex];
+    
+    // Increment swipe count for free users
+    await incrementSwipeCount();
     
     // Add to seen stocks
     setSeenStockTickers(prev => new Set(prev).add(currentStock.ticker));
@@ -271,6 +293,9 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
             <span>{userProfile.age}yo • {userProfile.riskTolerance} risk • {userProfile.sectorPreference}</span>
           </div>
         </div>
+
+        {/* Subscription Banner */}
+        <SubscriptionBanner />
 
         {/* Stats */}
         <div className="flex justify-center gap-4 mb-6 animate-fade-in delay-200">

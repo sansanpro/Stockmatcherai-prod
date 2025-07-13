@@ -68,6 +68,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_swipe_limits: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          swipes_used: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          swipes_used?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          swipes_used?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       energy_stocks: {
         Row: {
           ceo_highlights: string
@@ -296,6 +323,42 @@ export type Database = {
           stocks_failed?: number | null
           stocks_updated?: number | null
           update_type?: string
+        }
+        Relationships: []
+      }
+      subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          subscribed: boolean
+          subscription_end: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
