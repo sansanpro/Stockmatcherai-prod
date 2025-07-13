@@ -14,7 +14,7 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
 
   const handleUpgrade = async () => {
     await upgradeToPremi();
-    onClose();
+    // Don't close modal - let Stripe redirect handle the flow
   };
 
   return (
