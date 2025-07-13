@@ -66,6 +66,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     
     // Check swipe limit
     if (!canSwipe) {
+      console.log('User hit swipe limit, showing upgrade modal');
       setShowUpgradeModal(true);
       return;
     }
@@ -102,6 +103,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     
     // Check swipe limit
     if (!canSwipe) {
+      console.log('User hit swipe limit, showing upgrade modal');
       setShowUpgradeModal(true);
       return;
     }
@@ -392,7 +394,10 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       {/* Upgrade Modal */}
       <UpgradeModal 
         isOpen={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
+        onClose={() => {
+          console.log('Upgrade modal closed');
+          setShowUpgradeModal(false);
+        }}
       />
     </div>
   );
