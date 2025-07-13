@@ -284,8 +284,8 @@ serve(async (req) => {
           return aTime - bTime; // Oldest first
         }) || [];
         
-        // Batch size: 30 stocks max per run to prevent timeouts
-        const BATCH_SIZE = 30;
+        // Batch size: 12 stocks max per run to prevent timeouts
+        const BATCH_SIZE = 12;
         const stocksToUpdate = sortedStocks.slice(0, BATCH_SIZE);
         
         console.log(`📦 BATCH UPDATE: Processing ${stocksToUpdate.length}/${sortedStocks.length} stocks in ${sectorName} sector`);
@@ -423,7 +423,7 @@ serve(async (req) => {
     }
 
     // Smart batching for single sector updates
-    const BATCH_SIZE = 30;
+    const BATCH_SIZE = 12;
     stocksToUpdate = stocksToUpdate.slice(0, BATCH_SIZE);
 
     console.log(`Background update: Processing ${stocksToUpdate.length} stocks from ${targetSector} sector`);
