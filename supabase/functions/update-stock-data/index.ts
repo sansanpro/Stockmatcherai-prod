@@ -158,15 +158,41 @@ serve(async (req) => {
       const alphaVantage = new AlphaVantageService(alphaVantageKey);
 
       let requestBody = {};
+      let params = {};
+      
+      // Try to get data from multiple sources
       try {
-        requestBody = await req.json();
-        console.log('Request body received:', JSON.stringify(requestBody));
+        // First try JSON body
+        if (req.headers.get('content-type')?.includes('application/json')) {
+          requestBody = await req.json();
+          console.log('JSON body received:', JSON.stringify(requestBody));
+        } else {
+          console.log('No JSON content-type, checking URL params...');
+        }
       } catch (error) {
-        console.log('Failed to parse request body, using defaults:', error.message);
-        requestBody = {};
+        console.log('Failed to parse JSON body:', error.message);
       }
       
-      const { sector, updateType = 'scheduled', priority = false, expand = false, smartScheduling = false } = requestBody;
+      // Also check URL parameters (for cron triggers)
+      try {
+        const url = new URL(req.url);
+        params = Object.fromEntries(url.searchParams.entries());
+        console.log('URL params received:', JSON.stringify(params));
+      } catch (error) {
+        console.log('No URL params:', error.message);
+      }
+      
+      // Merge params and body (params take precedence)
+      const combined = { ...requestBody, ...params };
+      console.log('Combined parameters:', JSON.stringify(combined));
+      
+      const { 
+        sector, 
+        updateType = 'scheduled', 
+        priority = false, 
+        expand = false, 
+        smartScheduling = false 
+      } = combined;
       
       console.log(`Background update started - Sector: ${sector}, UpdateType: ${updateType}, Priority: ${priority}, SmartScheduling: ${smartScheduling}`);
       
