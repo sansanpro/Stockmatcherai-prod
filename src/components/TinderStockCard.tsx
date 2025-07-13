@@ -276,7 +276,7 @@ const TinderStockCard = ({
                 <DataFreshnessIndicator 
                   lastUpdated={(stock as any).lastUpdated} 
                   variant="inline"
-                  className="text-white/60"
+                  className="bg-black/20 backdrop-blur-sm rounded-full px-2 py-1"
                 />
               </div>
             </div>
@@ -296,7 +296,7 @@ const TinderStockCard = ({
                 <p className="text-xs text-gray-500 dark:text-gray-400">{stock.companyName}</p>
               </div>
             </div>
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-4 min-h-[5.5rem] max-h-[8.25rem] overflow-hidden">
               {stock.ceoHighlights}
             </p>
           </div>

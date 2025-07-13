@@ -35,20 +35,20 @@ const DataFreshnessIndicator: React.FC<DataFreshnessIndicatorProps> = ({
     const updated = new Date(date);
     const diffInMinutes = Math.floor((now.getTime() - updated.getTime()) / (1000 * 60));
     
-    // Fresh: within 30 minutes
-    if (diffInMinutes <= 30) return { status: 'fresh', color: 'text-green-500', icon: Wifi };
+    // Fresh: within 30 minutes - enhanced visibility with stronger colors
+    if (diffInMinutes <= 30) return { status: 'fresh', color: 'text-green-400 drop-shadow-lg', icon: Wifi };
     
-    // Stale: 30 minutes to 4 hours
-    if (diffInMinutes <= 240) return { status: 'stale', color: 'text-yellow-500', icon: Clock };
+    // Stale: 30 minutes to 4 hours - more visible yellow
+    if (diffInMinutes <= 240) return { status: 'stale', color: 'text-yellow-300 drop-shadow-lg', icon: Clock };
     
-    // Very stale: over 4 hours
-    return { status: 'very-stale', color: 'text-red-500', icon: WifiOff };
+    // Very stale: over 4 hours - enhanced red for visibility
+    return { status: 'very-stale', color: 'text-red-400 drop-shadow-lg', icon: WifiOff };
   };
 
   if (!lastUpdated) {
     const Icon = AlertTriangle;
     return (
-      <div className={`flex items-center gap-1 text-gray-400 ${className}`}>
+      <div className={`flex items-center gap-1 text-gray-300 drop-shadow-lg ${className}`}>
         <Icon className="w-3 h-3" />
         {showLabel && <span className="text-xs">No data</span>}
       </div>
