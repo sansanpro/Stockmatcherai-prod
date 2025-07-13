@@ -13,7 +13,7 @@ interface SubscriptionContextType {
   loading: boolean;
   checkSubscription: () => Promise<void>;
   incrementSwipeCount: () => Promise<void>;
-  upgradeToPremi: () => Promise<string | null>;
+  upgradeToPremi: () => Promise<void>;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -130,7 +130,7 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
   const upgradeToPremi = async () => {
     if (!user) {
       toast.error('Please sign in to upgrade');
-      return null;
+      return;
     }
 
     try {
@@ -140,18 +140,16 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
       if (error) {
         toast.error('Failed to start checkout process');
         console.error('Checkout error:', error);
-        return null;
+        return;
       }
 
-      if (data?.client_secret) {
-        return data.client_secret;
+      if (data?.url) {
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
       }
-      
-      return null;
     } catch (error) {
       toast.error('An error occurred while processing your request');
       console.error('Error creating checkout:', error);
-      return null;
     } finally {
       setLoading(false);
     }

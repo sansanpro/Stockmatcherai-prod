@@ -46,11 +46,11 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      ui_mode: "embedded",
-      return_url: `${req.headers.get("origin")}/`,
+      success_url: `${req.headers.get("origin")}/`,
+      cancel_url: `${req.headers.get("origin")}/`,
     });
 
-    return new Response(JSON.stringify({ client_secret: session.client_secret }), {
+    return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
