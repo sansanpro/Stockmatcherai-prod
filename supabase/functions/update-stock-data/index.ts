@@ -18,8 +18,11 @@ class AlphaVantageService {
   async getQuote(symbol: string) {
     try {
       const url = `${this.baseUrl}?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${this.apiKey}`;
+      console.log(`Making Alpha Vantage API call for ${symbol}: ${url}`);
       const response = await fetch(url);
       const data = await response.json();
+      
+      console.log(`Raw API response for ${symbol}:`, JSON.stringify(data));
       
       // Handle rate limit errors - log and return null instead of throwing
       if (data['Note'] && data['Note'].includes('API call frequency')) {
@@ -349,7 +352,9 @@ serve(async (req) => {
             const quote = await alphaVantage.getQuote(stock.ticker);
             totalApiCalls++;
             
+            console.log(`API Response for ${stock.ticker}:`, quote ? 'SUCCESS' : 'NULL/EMPTY');
             if (quote) {
+              console.log(`Quote details for ${stock.ticker}:`, JSON.stringify(quote));
               const currentPrice = parseFloat(quote['05. price']);
               const changePercent = parseFloat(quote['10. change percent'].replace('%', ''));
               
