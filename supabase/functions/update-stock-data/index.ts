@@ -26,16 +26,26 @@ class AlphaVantageService {
       
       // Handle rate limit errors - log and return null instead of throwing
       if (data['Note'] && data['Note'].includes('API call frequency')) {
-        console.log(`Rate limit hit for ${symbol}, skipping this call...`);
+        console.log(`⚠️ RATE LIMIT HIT for ${symbol}! Response:`, data['Note']);
         return null;
       }
       
       if (data['Error Message']) {
-        console.log(`API error for ${symbol}: ${data['Error Message']}`);
+        console.log(`❌ API ERROR for ${symbol}:`, data['Error Message']);
+        return null;
+      }
+
+      if (data['Information'] && data['Information'].includes('rate limit')) {
+        console.log(`⚠️ RATE LIMIT (Information field) for ${symbol}:`, data['Information']);
         return null;
       }
       
-      return data['Global Quote'] || null;
+      const quote = data['Global Quote'];
+      if (!quote) {
+        console.log(`⚠️ NO QUOTE DATA for ${symbol} - API returned:`, Object.keys(data));
+      }
+      
+      return quote || null;
     } catch (error) {
       console.error(`Network error for ${symbol}:`, error);
       return null;
