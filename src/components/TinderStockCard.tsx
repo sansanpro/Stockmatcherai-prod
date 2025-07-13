@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { StockRecommendation } from '@/types/stock-matcher';
-import { Heart, X, TrendingUp, DollarSign, Building, Eye } from 'lucide-react';
+import { Heart, X, TrendingUp, DollarSign, Building, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import EducationalTooltip from '@/components/EducationalTooltip';
 import DataFreshnessIndicator from '@/components/DataFreshnessIndicator';
 
@@ -30,6 +30,7 @@ const TinderStockCard = ({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [isExiting, setIsExiting] = useState(false);
+  const [isCeoExpanded, setIsCeoExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const getRiskColor = (risk: string) => {
@@ -296,9 +297,32 @@ const TinderStockCard = ({
                 <p className="text-xs text-gray-500 dark:text-gray-400">{stock.companyName}</p>
               </div>
             </div>
-            <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-4 min-h-[5.5rem] max-h-[8.25rem] overflow-hidden">
-              {stock.ceoHighlights}
-            </p>
+            <div className="relative">
+              <p className={`text-sm text-gray-700 dark:text-gray-300 leading-relaxed ${
+                isCeoExpanded ? '' : 'line-clamp-6'
+              } transition-all duration-300`}>
+                {stock.ceoHighlights}
+              </p>
+              {stock.ceoHighlights.split('\n').length > 6 || stock.ceoHighlights.length > 400 ? (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsCeoExpanded(!isCeoExpanded);
+                  }}
+                  className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm font-medium flex items-center gap-1 transition-colors"
+                >
+                  {isCeoExpanded ? (
+                    <>
+                      Show less <ChevronUp className="w-4 h-4" />
+                    </>
+                  ) : (
+                    <>
+                      ...More <ChevronDown className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              ) : null}
+            </div>
           </div>
 
           {/* Financials Grid */}
