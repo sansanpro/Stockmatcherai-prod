@@ -157,7 +157,15 @@ serve(async (req) => {
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
       const alphaVantage = new AlphaVantageService(alphaVantageKey);
 
-      const requestBody = await req.json().catch(() => ({}));
+      let requestBody = {};
+      try {
+        requestBody = await req.json();
+        console.log('Request body received:', JSON.stringify(requestBody));
+      } catch (error) {
+        console.log('Failed to parse request body, using defaults:', error.message);
+        requestBody = {};
+      }
+      
       const { sector, updateType = 'scheduled', priority = false, expand = false, smartScheduling = false } = requestBody;
       
       console.log(`Background update started - Sector: ${sector}, UpdateType: ${updateType}, Priority: ${priority}, SmartScheduling: ${smartScheduling}`);
