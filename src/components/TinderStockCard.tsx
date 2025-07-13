@@ -276,7 +276,7 @@ const TinderStockCard = ({
                 <DataFreshnessIndicator 
                   lastUpdated={(stock as any).lastUpdated} 
                   variant="inline"
-                  className=""
+                  className="bg-black/20 backdrop-blur-sm rounded-full px-2 py-1"
                 />
               </div>
             </div>
