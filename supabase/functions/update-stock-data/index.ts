@@ -141,22 +141,28 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const alphaVantageKey = Deno.env.get('ALPHA_VANTAGE_API_KEY');
+  console.log('Stock data update function called');
 
-    if (!alphaVantageKey) {
-      throw new Error('Alpha Vantage API key not configured');
-    }
+  // Background task function that handles the actual stock updates
+  async function performStockUpdate() {
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const alphaVantageKey = Deno.env.get('ALPHA_VANTAGE_API_KEY');
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const alphaVantage = new AlphaVantageService(alphaVantageKey);
+      if (!alphaVantageKey) {
+        throw new Error('Alpha Vantage API key not configured');
+      }
 
-    const { sector, updateType = 'scheduled', priority = false, expand = false, smartScheduling = false } = await req.json().catch(() => ({}));
-    
-    let targetSector = sector;
-    let sectorsToUpdate: string[] = [];
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      const alphaVantage = new AlphaVantageService(alphaVantageKey);
+
+      const { sector, updateType = 'scheduled', priority = false, expand = false, smartScheduling = false } = await req.json().catch(() => ({}));
+      
+      console.log(`Background update started - Sector: ${sector}, UpdateType: ${updateType}, Priority: ${priority}, SmartScheduling: ${smartScheduling}`);
+      
+      let targetSector = sector;
+      let sectorsToUpdate: string[] = [];
     
     // Smart scheduling: check all sectors for stale data (12+ hours old) and update ALL stale sectors
     if (smartScheduling) {
@@ -366,10 +372,8 @@ serve(async (req) => {
         message: `Smart update complete: ${totalUpdated} stocks updated across ${sectorsToUpdate.length} sectors`
       };
 
-      console.log('Multi-sector update completed:', response);
-      return new Response(JSON.stringify(response), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      console.log('Background multi-sector update completed:', response);
+      return;
     }
 
     // Single sector update logic (existing behavior)
@@ -377,8 +381,9 @@ serve(async (req) => {
     const shouldAutoExpand = await checkIfExpansionNeeded(supabase, targetSector);
     
     if (expand || shouldAutoExpand) {
-      console.log(`Expanding ${targetSector} database with new stocks from Alpha Vantage`);
+      console.log(`Background expansion for ${targetSector} database started`);
       await expandSectorDatabase(supabase, alphaVantage, targetSector);
+      console.log(`Background expansion for ${targetSector} database completed`);
     }
 
     // Create update log entry
@@ -418,7 +423,7 @@ serve(async (req) => {
     const maxStocks = priority ? 5 : 8; // Reduced to prevent timeouts
     stocksToUpdate = stocksToUpdate.slice(0, maxStocks);
 
-    console.log(`Updating ${stocksToUpdate.length} stocks from ${targetSector} sector`);
+    console.log(`Background update: Processing ${stocksToUpdate.length} stocks from ${targetSector} sector`);
 
     let updatedCount = 0;
     let failedCount = 0;
@@ -431,11 +436,11 @@ serve(async (req) => {
       try {
         // Rate limit BEFORE making API call
         if (apiCallsUsed > 0) {
-          console.log(`Rate limiting: waiting 13 seconds before API call ${apiCallsUsed + 1}...`);
+          console.log(`Background rate limiting: waiting 13 seconds before API call ${apiCallsUsed + 1}...`);
           await new Promise(resolve => setTimeout(resolve, 13000));
         }
         
-        console.log(`Updating ${stock.ticker} (${i + 1}/${stocksToUpdate.length})...`);
+        console.log(`Background updating ${stock.ticker} (${i + 1}/${stocksToUpdate.length})...`);
         const quote = await alphaVantage.getQuote(stock.ticker);
         apiCallsUsed++;
         
@@ -455,19 +460,19 @@ serve(async (req) => {
             .eq('ticker', stock.ticker);
 
           if (updateError) {
-            console.error(`Failed to update ${stock.ticker}:`, updateError);
+            console.error(`Background failed to update ${stock.ticker}:`, updateError);
             failedCount++;
           } else {
             updatedCount++;
-            console.log(`Updated ${stock.ticker}: $${currentPrice} (${changePercent}%)`);
+            console.log(`Background updated ${stock.ticker}: $${currentPrice} (${changePercent}%)`);
           }
         } else {
-          console.log(`No quote data received for ${stock.ticker} (likely rate limited or API error)`);
+          console.log(`Background: No quote data received for ${stock.ticker} (likely rate limited or API error)`);
           failedCount++;
         }
 
       } catch (error) {
-        console.error(`Error updating ${stock.ticker}:`, error);
+        console.error(`Background error updating ${stock.ticker}:`, error);
         failedCount++;
       }
     }
@@ -486,32 +491,40 @@ serve(async (req) => {
         .eq('id', logId);
     }
 
-    const response = {
+    console.log(`Background update completed for ${targetSector}: ${updatedCount} updated, ${failedCount} failed, ${apiCallsUsed} API calls`);
+
+    } catch (error) {
+      console.error('Background stock update error:', error);
+    }
+  }
+
+  try {
+    // Parse request data for response
+    const { sector, updateType = 'scheduled' } = await req.json().catch(() => ({}));
+    
+    // Start the background task without waiting for it
+    EdgeRuntime.waitUntil(performStockUpdate());
+
+    // Return immediate response to avoid timeout
+    return new Response(JSON.stringify({
       success: true,
-      sector: targetSector,
-      updateType,
-      priority,
-      stocksUpdated: updatedCount,
-      stocksFailed: failedCount,
-      apiCallsUsed,
-      message: `Updated ${updatedCount} stocks in ${targetSector} sector`
-    };
-
-    console.log('Update completed:', response);
-
-    return new Response(JSON.stringify(response), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      message: sector 
+        ? `Stock update for ${sector} sector started in background`
+        : 'Smart stock update started in background (processing most stale sector)',
+      status: 'processing'
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200
     });
 
   } catch (error) {
-    console.error('Update function error:', error);
-    
-    return new Response(JSON.stringify({ 
+    console.error('Error starting stock update function:', error);
+    return new Response(JSON.stringify({
       success: false,
-      error: error.message 
+      error: error.message
     }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500
     });
   }
 });
