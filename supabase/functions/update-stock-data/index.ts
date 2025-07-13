@@ -143,6 +143,36 @@ serve(async (req) => {
 
   console.log('Stock data update function called');
 
+  // Parse request data ONCE at the top level  
+  let requestData = {};
+  let params = {};
+  
+  // Try to get data from multiple sources
+  try {
+    // First try JSON body
+    if (req.headers.get('content-type')?.includes('application/json')) {
+      requestData = await req.json();
+      console.log('JSON body received:', JSON.stringify(requestData));
+    } else {
+      console.log('No JSON content-type, checking URL params...');
+    }
+  } catch (error) {
+    console.log('Failed to parse JSON body:', error.message);
+  }
+  
+  // Also check URL parameters (for cron triggers)
+  try {
+    const url = new URL(req.url);
+    params = Object.fromEntries(url.searchParams.entries());
+    console.log('URL params received:', JSON.stringify(params));
+  } catch (error) {
+    console.log('No URL params:', error.message);
+  }
+  
+  // Merge params and body (params take precedence)
+  const combined = { ...requestData, ...params };
+  console.log('Combined parameters:', JSON.stringify(combined));
+
   // Background task function that handles the actual stock updates
   async function performStockUpdate() {
     try {
@@ -157,34 +187,7 @@ serve(async (req) => {
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
       const alphaVantage = new AlphaVantageService(alphaVantageKey);
 
-      let requestBody = {};
-      let params = {};
-      
-      // Try to get data from multiple sources
-      try {
-        // First try JSON body
-        if (req.headers.get('content-type')?.includes('application/json')) {
-          requestBody = await req.json();
-          console.log('JSON body received:', JSON.stringify(requestBody));
-        } else {
-          console.log('No JSON content-type, checking URL params...');
-        }
-      } catch (error) {
-        console.log('Failed to parse JSON body:', error.message);
-      }
-      
-      // Also check URL parameters (for cron triggers)
-      try {
-        const url = new URL(req.url);
-        params = Object.fromEntries(url.searchParams.entries());
-        console.log('URL params received:', JSON.stringify(params));
-      } catch (error) {
-        console.log('No URL params:', error.message);
-      }
-      
-      // Merge params and body (params take precedence)
-      const combined = { ...requestBody, ...params };
-      console.log('Combined parameters:', JSON.stringify(combined));
+      // Use combined data that was parsed at the top level
       
       const { 
         sector, 
@@ -534,8 +537,8 @@ serve(async (req) => {
   }
 
   try {
-    // Parse request data for response
-    const { sector, updateType = 'scheduled' } = await req.json().catch(() => ({}));
+    // Use the already parsed combined data
+    const { sector, updateType = 'scheduled' } = combined;
     
     // Start the background task without waiting for it
     EdgeRuntime.waitUntil(performStockUpdate());
