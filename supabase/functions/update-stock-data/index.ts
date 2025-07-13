@@ -157,7 +157,8 @@ serve(async (req) => {
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
       const alphaVantage = new AlphaVantageService(alphaVantageKey);
 
-      const { sector, updateType = 'scheduled', priority = false, expand = false, smartScheduling = false } = await req.json().catch(() => ({}));
+      const requestBody = await req.json().catch(() => ({}));
+      const { sector, updateType = 'scheduled', priority = false, expand = false, smartScheduling = false } = requestBody;
       
       console.log(`Background update started - Sector: ${sector}, UpdateType: ${updateType}, Priority: ${priority}, SmartScheduling: ${smartScheduling}`);
       
