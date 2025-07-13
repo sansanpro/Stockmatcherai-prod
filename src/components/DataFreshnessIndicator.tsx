@@ -35,36 +35,54 @@ const DataFreshnessIndicator: React.FC<DataFreshnessIndicatorProps> = ({
     const updated = new Date(date);
     const diffInMinutes = Math.floor((now.getTime() - updated.getTime()) / (1000 * 60));
     
-    // Fresh: within 30 minutes - enhanced visibility with stronger colors
-    if (diffInMinutes <= 30) return { status: 'fresh', color: 'text-green-400 drop-shadow-lg', icon: Wifi };
+    // Fresh: within 30 minutes - vibrant green with glow
+    if (diffInMinutes <= 30) return { 
+      status: 'fresh', 
+      color: 'text-emerald-400', 
+      bgColor: 'bg-emerald-500/20 border-emerald-400/30',
+      glowColor: 'shadow-emerald-400/50',
+      icon: Wifi 
+    };
     
-    // Stale: 30 minutes to 4 hours - more visible yellow
-    if (diffInMinutes <= 240) return { status: 'stale', color: 'text-yellow-300 drop-shadow-lg', icon: Clock };
+    // Stale: 30 minutes to 4 hours - warm amber
+    if (diffInMinutes <= 240) return { 
+      status: 'stale', 
+      color: 'text-amber-300', 
+      bgColor: 'bg-amber-500/20 border-amber-300/30',
+      glowColor: 'shadow-amber-300/50',
+      icon: Clock 
+    };
     
-    // Very stale: over 4 hours - enhanced red for visibility
-    return { status: 'very-stale', color: 'text-red-400 drop-shadow-lg', icon: WifiOff };
+    // Very stale: over 4 hours - soft red
+    return { 
+      status: 'very-stale', 
+      color: 'text-rose-400', 
+      bgColor: 'bg-rose-500/20 border-rose-400/30',
+      glowColor: 'shadow-rose-400/50',
+      icon: WifiOff 
+    };
   };
 
   if (!lastUpdated) {
     const Icon = AlertTriangle;
     return (
-      <div className={`flex items-center gap-1 text-gray-300 drop-shadow-lg ${className}`}>
-        <Icon className="w-3 h-3" />
-        {showLabel && <span className="text-xs">No data</span>}
+      <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full border backdrop-blur-sm transition-all duration-300 text-slate-400 bg-slate-500/20 border-slate-400/30 shadow-sm ${className}`}>
+        <Icon className="w-3.5 h-3.5 animate-pulse" />
+        {showLabel && <span className="text-xs font-medium">No data</span>}
       </div>
     );
   }
 
   const timeAgo = getTimeAgo(lastUpdated);
-  const { status, color, icon: Icon } = getFreshnessStatus(lastUpdated);
+  const { status, color, bgColor, glowColor, icon: Icon } = getFreshnessStatus(lastUpdated);
 
   if (variant === 'badge') {
     const badgeVariant = status === 'fresh' ? 'default' : 
                         status === 'stale' ? 'secondary' : 'destructive';
     
     return (
-      <Badge variant={badgeVariant} className={`flex items-center gap-1 ${className}`}>
-        <Icon className="w-3 h-3" />
+      <Badge variant={badgeVariant} className={`flex items-center gap-2 ${className}`}>
+        <Icon className="w-3.5 h-3.5" />
         {timeAgo}
       </Badge>
     );
@@ -72,21 +90,21 @@ const DataFreshnessIndicator: React.FC<DataFreshnessIndicatorProps> = ({
 
   if (variant === 'detailed') {
     return (
-      <div className={`flex items-center gap-2 p-2 rounded-lg bg-muted/50 ${className}`}>
+      <div className={`flex items-center gap-3 p-3 rounded-lg border backdrop-blur-sm transition-all duration-300 hover:scale-105 ${bgColor} ${glowColor} shadow-lg ${className}`}>
         <Icon className={`w-4 h-4 ${color}`} />
         <div className="flex flex-col">
-          <span className="text-xs font-medium">Last Updated</span>
-          <span className={`text-xs ${color}`}>{timeAgo}</span>
+          <span className="text-xs font-medium text-white/90">Last Updated</span>
+          <span className={`text-xs font-semibold ${color}`}>{timeAgo}</span>
         </div>
       </div>
     );
   }
 
-  // Default inline variant
+  // Enhanced inline variant with modern styling
   return (
-    <div className={`flex items-center gap-1 ${color} ${className}`}>
-      <Icon className="w-3 h-3" />
-      {showLabel && <span className="text-xs">{timeAgo}</span>}
+    <div className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full border backdrop-blur-sm transition-all duration-300 hover:scale-105 ${bgColor} ${glowColor} shadow-lg ${className}`}>
+      <Icon className={`w-3.5 h-3.5 ${color}`} />
+      {showLabel && <span className={`text-xs font-medium ${color}`}>{timeAgo}</span>}
     </div>
   );
 };
