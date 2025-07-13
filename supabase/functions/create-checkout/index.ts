@@ -25,32 +25,44 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { apiVersion: "2023-10-16" });
+    
+    // Check if customer exists
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
+    } else {
+      // Create new customer
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.user_metadata?.full_name || user.email,
+      });
+      customerId = customer.id;
     }
 
-    const session = await stripe.checkout.sessions.create({
+    // Create subscription with setup intent for future payments
+    const subscription = await stripe.subscriptions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: { name: "Premium Subscription - Stock Matcher" },
-            unit_amount: 999, // $9.99 in cents
-            recurring: { interval: "month" },
-          },
-          quantity: 1,
+      items: [{
+        price_data: {
+          currency: "usd",
+          product_data: { name: "Premium Subscription - Stock Matcher" },
+          unit_amount: 999, // $9.99 in cents
+          recurring: { interval: "month" },
         },
-      ],
-      mode: "subscription",
-      success_url: `${req.headers.get("origin")}/`,
-      cancel_url: `${req.headers.get("origin")}/`,
+      }],
+      payment_behavior: 'default_incomplete',
+      payment_settings: { save_default_payment_method: 'on_subscription' },
+      expand: ['latest_invoice.payment_intent'],
     });
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    const paymentIntent = subscription.latest_invoice.payment_intent;
+
+    return new Response(JSON.stringify({ 
+      subscription_id: subscription.id,
+      client_secret: paymentIntent.client_secret,
+      customer_id: customerId 
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
