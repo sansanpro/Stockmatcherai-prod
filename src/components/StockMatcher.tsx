@@ -26,7 +26,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
-  const { canSwipe, incrementSwipeCount, upgradeToPremi } = useSubscription();
+  const { canSwipe, incrementSwipeCount, upgradeToPremi, dailySwipesUsed, dailySwipeLimit } = useSubscription();
 
   // Pre-load all recommendations once
   useEffect(() => {
@@ -62,7 +62,12 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   }, [userProfile]);
 
   const handleMatch = async () => {
-    if (animatingCard || currentIndex >= allRecommendations.length) return;
+    console.log('handleMatch called', { animatingCard, currentIndex, allRecommendationsLength: allRecommendations.length, canSwipe, dailySwipesUsed, dailySwipeLimit });
+    
+    if (animatingCard || currentIndex >= allRecommendations.length) {
+      console.log('Returning early due to animation or no more cards');
+      return;
+    }
     
     // Check swipe limit
     if (!canSwipe) {
@@ -99,7 +104,12 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   };
 
   const handlePass = async () => {
-    if (animatingCard || currentIndex >= allRecommendations.length) return;
+    console.log('handlePass called', { animatingCard, currentIndex, allRecommendationsLength: allRecommendations.length, canSwipe, dailySwipesUsed, dailySwipeLimit });
+    
+    if (animatingCard || currentIndex >= allRecommendations.length) {
+      console.log('Returning early due to animation or no more cards');
+      return;
+    }
     
     // Check swipe limit
     if (!canSwipe) {

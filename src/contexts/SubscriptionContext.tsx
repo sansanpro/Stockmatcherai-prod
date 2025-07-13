@@ -51,10 +51,14 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
       
       if (error) {
         console.error('Error checking subscription:', error);
-        // Set default free tier
+        // Set default free tier and continue - don't block the app
         setSubscribed(false);
         setSubscriptionTier('free');
         setSubscriptionEnd(null);
+        
+        // Still check daily swipe usage even if subscription check fails
+        await checkDailySwipeUsage();
+        return;
       } else {
         setSubscribed(data?.subscribed || false);
         setSubscriptionTier(data?.subscription_tier || 'free');
@@ -62,6 +66,22 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
       }
 
       // Check daily swipe usage
+      await checkDailySwipeUsage();
+    } catch (error) {
+      console.error('Error in checkSubscription:', error);
+      // Ensure app continues to work even if subscription check fails
+      setSubscribed(false);
+      setSubscriptionTier('free');
+      setDailySwipesUsed(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkDailySwipeUsage = async () => {
+    if (!user) return;
+    
+    try {
       const { data: swipeData, error: swipeError } = await supabase
         .from('daily_swipe_limits')
         .select('swipes_used')
@@ -76,12 +96,8 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
         setDailySwipesUsed(swipeData?.swipes_used || 0);
       }
     } catch (error) {
-      console.error('Error in checkSubscription:', error);
-      setSubscribed(false);
-      setSubscriptionTier('free');
+      console.error('Error in checkDailySwipeUsage:', error);
       setDailySwipesUsed(0);
-    } finally {
-      setLoading(false);
     }
   };
 
