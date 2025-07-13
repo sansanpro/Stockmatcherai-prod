@@ -5,7 +5,7 @@ import TinderStockCard from '@/components/TinderStockCard';
 import { generateStockRecommendations } from '@/utils/stockMatcher';
 import { useApp } from '@/contexts/AppContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
-import SubscriptionBanner from '@/components/SubscriptionBanner';
+import UpgradeModal from '@/components/UpgradeModal';
 import { Heart, X, RotateCcw, TrendingUp, Plus, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -23,6 +23,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [passes, setPasses] = useState<StockRecommendation[]>([]);
   const [animatingCard, setAnimatingCard] = useState(false);
   const [seenStockTickers, setSeenStockTickers] = useState<Set<string>>(new Set());
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
   const { canSwipe, incrementSwipeCount, upgradeToPremi } = useSubscription();
@@ -65,7 +66,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     
     // Check swipe limit
     if (!canSwipe) {
-      toast.error('You\'ve reached your daily swipe limit. Upgrade to Premium for unlimited swipes!');
+      setShowUpgradeModal(true);
       return;
     }
     
@@ -101,7 +102,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     
     // Check swipe limit
     if (!canSwipe) {
-      toast.error('You\'ve reached your daily swipe limit. Upgrade to Premium for unlimited swipes!');
+      setShowUpgradeModal(true);
       return;
     }
     
@@ -294,8 +295,6 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
           </div>
         </div>
 
-        {/* Subscription Banner */}
-        <SubscriptionBanner />
 
         {/* Stats */}
         <div className="flex justify-center gap-4 mb-6 animate-fade-in delay-200">
@@ -389,6 +388,12 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
           </Button>
         </div>
       </div>
+      
+      {/* Upgrade Modal */}
+      <UpgradeModal 
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+      />
     </div>
   );
 };
