@@ -1,74 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
+import { createFMPService, FMPService } from './fmpService.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-// Alpha Vantage service implementation
-class AlphaVantageService {
-  private apiKey: string;
-  private baseUrl = 'https://www.alphavantage.co/query';
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-  }
-
-  async getQuote(symbol: string) {
-    try {
-      const url = `${this.baseUrl}?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${this.apiKey}`;
-      console.log(`Making Alpha Vantage API call for ${symbol}: ${url}`);
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      console.log(`Raw API response for ${symbol}:`, JSON.stringify(data));
-      
-      // Handle rate limit errors - log and return null instead of throwing
-      if (data['Note'] && data['Note'].includes('API call frequency')) {
-        console.log(`⚠️ RATE LIMIT HIT for ${symbol}! Response:`, data['Note']);
-        return null;
-      }
-      
-      if (data['Error Message']) {
-        console.log(`❌ API ERROR for ${symbol}:`, data['Error Message']);
-        return null;
-      }
-
-      if (data['Information'] && data['Information'].includes('rate limit')) {
-        console.log(`⚠️ RATE LIMIT (Information field) for ${symbol}:`, data['Information']);
-        return null;
-      }
-      
-      const quote = data['Global Quote'];
-      if (!quote) {
-        console.log(`⚠️ NO QUOTE DATA for ${symbol} - API returned:`, Object.keys(data));
-      }
-      
-      return quote || null;
-    } catch (error) {
-      console.error(`Network error for ${symbol}:`, error);
-      return null;
-    }
-  }
-
-  async getCompanyOverview(symbol: string) {
-    try {
-      const url = `${this.baseUrl}?function=OVERVIEW&symbol=${symbol}&apikey=${this.apiKey}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      if (data['Error Message'] || data['Note']) {
-        throw new Error(data['Error Message'] || data['Note']);
-      }
-      
-      return data.Symbol ? data : null;
-    } catch (error) {
-      console.error(`Failed to get overview for ${symbol}:`, error);
-      return null;
-    }
-  }
-}
 
 // Comprehensive stock symbols for expansion (500+ stocks across sectors)
 const STOCK_EXPANSION_SYMBOLS = [
@@ -191,14 +128,14 @@ serve(async (req) => {
     try {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
       const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const alphaVantageKey = Deno.env.get('ALPHA_VANTAGE_API_KEY');
+      const fmpApiKey = Deno.env.get('FMP_API_KEY');
 
-      if (!alphaVantageKey) {
-        throw new Error('Alpha Vantage API key not configured');
+      if (!fmpApiKey) {
+        throw new Error('Financial Modeling Prep API key not configured');
       }
 
       const supabase = createClient(supabaseUrl, supabaseServiceKey);
-      const alphaVantage = new AlphaVantageService(alphaVantageKey);
+      const fmpService = createFMPService(fmpApiKey);
 
       // Use combined data that was parsed at the top level
       
@@ -352,14 +289,14 @@ serve(async (req) => {
           
           try {
             // CRITICAL: Rate limit BEFORE making API call 
-            // Alpha Vantage free tier: 5 calls per minute = 12+ second intervals
+            // FMP has better limits: 250 calls/day vs Alpha Vantage's 25 calls/day
             if (totalApiCalls > 0) {
-              console.log(`Rate limiting: waiting 13 seconds before API call ${totalApiCalls + 1}...`);
-              await new Promise(resolve => setTimeout(resolve, 13000));
+              console.log(`Rate limiting: waiting 2 seconds before API call ${totalApiCalls + 1}...`);
+              await new Promise(resolve => setTimeout(resolve, 2000));
             }
             
             console.log(`Updating ${stock.ticker} (${i + 1}/${stocksToUpdate.length})...`);
-            const quote = await alphaVantage.getQuote(stock.ticker);
+            const quote = await fmpService.getQuote(stock.ticker);
             totalApiCalls++;
             
             console.log(`API Response for ${stock.ticker}:`, quote ? 'SUCCESS' : 'NULL/EMPTY');
@@ -435,7 +372,7 @@ serve(async (req) => {
     
     if (expand || shouldAutoExpand) {
       console.log(`Background expansion for ${targetSector} database started`);
-      await expandSectorDatabase(supabase, alphaVantage, targetSector);
+      await expandSectorDatabase(supabase, fmpService, targetSector);
       console.log(`Background expansion for ${targetSector} database completed`);
     }
 
@@ -494,7 +431,7 @@ serve(async (req) => {
         }
         
         console.log(`Background updating ${stock.ticker} (${i + 1}/${stocksToUpdate.length})...`);
-        const quote = await alphaVantage.getQuote(stock.ticker);
+        const quote = await fmpService.getQuote(stock.ticker);
         apiCallsUsed++;
         
         if (quote) {
@@ -600,7 +537,7 @@ async function checkIfExpansionNeeded(supabase: any, sector: string): Promise<bo
 }
 
 // Helper function to expand sector database with new stocks
-async function expandSectorDatabase(supabase: any, alphaVantage: AlphaVantageService, sector: string): Promise<void> {
+async function expandSectorDatabase(supabase: any, fmpService: FMPService, sector: string): Promise<void> {
   try {
     const tableName = `${sector}_stocks`;
     
@@ -623,10 +560,10 @@ async function expandSectorDatabase(supabase: any, alphaVantage: AlphaVantageSer
     
     for (const symbol of sectorSymbols) {
       try {
-        // Get quote and overview data
+        // Get quote and overview data from FMP
         const [quote, overview] = await Promise.all([
-          alphaVantage.getQuote(symbol),
-          alphaVantage.getCompanyOverview(symbol)
+          fmpService.getQuote(symbol),
+          fmpService.getCompanyProfile(symbol)
         ]);
         
         apiCalls += 2;
