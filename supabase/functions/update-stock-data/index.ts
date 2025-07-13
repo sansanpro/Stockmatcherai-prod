@@ -277,8 +277,9 @@ serve(async (req) => {
         }
 
         // Update ONLY stocks that are stale (12+ hours old)
-        const stocksToUpdate = sectorStocks || [];
-        console.log(`Updating ${stocksToUpdate.length} stale stocks (>12h old) in ${sectorName} sector`);
+        // Limit to 30 stocks per run to avoid timeouts
+        const stocksToUpdate = sectorStocks?.slice(0, 30) || [];
+        console.log(`Updating ${stocksToUpdate.length} stale stocks (max 30 per run) in ${sectorName} sector`);
 
         let sectorUpdated = 0;
         let sectorFailed = 0;
