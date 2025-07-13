@@ -31,21 +31,36 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
 
   // Mount Stripe Elements when we have client secret
   useEffect(() => {
-    if (stripe && clientSecret && showPaymentForm) {
-      const checkout = stripe.embeddedCheckout({
-        clientSecret: clientSecret,
-      });
+    const mountCheckout = async () => {
+      if (stripe && clientSecret && showPaymentForm) {
+        try {
+          const checkoutElement = document.getElementById('checkout');
+          if (checkoutElement) {
+            const checkout = await stripe.initEmbeddedCheckout({
+              clientSecret: clientSecret,
+            });
 
-      if (checkoutRef.current) {
-        checkout.mount('#checkout');
-      }
-
-      return () => {
-        if (checkoutRef.current) {
-          checkout.destroy();
+            checkout.mount('#checkout');
+            
+            checkoutRef.current = checkout;
+          }
+        } catch (error) {
+          console.error('Error mounting Stripe checkout:', error);
         }
-      };
+      }
+    };
+
+    if (showPaymentForm) {
+      // Small delay to ensure DOM element is available
+      setTimeout(mountCheckout, 100);
     }
+
+    return () => {
+      if (checkoutRef.current && checkoutRef.current.destroy) {
+        checkoutRef.current.destroy();
+        checkoutRef.current = null;
+      }
+    };
   }, [stripe, clientSecret, showPaymentForm]);
 
   const handleUpgrade = async () => {
