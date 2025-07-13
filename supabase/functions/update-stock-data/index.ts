@@ -424,10 +424,10 @@ serve(async (req) => {
       const stock = stocksToUpdate[i];
       
       try {
-        // Rate limit BEFORE making API call
+        // Rate limit BEFORE making API call - FMP allows faster calls
         if (apiCallsUsed > 0) {
-          console.log(`Background rate limiting: waiting 13 seconds before API call ${apiCallsUsed + 1}...`);
-          await new Promise(resolve => setTimeout(resolve, 13000));
+          console.log(`Background rate limiting: waiting 2 seconds before FMP API call ${apiCallsUsed + 1}...`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
         
         console.log(`Background updating ${stock.ticker} (${i + 1}/${stocksToUpdate.length})...`);
