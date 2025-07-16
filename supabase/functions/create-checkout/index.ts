@@ -82,7 +82,7 @@ serve(async (req) => {
       items: [{
         price_data: {
           currency: "usd",
-          product: { name: "Premium Subscription - Stock Matcher" },
+          product_data: { name: "Premium Subscription - Stock Matcher" },
           unit_amount: 999, // $9.99 in cents
           recurring: { interval: "month" },
         },
