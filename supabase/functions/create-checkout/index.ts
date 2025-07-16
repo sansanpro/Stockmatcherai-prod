@@ -75,11 +75,11 @@ serve(async (req) => {
       logStep("Created new customer", { customerId });
     }
 
-    // Create subscription with incomplete payment behavior
-    logStep("Creating subscription");
-    const subscription = await stripe.subscriptions.create({
+    // Create checkout session for subscription
+    logStep("Creating checkout session");
+    const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      items: [{
+      line_items: [{
         price_data: {
           currency: "usd",
           product_data: {
@@ -88,30 +88,18 @@ serve(async (req) => {
           unit_amount: 999, // $9.99 in cents
           recurring: { interval: "month" },
         },
+        quantity: 1,
       }],
-      payment_behavior: 'default_incomplete',
-      payment_settings: { 
-        save_default_payment_method: 'on_subscription',
-        payment_method_types: ['card']
-      },
-      expand: ['latest_invoice.payment_intent'],
+      mode: 'subscription',
+      success_url: `${req.headers.get("origin")}/success`,
+      cancel_url: `${req.headers.get("origin")}/cancel`,
     });
 
-    logStep("Subscription created", { subscriptionId: subscription.id });
-
-    // Get the payment intent from the subscription's latest invoice
-    const invoice = subscription.latest_invoice as Stripe.Invoice;
-    const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
-
-    if (!paymentIntent?.client_secret) {
-      throw new Error("Failed to create payment intent for subscription");
-    }
-
-    logStep("Payment intent created", { paymentIntentId: paymentIntent.id });
+    logStep("Checkout session created", { sessionId: session.id, url: session.url });
 
     return new Response(JSON.stringify({ 
-      subscription_id: subscription.id,
-      client_secret: paymentIntent.client_secret,
+      url: session.url,
+      session_id: session.id,
       customer_id: customerId 
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
