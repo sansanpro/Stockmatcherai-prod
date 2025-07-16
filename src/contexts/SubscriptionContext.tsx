@@ -13,7 +13,7 @@ interface SubscriptionContextType {
   loading: boolean;
   checkSubscription: () => Promise<void>;
   incrementSwipeCount: () => Promise<void>;
-  upgradeToPremi: () => Promise<{client_secret: string, subscription_id: string} | null>;
+  upgradeToPremi: () => Promise<{url: string, session_id: string} | null>;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -143,10 +143,12 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
         return null;
       }
 
-      if (data?.client_secret && data?.subscription_id) {
+      if (data?.url && data?.session_id) {
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
         return {
-          client_secret: data.client_secret,
-          subscription_id: data.subscription_id
+          url: data.url,
+          session_id: data.session_id
         };
       }
       

@@ -2,62 +2,43 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
-import { Crown, Check, ArrowLeft, CreditCard } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
-import CheckoutForm from './CheckoutForm';
+import { Crown, Check, CreditCard } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface UpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// You'll need to replace this with your actual publishable key
-const stripePromise = loadStripe('pk_live_51QSXqXLjZxOQ5qnPBWKkzKI5I7w9fG3dBMbcnVzQLHxgHSA2SrOOJe1A5Lj7yLI5QQGBgI0gJdLvF4yGQ00aD0a0yA00');
-
 const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const { upgradeToPremi, loading, checkSubscription } = useSubscription();
-  const [paymentData, setPaymentData] = useState<{client_secret: string, subscription_id: string} | null>(null);
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleUpgrade = async () => {
+    setIsProcessing(true);
     const data = await upgradeToPremi();
     if (data) {
-      setPaymentData(data);
-      setShowPaymentForm(true);
+      toast.success('Redirected to checkout. Complete payment to upgrade!');
+      onClose();
     }
-  };
-
-  const handleBack = () => {
-    setShowPaymentForm(false);
-    setPaymentData(null);
+    setIsProcessing(false);
   };
 
   const handleClose = () => {
-    setShowPaymentForm(false);
-    setPaymentData(null);
     onClose();
     // Refresh subscription status when modal closes
     checkSubscription();
   };
 
-  const handlePaymentSuccess = () => {
-    setShowPaymentForm(false);
-    setPaymentData(null);
-    onClose();
-    checkSubscription();
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className={`${showPaymentForm ? 'max-w-lg' : 'max-w-md'}`}>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            {showPaymentForm ? 'Complete Your Payment' : 'Upgrade to Premium'}
+            Upgrade to Premium
           </DialogTitle>
         </DialogHeader>
         
-        {!showPaymentForm ? (
           <div className="space-y-6 p-4">
             <div className="text-center">
               <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -101,10 +82,10 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
             <div className="space-y-3">
               <Button 
                 onClick={handleUpgrade}
-                disabled={loading}
+                disabled={loading || isProcessing}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
               >
-                {loading ? (
+                {loading || isProcessing ? (
                   <>
                     <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
                     Processing...
@@ -130,40 +111,6 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
               Secure payment processed by Stripe
             </div>
           </div>
-        ) : paymentData ? (
-          <div className="p-4">
-            <div className="mb-4">
-              <Button 
-                onClick={handleBack}
-                variant="ghost"
-                className="mb-4"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Plan Details
-              </Button>
-            </div>
-            
-            <Elements 
-              stripe={stripePromise}
-              options={{
-                clientSecret: paymentData.client_secret,
-                appearance: {
-                  theme: 'stripe',
-                  variables: {
-                    colorPrimary: '#2563eb',
-                  }
-                }
-              }}
-            >
-              <CheckoutForm 
-                clientSecret={paymentData.client_secret}
-                subscriptionId={paymentData.subscription_id}
-                onSuccess={handlePaymentSuccess}
-                onCancel={handleBack}
-              />
-            </Elements>
-          </div>
-        ) : null}
       </DialogContent>
     </Dialog>
   );
