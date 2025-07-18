@@ -98,12 +98,13 @@ serve(async (req) => {
     const paymentIntent = invoice?.payment_intent;
 
     if (!paymentIntent?.client_secret) {
+      logStep("ERROR: No payment intent client secret found");
       throw new Error('Failed to create payment intent');
     }
 
-    logStep("Subscription created", { 
+    logStep("Subscription created successfully", { 
       subscriptionId: subscription.id, 
-      clientSecret: paymentIntent.client_secret 
+      clientSecret: paymentIntent.client_secret.substring(0, 20) + "..." 
     });
 
     return new Response(JSON.stringify({ 

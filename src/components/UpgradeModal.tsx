@@ -8,7 +8,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import CheckoutForm from './CheckoutForm';
 
-const stripePromise = loadStripe('pk_test_51QO6gPBNJFhPr3hn9x5SPJbhYnqjI2r3sA9LV6F6iUAUm3vqzNjX91lOJzQCOQ2Gt6vyILRk2NjnhBqP5oMX7EjF00eaWaJf7T');
+const stripePromise = loadStripe('pk_test_51QO6gPBNJFhPr3hn9x5SPJbhYnqjI2r3sA9LV6F6iUAUm3vqzNjX91lOJzQCOQ2Gt6vyILRk2NjnhBqP5oMX7EjF00eaWaJf7T'); // Replace with your actual publishable key
 
 interface UpgradeModalProps {
   isOpen: boolean;
