@@ -13,7 +13,7 @@ interface SubscriptionContextType {
   loading: boolean;
   checkSubscription: () => Promise<void>;
   incrementSwipeCount: () => Promise<void>;
-  upgradeToPremi: () => Promise<{clientSecret: string, subscriptionId: string} | null>;
+  upgradeToPremi: () => Promise<{url: string, sessionId: string} | null>;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -143,10 +143,10 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
         return null;
       }
 
-      if (data?.clientSecret && data?.subscriptionId) {
+      if (data?.url && data?.sessionId) {
         return {
-          clientSecret: data.clientSecret,
-          subscriptionId: data.subscriptionId
+          url: data.url,
+          sessionId: data.sessionId
         };
       }
       

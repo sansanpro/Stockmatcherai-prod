@@ -75,11 +75,11 @@ serve(async (req) => {
       logStep("Created new customer", { customerId });
     }
 
-    // Create subscription with payment intent for inline checkout
-    logStep("Creating subscription with payment intent");
-    const subscription = await stripe.subscriptions.create({
+    // Create Stripe Checkout Session (simpler approach)
+    logStep("Creating Stripe Checkout Session");
+    const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      items: [{
+      line_items: [{
         price_data: {
           currency: "usd",
           product_data: {
@@ -88,29 +88,21 @@ serve(async (req) => {
           unit_amount: 999, // $9.99 in cents
           recurring: { interval: "month" },
         },
+        quantity: 1,
       }],
-      payment_behavior: 'default_incomplete',
-      payment_settings: { save_default_payment_method: 'on_subscription' },
-      expand: ['latest_invoice.payment_intent'],
+      mode: 'subscription',
+      success_url: `${req.headers.get("origin") || "http://localhost:3000"}/?upgrade=success`,
+      cancel_url: `${req.headers.get("origin") || "http://localhost:3000"}/?upgrade=cancelled`,
     });
 
-    const invoice = subscription.latest_invoice as any;
-    const paymentIntent = invoice?.payment_intent;
-
-    if (!paymentIntent?.client_secret) {
-      logStep("ERROR: No payment intent client secret found");
-      throw new Error('Failed to create payment intent');
-    }
-
-    logStep("Subscription created successfully", { 
-      subscriptionId: subscription.id, 
-      clientSecret: paymentIntent.client_secret.substring(0, 20) + "..." 
+    logStep("Checkout session created successfully", { 
+      sessionId: session.id,
+      url: session.url?.substring(0, 50) + "..." 
     });
 
     return new Response(JSON.stringify({ 
-      clientSecret: paymentIntent.client_secret,
-      subscriptionId: subscription.id,
-      customerId: customerId 
+      url: session.url,
+      sessionId: session.id
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
