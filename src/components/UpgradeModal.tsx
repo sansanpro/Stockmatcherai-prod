@@ -4,6 +4,11 @@ import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Crown, Check, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import CheckoutForm from './CheckoutForm';
+
+const stripePromise = loadStripe('pk_test_51QO6gPBNJFhPr3hn9x5SPJbhYnqjI2r3sA9LV6F6iUAUm3vqzNjX91lOJzQCOQ2Gt6vyILRk2NjnhBqP5oMX7EjF00eaWaJf7T');
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -13,15 +18,29 @@ interface UpgradeModalProps {
 const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const { upgradeToPremi, loading, checkSubscription } = useSubscription();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
 
   const handleUpgrade = async () => {
     setIsProcessing(true);
     const data = await upgradeToPremi();
     if (data) {
-      toast.success('Redirected to checkout. Complete payment to upgrade!');
-      onClose();
+      setClientSecret(data.clientSecret);
+      setSubscriptionId(data.subscriptionId);
+      toast.success('Payment form loaded. Complete payment to upgrade!');
     }
     setIsProcessing(false);
+  };
+
+  const handlePaymentSuccess = () => {
+    toast.success('Payment successful! Welcome to Premium!');
+    checkSubscription();
+    onClose();
+  };
+
+  const handlePaymentCancel = () => {
+    setClientSecret(null);
+    setSubscriptionId(null);
   };
 
   const handleClose = () => {
@@ -79,33 +98,44 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <Button 
-                onClick={handleUpgrade}
-                disabled={loading || isProcessing}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
-              >
-                {loading || isProcessing ? (
-                  <>
-                    <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Upgrade Now
-                  </>
-                )}
-              </Button>
-              
-              <Button 
-                onClick={handleClose}
-                variant="outline" 
-                className="w-full"
-              >
-                Maybe Later
-              </Button>
-            </div>
+            {clientSecret && subscriptionId ? (
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <CheckoutForm
+                  clientSecret={clientSecret}
+                  subscriptionId={subscriptionId}
+                  onSuccess={handlePaymentSuccess}
+                  onCancel={handlePaymentCancel}
+                />
+              </Elements>
+            ) : (
+              <div className="space-y-3">
+                <Button 
+                  onClick={handleUpgrade}
+                  disabled={loading || isProcessing}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
+                >
+                  {loading || isProcessing ? (
+                    <>
+                      <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Upgrade Now
+                    </>
+                  )}
+                </Button>
+                
+                <Button 
+                  onClick={handleClose}
+                  variant="outline" 
+                  className="w-full"
+                >
+                  Maybe Later
+                </Button>
+              </div>
+            )}
 
             <div className="text-center text-xs text-gray-500">
               Secure payment processed by Stripe

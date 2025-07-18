@@ -75,32 +75,41 @@ serve(async (req) => {
       logStep("Created new customer", { customerId });
     }
 
-    // Create checkout session for subscription
-    logStep("Creating checkout session");
-    const session = await stripe.checkout.sessions.create({
+    // Create subscription with payment intent for inline checkout
+    logStep("Creating subscription with payment intent");
+    const subscription = await stripe.subscriptions.create({
       customer: customerId,
-      line_items: [{
+      items: [{
         price_data: {
           currency: "usd",
           product_data: {
-            name: "Premium Subscription - Stock Matcher"
+            name: "Premium Subscription"
           },
           unit_amount: 999, // $9.99 in cents
           recurring: { interval: "month" },
         },
-        quantity: 1,
       }],
-      mode: 'subscription',
-      success_url: `${req.headers.get("origin")}/success`,
-      cancel_url: `${req.headers.get("origin")}/cancel`,
+      payment_behavior: 'default_incomplete',
+      payment_settings: { save_default_payment_method: 'on_subscription' },
+      expand: ['latest_invoice.payment_intent'],
     });
 
-    logStep("Checkout session created", { sessionId: session.id, url: session.url });
+    const invoice = subscription.latest_invoice as any;
+    const paymentIntent = invoice?.payment_intent;
+
+    if (!paymentIntent?.client_secret) {
+      throw new Error('Failed to create payment intent');
+    }
+
+    logStep("Subscription created", { 
+      subscriptionId: subscription.id, 
+      clientSecret: paymentIntent.client_secret 
+    });
 
     return new Response(JSON.stringify({ 
-      url: session.url,
-      session_id: session.id,
-      customer_id: customerId 
+      clientSecret: paymentIntent.client_secret,
+      subscriptionId: subscription.id,
+      customerId: customerId 
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
