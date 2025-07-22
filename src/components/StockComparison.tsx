@@ -86,7 +86,7 @@ const StockComparison = ({ availableStocks }: StockComparisonProps) => {
           Compare Stocks
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto dark:bg-gray-800">
+      <DialogContent className="w-full max-w-xs sm:max-w-lg md:max-w-2xl max-h-[90vh] overflow-y-auto dark:bg-gray-800 p-2 sm:p-4">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 dark:text-white">
             <Scale className="w-5 h-5" />
@@ -98,7 +98,7 @@ const StockComparison = ({ availableStocks }: StockComparisonProps) => {
           {/* Stock Selection */}
           <Card className="dark:bg-gray-700 dark:border-gray-600">
             <CardHeader>
-              <CardTitle className="text-lg dark:text-white">Select Stocks to Compare (Max 3)</CardTitle>
+              <CardTitle className="text-base sm:text-lg dark:text-white">Select Stocks to Compare (Max 3)</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -118,12 +118,12 @@ const StockComparison = ({ availableStocks }: StockComparisonProps) => {
                 </Select>
 
                 {selectedStocks.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1 sm:gap-2">
                     {selectedStocks.map(stock => (
                       <Badge 
                         key={stock.id} 
                         variant="outline" 
-                        className="flex items-center gap-2 px-3 py-1 dark:border-gray-500 dark:text-gray-300"
+                        className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 dark:border-gray-500 dark:text-gray-300 text-xs sm:text-sm"
                       >
                         {stock.ticker}
                         <Button
@@ -147,11 +147,11 @@ const StockComparison = ({ availableStocks }: StockComparisonProps) => {
               {/* Comparison Table */}
               <Card className="dark:bg-gray-700 dark:border-gray-600">
                 <CardHeader>
-                  <CardTitle className="text-lg dark:text-white">Key Metrics Comparison</CardTitle>
+                  <CardTitle className="text-base sm:text-lg dark:text-white">Key Metrics Comparison</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="w-full text-xs sm:text-sm">
                       <thead>
                         <tr className="border-b dark:border-gray-600">
                           <th className="text-left py-2 text-gray-600 dark:text-gray-300">Metric</th>
@@ -243,10 +243,10 @@ const StockComparison = ({ availableStocks }: StockComparisonProps) => {
               {/* Visual Comparison Chart */}
               <Card className="dark:bg-gray-700 dark:border-gray-600">
                 <CardHeader>
-                  <CardTitle className="text-lg dark:text-white">Performance Comparison</CardTitle>
+                  <CardTitle className="text-base sm:text-lg dark:text-white">Performance Comparison</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80">
+                  <div className="h-56 sm:h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsBarChart data={comparisonData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" />
@@ -279,13 +279,13 @@ const StockComparison = ({ availableStocks }: StockComparisonProps) => {
           {selectedStocks.length >= 2 && (
             <Card className="dark:bg-gray-700 dark:border-gray-600">
               <CardHeader>
-                <CardTitle className="text-lg dark:text-white">Comparison Insights</CardTitle>
+                <CardTitle className="text-base sm:text-lg dark:text-white">Comparison Insights</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
+                  <div className="p-2 sm:p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Best Performer (1Y)</h4>
-                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                    <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300">
                       {(() => {
                         const bestStock = selectedStocks.reduce((best, current) => 
                           current.oneYearReturn > best.oneYearReturn ? current : best
@@ -294,9 +294,9 @@ const StockComparison = ({ availableStocks }: StockComparisonProps) => {
                       })()}
                     </p>
                   </div>
-                  <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="p-2 sm:p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                     <h4 className="font-semibold text-green-800 dark:text-green-300 mb-2">Highest Dividend</h4>
-                    <p className="text-sm text-green-700 dark:text-green-300">
+                    <p className="text-xs sm:text-sm text-green-700 dark:text-green-300">
                       {(() => {
                         const bestDividend = selectedStocks.reduce((best, current) => 
                           current.dividendYield > best.dividendYield ? current : best
@@ -305,9 +305,9 @@ const StockComparison = ({ availableStocks }: StockComparisonProps) => {
                       })()}
                     </p>
                   </div>
-                  <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                  <div className="p-2 sm:p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                     <h4 className="font-semibold text-purple-800 dark:text-purple-300 mb-2">Lowest Risk</h4>
-                    <p className="text-sm text-purple-700 dark:text-purple-300">
+                    <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-300">
                       {(() => {
                         const lowestRisk = selectedStocks.find(s => s.riskLevel === 'low') || 
                                           selectedStocks.find(s => s.riskLevel === 'medium') || 
@@ -316,9 +316,9 @@ const StockComparison = ({ availableStocks }: StockComparisonProps) => {
                       })()}
                     </p>
                   </div>
-                  <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                  <div className="p-2 sm:p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                     <h4 className="font-semibold text-yellow-800 dark:text-yellow-300 mb-2">Best Value</h4>
-                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                    <p className="text-xs sm:text-sm text-yellow-700 dark:text-yellow-300">
                       {(() => {
                         const bestValue = selectedStocks.reduce((best, current) => 
                           current.peRatio < best.peRatio ? current : best

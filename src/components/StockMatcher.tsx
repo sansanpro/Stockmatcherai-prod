@@ -295,8 +295,8 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const currentStock = allRecommendations[currentIndex];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4">
-      <div className="max-w-md mx-auto">
+    <div className="w-screen h-screen max-w-[1290px] max-h-[2796px] min-w-0 min-h-0 mx-auto pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 overflow-auto">
+      <div className="w-full mx-auto">
         {/* Header */}
         <div className="text-center mb-6 pt-4 animate-fade-in">
           <h1 className="text-2xl font-bold text-white mb-2">

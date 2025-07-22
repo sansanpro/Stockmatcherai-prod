@@ -18,6 +18,8 @@ import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import { Moon, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Bell, User as UserIcon, Scale, Heart as HeartIcon, Home } from 'lucide-react';
 
 const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -28,6 +30,7 @@ const IndexContent = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const { isDarkMode, toggleDarkMode, addToWatchlist, passStock } = useApp();
   const { user, loading } = useAuth();
+  const isMobile = useIsMobile();
 
   // Check for existing user profile when user logs in
   useEffect(() => {
@@ -198,7 +201,7 @@ const IndexContent = () => {
   // Show welcome screen for unauthenticated users
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-auto">
         <Card className="w-full max-w-lg text-center shadow-xl dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="space-y-4">
             <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -249,17 +252,16 @@ const IndexContent = () => {
 
   // Header for authenticated app navigation
   const AppHeader = () => (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-      <div className="max-w-4xl mx-auto flex items-center justify-between">
-        <div className="flex-1"></div>
-        
-        <div className="flex items-center gap-4 justify-center">
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-2 py-2 w-full overflow-x-hidden pt-[env(safe-area-inset-top)] pb-2">
+      <div className="w-full flex flex-wrap items-center justify-between gap-1 sm:gap-4">
+        <div className="flex-1 min-w-0"></div>
+        <div className="flex flex-wrap items-center gap-1 sm:gap-4 justify-center w-full sm:w-auto">
           <Button
             onClick={() => setCurrentStep('matching')}
             variant={currentStep === 'matching' ? 'default' : 'ghost'}
             size="sm"
             disabled={!userProfile}
-            className="flex items-center gap-2 px-6"
+            className="flex items-center gap-2 px-4 sm:px-6"
           >
             <Heart className="w-4 h-4" />
             Match
@@ -269,14 +271,13 @@ const IndexContent = () => {
             variant={currentStep === 'matches' ? 'default' : 'ghost'}
             size="sm"
             disabled={!userProfile}
-            className="flex items-center gap-2 px-6"
+            className="flex items-center gap-2 px-4 sm:px-6"
           >
             <Heart className="w-4 h-4 fill-current" />
             Your Likes
           </Button>
         </div>
-        
-        <div className="flex items-center gap-2 flex-1 justify-end">
+        <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0 justify-end">
           <StockComparison availableStocks={[]} />
           <NotificationSystem />
           <Button
@@ -293,11 +294,22 @@ const IndexContent = () => {
     </div>
   );
 
+  // Bottom navigation bar for mobile
+  const BottomNavBar = () => (
+    <nav className="fixed bottom-0 left-0 w-full z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center py-2 pb-[env(safe-area-inset-bottom)] shadow-lg" style={{ fontFamily: 'SF Pro Text, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif' }}>
+      <button onClick={() => setCurrentStep('matching')} className={`flex flex-col items-center text-xs ${currentStep === 'matching' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-300'}`}> <Home className="w-6 h-6 mb-0.5" />Match</button>
+      <button onClick={() => setCurrentStep('matches')} className={`flex flex-col items-center text-xs ${currentStep === 'matches' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-300'}`}> <HeartIcon className="w-6 h-6 mb-0.5" />Likes</button>
+      <button onClick={() => setCurrentStep('settings')} className="flex flex-col items-center text-xs text-gray-500 dark:text-gray-300"> <UserIcon className="w-6 h-6 mb-0.5" />Profile</button>
+      <button onClick={() => setCurrentStep('matches')} className="flex flex-col items-center text-xs text-gray-500 dark:text-gray-300"> <Scale className="w-6 h-6 mb-0.5" />Compare</button>
+      <button onClick={() => setCurrentStep('matches')} className="flex flex-col items-center text-xs text-gray-500 dark:text-gray-300 relative"> <Bell className="w-6 h-6 mb-0.5" />{/* notifications.length > 0 && <span className="absolute top-0 right-1 bg-red-500 text-white rounded-full text-[10px] px-1">{notifications.length}</span> */}Notifications</button>
+    </nav>
+  );
+
   // Show profile setup for authenticated users without profile
   if (currentStep === 'welcome' || currentStep === 'profile') {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+        <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-auto">
           {currentStep === 'profile' && <AppHeader />}
           <div className="pt-8">
             <UserProfileForm 
@@ -328,8 +340,8 @@ const IndexContent = () => {
   if (currentStep === 'matching') {
     return (
       <ProtectedRoute>
-        <AppHeader />
-        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700">
+        {!isMobile && <AppHeader />}
+        <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-auto">
           <StockMatcher 
             userProfile={userProfile!} 
             onReset={handleUpdateProfile}
@@ -343,6 +355,7 @@ const IndexContent = () => {
           onMatch={handleMatchFromModal}
           onPass={handlePassFromModal}
         />
+        {isMobile && user && <BottomNavBar />}
       </ProtectedRoute>
     );
   }
@@ -350,9 +363,9 @@ const IndexContent = () => {
   if (currentStep === 'matches') {
     return (
       <ProtectedRoute>
-        <AppHeader />
-        <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 p-4">
-          <div className="max-w-6xl mx-auto pt-8">
+        {!isMobile && <AppHeader />}
+        <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 p-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-auto overflow-x-hidden">
+          <div className="w-full pt-8">
             <Matches onViewDetails={handleViewStockDetails} />
           </div>
         </div>
@@ -363,6 +376,7 @@ const IndexContent = () => {
           onMatch={handleMatchFromModal}
           onPass={handlePassFromModal}
         />
+        {isMobile && user && <BottomNavBar />}
       </ProtectedRoute>
     );
   }

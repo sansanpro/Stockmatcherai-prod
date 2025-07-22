@@ -22,5 +22,5 @@
     "noUnusedLocals": false,
     "strictNullChecks": false
   },
-  "extends": "expo/tsconfig.base"
+
 }

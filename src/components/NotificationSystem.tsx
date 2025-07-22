@@ -61,18 +61,18 @@ const NotificationSystem = () => {
         onClick={() => setShowNotifications(!showNotifications)}
         variant="outline"
         size="sm"
-        className="relative"
+        className="relative w-8 h-8 sm:w-10 sm:h-10 p-0"
       >
         <Bell className="w-4 h-4" />
         {notifications.length > 0 && (
-          <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center bg-red-500">
+          <Badge className="absolute -top-2 -right-2 w-4 h-4 sm:w-5 sm:h-5 p-0 flex items-center justify-center bg-red-500 text-xs">
             {notifications.length}
           </Badge>
         )}
       </Button>
 
       {showNotifications && (
-        <div className="absolute top-12 right-0 w-80 z-50">
+        <div className="absolute top-10 sm:top-12 right-0 w-64 sm:w-80 z-50">
           <Card className="shadow-lg dark:bg-gray-800 dark:border-gray-700">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2 dark:text-white">

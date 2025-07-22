@@ -76,8 +76,8 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="max-w-2xl mx-auto pt-8">
+    <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 overflow-x-hidden">
+      <div className="w-full pt-8">
         <div className="flex items-center gap-4 mb-6">
           <Button
             onClick={onBack}

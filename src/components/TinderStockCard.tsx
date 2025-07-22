@@ -212,9 +212,9 @@ const TinderStockCard = ({
 
       <Card 
         ref={cardRef}
-        className={`w-full max-w-sm mx-auto shadow-2xl border-0 bg-white dark:bg-gray-800 overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
+        className={`w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto shadow-2xl border-0 bg-white dark:bg-gray-800 overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
           isExiting ? 'animate-scale-out' : 'animate-scale-in'
-        }`}
+        } min-h-[420px] sm:min-h-[480px] md:min-h-[520px] rounded-2xl`}
         style={{
           transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
           opacity,
@@ -230,19 +230,19 @@ const TinderStockCard = ({
         <CardContent className="p-0">
           {/* Header with gradient background */}
           <div 
-            className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-6 relative overflow-hidden`}
+            className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-4 sm:p-6 relative overflow-hidden rounded-t-2xl`}
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16 animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12 animate-pulse delay-75"></div>
+            <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-white/10 rounded-full -translate-y-8 sm:-translate-y-16 translate-x-8 sm:translate-x-16 animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/10 rounded-full translate-y-6 sm:translate-y-12 -translate-x-6 sm:-translate-x-12 animate-pulse delay-75"></div>
             
             <div className="relative z-10">
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start mb-4 gap-2">
                 <div className="flex-1 animate-fade-in">
-                  <h2 className="text-2xl font-bold leading-tight">{stock.companyName}</h2>
-                  <p className="text-white/90 font-medium text-lg">({stock.ticker})</p>
+                  <h2 className="text-lg sm:text-2xl font-bold leading-tight">{stock.companyName}</h2>
+                  <p className="text-white/90 font-medium text-base sm:text-lg">({stock.ticker})</p>
                 </div>
                 <div className="flex items-center gap-2 animate-fade-in delay-100">
-                  <Badge className="bg-white/20 text-white border-white/30 font-semibold px-3 py-1 backdrop-blur-sm">
+                  <Badge className="bg-white/20 text-white border-white/30 font-semibold px-2 py-1 sm:px-3 sm:py-1 backdrop-blur-sm text-xs sm:text-sm">
                     {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()}
                   </Badge>
                   <EducationalTooltip 
@@ -252,7 +252,7 @@ const TinderStockCard = ({
                   {onViewDetails && (
                     <button
                       onClick={handleViewDetails}
-                      className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-colors"
+                      className="bg-white/20 hover:bg-white/30 text-white p-1 sm:p-2 rounded-full transition-colors"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
@@ -260,13 +260,11 @@ const TinderStockCard = ({
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 text-white/90 animate-fade-in delay-200">
+              <div className="flex flex-wrap items-center gap-2 text-white/90 animate-fade-in delay-200 text-xs sm:text-sm">
                 <Building className="w-4 h-4" />
-                <span className="text-sm">{stock.sector}</span>
+                <span>{stock.sector}</span>
                 <TrendingUp className="w-4 h-4 ml-2" />
-                <span className={`text-sm font-semibold transition-colors ${stock.oneYearReturn >= 0 ? 'text-green-200' : 'text-red-200'}`}>
-                  {stock.oneYearReturn > 0 ? '+' : ''}{stock.oneYearReturn.toFixed(1)}%
-                </span>
+                <span className={`font-semibold transition-colors ${stock.oneYearReturn >= 0 ? 'text-green-200' : 'text-red-200'}`}>{stock.oneYearReturn > 0 ? '+' : ''}{stock.oneYearReturn.toFixed(1)}%</span>
                 <EducationalTooltip 
                   content="1-Year Return shows how much the stock price has changed over the past 12 months"
                   className="text-white/70 hover:text-white transition-colors"
@@ -277,28 +275,28 @@ const TinderStockCard = ({
                 <DataFreshnessIndicator 
                   lastUpdated={(stock as any).lastUpdated} 
                   variant="inline"
-                  className="bg-black/20 backdrop-blur-sm rounded-full px-2 py-1"
+                  className="bg-black/20 backdrop-blur-sm rounded-full px-2 py-1 text-xs"
                 />
               </div>
             </div>
           </div>
 
           {/* CEO Section with Stylish Initials */}
-          <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-fade-in delay-300">
-            <div className="flex items-center gap-4 mb-3">
-              <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-blue-500/20">
-                <span className="text-white font-bold text-xl tracking-wide">
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-fade-in delay-300">
+            <div className="flex items-center gap-3 sm:gap-4 mb-3">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-blue-500/20">
+                <span className="text-white font-bold text-base sm:text-xl tracking-wide">
                   {getCeoInitials(stock.ceoName)}
                 </span>
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 dark:text-white text-lg">{stock.ceoName}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Chief Executive Officer</p>
+                <h3 className="font-bold text-gray-900 dark:text-white text-base sm:text-lg">{stock.ceoName}</h3>
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Chief Executive Officer</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">{stock.companyName}</p>
               </div>
             </div>
             <div className="relative">
-              <p className={`text-sm text-gray-700 dark:text-gray-300 leading-relaxed ${
+              <p className={`text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed ${
                 isCeoExpanded ? '' : 'line-clamp-6'
               } transition-all duration-300`}>
                 {stock.ceoHighlights}
@@ -309,7 +307,7 @@ const TinderStockCard = ({
                     e.stopPropagation();
                     setIsCeoExpanded(!isCeoExpanded);
                   }}
-                  className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm font-medium flex items-center gap-1 transition-colors"
+                  className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-xs sm:text-sm font-medium flex items-center gap-1 transition-colors"
                 >
                   {isCeoExpanded ? (
                     <>
@@ -326,61 +324,61 @@ const TinderStockCard = ({
           </div>
 
           {/* Financials Grid */}
-          <div className="p-6 bg-white dark:bg-gray-800 animate-fade-in delay-400">
-            <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <div className="p-4 sm:p-6 bg-white dark:bg-gray-800 animate-fade-in delay-400">
+            <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 text-base sm:text-lg">
               <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
               Key Metrics
             </h4>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-2 sm:p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
+                  <p className="text-[10px] sm:text-xs text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
                   <EducationalTooltip 
                     content="P/E Ratio compares a company's share price to its earnings per share. Lower values may indicate undervalued stocks."
                   />
                 </div>
-                <p className="text-xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
+                <p className="text-base sm:text-xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
               </div>
-              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-2 sm:p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
+                  <p className="text-[10px] sm:text-xs text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
                   <EducationalTooltip 
                     content="Market Capitalization is the total value of all company shares. Larger caps are typically more stable."
                   />
                 </div>
-                <p className="text-xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
+                <p className="text-base sm:text-xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
               </div>
-              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-2 sm:p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                 <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs text-green-600 dark:text-green-400 font-medium">Price/Share</p>
+                  <p className="text-[10px] sm:text-xs text-green-600 dark:text-green-400 font-medium">Price/Share</p>
                   <EducationalTooltip 
                     content="Current trading price per individual share of the company's stock."
                   />
                 </div>
-                <p className="text-xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
+                <p className="text-base sm:text-xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
               </div>
               {stock.dividendYield > 0 && (
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-2 sm:p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                   <div className="flex items-center justify-center gap-1 mb-1">
-                    <p className="text-xs text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
+                    <p className="text-[10px] sm:text-xs text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
                     <EducationalTooltip 
                       content="Dividend Yield shows the annual dividend payments as a percentage of the stock price. Higher yields provide more regular income."
                     />
                   </div>
-                  <p className="text-xl font-bold text-orange-700 dark:text-orange-300">{stock.dividendYield.toFixed(2)}%</p>
+                  <p className="text-base sm:text-xl font-bold text-orange-700 dark:text-orange-300">{stock.dividendYield.toFixed(2)}%</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Why it fits section */}
-          <div className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500">
-            <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500">
+            <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-base sm:text-lg">
               <span className="text-lg">💡</span>
               Why this matches you
             </h4>
-            <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-4 rounded-xl border border-white/50 dark:border-gray-600/50 transform hover:scale-[1.02] transition-all duration-300">
-              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+            <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-3 sm:p-4 rounded-xl border border-white/50 dark:border-gray-600/50 transform hover:scale-[1.02] transition-all duration-300">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                 {stock.whyItFits}
               </p>
             </div>
