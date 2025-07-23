@@ -212,9 +212,9 @@ const TinderStockCard = ({
 
       <Card 
         ref={cardRef}
-        className={`w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto shadow-2xl border-0 bg-white dark:bg-gray-800 overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
+        className={`w-full max-w-[min(90vw,360px)] sm:max-w-sm md:max-w-md mx-auto shadow-2xl border-0 bg-card overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
           isExiting ? 'animate-scale-out' : 'animate-scale-in'
-        } min-h-[420px] sm:min-h-[480px] md:min-h-[520px] rounded-2xl`}
+        } h-full max-h-[65vh] sm:max-h-[70vh] rounded-2xl flex flex-col`}
         style={{
           transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
           opacity,
@@ -227,22 +227,22 @@ const TinderStockCard = ({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <CardContent className="p-0">
+        <CardContent className="p-0 flex flex-col h-full overflow-y-auto">
           {/* Header with gradient background */}
           <div 
-            className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-4 sm:p-6 relative overflow-hidden rounded-t-2xl`}
+            className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-3 sm:p-4 relative overflow-hidden rounded-t-2xl flex-shrink-0`}
           >
-            <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-white/10 rounded-full -translate-y-8 sm:-translate-y-16 translate-x-8 sm:translate-x-16 animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/10 rounded-full translate-y-6 sm:translate-y-12 -translate-x-6 sm:-translate-x-12 animate-pulse delay-75"></div>
+            <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/10 rounded-full -translate-y-6 sm:-translate-y-12 translate-x-6 sm:translate-x-12 animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-12 h-12 sm:w-16 sm:h-16 bg-white/10 rounded-full translate-y-4 sm:translate-y-8 -translate-x-4 sm:-translate-x-8 animate-pulse delay-75"></div>
             
             <div className="relative z-10">
-              <div className="flex flex-col sm:flex-row justify-between items-start mb-4 gap-2">
-                <div className="flex-1 animate-fade-in">
-                  <h2 className="text-lg sm:text-2xl font-bold leading-tight">{stock.companyName}</h2>
-                  <p className="text-white/90 font-medium text-base sm:text-lg">({stock.ticker})</p>
+              <div className="flex justify-between items-start mb-3 gap-2">
+                <div className="flex-1 min-w-0 animate-fade-in">
+                  <h2 className="text-base sm:text-xl font-bold leading-tight truncate">{stock.companyName}</h2>
+                  <p className="text-white/90 font-medium text-sm sm:text-base">({stock.ticker})</p>
                 </div>
-                <div className="flex items-center gap-2 animate-fade-in delay-100">
-                  <Badge className="bg-white/20 text-white border-white/30 font-semibold px-2 py-1 sm:px-3 sm:py-1 backdrop-blur-sm text-xs sm:text-sm">
+                <div className="flex items-center gap-2 animate-fade-in delay-100 flex-shrink-0">
+                  <Badge className="bg-white/20 text-white border-white/30 font-semibold px-2 py-1 backdrop-blur-sm text-xs whitespace-nowrap">
                     {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()}
                   </Badge>
                   <EducationalTooltip 

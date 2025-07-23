@@ -298,31 +298,31 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     <div className="w-screen h-screen max-w-[1290px] max-h-[2796px] min-w-0 min-h-0 mx-auto pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 overflow-auto">
       <div className="w-full mx-auto">
         {/* Header */}
-        <div className="text-center mb-6 pt-4 animate-fade-in">
-          <h1 className="text-2xl font-bold text-white mb-2">
+        <div className="text-center mb-4 sm:mb-6 pt-2 sm:pt-4 animate-fade-in px-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
             Stock Matcher 💕
           </h1>
-          <div className="flex items-center justify-center gap-2 text-white/80 text-sm">
-            <span>{userProfile.age}yo • {userProfile.riskTolerance} risk • {userProfile.sectorPreference}</span>
+          <div className="flex items-center justify-center gap-1 sm:gap-2 text-white/80 text-xs sm:text-sm">
+            <span className="truncate max-w-[300px]">{userProfile.age}yo • {userProfile.riskTolerance} risk • {userProfile.sectorPreference}</span>
           </div>
         </div>
 
 
         {/* Stats */}
-        <div className="flex justify-center gap-4 mb-6 animate-fade-in delay-200">
-          <div className="bg-green-500/20 backdrop-blur-lg rounded-xl px-4 py-2 flex items-center gap-2 border border-green-400/30 transform hover:scale-105 transition-all duration-200">
+        <div className="flex justify-center gap-3 sm:gap-4 mb-4 sm:mb-6 animate-fade-in delay-200 px-4">
+          <div className="bg-green-500/20 backdrop-blur-lg rounded-xl px-3 sm:px-4 py-2 flex items-center gap-2 border border-green-400/30 transform hover:scale-105 transition-all duration-200">
             <Heart className="w-4 h-4 text-green-300 fill-current" />
-            <span className="text-white font-medium">{matches.length}</span>
+            <span className="text-white font-medium text-sm sm:text-base">{matches.length}</span>
           </div>
-          <div className="bg-red-500/20 backdrop-blur-lg rounded-xl px-4 py-2 flex items-center gap-2 border border-red-400/30 transform hover:scale-105 transition-all duration-200">
+          <div className="bg-red-500/20 backdrop-blur-lg rounded-xl px-3 sm:px-4 py-2 flex items-center gap-2 border border-red-400/30 transform hover:scale-105 transition-all duration-200">
             <X className="w-4 h-4 text-red-300" />
-            <span className="text-white font-medium">{passes.length}</span>
+            <span className="text-white font-medium text-sm sm:text-base">{passes.length}</span>
           </div>
         </div>
 
         {/* Stock Cards Stack */}
         {allRecommendations.length > 0 && currentStock && (
-          <div className="mb-8 relative h-[600px] animate-fade-in delay-300">
+          <div className="mb-8 relative h-[70vh] max-h-[600px] min-h-[500px] animate-fade-in delay-300">
             {visibleCards.map((stock, stackIndex) => {
               const cardIndex = currentIndex + stackIndex;
               const isActiveCard = stackIndex === 0;
@@ -346,32 +346,32 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
         )}
 
         {/* Action Buttons */}
-        <div className="flex justify-center items-center gap-6 animate-fade-in delay-400">
+        <div className="flex justify-center items-center gap-4 sm:gap-6 animate-fade-in delay-400 px-4">
           <Button
             onClick={handlePass}
             disabled={animatingCard}
-            className="w-16 h-16 rounded-full bg-white/20 hover:bg-red-500/30 border-2 border-red-400/50 backdrop-blur-lg disabled:opacity-50 transform hover:scale-110 active:scale-95 transition-all duration-200"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/20 hover:bg-red-500/30 border-2 border-red-400/50 backdrop-blur-lg disabled:opacity-50 transform hover:scale-110 active:scale-95 transition-all duration-200"
             variant="ghost"
           >
-            <X className="w-8 h-8 text-red-400" />
+            <X className="w-6 h-6 sm:w-8 sm:h-8 text-red-400" />
           </Button>
 
           <Button
             onClick={handleUndo}
             disabled={currentIndex === 0 || animatingCard}
-            className="w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 disabled:opacity-50 backdrop-blur-lg transform hover:scale-110 active:scale-95 transition-all duration-200"
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 disabled:opacity-50 backdrop-blur-lg transform hover:scale-110 active:scale-95 transition-all duration-200"
             variant="ghost"
           >
-            <RotateCcw className="w-5 h-5 text-white" />
+            <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </Button>
 
           <Button
             onClick={handleMatch}
             disabled={animatingCard}
-            className="w-16 h-16 rounded-full bg-white/20 hover:bg-green-500/30 border-2 border-green-400/50 backdrop-blur-lg disabled:opacity-50 transform hover:scale-110 active:scale-95 transition-all duration-200"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/20 hover:bg-green-500/30 border-2 border-green-400/50 backdrop-blur-lg disabled:opacity-50 transform hover:scale-110 active:scale-95 transition-all duration-200"
             variant="ghost"
           >
-            <Heart className="w-8 h-8 text-green-400 fill-current" />
+            <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-green-400 fill-current" />
           </Button>
         </div>
 

@@ -296,12 +296,47 @@ const IndexContent = () => {
 
   // Bottom navigation bar for mobile
   const BottomNavBar = () => (
-    <nav className="fixed bottom-0 left-0 w-full z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center py-2 pb-[env(safe-area-inset-bottom)] shadow-lg" style={{ fontFamily: 'SF Pro Text, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif' }}>
-      <button onClick={() => setCurrentStep('matching')} className={`flex flex-col items-center text-xs ${currentStep === 'matching' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-300'}`}> <Home className="w-6 h-6 mb-0.5" />Match</button>
-      <button onClick={() => setCurrentStep('matches')} className={`flex flex-col items-center text-xs ${currentStep === 'matches' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-300'}`}> <HeartIcon className="w-6 h-6 mb-0.5" />Likes</button>
-      <button onClick={() => setCurrentStep('settings')} className="flex flex-col items-center text-xs text-gray-500 dark:text-gray-300"> <UserIcon className="w-6 h-6 mb-0.5" />Profile</button>
-      <button onClick={() => setCurrentStep('matches')} className="flex flex-col items-center text-xs text-gray-500 dark:text-gray-300"> <Scale className="w-6 h-6 mb-0.5" />Compare</button>
-      <button onClick={() => setCurrentStep('matches')} className="flex flex-col items-center text-xs text-gray-500 dark:text-gray-300 relative"> <Bell className="w-6 h-6 mb-0.5" />{/* notifications.length > 0 && <span className="absolute top-0 right-1 bg-red-500 text-white rounded-full text-[10px] px-1">{notifications.length}</span> */}Notifications</button>
+    <nav className="fixed bottom-0 left-0 w-full z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 flex justify-around items-center py-3 pb-[max(env(safe-area-inset-bottom),1rem)] shadow-lg" style={{ fontFamily: 'SF Pro Text, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif' }}>
+      <button 
+        onClick={() => setCurrentStep('matching')} 
+        className={`flex flex-col items-center min-h-[44px] min-w-[44px] justify-center transition-colors ${
+          currentStep === 'matching' ? 'text-primary' : 'text-muted-foreground'
+        }`}
+      >
+        <Home className="w-5 h-5 mb-1" />
+        <span className="text-[10px] font-medium">Match</span>
+      </button>
+      <button 
+        onClick={() => setCurrentStep('matches')} 
+        className={`flex flex-col items-center min-h-[44px] min-w-[44px] justify-center transition-colors ${
+          currentStep === 'matches' ? 'text-primary' : 'text-muted-foreground'
+        }`}
+      >
+        <HeartIcon className="w-5 h-5 mb-1" />
+        <span className="text-[10px] font-medium">Likes</span>
+      </button>
+      <button 
+        onClick={() => setCurrentStep('settings')} 
+        className={`flex flex-col items-center min-h-[44px] min-w-[44px] justify-center transition-colors ${
+          currentStep === 'settings' ? 'text-primary' : 'text-muted-foreground'
+        }`}
+      >
+        <UserIcon className="w-5 h-5 mb-1" />
+        <span className="text-[10px] font-medium">Profile</span>
+      </button>
+      <button 
+        onClick={handleOpenSettings} 
+        className="flex flex-col items-center min-h-[44px] min-w-[44px] justify-center text-muted-foreground transition-colors"
+      >
+        <Scale className="w-5 h-5 mb-1" />
+        <span className="text-[10px] font-medium">Compare</span>
+      </button>
+      <button 
+        className="flex flex-col items-center min-h-[44px] min-w-[44px] justify-center text-muted-foreground transition-colors relative"
+      >
+        <Bell className="w-5 h-5 mb-1" />
+        <span className="text-[10px] font-medium">Alerts</span>
+      </button>
     </nav>
   );
 
@@ -341,7 +376,7 @@ const IndexContent = () => {
     return (
       <ProtectedRoute>
         {!isMobile && <AppHeader />}
-        <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-auto">
+        <div className={`min-h-screen w-full min-w-0 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 pt-[env(safe-area-inset-top)] overflow-auto ${isMobile ? 'pb-24' : 'pb-[env(safe-area-inset-bottom)]'}`}>
           <StockMatcher 
             userProfile={userProfile!} 
             onReset={handleUpdateProfile}
@@ -364,8 +399,8 @@ const IndexContent = () => {
     return (
       <ProtectedRoute>
         {!isMobile && <AppHeader />}
-        <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 p-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-auto overflow-x-hidden">
-          <div className="w-full pt-8">
+        <div className={`min-h-screen w-full min-w-0 bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 px-4 pt-[env(safe-area-inset-top)] overflow-auto overflow-x-hidden ${isMobile ? 'pb-24' : 'pb-[env(safe-area-inset-bottom)]'}`}>
+          <div className="w-full pt-4">
             <Matches onViewDetails={handleViewStockDetails} />
           </div>
         </div>
