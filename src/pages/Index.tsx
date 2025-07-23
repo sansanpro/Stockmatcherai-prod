@@ -19,7 +19,7 @@ import { Moon, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Bell, User as UserIcon, Scale, Heart as HeartIcon, Home } from 'lucide-react';
+import { User as UserIcon, Scale, Heart as HeartIcon, Home } from 'lucide-react';
 
 const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -296,7 +296,7 @@ const IndexContent = () => {
 
   // Bottom navigation bar for mobile
   const BottomNavBar = () => (
-    <nav className="fixed bottom-0 left-0 w-full z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 flex justify-around items-center py-3 pb-[max(env(safe-area-inset-bottom),1rem)] shadow-lg" style={{ fontFamily: 'SF Pro Text, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif' }}>
+    <nav className="fixed bottom-0 left-0 w-full z-50 bg-background/95 backdrop-blur-sm border-t border-border flex justify-around items-center py-3 pb-safe-area-inset-bottom shadow-lg" style={{ fontFamily: 'SF Pro Text, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif' }}>
       <button 
         onClick={() => setCurrentStep('matching')} 
         className={`flex flex-col items-center min-h-[44px] min-w-[44px] justify-center transition-colors ${
@@ -330,12 +330,6 @@ const IndexContent = () => {
       >
         <Scale className="w-5 h-5 mb-1" />
         <span className="text-[10px] font-medium">Compare</span>
-      </button>
-      <button 
-        className="flex flex-col items-center min-h-[44px] min-w-[44px] justify-center text-muted-foreground transition-colors relative"
-      >
-        <Bell className="w-5 h-5 mb-1" />
-        <span className="text-[10px] font-medium">Alerts</span>
       </button>
     </nav>
   );
