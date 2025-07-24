@@ -345,35 +345,6 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex justify-center items-center gap-4 sm:gap-6 animate-fade-in delay-400 px-4">
-          <Button
-            onClick={handlePass}
-            disabled={animatingCard}
-            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/20 hover:bg-red-500/30 border-2 border-red-400/50 backdrop-blur-lg disabled:opacity-50 transform hover:scale-110 active:scale-95 transition-all duration-200"
-            variant="ghost"
-          >
-            <X className="w-6 h-6 sm:w-8 sm:h-8 text-red-400" />
-          </Button>
-
-          <Button
-            onClick={handleUndo}
-            disabled={currentIndex === 0 || animatingCard}
-            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 hover:bg-white/30 disabled:opacity-50 backdrop-blur-lg transform hover:scale-110 active:scale-95 transition-all duration-200"
-            variant="ghost"
-          >
-            <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-          </Button>
-
-          <Button
-            onClick={handleMatch}
-            disabled={animatingCard}
-            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/20 hover:bg-green-500/30 border-2 border-green-400/50 backdrop-blur-lg disabled:opacity-50 transform hover:scale-110 active:scale-95 transition-all duration-200"
-            variant="ghost"
-          >
-            <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-green-400 fill-current" />
-          </Button>
-        </div>
 
       </div>
       
