@@ -295,10 +295,10 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const currentStock = allRecommendations[currentIndex];
 
   return (
-    <div className="w-screen h-screen max-w-[1290px] max-h-[2796px] min-w-0 min-h-0 mx-auto pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 overflow-auto">
+    <div className="w-screen h-screen max-w-[1290px] max-h-[2796px] min-w-0 min-h-0 mx-auto pt-safe-area-inset-top pb-safe-area-inset-bottom bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 overflow-auto">
       <div className="w-full mx-auto">
         {/* Header */}
-        <div className="text-center mb-4 sm:mb-6 pt-2 sm:pt-4 animate-fade-in px-4">
+        <div className="text-center mb-4 sm:mb-6 pt-8 sm:pt-12 animate-fade-in px-4">
           <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
             Stock Matcher 💕
           </h1>
@@ -375,30 +375,6 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
           </Button>
         </div>
 
-        {/* Quick Add to Watchlist */}
-        {currentStock && !isInWatchlist(currentStock.ticker) && (
-          <div className="mt-6 text-center animate-fade-in delay-500">
-            <Button
-              onClick={() => addToWatchlist(currentStock)}
-              variant="ghost"
-              className="text-white/70 hover:text-white hover:bg-white/10 flex items-center gap-2 transform hover:scale-105 transition-all duration-200"
-            >
-              <Plus className="w-4 h-4" />
-              Add to Watchlist
-            </Button>
-          </div>
-        )}
-
-        {/* Bottom Actions */}
-        <div className="mt-8 animate-fade-in delay-600">
-          <Button 
-            onClick={onReset}
-            variant="ghost"
-            className="w-full text-white/70 hover:text-white hover:bg-white/10 transform hover:scale-105 transition-all duration-200"
-          >
-            Update Profile
-          </Button>
-        </div>
       </div>
       
       {/* Upgrade Modal */}

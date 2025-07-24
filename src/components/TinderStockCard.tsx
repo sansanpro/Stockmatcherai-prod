@@ -372,7 +372,7 @@ const TinderStockCard = ({
           </div>
 
           {/* Why it fits section */}
-          <div className="p-4 sm:p-6 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500 mb-16">
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500">
             <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-base sm:text-lg">
               <span className="text-lg">💡</span>
               Why this matches you
@@ -384,23 +384,6 @@ const TinderStockCard = ({
             </div>
           </div>
         </CardContent>
-
-        {/* Floating Action Buttons */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 z-20">
-          <button
-            onClick={onPass}
-            className="w-12 h-12 rounded-full bg-red-500/80 hover:bg-red-500 backdrop-blur-sm border border-red-400/50 flex items-center justify-center transform hover:scale-110 active:scale-95 transition-all duration-200 shadow-lg"
-          >
-            <X className="w-6 h-6 text-white" />
-          </button>
-          
-          <button
-            onClick={onMatch}
-            className="w-12 h-12 rounded-full bg-green-500/80 hover:bg-green-500 backdrop-blur-sm border border-green-400/50 flex items-center justify-center transform hover:scale-110 active:scale-95 transition-all duration-200 shadow-lg"
-          >
-            <Heart className="w-6 h-6 text-white fill-current" />
-          </button>
-        </div>
       </Card>
     </div>
   );
