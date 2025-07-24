@@ -277,13 +277,6 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
               <RotateCcw className="w-5 h-5 mr-2" />
               Get More Recommendations
             </Button>
-            <Button 
-              onClick={onReset}
-              variant="outline"
-              className="w-full bg-transparent border-white/30 text-white hover:bg-white/10 h-12 rounded-xl transform hover:scale-105 transition-all duration-200"
-            >
-              Update Profile
-            </Button>
           </div>
         </div>
       </div>
