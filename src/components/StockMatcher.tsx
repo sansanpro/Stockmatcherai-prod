@@ -315,7 +315,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
         {/* Stock Cards Stack */}
         {allRecommendations.length > 0 && currentStock && (
-          <div className="mb-8 relative h-[70vh] max-h-[600px] min-h-[500px] animate-fade-in delay-300">
+          <div className="mb-6 relative h-[65vh] max-h-[550px] min-h-[450px] animate-fade-in delay-300">
             {visibleCards.map((stock, stackIndex) => {
               const cardIndex = currentIndex + stackIndex;
               const isActiveCard = stackIndex === 0;
@@ -335,6 +335,35 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
                 />
               );
             })}
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        {allRecommendations.length > 0 && currentStock && (
+          <div className="flex justify-center gap-6 mb-6 px-4 animate-fade-in delay-400">
+            <Button
+              onClick={handlePass}
+              disabled={animatingCard || !canSwipe}
+              className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+            >
+              <X className="w-8 h-8" />
+            </Button>
+            
+            <Button
+              onClick={handleUndo}
+              disabled={currentIndex === 0 || animatingCard}
+              className="w-12 h-12 rounded-full bg-gray-500/80 hover:bg-gray-600 border-0 text-white shadow-xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+            >
+              <RotateCcw className="w-5 h-5" />
+            </Button>
+            
+            <Button
+              onClick={handleMatch}
+              disabled={animatingCard || !canSwipe}
+              className="w-16 h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+            >
+              <Heart className="w-8 h-8" />
+            </Button>
           </div>
         )}
 

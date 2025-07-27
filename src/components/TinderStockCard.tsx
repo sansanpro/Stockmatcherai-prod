@@ -214,7 +214,7 @@ const TinderStockCard = ({
         ref={cardRef}
         className={`w-full max-w-[min(90vw,360px)] sm:max-w-sm md:max-w-md mx-auto shadow-2xl border-0 bg-card overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
           isExiting ? 'animate-scale-out' : 'animate-scale-in'
-        } h-full max-h-[65vh] sm:max-h-[70vh] rounded-2xl flex flex-col relative`}
+        } h-full max-h-[60vh] sm:max-h-[65vh] rounded-2xl flex flex-col relative`}
         style={{
           transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
           opacity,
@@ -371,14 +371,14 @@ const TinderStockCard = ({
             </div>
           </div>
 
-          {/* Why it fits section */}
-          <div className="p-4 sm:p-6 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500">
+          {/* Why it fits section - More prominent */}
+          <div className="p-4 sm:p-6 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500 flex-shrink-0">
             <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-base sm:text-lg">
               <span className="text-lg">💡</span>
               Why this matches you
             </h4>
-            <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-3 sm:p-4 rounded-xl border border-white/50 dark:border-gray-600/50 transform hover:scale-[1.02] transition-all duration-300">
-              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-5 rounded-xl border border-white/50 dark:border-gray-600/50 shadow-lg">
+              <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
                 {stock.whyItFits}
               </p>
             </div>
