@@ -147,6 +147,8 @@ serve(async (req) => {
         smartScheduling = false 
       } = combined;
       
+      let specificStocksToUpdate: Record<string, string[]> = {};
+      
       console.log(`Background update started - Sector: ${sector}, UpdateType: ${updateType}, Priority: ${priority}, SmartScheduling: ${smartScheduling}`);
       
       let targetSector = sector;
@@ -200,6 +202,75 @@ serve(async (req) => {
       // Process ALL sectors that need updating
       targetSector = 'all_stale_sectors';
     }
+
+    // 4-hour stale stock cleanup: Find individual stocks older than 4 hours across all sectors
+    if (updateType === 'staleStockCleanup' || updateType === 'smartScheduling') {
+      console.log('🕐 Checking for individual stocks older than 4 hours...');
+      
+      const staleStocks = [];
+      const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
+      const sectors = ['technology', 'healthcare', 'finance', 'energy', 'consumer', 'utilities'];
+      
+      for (const sectorName of sectors) {
+        try {
+          const { data: oldStocks, error } = await supabase
+            .from(`${sectorName}_stocks`)
+            .select('ticker, last_updated')
+            .lt('last_updated', fourHoursAgo)
+            .order('last_updated', { ascending: true })
+            .limit(15); // Limit per sector to stay within rate limits
+
+          if (error) {
+            console.error(`❌ Error finding stale ${sectorName} stocks:`, error);
+            continue;
+          }
+
+          if (oldStocks && oldStocks.length > 0) {
+            console.log(`📍 Found ${oldStocks.length} stale stocks in ${sectorName} (4+ hours old)`);
+            staleStocks.push(...oldStocks.map(stock => ({ ...stock, sector: sectorName })));
+          }
+        } catch (error) {
+          console.error(`❌ Error processing stale stocks in ${sectorName}:`, error);
+        }
+      }
+
+      // Sort by oldest first and limit to 40 stocks total to stay within FMP rate limits  
+      staleStocks.sort((a, b) => new Date(a.last_updated).getTime() - new Date(b.last_updated).getTime());
+      const stocksToUpdate = staleStocks.slice(0, 40);
+      
+      if (stocksToUpdate.length > 0) {
+        console.log(`🔄 Found ${stocksToUpdate.length} stocks older than 4 hours (targeting oldest first)`);
+        
+        // Group by sector for efficient updates
+        const stocksBySector = stocksToUpdate.reduce((acc, stock) => {
+          if (!acc[stock.sector]) acc[stock.sector] = [];
+          acc[stock.sector].push(stock.ticker);
+          return acc;
+        }, {});
+
+        // Add these sectors to update list and mark specific stocks
+        for (const [sectorName, tickers] of Object.entries(stocksBySector)) {
+          if (!sectorsToUpdate.includes(sectorName)) {
+            sectorsToUpdate.push(sectorName);
+          }
+          // Store specific tickers to update for this sector
+          if (!specificStocksToUpdate[sectorName]) {
+            specificStocksToUpdate[sectorName] = tickers;
+          } else {
+            specificStocksToUpdate[sectorName].push(...tickers);
+          }
+        }
+        
+        console.log(`📋 Will update ${Object.keys(stocksBySector).length} sectors with specific stale stocks`);
+        
+        // Override target to process these stale stocks
+        if (sectorsToUpdate.length > 0) {
+          targetSector = 'stale_stocks_cleanup';
+        }
+      } else {
+        console.log('✅ No stocks older than 4 hours found');
+      }
+    }
     
     // If no sector specified and not smart scheduling, determine based on schedule
     if (!targetSector && !smartScheduling) {
@@ -238,7 +309,118 @@ serve(async (req) => {
 
     console.log(`Starting ${updateType} update for ${targetSector}`);
 
-    // Handle multi-sector updates when using smart scheduling
+    // Handle stale stock cleanup (4+ hour old stocks)
+    if (targetSector === 'stale_stocks_cleanup' && sectorsToUpdate.length > 0) {
+      console.log(`Processing stale stock cleanup for ${sectorsToUpdate.length} sectors with specific stocks`);
+      
+      // Create update log entry for stale stock cleanup
+      const { data: logEntry } = await supabase
+        .from('stock_update_logs')
+        .insert({
+          sector: sectorsToUpdate.join(', '),
+          update_type: 'staleStockCleanup',
+          status: 'running'
+        })
+        .select()
+        .single();
+
+      const logId = logEntry?.id;
+      let totalUpdated = 0;
+      let totalFailed = 0;
+      let totalApiCalls = 0;
+
+      // Process each sector with specific stocks
+      for (const sectorName of sectorsToUpdate) {
+        console.log(`\n--- Processing stale stocks in ${sectorName.toUpperCase()} sector ---`);
+        
+        const tableName = `${sectorName}_stocks`;
+        const specificTickers = specificStocksToUpdate[sectorName] || [];
+        
+        console.log(`📦 Processing ${specificTickers.length} specific stale stocks in ${sectorName}`);
+
+        let sectorUpdated = 0;
+        let sectorFailed = 0;
+
+        // Update only the specific stale stocks
+        for (let i = 0; i < specificTickers.length; i++) {
+          const ticker = specificTickers[i];
+          
+          try {
+            // Rate limit BEFORE making API call 
+            if (totalApiCalls > 0) {
+              console.log(`Rate limiting: waiting 2 seconds before API call ${totalApiCalls + 1}...`);
+              await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+            
+            console.log(`Updating stale stock ${ticker} (${i + 1}/${specificTickers.length})...`);
+            const quote = await fmpService.getQuote(ticker);
+            totalApiCalls++;
+            
+            if (quote) {
+              const currentPrice = parseFloat(quote['05. price']);
+              const changePercent = parseFloat(quote['10. change percent'].replace('%', ''));
+              
+              const { error: updateError } = await supabase
+                .from(tableName)
+                .update({
+                  price_per_share: currentPrice,
+                  one_year_return: changePercent,
+                  last_updated: new Date().toISOString()
+                })
+                .eq('ticker', ticker);
+
+              if (updateError) {
+                console.error(`Failed to update ${ticker}:`, updateError);
+                sectorFailed++;
+              } else {
+                sectorUpdated++;
+                console.log(`Updated stale stock ${ticker}: $${currentPrice} (${changePercent}%)`);
+              }
+            } else {
+              console.log(`No quote data received for ${ticker}`);
+              sectorFailed++;
+            }
+
+          } catch (error) {
+            console.error(`Error updating ${ticker}:`, error);
+            sectorFailed++;
+          }
+        }
+        
+        totalUpdated += sectorUpdated;
+        totalFailed += sectorFailed;
+        console.log(`${sectorName.toUpperCase()} stale stock cleanup complete: ${sectorUpdated} updated, ${sectorFailed} failed`);
+      }
+
+      // Update log entry with totals
+      if (logId) {
+        await supabase
+          .from('stock_update_logs')
+          .update({
+            stocks_updated: totalUpdated,
+            stocks_failed: totalFailed,
+            api_calls_used: totalApiCalls,
+            completed_at: new Date().toISOString(),
+            status: totalFailed > totalUpdated ? 'partial' : 'completed'
+          })
+          .eq('id', logId);
+      }
+
+      const response = {
+        success: true,
+        sector: `${sectorsToUpdate.length} sectors: ${sectorsToUpdate.join(', ')}`,
+        updateType: 'staleStockCleanup',
+        stocksUpdated: totalUpdated,
+        stocksFailed: totalFailed,
+        apiCallsUsed: totalApiCalls,
+        message: `Stale stock cleanup complete: ${totalUpdated} stocks updated (4+ hours old)`
+      };
+
+      console.log('Background stale stock cleanup completed:', response);
+      return;
+    }
+
+    // Handle multi-sector updates when using smart scheduling  
     if (targetSector === 'all_stale_sectors' && sectorsToUpdate.length > 0) {
       console.log(`Processing ${sectorsToUpdate.length} stale sectors: ${sectorsToUpdate.join(', ')}`);
       
