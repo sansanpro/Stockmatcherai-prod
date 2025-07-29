@@ -11,7 +11,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Configure Stripe
         StripeAPI.defaultPublishableKey = "pk_test_51QO6gPBNJFhPr3hn9x5SPJbhYnqjI2r3sA9LV6F6iUAUm3vqzNjX91lOJzQCOQ2Gt6vyILRk2NjnhBqP5oMX7EjF00eaWaJf7T"
+        
+        // Register custom plugins
+        self.registerPlugins()
+        
         return true
+    }
+    
+    private func registerPlugins() {
+        // Register the Stripe payment plugin
+        CapacitorApp.plugin.add(StripePaymentPlugin.self)
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
