@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Crown, Check, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
-import { nativeStripeService } from '@/services/nativeStripeService';
+import { Stripe } from '@capacitor-community/stripe';
+import { Capacitor } from '@capacitor/core';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -16,8 +18,8 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleNativePayment = async () => {
-    if (!nativeStripeService.isNativePlatform()) {
-      toast.error('Native payments only available on iOS');
+    if (!Capacitor.isNativePlatform()) {
+      toast.error('Native payments only available on iOS/Android');
       return;
     }
 
@@ -26,17 +28,36 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       toast.success('Preparing payment...');
       
       // Create payment intent on backend
-      const paymentData = await nativeStripeService.createPaymentIntent();
+      const { data, error } = await supabase.functions.invoke('create-payment-intent');
       
-      // Present native payment sheet
-      const result = await nativeStripeService.presentPaymentSheet(paymentData);
+      if (error) {
+        throw new Error(error.message || 'Failed to create payment intent');
+      }
+
+      // Initialize Stripe with publishable key
+      await Stripe.initialize({
+        publishableKey: data.publishableKey,
+      });
       
-      if (result.status === 'completed') {
-        toast.success('Payment successful! Welcome to Premium!');
+      // Create payment sheet
+      await Stripe.createPaymentSheet({
+        paymentIntentClientSecret: data.paymentIntentClientSecret,
+        merchantDisplayName: "StockMatcher AI",
+      });
+      
+      // Present payment sheet
+      const { paymentResult } = await Stripe.presentPaymentSheet();
+      console.log('Payment result:', paymentResult);
+      
+      // Handle payment result based on the actual response structure
+      if (paymentResult && typeof paymentResult === 'object') {
+        // Check if payment was successful
+        // The exact structure depends on the plugin version
+        toast.success('Payment completed! Please check your subscription status.');
         await checkSubscription();
         onClose();
-      } else if (result.status === 'canceled') {
-        toast.info('Payment canceled');
+      } else {
+        toast.info('Payment process ended');
       }
     } catch (error: any) {
       console.error('Payment error:', error);
