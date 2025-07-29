@@ -63,7 +63,7 @@ public class StripePaymentPlugin: CAPPlugin {
         appearance.colors.text = UIColor.label
         appearance.colors.textSecondary = UIColor.secondaryLabel
         appearance.colors.componentText = UIColor.label
-        appearance.colors.placeholderText = UIColor.placeholderText
+        // Note: placeholderText property was removed in newer Stripe SDK versions
         appearance.colors.icon = UIColor.label
         appearance.colors.danger = UIColor.systemRed
         
