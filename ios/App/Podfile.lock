@@ -2,47 +2,10 @@ PODS:
   - Capacitor (7.4.0):
     - CapacitorCordova
   - CapacitorCordova (7.4.0)
-  - Stripe (23.32.0):
-    - StripeApplePay (= 23.32.0)
-    - StripeCore (= 23.32.0)
-    - StripePayments (= 23.32.0)
-    - StripePaymentsUI (= 23.32.0)
-    - StripeUICore (= 23.32.0)
-  - StripeApplePay (23.32.0):
-    - StripeCore (= 23.32.0)
-  - StripeCore (23.32.0)
-  - StripePayments (23.32.0):
-    - StripeCore (= 23.32.0)
-    - StripePayments/Stripe3DS2 (= 23.32.0)
-  - StripePayments/Stripe3DS2 (23.32.0):
-    - StripeCore (= 23.32.0)
-  - StripePaymentSheet (23.32.0):
-    - StripeApplePay (= 23.32.0)
-    - StripeCore (= 23.32.0)
-    - StripePayments (= 23.32.0)
-    - StripePaymentsUI (= 23.32.0)
-  - StripePaymentsUI (23.32.0):
-    - StripeCore (= 23.32.0)
-    - StripePayments (= 23.32.0)
-    - StripeUICore (= 23.32.0)
-  - StripeUICore (23.32.0):
-    - StripeCore (= 23.32.0)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
-  - Stripe (~> 23.0)
-  - StripePaymentSheet (~> 23.0)
-
-SPEC REPOS:
-  trunk:
-    - Stripe
-    - StripeApplePay
-    - StripeCore
-    - StripePayments
-    - StripePaymentSheet
-    - StripePaymentsUI
-    - StripeUICore
 
 EXTERNAL SOURCES:
   Capacitor:
@@ -53,14 +16,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Capacitor: 10feab36396883c55373328124a677f118cd4b5f
   CapacitorCordova: 723e017d8a80ab2ede9959fbe37556c35ac860d5
-  Stripe: d546a79759fb2b0983076d2551096b91d032693a
-  StripeApplePay: fd4aeaa8af1ebbfe5e38390ef7b4607f66494f80
-  StripeCore: 4999b0c234127b28b9e656caa558ba4406ce58b3
-  StripePayments: a1260c9fecdb8640462c1fe70c4e2e17df2ab3a8
-  StripePaymentSheet: 155d402ee01447002d23c982e905ce06e6d7ef66
-  StripePaymentsUI: 2084d4398cb4869b13dd9eac43a00481476b152f
-  StripeUICore: 2c115cc8498f3badc19b4a41b3b1fdac0ae21d41
 
-PODFILE CHECKSUM: 783259ec6c96fa908e8c8b947326660232f076fa
+PODFILE CHECKSUM: 94a17055acff1f015aff073269f37e489b6a4840
 
 COCOAPODS: 1.16.2
