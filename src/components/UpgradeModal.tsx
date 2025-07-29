@@ -34,12 +34,7 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
         throw new Error(error.message || 'Failed to create payment intent');
       }
 
-      // Initialize Stripe with publishable key
-      await Stripe.initialize({
-        publishableKey: data.publishableKey,
-      });
-      
-      // Create payment sheet
+      // Create payment sheet (plugin is already initialized via capacitor.config.ts)
       await Stripe.createPaymentSheet({
         paymentIntentClientSecret: data.paymentIntentClientSecret,
         merchantDisplayName: "StockMatcher AI",

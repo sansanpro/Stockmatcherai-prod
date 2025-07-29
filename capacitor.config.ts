@@ -10,6 +10,9 @@ const config: CapacitorConfig = {
       launchShowDuration: 2000,
       backgroundColor: '#4f46e5',
       showSpinner: false
+    },
+    Stripe: {
+      publishableKey: 'pk_test_51Q8l4wKVN448QAiBDGLmjLTQAQY5DFzNGTbNxrhIJYQWgSj8VDUHBKNfr5qS6CZmS5cUIvR3fKkzWFvjhqfhSlxK00cEpPOOIe'
     }
   }
 };
