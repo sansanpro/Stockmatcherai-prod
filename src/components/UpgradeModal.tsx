@@ -4,11 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Crown, Check, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import CheckoutForm from './CheckoutForm';
-
-const stripePromise = loadStripe('pk_test_51QO6gPBNJFhPr3hn9x5SPJbhYnqjI2r3sA9LV6F6iUAUm3vqzNjX91lOJzQCOQ2Gt6vyILRk2NjnhBqP5oMX7EjF00eaWaJf7T'); // Replace with your actual publishable key
+import { nativeStripeService } from '@/services/nativeStripeService';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -16,19 +12,38 @@ interface UpgradeModalProps {
 }
 
 const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
-  const { upgradeToPremi, loading, checkSubscription } = useSubscription();
+  const { checkSubscription } = useSubscription();
   const [isProcessing, setIsProcessing] = useState(false);
-  // No longer needed for redirect approach
 
-  const handleUpgrade = async () => {
-    setIsProcessing(true);
-    const data = await upgradeToPremi();
-    if (data?.url) {
-      // Redirect to Stripe Checkout
-      window.open(data.url, '_blank');
-      toast.success('Redirecting to secure checkout...');
+  const handleNativePayment = async () => {
+    if (!nativeStripeService.isNativePlatform()) {
+      toast.error('Native payments only available on iOS');
+      return;
     }
-    setIsProcessing(false);
+
+    setIsProcessing(true);
+    try {
+      toast.success('Preparing payment...');
+      
+      // Create payment intent on backend
+      const paymentData = await nativeStripeService.createPaymentIntent();
+      
+      // Present native payment sheet
+      const result = await nativeStripeService.presentPaymentSheet(paymentData);
+      
+      if (result.status === 'completed') {
+        toast.success('Payment successful! Welcome to Premium!');
+        await checkSubscription();
+        onClose();
+      } else if (result.status === 'canceled') {
+        toast.info('Payment canceled');
+      }
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      toast.error(error.message || 'Payment failed');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handlePaymentSuccess = () => {
@@ -96,11 +111,11 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
 
             <div className="space-y-3">
               <Button 
-                onClick={handleUpgrade}
-                disabled={loading || isProcessing}
+                onClick={handleNativePayment}
+                disabled={isProcessing}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
               >
-                {loading || isProcessing ? (
+                {isProcessing ? (
                   <>
                     <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
                     Processing...

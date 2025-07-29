@@ -1,5 +1,7 @@
 import UIKit
 import Capacitor
+import Stripe
+import StripePaymentSheet
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -7,7 +9,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Configure Stripe
+        StripeAPI.defaultPublishableKey = "pk_test_51QO6gPBNJFhPr3hn9x5SPJbhYnqjI2r3sA9LV6F6iUAUm3vqzNjX91lOJzQCOQ2Gt6vyILRk2NjnhBqP5oMX7EjF00eaWaJf7T"
         return true
     }
 
