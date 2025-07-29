@@ -13,22 +13,22 @@ export const filterStocksByProfile = (
 
   console.log(`Starting with ${stocks.length} stocks for sector: ${profile.sectorPreference}`);
 
-  // Calculate affordability threshold - much more conservative for salary protection
+  // Calculate affordability threshold based on salary
   const getAffordabilityThreshold = (experience: string, salary: number) => {
-    // Base affordability on annual salary divided by reasonable investment amounts
-    const maxStockPrice = Math.min(salary * 0.02, 200); // Max 2% of annual salary per stock, capped at $200
+    // Base affordability on annual salary - more realistic for actual investing
+    const basePercentage = salary * 0.05; // 5% of annual salary per stock as base
     
     switch (experience) {
       case 'none':
-        return Math.min(maxStockPrice, 50); // Very conservative for beginners
+        return Math.max(basePercentage * 0.3, 25); // 1.5% of salary, minimum $25
       case 'beginner':
-        return Math.min(maxStockPrice, 100); // Conservative
+        return Math.max(basePercentage * 0.5, 50); // 2.5% of salary, minimum $50
       case 'intermediate':
-        return maxStockPrice;
+        return Math.max(basePercentage * 0.8, 100); // 4% of salary, minimum $100
       case 'advanced':
-        return maxStockPrice * 1.5; // Slightly more flexible for advanced
+        return basePercentage; // Full 5% of salary
       default:
-        return Math.min(maxStockPrice, 100);
+        return Math.max(basePercentage * 0.5, 50); // Default to beginner level
     }
   };
 
