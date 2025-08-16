@@ -77,7 +77,7 @@ serve(async (req) => {
     logStep("Created setup intent", { setupIntentId: setupIntent.id });
 
     return new Response(JSON.stringify({
-      paymentIntentClientSecret: setupIntent.client_secret,
+      setupIntentClientSecret: setupIntent.client_secret,
       customerId: customer.id,
       customerEphemeralKeySecret: ephemeralKey.secret,
       publishableKey: "pk_test_51Q8l4wKVN448QAiBDGLmjLTQAQY5DFzNGTbNxrhIJYQWgSj8VDUHBKNfr5qS6CZmS5cUIvR3fKkzWFvjhqfhSlxK00cEpPOOIe"

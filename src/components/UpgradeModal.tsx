@@ -35,27 +35,33 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       }
 
       // Validate required response data
-      if (!data.paymentIntentClientSecret || !data.customerId || !data.customerEphemeralKeySecret || !data.publishableKey) {
+      if (!data.setupIntentClientSecret || !data.customerId || !data.customerEphemeralKeySecret || !data.publishableKey) {
         throw new Error('Missing required payment data from backend');
       }
 
-      // Create payment sheet with all required parameters for iOS
-      console.log('Creating payment sheet with secret:', data.paymentIntentClientSecret.substring(0, 20) + '...');
+      // Initialize Stripe plugin explicitly
+      console.log('Initializing Stripe plugin with publishable key...');
+      await Stripe.initialize({
+        publishableKey: data.publishableKey,
+      });
+      console.log('Stripe plugin initialized successfully');
+
+      // Create payment sheet with SetupIntent for subscriptions
+      console.log('Creating payment sheet with setup intent secret:', data.setupIntentClientSecret.substring(0, 20) + '...');
       console.log('Customer ID:', data.customerId);
-      console.log('Publishable key:', data.publishableKey.substring(0, 20) + '...');
       
       try {
         await Stripe.createPaymentSheet({
-          paymentIntentClientSecret: data.paymentIntentClientSecret,
+          setupIntentClientSecret: data.setupIntentClientSecret,
           customerId: data.customerId,
           customerEphemeralKeySecret: data.customerEphemeralKeySecret,
           merchantDisplayName: "StockMatcher AI"
         });
-        console.log('Payment sheet created successfully with all parameters');
+        console.log('Payment sheet created successfully with SetupIntent');
       } catch (createError) {
         console.error('Error creating payment sheet:', createError);
         console.error('Payment sheet creation failed with data:', {
-          hasSecret: !!data.paymentIntentClientSecret,
+          hasSecret: !!data.setupIntentClientSecret,
           hasCustomerId: !!data.customerId,
           hasEphemeralKey: !!data.customerEphemeralKeySecret,
           hasPublishableKey: !!data.publishableKey
