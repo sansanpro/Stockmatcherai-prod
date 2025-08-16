@@ -59,8 +59,9 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       
     } catch (error: any) {
       console.error('Checkout error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage = error?.message || error?.toString() || 'Failed to open checkout';
       toast.error(`Checkout failed: ${errorMessage}`);
+    } finally {
       setIsProcessing(false);
     }
   };
