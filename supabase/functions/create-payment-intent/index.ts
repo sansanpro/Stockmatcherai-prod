@@ -64,20 +64,24 @@ serve(async (req) => {
     );
     logStep("Created ephemeral key");
 
-    // Create setup intent for subscription (better for mobile subscriptions)
-    const setupIntent = await stripe.setupIntents.create({
+    // Create payment intent for subscription (payment sheet requires PaymentIntent, not SetupIntent)
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: 999, // $9.99 in cents for subscription
+      currency: 'usd',
       customer: customer.id,
-      usage: 'off_session',
-      payment_method_types: ['card'],
+      setup_future_usage: 'off_session', // This allows future payments
+      automatic_payment_methods: {
+        enabled: true,
+      },
       metadata: {
         userId: user.id,
         type: 'subscription'
       }
     });
-    logStep("Created setup intent", { setupIntentId: setupIntent.id });
+    logStep("Created payment intent", { paymentIntentId: paymentIntent.id });
 
     return new Response(JSON.stringify({
-      setupIntentClientSecret: setupIntent.client_secret,
+      paymentIntentClientSecret: paymentIntent.client_secret,
       customerId: customer.id,
       customerEphemeralKeySecret: ephemeralKey.secret,
       publishableKey: "pk_test_51Q8l4wKVN448QAiBDGLmjLTQAQY5DFzNGTbNxrhIJYQWgSj8VDUHBKNfr5qS6CZmS5cUIvR3fKkzWFvjhqfhSlxK00cEpPOOIe"

@@ -35,29 +35,46 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       }
 
       // Validate required response data
-      if (!data.setupIntentClientSecret || !data.customerId || !data.customerEphemeralKeySecret || !data.publishableKey) {
+      if (!data.paymentIntentClientSecret || !data.customerId || !data.customerEphemeralKeySecret || !data.publishableKey) {
+        console.error('Missing payment data:', {
+          hasSecret: !!data.paymentIntentClientSecret,
+          hasCustomerId: !!data.customerId,
+          hasEphemeralKey: !!data.customerEphemeralKeySecret,
+          hasPublishableKey: !!data.publishableKey
+        });
         throw new Error('Missing required payment data from backend');
       }
 
-      // Initialize Stripe plugin explicitly
-      console.log('Initializing Stripe plugin with publishable key...');
-      await Stripe.initialize({
-        publishableKey: data.publishableKey,
-      });
-      console.log('Stripe plugin initialized successfully');
+      // Initialize Stripe plugin explicitly with detailed logging
+      console.log('Initializing Stripe plugin...');
+      try {
+        await Stripe.initialize({
+          publishableKey: data.publishableKey,
+        });
+        console.log('Stripe plugin initialized successfully');
+      } catch (initError) {
+        console.error('Failed to initialize Stripe plugin:', initError);
+        throw new Error('Failed to initialize payment system');
+      }
 
-      // Create payment sheet with SetupIntent for subscriptions
-      console.log('Creating payment sheet with setup intent secret:', data.setupIntentClientSecret.substring(0, 20) + '...');
-      console.log('Customer ID:', data.customerId);
+      // Create payment sheet with PaymentIntent (more compatible than SetupIntent)
+      console.log('Creating payment sheet with payment intent secret:', data.paymentIntentClientSecret.substring(0, 20) + '...');
+      console.log('Full payment data:', {
+        hasSecret: !!data.paymentIntentClientSecret,
+        hasCustomerId: !!data.customerId,
+        hasEphemeralKey: !!data.customerEphemeralKeySecret,
+        secretLength: data.paymentIntentClientSecret?.length,
+        customerIdLength: data.customerId?.length
+      });
       
       try {
         await Stripe.createPaymentSheet({
-          setupIntentClientSecret: data.setupIntentClientSecret,
+          paymentIntentClientSecret: data.paymentIntentClientSecret,
           customerId: data.customerId,
           customerEphemeralKeySecret: data.customerEphemeralKeySecret,
           merchantDisplayName: "StockMatcher AI"
         });
-        console.log('Payment sheet created successfully with SetupIntent');
+        console.log('Payment sheet created successfully with PaymentIntent');
       } catch (createError) {
         console.error('Error creating payment sheet:', createError);
         console.error('Payment sheet creation failed with data:', {
