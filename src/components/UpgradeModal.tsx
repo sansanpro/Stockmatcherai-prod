@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Crown, Check, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
-import { Stripe } from '@capacitor-community/stripe';
+import { Stripe, PaymentSheetEventsEnum } from '@capacitor-community/stripe';
 import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -68,48 +68,86 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       });
       
       try {
-        await Stripe.createPaymentSheet({
+        const paymentSheetConfig = {
           paymentIntentClientSecret: data.paymentIntentClientSecret,
           customerId: data.customerId,
           customerEphemeralKeySecret: data.customerEphemeralKeySecret,
           merchantDisplayName: "StockMatcher AI"
+        };
+        
+        console.log('Creating payment sheet with config:', {
+          hasSecret: !!paymentSheetConfig.paymentIntentClientSecret,
+          secretPrefix: paymentSheetConfig.paymentIntentClientSecret?.substring(0, 7),
+          hasCustomerId: !!paymentSheetConfig.customerId,
+          hasEphemeralKey: !!paymentSheetConfig.customerEphemeralKeySecret,
+          merchantName: paymentSheetConfig.merchantDisplayName
         });
+        
+        await Stripe.createPaymentSheet(paymentSheetConfig);
         console.log('Payment sheet created successfully with PaymentIntent');
-      } catch (createError) {
+      } catch (createError: any) {
         console.error('Error creating payment sheet:', createError);
-        console.error('Payment sheet creation failed with data:', {
-          hasSecret: !!data.setupIntentClientSecret,
-          hasCustomerId: !!data.customerId,
-          hasEphemeralKey: !!data.customerEphemeralKeySecret,
-          hasPublishableKey: !!data.publishableKey
+        console.error('Full error details:', {
+          message: createError.message,
+          code: createError.code,
+          type: createError.type,
+          localizedDescription: createError.localizedDescription,
+          error: createError
         });
-        throw createError;
+        
+        // Try simpler configuration without customer parameters
+        console.log('Retrying with simplified payment sheet configuration...');
+        try {
+          await Stripe.createPaymentSheet({
+            paymentIntentClientSecret: data.paymentIntentClientSecret,
+            merchantDisplayName: "StockMatcher AI"
+          });
+          console.log('Payment sheet created successfully with simplified config');
+        } catch (retryError: any) {
+          console.error('Simplified config also failed:', retryError);
+          throw new Error(`Payment sheet creation failed: ${retryError.message || retryError}`);
+        }
       }
       
-      // Add a longer delay to ensure the sheet is ready
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Present payment sheet
+      // Present payment sheet with enhanced error handling
       console.log('Presenting payment sheet...');
-      let paymentResult;
       try {
         const result = await Stripe.presentPaymentSheet();
-        paymentResult = result.paymentResult;
-        console.log('Payment result:', paymentResult);
-      } catch (presentError) {
+        console.log('Payment sheet presentation result:', result);
+        
+        if (result && result.paymentResult) {
+          console.log('Payment result received:', result.paymentResult);
+          
+          // Handle different payment results
+          if (result.paymentResult === 'paymentSheetFailed') {
+            console.error('Payment sheet failed to present properly');
+            toast.error('Payment failed. Please try again.');
+            return;
+          }
+          
+          // Check for successful payment using correct enum values
+          if (result.paymentResult === PaymentSheetEventsEnum.Completed) {
+            toast.success('Payment completed successfully!');
+            await checkSubscription();
+            onClose();
+            return;
+          }
+          
+          // Handle cancellation
+          toast.info('Payment was cancelled');
+        } else {
+          console.log('No payment result received');
+          toast.info('Payment process ended');
+        }
+      } catch (presentError: any) {
         console.error('Error presenting payment sheet:', presentError);
-        throw presentError;
-      }
-      
-      // Handle payment result based on the actual response structure
-      if (paymentResult && typeof paymentResult === 'object') {
-        // Check if payment was successful
-        // The exact structure depends on the plugin version
-        toast.success('Payment completed! Please check your subscription status.');
-        await checkSubscription();
-        onClose();
-      } else {
-        toast.info('Payment process ended');
+        console.error('Present error details:', {
+          message: presentError.message,
+          code: presentError.code,
+          type: presentError.type,
+          error: presentError
+        });
+        toast.error('Failed to open payment sheet. Please try again.');
       }
     } catch (error: any) {
       console.error('Payment error:', error);
