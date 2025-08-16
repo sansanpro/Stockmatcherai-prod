@@ -59,7 +59,7 @@ serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://a8e2b687-48bf-4171-9dfa-1c6295dd71d3.lovableproject.com";
     
-    // Create checkout session for subscription
+    // Create embedded checkout session for subscription
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
       line_items: [
@@ -79,8 +79,8 @@ serve(async (req) => {
         },
       ],
       mode: 'subscription',
-      success_url: `${origin}/?payment=success`,
-      cancel_url: `${origin}/?payment=cancelled`,
+      ui_mode: 'embedded',
+      return_url: `${origin}/?payment=success`,
       metadata: {
         userId: user.id
       }
@@ -89,7 +89,7 @@ serve(async (req) => {
     logStep("Created checkout session", { sessionId: session.id, url: session.url });
 
     return new Response(JSON.stringify({
-      url: session.url,
+      clientSecret: session.client_secret,
       sessionId: session.id
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
