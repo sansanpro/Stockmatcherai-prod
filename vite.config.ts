@@ -22,8 +22,8 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       external: (id) => {
-        // Externalize Capacitor plugins for mobile builds
-        if (id.includes('@capacitor/')) {
+        // Only externalize specific Capacitor plugins that are dynamically imported
+        if (id === '@capacitor/browser') {
           return true;
         }
         return false;
@@ -31,6 +31,6 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    exclude: ['@capacitor/browser', '@capacitor/core']
+    exclude: ['@capacitor/browser']
   }
 }));
