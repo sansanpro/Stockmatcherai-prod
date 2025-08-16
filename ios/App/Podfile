@@ -16,6 +16,9 @@ end
 
 target 'App' do
   capacitor_pods
+  # Stripe dependencies
+  pod 'Stripe', '~> 24.15.0'
+  pod 'StripePaymentSheet', '~> 24.15.0'
 end
 
 post_install do |installer|

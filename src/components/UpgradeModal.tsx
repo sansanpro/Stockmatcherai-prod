@@ -18,14 +18,14 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleNativePayment = async () => {
-    if (!Capacitor.isNativePlatform()) {
-      toast.error('Native payments only available on iOS/Android');
-      return;
-    }
-
     setIsProcessing(true);
     try {
       toast.success('Preparing payment...');
+      
+      // Check if Stripe plugin is available
+      console.log('Stripe plugin available:', !!Stripe);
+      console.log('Capacitor platform:', Capacitor.getPlatform());
+      console.log('Stripe object:', Stripe);
       
       // Create payment intent on backend
       const { data, error } = await supabase.functions.invoke('create-payment-intent');
@@ -35,14 +35,32 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       }
 
       // Create payment sheet (plugin is already initialized via capacitor.config.ts)
-      await Stripe.createPaymentSheet({
-        paymentIntentClientSecret: data.paymentIntentClientSecret,
-        merchantDisplayName: "StockMatcher AI",
-      });
+      console.log('Creating payment sheet with secret:', data.paymentIntentClientSecret.substring(0, 20) + '...');
+      try {
+        await Stripe.createPaymentSheet({
+          paymentIntentClientSecret: data.paymentIntentClientSecret,
+          merchantDisplayName: "StockMatcher AI"
+        });
+        console.log('Payment sheet created successfully');
+      } catch (createError) {
+        console.error('Error creating payment sheet:', createError);
+        throw createError;
+      }
+      
+      // Add a longer delay to ensure the sheet is ready
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Present payment sheet
-      const { paymentResult } = await Stripe.presentPaymentSheet();
-      console.log('Payment result:', paymentResult);
+      console.log('Presenting payment sheet...');
+      let paymentResult;
+      try {
+        const result = await Stripe.presentPaymentSheet();
+        paymentResult = result.paymentResult;
+        console.log('Payment result:', paymentResult);
+      } catch (presentError) {
+        console.error('Error presenting payment sheet:', presentError);
+        throw presentError;
+      }
       
       // Handle payment result based on the actual response structure
       if (paymentResult && typeof paymentResult === 'object') {
