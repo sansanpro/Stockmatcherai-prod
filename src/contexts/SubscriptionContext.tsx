@@ -135,7 +135,7 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
 
     try {
       setLoading(true);
-      const { data, error } = await supabase.functions.invoke('create-checkout');
+      const { data, error } = await supabase.functions.invoke('create-checkout-session');
       
       if (error) {
         toast.error('Failed to start checkout process');
@@ -143,9 +143,9 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
         return null;
       }
 
-      if (data?.url && data?.sessionId) {
+      if (data?.clientSecret && data?.sessionId) {
         return {
-          url: data.url,
+          url: data.clientSecret, // Return clientSecret as url for compatibility  
           sessionId: data.sessionId
         };
       }
