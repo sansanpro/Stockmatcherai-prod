@@ -34,16 +34,32 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
         throw new Error(error.message || 'Failed to create payment intent');
       }
 
-      // Create payment sheet (plugin is already initialized via capacitor.config.ts)
+      // Validate required response data
+      if (!data.paymentIntentClientSecret || !data.customerId || !data.customerEphemeralKeySecret || !data.publishableKey) {
+        throw new Error('Missing required payment data from backend');
+      }
+
+      // Create payment sheet with all required parameters for iOS
       console.log('Creating payment sheet with secret:', data.paymentIntentClientSecret.substring(0, 20) + '...');
+      console.log('Customer ID:', data.customerId);
+      console.log('Publishable key:', data.publishableKey.substring(0, 20) + '...');
+      
       try {
         await Stripe.createPaymentSheet({
           paymentIntentClientSecret: data.paymentIntentClientSecret,
+          customerId: data.customerId,
+          customerEphemeralKeySecret: data.customerEphemeralKeySecret,
           merchantDisplayName: "StockMatcher AI"
         });
-        console.log('Payment sheet created successfully');
+        console.log('Payment sheet created successfully with all parameters');
       } catch (createError) {
         console.error('Error creating payment sheet:', createError);
+        console.error('Payment sheet creation failed with data:', {
+          hasSecret: !!data.paymentIntentClientSecret,
+          hasCustomerId: !!data.customerId,
+          hasEphemeralKey: !!data.customerEphemeralKeySecret,
+          hasPublishableKey: !!data.publishableKey
+        });
         throw createError;
       }
       

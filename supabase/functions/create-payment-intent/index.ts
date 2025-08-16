@@ -64,24 +64,23 @@ serve(async (req) => {
     );
     logStep("Created ephemeral key");
 
-    // Create payment intent for subscription
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: 999, // $9.99 in cents
-      currency: 'usd',
+    // Create setup intent for subscription (better for mobile subscriptions)
+    const setupIntent = await stripe.setupIntents.create({
       customer: customer.id,
-      setup_future_usage: 'off_session',
+      usage: 'off_session',
+      payment_method_types: ['card'],
       metadata: {
         userId: user.id,
         type: 'subscription'
       }
     });
-    logStep("Created payment intent", { paymentIntentId: paymentIntent.id });
+    logStep("Created setup intent", { setupIntentId: setupIntent.id });
 
     return new Response(JSON.stringify({
-      paymentIntentClientSecret: paymentIntent.client_secret,
+      paymentIntentClientSecret: setupIntent.client_secret,
       customerId: customer.id,
       customerEphemeralKeySecret: ephemeralKey.secret,
-      publishableKey: "pk_test_51QO6gPBNJFhPr3hn9x5SPJbhYnqjI2r3sA9LV6F6iUAUm3vqzNjX91lOJzQCOQ2Gt6vyILRk2NjnhBqP5oMX7EjF00eaWaJf7T"
+      publishableKey: "pk_test_51Q8l4wKVN448QAiBDGLmjLTQAQY5DFzNGTbNxrhIJYQWgSj8VDUHBKNfr5qS6CZmS5cUIvR3fKkzWFvjhqfhSlxK00cEpPOOIe"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
