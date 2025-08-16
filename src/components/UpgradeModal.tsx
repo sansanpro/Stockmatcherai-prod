@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Crown, Check, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
-import { Stripe, PaymentSheetEventsEnum } from '@capacitor-community/stripe';
-import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UpgradeModalProps {
@@ -17,142 +16,44 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const { checkSubscription } = useSubscription();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleNativePayment = async () => {
+  const handlePayment = async () => {
     setIsProcessing(true);
+    console.log('Starting checkout session...');
+
     try {
-      toast.success('Preparing payment...');
-      
-      // Check if Stripe plugin is available
-      console.log('Stripe plugin available:', !!Stripe);
-      console.log('Capacitor platform:', Capacitor.getPlatform());
-      console.log('Stripe object:', Stripe);
-      
-      // Create payment intent on backend
-      const { data, error } = await supabase.functions.invoke('create-payment-intent');
-      
-      if (error) {
-        throw new Error(error.message || 'Failed to create payment intent');
-      }
-
-      // Validate required response data
-      if (!data.paymentIntentClientSecret || !data.customerId || !data.customerEphemeralKeySecret || !data.publishableKey) {
-        console.error('Missing payment data:', {
-          hasSecret: !!data.paymentIntentClientSecret,
-          hasCustomerId: !!data.customerId,
-          hasEphemeralKey: !!data.customerEphemeralKeySecret,
-          hasPublishableKey: !!data.publishableKey
-        });
-        throw new Error('Missing required payment data from backend');
-      }
-
-      // Initialize Stripe plugin explicitly with detailed logging
-      console.log('Initializing Stripe plugin...');
-      try {
-        await Stripe.initialize({
-          publishableKey: data.publishableKey,
-        });
-        console.log('Stripe plugin initialized successfully');
-      } catch (initError) {
-        console.error('Failed to initialize Stripe plugin:', initError);
-        throw new Error('Failed to initialize payment system');
-      }
-
-      // Create payment sheet with PaymentIntent (more compatible than SetupIntent)
-      console.log('Creating payment sheet with payment intent secret:', data.paymentIntentClientSecret.substring(0, 20) + '...');
-      console.log('Full payment data:', {
-        hasSecret: !!data.paymentIntentClientSecret,
-        hasCustomerId: !!data.customerId,
-        hasEphemeralKey: !!data.customerEphemeralKeySecret,
-        secretLength: data.paymentIntentClientSecret?.length,
-        customerIdLength: data.customerId?.length
+      // Create checkout session
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        headers: {
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        }
       });
-      
-      try {
-        const paymentSheetConfig = {
-          paymentIntentClientSecret: data.paymentIntentClientSecret,
-          customerId: data.customerId,
-          customerEphemeralKeySecret: data.customerEphemeralKeySecret,
-          merchantDisplayName: "StockMatcher AI"
-        };
-        
-        console.log('Creating payment sheet with config:', {
-          hasSecret: !!paymentSheetConfig.paymentIntentClientSecret,
-          secretPrefix: paymentSheetConfig.paymentIntentClientSecret?.substring(0, 7),
-          hasCustomerId: !!paymentSheetConfig.customerId,
-          hasEphemeralKey: !!paymentSheetConfig.customerEphemeralKeySecret,
-          merchantName: paymentSheetConfig.merchantDisplayName
-        });
-        
-        await Stripe.createPaymentSheet(paymentSheetConfig);
-        console.log('Payment sheet created successfully with PaymentIntent');
-      } catch (createError: any) {
-        console.error('Error creating payment sheet:', createError);
-        console.error('Full error details:', {
-          message: createError.message,
-          code: createError.code,
-          type: createError.type,
-          localizedDescription: createError.localizedDescription,
-          error: createError
-        });
-        
-        // Try simpler configuration without customer parameters
-        console.log('Retrying with simplified payment sheet configuration...');
-        try {
-          await Stripe.createPaymentSheet({
-            paymentIntentClientSecret: data.paymentIntentClientSecret,
-            merchantDisplayName: "StockMatcher AI"
-          });
-          console.log('Payment sheet created successfully with simplified config');
-        } catch (retryError: any) {
-          console.error('Simplified config also failed:', retryError);
-          throw new Error(`Payment sheet creation failed: ${retryError.message || retryError}`);
-        }
+
+      if (error) {
+        console.error('Error creating checkout session:', error);
+        throw error;
       }
-      
-      // Present payment sheet with enhanced error handling
-      console.log('Presenting payment sheet...');
-      try {
-        const result = await Stripe.presentPaymentSheet();
-        console.log('Payment sheet presentation result:', result);
-        
-        if (result && result.paymentResult) {
-          console.log('Payment result received:', result.paymentResult);
-          
-          // Handle different payment results
-          if (result.paymentResult === 'paymentSheetFailed') {
-            console.error('Payment sheet failed to present properly');
-            toast.error('Payment failed. Please try again.');
-            return;
-          }
-          
-          // Check for successful payment using correct enum values
-          if (result.paymentResult === PaymentSheetEventsEnum.Completed) {
-            toast.success('Payment completed successfully!');
-            await checkSubscription();
-            onClose();
-            return;
-          }
-          
-          // Handle cancellation
-          toast.info('Payment was cancelled');
-        } else {
-          console.log('No payment result received');
-          toast.info('Payment process ended');
-        }
-      } catch (presentError: any) {
-        console.error('Error presenting payment sheet:', presentError);
-        console.error('Present error details:', {
-          message: presentError.message,
-          code: presentError.code,
-          type: presentError.type,
-          error: presentError
-        });
-        toast.error('Failed to open payment sheet. Please try again.');
+
+      if (!data?.url) {
+        throw new Error('No checkout URL received');
       }
+
+      console.log('Opening checkout in browser:', data.url);
+      
+      // Open checkout in in-app browser
+      await Browser.open({
+        url: data.url,
+        windowName: '_self',
+        toolbarColor: '#000000',
+        presentationStyle: 'popover'
+      });
+
+      // Close the modal since user is going to checkout
+      onClose();
+      
     } catch (error: any) {
-      console.error('Payment error:', error);
-      toast.error(error.message || 'Payment failed');
-    } finally {
+      console.error('Checkout error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error(`Checkout failed: ${errorMessage}`);
       setIsProcessing(false);
     }
   };
@@ -222,14 +123,14 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
 
             <div className="space-y-3">
               <Button 
-                onClick={handleNativePayment}
+                onClick={handlePayment}
                 disabled={isProcessing}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
               >
                 {isProcessing ? (
                   <>
                     <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
-                    Processing...
+                    Opening checkout...
                   </>
                 ) : (
                   <>
