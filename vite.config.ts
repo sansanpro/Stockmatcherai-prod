@@ -28,6 +28,10 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    include: ['@stripe/stripe-js', '@stripe/react-stripe-js']
+    include: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
+    force: true
+  },
+  ssr: {
+    noExternal: ['@stripe/stripe-js', '@stripe/react-stripe-js']
   }
 }));
