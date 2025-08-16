@@ -130,20 +130,43 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Extract unique tickers
+    // Extract unique tickers and limit for wall-clock time constraints
     const uniqueTickers = [...new Set(allStaleStocks.map(stock => stock.ticker))];
     console.log(`📈 Unique tickers to update: ${uniqueTickers.length}`, uniqueTickers.slice(0, 10));
 
-    // Batch update process
+    // Calculate time constraints (leave 30 seconds buffer for processing)
+    const startTime = Date.now();
+    const maxProcessingTime = 120 * 1000; // 120 seconds, leaving 30s buffer
+    
+    // Prioritize oldest stocks first
+    const sortedTickers = uniqueTickers.sort((a, b) => {
+      const aOldest = Math.min(...allStaleStocks.filter(s => s.ticker === a).map(s => new Date(s.updated_at).getTime()));
+      const bOldest = Math.min(...allStaleStocks.filter(s => s.ticker === b).map(s => new Date(s.updated_at).getTime()));
+      return aOldest - bOldest;
+    });
+
+    // Optimize for free plan: process more tickers in less time
     let successCount = 0;
     let failCount = 0;
-    const batchSize = 5; // Process in smaller batches to avoid overwhelming the API
+    const batchSize = 10; // Larger batches for parallel processing
+    let processedCount = 0;
 
-    for (let i = 0; i < uniqueTickers.length; i += batchSize) {
-      const batchTickers = uniqueTickers.slice(i, i + batchSize);
-      console.log(`🔄 Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(uniqueTickers.length / batchSize)}: ${batchTickers.join(', ')}`);
+    console.log(`⚡ Optimized for free plan - targeting ${Math.min(50, sortedTickers.length)} most critical stocks`);
 
-      for (const ticker of batchTickers) {
+    for (let i = 0; i < sortedTickers.length && processedCount < 50; i += batchSize) {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - startTime;
+      
+      if (elapsedTime > maxProcessingTime) {
+        console.log(`⏰ Approaching time limit (${elapsedTime}ms), stopping processing`);
+        break;
+      }
+
+      const batchTickers = sortedTickers.slice(i, i + batchSize);
+      console.log(`🔄 Processing batch ${Math.floor(i / batchSize) + 1}: ${batchTickers.join(', ')}`);
+
+      // Process batch in parallel to save time
+      const batchPromises = batchTickers.map(async (ticker) => {
         try {
           console.log(`📊 Fetching data for ${ticker}...`);
           
@@ -152,8 +175,7 @@ Deno.serve(async (req) => {
           
           if (!quote) {
             console.log(`⚠️ No quote data received for ${ticker}`);
-            failCount++;
-            continue;
+            return { ticker, success: false, error: 'No data' };
           }
 
           // Parse quote data
@@ -162,14 +184,15 @@ Deno.serve(async (req) => {
           
           if (currentPrice <= 0) {
             console.log(`⚠️ Invalid price data for ${ticker}: ${currentPrice}`);
-            failCount++;
-            continue;
+            return { ticker, success: false, error: 'Invalid price' };
           }
 
           console.log(`💰 ${ticker}: $${currentPrice} (${changePercent > 0 ? '+' : ''}${changePercent}%)`);
 
           // Update all instances of this ticker across all tables
           const stocksToUpdate = allStaleStocks.filter(stock => stock.ticker === ticker);
+          let updateCount = 0;
+          let updateErrors = 0;
           
           for (const stock of stocksToUpdate) {
             try {
@@ -184,31 +207,45 @@ Deno.serve(async (req) => {
 
               if (updateError) {
                 console.error(`❌ Error updating ${ticker} in ${stock.table}:`, updateError);
-                failCount++;
+                updateErrors++;
               } else {
                 console.log(`✅ Updated ${ticker} in ${stock.table}`);
-                successCount++;
+                updateCount++;
               }
             } catch (updateErr) {
               console.error(`❌ Exception updating ${ticker} in ${stock.table}:`, updateErr);
-              failCount++;
+              updateErrors++;
             }
           }
 
-          // Rate limiting - wait 2 seconds between API calls
-          console.log('⏳ Waiting 2 seconds before next API call...');
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          return { ticker, success: updateCount > 0, updateCount, updateErrors };
 
         } catch (error) {
           console.error(`❌ Error processing ${ticker}:`, error);
+          return { ticker, success: false, error: error.message };
+        }
+      });
+
+      // Wait for batch to complete
+      const batchResults = await Promise.all(batchPromises);
+      
+      // Process results
+      batchResults.forEach(result => {
+        if (result.success) {
+          successCount += result.updateCount || 1;
+        } else {
           failCount++;
         }
-      }
+        processedCount++;
+      });
 
-      // Longer pause between batches
-      if (i + batchSize < uniqueTickers.length) {
-        console.log('⏳ Waiting 5 seconds before next batch...');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+      // Minimal delay between batches (reduced from 5s to 1s)
+      if (i + batchSize < sortedTickers.length && processedCount < 50) {
+        const remainingTime = maxProcessingTime - (Date.now() - startTime);
+        if (remainingTime > 10000) { // Only wait if we have time
+          console.log('⏳ Brief pause before next batch...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
     }
 
