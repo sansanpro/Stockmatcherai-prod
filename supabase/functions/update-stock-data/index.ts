@@ -138,12 +138,27 @@ Deno.serve(async (req) => {
     const startTime = Date.now();
     const maxProcessingTime = 120 * 1000; // 120 seconds, leaving 30s buffer
     
-    // Prioritize oldest stocks first
-    const sortedTickers = uniqueTickers.sort((a, b) => {
-      const aOldest = Math.min(...allStaleStocks.filter(s => s.ticker === a).map(s => new Date(s.updated_at).getTime()));
-      const bOldest = Math.min(...allStaleStocks.filter(s => s.ticker === b).map(s => new Date(s.updated_at).getTime()));
-      return aOldest - bOldest;
+    // Ensure balanced sector representation by grouping by sector and taking oldest from each
+    const tickersBySector = sectorTables.reduce((acc, table) => {
+      const sectorStocks = allStaleStocks.filter(s => s.table === table);
+      const sectorTickers = [...new Set(sectorStocks.map(s => s.ticker))];
+      acc[table] = sectorTickers.sort((a, b) => {
+        const aOldest = Math.min(...sectorStocks.filter(s => s.ticker === a).map(s => new Date(s.updated_at).getTime()));
+        const bOldest = Math.min(...sectorStocks.filter(s => s.ticker === b).map(s => new Date(s.updated_at).getTime()));
+        return aOldest - bOldest;
+      });
+      return acc;
+    }, {} as Record<string, string[]>);
+
+    // Create balanced selection: take ~8 from each sector to ensure all sectors get updates
+    const tickersPerSector = Math.floor(50 / sectorTables.length);
+    const sortedTickers: string[] = [];
+    sectorTables.forEach(table => {
+      const sectorTickers = tickersBySector[table] || [];
+      sortedTickers.push(...sectorTickers.slice(0, tickersPerSector + 2)); // +2 for rounding
     });
+    
+    console.log(`⚖️ Balanced sector selection - ${sortedTickers.length} tickers distributed across all sectors`);
 
     // Optimize for free plan: process more tickers in less time
     let successCount = 0;
