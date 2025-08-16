@@ -31,7 +31,23 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log('🚀 Stock data update function started');
+    // Parse request body to get parameters from cron jobs
+    let requestBody: any = {};
+    try {
+      if (req.method === 'POST') {
+        const text = await req.text();
+        if (text) {
+          requestBody = JSON.parse(text);
+        }
+      }
+    } catch (e) {
+      console.log('📝 No request body or invalid JSON, proceeding with default parameters');
+    }
+
+    const updateType = requestBody.updateType || 'default';
+    const source = requestBody.source || 'manual';
+    
+    console.log(`🚀 Stock data update function started - Type: ${updateType}, Source: ${source}`);
     
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
