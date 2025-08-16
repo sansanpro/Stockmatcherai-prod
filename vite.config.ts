@@ -22,9 +22,12 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       external: (id) => {
-        // Don't externalize any Capacitor modules - they need to be bundled
+        // Don't externalize any modules - they need to be bundled
         return false;
       },
     },
   },
+  optimizeDeps: {
+    include: ['@stripe/stripe-js', '@stripe/react-stripe-js']
+  }
 }));
