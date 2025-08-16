@@ -19,5 +19,18 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-
+  build: {
+    rollupOptions: {
+      external: (id) => {
+        // Externalize Capacitor plugins for mobile builds
+        if (id.includes('@capacitor/')) {
+          return true;
+        }
+        return false;
+      },
+    },
+  },
+  optimizeDeps: {
+    exclude: ['@capacitor/browser', '@capacitor/core']
+  }
 }));

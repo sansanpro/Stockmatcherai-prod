@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Crown, Check, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
-import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UpgradeModalProps {
@@ -39,13 +39,20 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
 
       console.log('Opening checkout in browser:', data.url);
       
-      // Open checkout in in-app browser
-      await Browser.open({
-        url: data.url,
-        windowName: '_self',
-        toolbarColor: '#000000',
-        presentationStyle: 'popover'
-      });
+      // Check if we're on a mobile platform
+      if (Capacitor.isNativePlatform()) {
+        // Use dynamic import for Capacitor Browser on mobile
+        const { Browser } = await import('@capacitor/browser');
+        await Browser.open({
+          url: data.url,
+          windowName: '_self',
+          toolbarColor: '#000000',
+          presentationStyle: 'popover'
+        });
+      } else {
+        // Use window.open for web
+        window.open(data.url, '_blank');
+      }
 
       // Close the modal since user is going to checkout
       onClose();
