@@ -27,15 +27,14 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          'stripe': ['@stripe/stripe-js', '@stripe/react-stripe-js']
+          'stripe': ['@stripe/stripe-js']
         }
       }
     },
   },
   optimizeDeps: {
     include: [
-      '@stripe/stripe-js', 
-      '@stripe/react-stripe-js'
+      '@stripe/stripe-js'
     ],
     esbuildOptions: {
       target: 'es2020'
