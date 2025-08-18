@@ -26,7 +26,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
-  const { canSwipe, incrementSwipeCount, upgradeToPremi, dailySwipesUsed, dailySwipeLimit } = useSubscription();
+  const { canSwipe, incrementSwipeCount, dailySwipesUsed, dailySwipeLimit } = useSubscription();
 
   // Pre-load all recommendations once
   useEffect(() => {

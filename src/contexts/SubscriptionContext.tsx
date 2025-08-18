@@ -13,7 +13,6 @@ interface SubscriptionContextType {
   loading: boolean;
   checkSubscription: () => Promise<void>;
   incrementSwipeCount: () => Promise<void>;
-  upgradeToPremi: () => Promise<{url: string, sessionId: string} | null>;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -127,38 +126,6 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
     }
   };
 
-  const upgradeToPremi = async () => {
-    if (!user) {
-      toast.error('Please sign in to upgrade');
-      return null;
-    }
-
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.functions.invoke('create-checkout-session');
-      
-      if (error) {
-        toast.error('Failed to start checkout process');
-        console.error('Checkout error:', error);
-        return null;
-      }
-
-      if (data?.clientSecret && data?.sessionId) {
-        return {
-          url: data.clientSecret, // Return clientSecret as url for compatibility  
-          sessionId: data.sessionId
-        };
-      }
-      
-      return null;
-    } catch (error) {
-      toast.error('An error occurred while processing your request');
-      console.error('Error creating checkout:', error);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     if (user) {
@@ -182,8 +149,7 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
       canSwipe,
       loading,
       checkSubscription,
-      incrementSwipeCount,
-      upgradeToPremi
+      incrementSwipeCount
     }}>
       {children}
     </SubscriptionContext.Provider>

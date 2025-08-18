@@ -21,17 +21,12 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     rollupOptions: {
-      external: (id) => {
-        // Don't externalize any modules - they need to be bundled
-        return false;
-      },
+      external: [],
     },
   },
   optimizeDeps: {
     include: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
-    force: true
-  },
-  ssr: {
-    noExternal: ['@stripe/stripe-js', '@stripe/react-stripe-js']
+    force: true,
+    exclude: []
   }
 }));
