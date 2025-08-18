@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Crown, Check, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,37 +15,94 @@ interface UpgradeModalProps {
 
 const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const { checkSubscription } = useSubscription();
+  const { user, session } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const handlePayment = async () => {
     setIsProcessing(true);
-    console.log('Starting embedded checkout session...');
-
+    console.log('🚀 Starting checkout process...');
+    
     try {
-      // Create embedded checkout session
+      // Step 1: Validate authentication
+      console.log('🔐 Checking authentication state:', {
+        hasUser: !!user,
+        hasSession: !!session,
+        userEmail: user?.email,
+        sessionValid: !!session?.access_token
+      });
+
+      if (!user || !session) {
+        throw new Error('You must be logged in to upgrade. Please sign in and try again.');
+      }
+
+      if (!session.access_token) {
+        console.log('🔄 No access token in current session, refreshing session...');
+        const { data: refreshedSession, error: refreshError } = await supabase.auth.getSession();
+        
+        if (refreshError || !refreshedSession.session?.access_token) {
+          throw new Error('Authentication session expired. Please sign in again.');
+        }
+        
+        console.log('✅ Session refreshed successfully');
+      }
+
+      // Step 2: Prepare request
+      const accessToken = session.access_token;
+      console.log('📡 Preparing checkout session request with token:', accessToken.substring(0, 20) + '...');
+
+      // Step 3: Call edge function
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
         }
       });
 
+      console.log('📦 Edge function response:', {
+        hasData: !!data,
+        hasError: !!error,
+        dataKeys: data ? Object.keys(data) : [],
+        errorDetails: error
+      });
+
       if (error) {
-        console.error('Error creating checkout session:', error);
-        throw error;
+        console.error('❌ Edge function error:', error);
+        throw new Error(`Checkout service error: ${error.message || JSON.stringify(error)}`);
       }
 
-      if (!data?.clientSecret) {
-        throw new Error('No client secret received');
+      if (!data) {
+        throw new Error('No response received from checkout service');
       }
 
-      console.log('Received client secret for embedded checkout');
+      if (!data.clientSecret) {
+        console.error('❌ Missing client secret in response:', data);
+        throw new Error('Invalid checkout response - missing client secret');
+      }
+
+      console.log('✅ Received client secret for embedded checkout');
       setClientSecret(data.clientSecret);
       
     } catch (error: any) {
-      console.error('Checkout error:', error);
-      const errorMessage = error?.message || error?.toString() || 'Failed to create checkout';
-      toast.error(`Checkout failed: ${errorMessage}`);
+      console.error('💥 Checkout error:', {
+        message: error?.message,
+        stack: error?.stack,
+        fullError: error
+      });
+      
+      let userMessage = 'Failed to start checkout process';
+      
+      if (error?.message?.includes('logged in')) {
+        userMessage = error.message;
+      } else if (error?.message?.includes('session expired')) {
+        userMessage = error.message;
+      } else if (error?.message?.includes('client secret')) {
+        userMessage = 'Checkout configuration error. Please try again or contact support.';
+      } else if (error?.message) {
+        userMessage = `Checkout failed: ${error.message}`;
+      }
+      
+      toast.error(userMessage);
       setIsProcessing(false);
     }
   };
