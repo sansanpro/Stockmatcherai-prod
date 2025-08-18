@@ -20,13 +20,28 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true
+    },
     rollupOptions: {
-      external: [],
+      output: {
+        manualChunks: {
+          'stripe': ['@stripe/stripe-js', '@stripe/react-stripe-js']
+        }
+      }
     },
   },
   optimizeDeps: {
-    include: ['@stripe/stripe-js', '@stripe/react-stripe-js'],
-    force: true,
-    exclude: []
+    include: [
+      '@stripe/stripe-js', 
+      '@stripe/react-stripe-js'
+    ],
+    esbuildOptions: {
+      target: 'es2020'
+    }
+  },
+  define: {
+    global: 'globalThis',
   }
 }));
