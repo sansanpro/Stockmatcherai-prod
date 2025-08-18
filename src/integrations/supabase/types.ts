@@ -7,13 +7,55 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
   public: {
     Tables: {
+      ai_recommendations: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          diversification_score: number | null
+          id: string
+          model_version: string
+          processing_time_ms: number | null
+          recommendations: Json
+          session_id: string
+          updated_at: string
+          user_id: string
+          user_profile: Json
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          diversification_score?: number | null
+          id?: string
+          model_version?: string
+          processing_time_ms?: number | null
+          recommendations: Json
+          session_id?: string
+          updated_at?: string
+          user_id: string
+          user_profile: Json
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          diversification_score?: number | null
+          id?: string
+          model_version?: string
+          processing_time_ms?: number | null
+          recommendations?: Json
+          session_id?: string
+          updated_at?: string
+          user_id?: string
+          user_profile?: Json
+        }
+        Relationships: []
+      }
       consumer_stocks: {
         Row: {
           ceo_highlights: string
@@ -284,6 +326,45 @@ export type Database = {
         }
         Relationships: []
       }
+      recommendation_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          matches_count: number | null
+          passes_count: number | null
+          recommendations_shown: number | null
+          session_duration_seconds: number | null
+          session_type: string
+          user_id: string
+          user_satisfaction_score: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          matches_count?: number | null
+          passes_count?: number | null
+          recommendations_shown?: number | null
+          session_duration_seconds?: number | null
+          session_type: string
+          user_id: string
+          user_satisfaction_score?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          matches_count?: number | null
+          passes_count?: number | null
+          recommendations_shown?: number | null
+          session_duration_seconds?: number | null
+          session_type?: string
+          user_id?: string
+          user_satisfaction_score?: number | null
+        }
+        Relationships: []
+      }
       stock_update_logs: {
         Row: {
           api_calls_used: number | null
@@ -416,6 +497,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_feedback: {
+        Row: {
+          created_at: string
+          feedback_reason: string | null
+          feedback_type: string
+          id: string
+          is_ai_recommendation: boolean
+          recommendation_id: string | null
+          stock_ticker: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback_reason?: string | null
+          feedback_type: string
+          id?: string
+          is_ai_recommendation?: boolean
+          recommendation_id?: string | null
+          stock_ticker: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback_reason?: string | null
+          feedback_type?: string
+          id?: string
+          is_ai_recommendation?: boolean
+          recommendation_id?: string | null
+          stock_ticker?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_feedback_recommendation_id_fkey"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_recommendations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_matches: {
         Row: {
           company_name: string
@@ -452,11 +574,14 @@ export type Database = {
       user_profiles: {
         Row: {
           age_range: string | null
+          ai_learned_preferences: Json | null
+          behavior_patterns: Json | null
           created_at: string
           id: string
           income_level: string | null
           investment_experience: string | null
           investment_goals: string[] | null
+          last_ai_analysis: string | null
           risk_tolerance: string | null
           sectors_of_interest: string[] | null
           time_horizon: string | null
@@ -465,11 +590,14 @@ export type Database = {
         }
         Insert: {
           age_range?: string | null
+          ai_learned_preferences?: Json | null
+          behavior_patterns?: Json | null
           created_at?: string
           id?: string
           income_level?: string | null
           investment_experience?: string | null
           investment_goals?: string[] | null
+          last_ai_analysis?: string | null
           risk_tolerance?: string | null
           sectors_of_interest?: string[] | null
           time_horizon?: string | null
@@ -478,11 +606,14 @@ export type Database = {
         }
         Update: {
           age_range?: string | null
+          ai_learned_preferences?: Json | null
+          behavior_patterns?: Json | null
           created_at?: string
           id?: string
           income_level?: string | null
           investment_experience?: string | null
           investment_goals?: string[] | null
+          last_ai_analysis?: string | null
           risk_tolerance?: string | null
           sectors_of_interest?: string[] | null
           time_horizon?: string | null
