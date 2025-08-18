@@ -13,6 +13,7 @@ interface StripeCheckoutProps {
 
 const StripeCheckout = ({ clientSecret, onComplete }: StripeCheckoutProps) => {
   const checkoutRef = useRef<HTMLDivElement>(null);
+  const checkoutInstanceRef = useRef<any>(null);
   const { checkSubscription } = useSubscription();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,6 +21,14 @@ const StripeCheckout = ({ clientSecret, onComplete }: StripeCheckoutProps) => {
     const initializeCheckout = async () => {
       try {
         console.log('🔧 Initializing Stripe embedded checkout...');
+        
+        // Destroy any existing checkout instance
+        if (checkoutInstanceRef.current) {
+          console.log('🧹 Destroying previous checkout instance...');
+          checkoutInstanceRef.current.destroy();
+          checkoutInstanceRef.current = null;
+        }
+        
         const stripe = await stripePromise;
         if (!stripe || !checkoutRef.current) {
           console.error('❌ Stripe or checkout ref not available');
@@ -58,6 +67,9 @@ const StripeCheckout = ({ clientSecret, onComplete }: StripeCheckoutProps) => {
           }
         });
 
+        // Store the checkout instance for cleanup
+        checkoutInstanceRef.current = checkout;
+
         console.log('📦 Mounting checkout to DOM...');
         checkout.mount(checkoutRef.current);
         setIsLoading(false);
@@ -71,6 +83,15 @@ const StripeCheckout = ({ clientSecret, onComplete }: StripeCheckoutProps) => {
     };
 
     initializeCheckout();
+    
+    // Cleanup function to destroy checkout instance when component unmounts
+    return () => {
+      if (checkoutInstanceRef.current) {
+        console.log('🧹 Cleaning up checkout instance on unmount...');
+        checkoutInstanceRef.current.destroy();
+        checkoutInstanceRef.current = null;
+      }
+    };
   }, [clientSecret, checkSubscription, onComplete]);
 
   return (
