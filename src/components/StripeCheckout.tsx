@@ -3,6 +3,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import './StripeCheckout.css';
 
 const stripePromise = loadStripe('pk_test_51QWQmbP8fWHxbLTpXgcT9fRAcRO6Xrwpj7dIc0j2UaKnwqr1DbgP5gG9bWJWm65hWO6XSLdtYWaAZKJTHpEAi8pj0004R8VEfI');
 
@@ -95,14 +96,26 @@ const StripeCheckout = ({ clientSecret, onComplete }: StripeCheckoutProps) => {
   }, [clientSecret, checkSubscription, onComplete]);
 
   return (
-    <div className="stripe-checkout">
+    <div className="stripe-checkout-container h-full w-full relative">
       {isLoading && (
-        <div className="flex items-center justify-center p-8">
-          <div className="animate-spin w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full" />
-          <span className="ml-3 text-sm text-muted-foreground">Loading checkout...</span>
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-10">
+          <div className="flex flex-col items-center gap-3">
+            <div className="animate-spin w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full" />
+            <span className="text-sm text-muted-foreground">Loading secure checkout...</span>
+          </div>
         </div>
       )}
-      <div ref={checkoutRef} />
+      <div 
+        ref={checkoutRef} 
+        className="stripe-checkout-frame h-full w-full"
+        style={{
+          minHeight: '600px',
+          contain: 'layout style paint',
+          willChange: 'transform',
+          touchAction: 'pan-y pinch-zoom',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      />
     </div>
   );
 };

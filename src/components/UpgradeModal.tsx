@@ -123,15 +123,15 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className={clientSecret ? "max-w-2xl w-full h-[80vh] p-0 overflow-hidden" : "max-w-md"}>
+        <DialogHeader className={clientSecret ? "sr-only" : ""}>
           <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Upgrade to Premium
           </DialogTitle>
         </DialogHeader>
         
           {clientSecret ? (
-            <div className="p-4">
+            <div className="w-full h-full flex flex-col">
               <StripeCheckout 
                 clientSecret={clientSecret} 
                 onComplete={handlePaymentComplete}
