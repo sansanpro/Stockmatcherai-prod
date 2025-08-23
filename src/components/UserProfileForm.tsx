@@ -24,20 +24,29 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submitted with profile:', profile);
+    console.log('User ID:', user?.id);
+    console.log('Is profile complete?', isProfileComplete(profile));
+    
     if (!user?.id) {
+      console.log('No user ID found');
       toast.error('You must be logged in to save your profile');
       return;
     }
 
     if (!isProfileComplete(profile)) {
+      console.log('Profile incomplete:', profile);
       toast.error('Please fill in all required fields');
       return;
     }
 
     setLoading(true);
+    console.log('Starting profile save process...');
     
     try {
+      console.log('Calling saveUserProfile with:', profile, user.id);
       await saveUserProfile(profile as UserProfile, user.id);
+      console.log('Profile saved successfully');
       toast.success(isUpdate ? 'Profile updated successfully!' : 'Profile saved successfully!');
       onComplete(profile as UserProfile);
     } catch (error) {
