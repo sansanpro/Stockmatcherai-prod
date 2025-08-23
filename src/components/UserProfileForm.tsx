@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserProfile } from '@/types/stock-matcher';
 import { useAuth } from '@/contexts/AuthContext';
-import { saveUserProfile } from '@/utils/profileManager';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface UserProfileFormProps {
@@ -44,9 +44,36 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
     console.log('Starting profile save process...');
     
     try {
-      console.log('Calling saveUserProfile with:', profile, user.id);
-      await saveUserProfile(profile as UserProfile, user.id);
-      console.log('Profile saved successfully');
+      // Use the same saving logic as Index.tsx to avoid conflicts
+      const profileData = {
+        user_id: user.id,
+        age_range: `${profile.age}-${profile.age + 10}`,
+        investment_experience: profile.experience,
+        risk_tolerance: profile.riskTolerance,
+        sectors_of_interest: [profile.sectorPreference],
+        investment_goals: [profile.investmentGoal],
+        income_level: profile.salary.toString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('Profile data to save:', profileData);
+
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .upsert(profileData, {
+          onConflict: 'user_id'
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error saving user profile:', error);
+        toast.error('Failed to save profile. Please try again.');
+        return;
+      }
+
+      console.log('Profile saved successfully:', data);
       toast.success(isUpdate ? 'Profile updated successfully!' : 'Profile saved successfully!');
       onComplete(profile as UserProfile);
     } catch (error) {
