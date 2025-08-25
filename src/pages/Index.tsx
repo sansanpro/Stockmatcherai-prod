@@ -68,10 +68,13 @@ const IndexContent = () => {
 
         if (profileData) {
           console.log('Found existing profile, converting to UserProfile format:', profileData);
+          console.log('ISSUE IDENTIFIED: Database schema missing age and gender fields!');
+          console.log('Database fields available:', Object.keys(profileData));
+          
           // Convert database format to UserProfile format
           const profile: UserProfile = {
-            age: 25, // Default age since it's not in the database schema
-            gender: 'other', // Default gender since it's not in the database schema
+            age: 25, // DEFAULT VALUE - age not stored in database
+            gender: 'other', // DEFAULT VALUE - gender not stored in database  
             salary: parseInt(profileData.income_level?.replace(/[^\d]/g, '') || '50000'),
             experience: profileData.investment_experience || 'beginner',
             riskTolerance: profileData.risk_tolerance || 'medium',
@@ -79,7 +82,8 @@ const IndexContent = () => {
             investmentGoal: profileData.investment_goals?.[0] || 'growth'
           };
           
-          console.log('Converted profile:', profile);
+          console.log('Converted profile with DEFAULTS for age/gender:', profile);
+          console.log('WARNING: This profile will not pass validation because age/gender are defaults!');
           setUserProfile(profile);
           setCurrentStep('matching');
         } else {

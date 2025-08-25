@@ -98,7 +98,28 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
   };
 
   const isProfileComplete = (p: Partial<UserProfile>): p is UserProfile => {
-    return !!(p.age && p.gender && p.salary && p.experience && p.riskTolerance && p.sectorPreference && p.investmentGoal);
+    const fields = {
+      age: p.age,
+      gender: p.gender,
+      salary: p.salary,
+      experience: p.experience,
+      riskTolerance: p.riskTolerance,
+      sectorPreference: p.sectorPreference,
+      investmentGoal: p.investmentGoal
+    };
+    
+    console.log('Profile completeness check:', fields);
+    
+    const missingFields = Object.entries(fields)
+      .filter(([key, value]) => !value)
+      .map(([key]) => key);
+    
+    console.log('Missing fields:', missingFields);
+    
+    const isComplete = !!(p.age && p.gender && p.salary && p.experience && p.riskTolerance && p.sectorPreference && p.investmentGoal);
+    console.log('Is profile complete?', isComplete);
+    
+    return isComplete;
   };
 
   return (
@@ -231,6 +252,21 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                   <SelectItem value="short-term">Short-term gains</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Debug Info - Remove after fixing */}
+            <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm">
+              <h4 className="font-semibold mb-2">Debug Info:</h4>
+              <div className="space-y-1">
+                <div>Age: {profile.age ? '✅' : '❌'} ({profile.age})</div>
+                <div>Gender: {profile.gender ? '✅' : '❌'} ({profile.gender})</div>
+                <div>Salary: {profile.salary ? '✅' : '❌'} ({profile.salary})</div>
+                <div>Experience: {profile.experience ? '✅' : '❌'} ({profile.experience})</div>
+                <div>Risk Tolerance: {profile.riskTolerance ? '✅' : '❌'} ({profile.riskTolerance})</div>
+                <div>Sector: {profile.sectorPreference ? '✅' : '❌'} ({profile.sectorPreference})</div>
+                <div>Goal: {profile.investmentGoal ? '✅' : '❌'} ({profile.investmentGoal})</div>
+                <div className="font-semibold">Complete: {isProfileComplete(profile) ? '✅' : '❌'}</div>
+              </div>
             </div>
 
             <Button 
