@@ -175,7 +175,13 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                   value={profile.salary || ''}
                   onChange={(e) => {
                     const value = e.target.value;
-                    const numValue = value === '' ? null : parseInt(value);
+                    let numValue: number | null = null;
+                    
+                    if (value !== '') {
+                      const parsed = parseInt(value, 10);
+                      numValue = isNaN(parsed) ? null : parsed;
+                    }
+                    
                     console.log('Salary input changed:', value, '-> parsed:', numValue);
                     setProfile(prev => ({ ...prev, salary: numValue }));
                   }}
