@@ -141,7 +141,17 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                   min="18"
                   max="100"
                   value={profile.age || ''}
-                  onChange={(e) => setProfile(prev => ({ ...prev, age: parseInt(e.target.value) }))}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    let numValue: number | null = null;
+                    
+                    if (value !== '') {
+                      const parsed = parseInt(value, 10);
+                      numValue = isNaN(parsed) ? null : parsed;
+                    }
+                    
+                    setProfile(prev => ({ ...prev, age: numValue }));
+                  }}
                   placeholder="25"
                   required
                 />
