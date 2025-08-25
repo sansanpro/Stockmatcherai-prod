@@ -188,11 +188,13 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                     let numValue: number | null = null;
                     
                     if (value !== '') {
-                      const parsed = parseInt(value, 10);
+                      // Remove dollar sign, commas, and spaces for parsing
+                      const cleanedValue = value.replace(/[$,\s]/g, '');
+                      const parsed = parseInt(cleanedValue, 10);
                       numValue = isNaN(parsed) ? null : parsed;
                     }
                     
-                    console.log('Salary input changed:', value, '-> parsed:', numValue);
+                    console.log('Salary input changed:', value, '-> cleaned and parsed:', numValue);
                     setProfile(prev => ({ ...prev, salary: numValue }));
                   }}
                   placeholder="60000"
