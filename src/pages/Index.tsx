@@ -68,22 +68,20 @@ const IndexContent = () => {
 
         if (profileData) {
           console.log('Found existing profile, converting to UserProfile format:', profileData);
-          console.log('ISSUE IDENTIFIED: Database schema missing age and gender fields!');
           console.log('Database fields available:', Object.keys(profileData));
           
-          // Convert database format to UserProfile format
+          // Convert database format to UserProfile format using actual stored values
           const profile: UserProfile = {
-            age: 25, // DEFAULT VALUE - age not stored in database
-            gender: 'other', // DEFAULT VALUE - gender not stored in database  
-            salary: parseInt(profileData.income_level?.replace(/[^\d]/g, '') || '50000'),
+            age: profileData.age || (profileData.age_range ? parseInt(profileData.age_range.split('-')[0]) : 25),
+            gender: profileData.gender || 'prefer-not-to-say',
+            salary: profileData.salary || (profileData.income_level ? parseInt(profileData.income_level.replace(/[^\d]/g, '')) : null),
             experience: profileData.investment_experience || 'beginner',
             riskTolerance: profileData.risk_tolerance || 'medium',
             sectorPreference: profileData.sectors_of_interest?.[0] || 'any',
             investmentGoal: profileData.investment_goals?.[0] || 'growth'
           };
           
-          console.log('Converted profile with DEFAULTS for age/gender:', profile);
-          console.log('WARNING: This profile will not pass validation because age/gender are defaults!');
+          console.log('Converted profile from database:', profile);
           setUserProfile(profile);
           setCurrentStep('matching');
         } else {
@@ -118,12 +116,16 @@ const IndexContent = () => {
     try {
       const profileData = {
         user_id: user.id,
-        age_range: `${profile.age}-${profile.age + 10}`,
+        age: profile.age,
+        gender: profile.gender,
+        salary: profile.salary,
         investment_experience: profile.experience,
         risk_tolerance: profile.riskTolerance,
         sectors_of_interest: [profile.sectorPreference],
         investment_goals: [profile.investmentGoal],
-        income_level: profile.salary.toString(),
+        // Keep backward compatibility
+        age_range: `${profile.age}-${profile.age + 10}`,
+        income_level: profile.salary?.toString() || null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };

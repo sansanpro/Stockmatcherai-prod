@@ -573,48 +573,57 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          age: number | null
           age_range: string | null
           ai_learned_preferences: Json | null
           behavior_patterns: Json | null
           created_at: string
+          gender: string | null
           id: string
           income_level: string | null
           investment_experience: string | null
           investment_goals: string[] | null
           last_ai_analysis: string | null
           risk_tolerance: string | null
+          salary: number | null
           sectors_of_interest: string[] | null
           time_horizon: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          age?: number | null
           age_range?: string | null
           ai_learned_preferences?: Json | null
           behavior_patterns?: Json | null
           created_at?: string
+          gender?: string | null
           id?: string
           income_level?: string | null
           investment_experience?: string | null
           investment_goals?: string[] | null
           last_ai_analysis?: string | null
           risk_tolerance?: string | null
+          salary?: number | null
           sectors_of_interest?: string[] | null
           time_horizon?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          age?: number | null
           age_range?: string | null
           ai_learned_preferences?: Json | null
           behavior_patterns?: Json | null
           created_at?: string
+          gender?: string | null
           id?: string
           income_level?: string | null
           investment_experience?: string | null
           investment_goals?: string[] | null
           last_ai_analysis?: string | null
           risk_tolerance?: string | null
+          salary?: number | null
           sectors_of_interest?: string[] | null
           time_horizon?: string | null
           updated_at?: string
