@@ -111,12 +111,12 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
     console.log('Profile completeness check:', fields);
     
     const missingFields = Object.entries(fields)
-      .filter(([key, value]) => !value)
+      .filter(([key, value]) => !value && value !== 0) // Allow 0 salary
       .map(([key]) => key);
     
     console.log('Missing fields:', missingFields);
     
-    const isComplete = !!(p.age && p.gender && p.salary && p.experience && p.riskTolerance && p.sectorPreference && p.investmentGoal);
+    const isComplete = !!(p.age && p.gender && (p.salary || p.salary === 0) && p.experience && p.riskTolerance && p.sectorPreference && p.investmentGoal);
     console.log('Is profile complete?', isComplete);
     
     return isComplete;
@@ -168,15 +168,20 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
 
             <div className="space-y-2">
               <Label htmlFor="salary">Annual Salary 💰</Label>
-              <Input
-                id="salary"
-                type="number"
-                min="0"
-                value={profile.salary || ''}
-                onChange={(e) => setProfile(prev => ({ ...prev, salary: parseInt(e.target.value) }))}
-                placeholder="60000"
-                required
-              />
+                <Input
+                  id="salary"
+                  type="number"
+                  min="0"
+                  value={profile.salary || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const numValue = value === '' ? null : parseInt(value);
+                    console.log('Salary input changed:', value, '-> parsed:', numValue);
+                    setProfile(prev => ({ ...prev, salary: numValue }));
+                  }}
+                  placeholder="60000"
+                  required
+                />
             </div>
 
             <div className="space-y-2">
