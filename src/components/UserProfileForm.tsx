@@ -47,12 +47,16 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
       // Use the same saving logic as Index.tsx to avoid conflicts
       const profileData = {
         user_id: user.id,
-        age_range: `${profile.age}-${profile.age + 10}`,
+        age: profile.age,
+        gender: profile.gender,
+        salary: profile.salary,
         investment_experience: profile.experience,
         risk_tolerance: profile.riskTolerance,
         sectors_of_interest: [profile.sectorPreference],
         investment_goals: [profile.investmentGoal],
-        income_level: profile.salary.toString(),
+        // Keep backward compatibility
+        age_range: `${profile.age}-${profile.age + 10}`,
+        income_level: profile.salary?.toString() || null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
