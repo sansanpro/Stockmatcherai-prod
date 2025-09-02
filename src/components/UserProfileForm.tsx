@@ -184,8 +184,7 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
               <Label htmlFor="salary">Annual Salary 💰</Label>
                 <Input
                   id="salary"
-                  type="number"
-                  min="0"
+                  type="text"
                   value={profile.salary || ''}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -195,13 +194,15 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                       console.log('Setting salary to null (empty input)');
                       setProfile(prev => ({ ...prev, salary: null }));
                     } else {
-                      const parsed = parseFloat(value);
-                      const numValue = isNaN(parsed) ? null : parsed;
-                      console.log('Salary input changed:', value, '-> parsed:', numValue);
+                      // Remove dollar sign, commas, and spaces for parsing
+                      const cleanedValue = value.replace(/[$,\s]/g, '');
+                      const parsed = parseInt(cleanedValue, 10);
+                      const numValue = isNaN(parsed) || parsed < 0 ? null : parsed;
+                      console.log('Salary input changed:', value, '-> cleaned:', cleanedValue, '-> parsed:', numValue);
                       setProfile(prev => ({ ...prev, salary: numValue }));
                     }
                   }}
-                  placeholder="60000"
+                  placeholder="$60,000"
                   required
                 />
             </div>
