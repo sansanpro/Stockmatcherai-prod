@@ -66,10 +66,11 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    // Check for all subscription statuses that should be considered "subscribed"
+    // Get ALL subscriptions for this customer (including canceled ones to debug)
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      limit: 10, // Get more to check all statuses
+      limit: 100, // Get all subscriptions
+      // Don't filter by status - get everything
     });
     
     // Log detailed subscription information for debugging
