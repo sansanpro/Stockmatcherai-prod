@@ -189,17 +189,17 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                   value={profile.salary || ''}
                   onChange={(e) => {
                     const value = e.target.value;
-                    let numValue: number | null = null;
+                    console.log('Salary input raw value:', value);
                     
-                    if (value !== '') {
-                      // Remove dollar sign, commas, and spaces for parsing
-                      const cleanedValue = value.replace(/[$,\s]/g, '');
-                      const parsed = parseInt(cleanedValue, 10);
-                      numValue = isNaN(parsed) ? null : parsed;
+                    if (value === '') {
+                      console.log('Setting salary to null (empty input)');
+                      setProfile(prev => ({ ...prev, salary: null }));
+                    } else {
+                      const parsed = parseFloat(value);
+                      const numValue = isNaN(parsed) ? null : parsed;
+                      console.log('Salary input changed:', value, '-> parsed:', numValue);
+                      setProfile(prev => ({ ...prev, salary: numValue }));
                     }
-                    
-                    console.log('Salary input changed:', value, '-> cleaned and parsed:', numValue);
-                    setProfile(prev => ({ ...prev, salary: numValue }));
                   }}
                   placeholder="60000"
                   required
