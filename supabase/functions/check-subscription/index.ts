@@ -72,6 +72,21 @@ serve(async (req) => {
       limit: 10, // Get more to check all statuses
     });
     
+    // Log detailed subscription information for debugging
+    logStep("Raw subscription data", { 
+      customer: customerId,
+      subscriptions: subscriptions.data.map(s => ({
+        id: s.id,
+        status: s.status,
+        current_period_start: s.current_period_start,
+        current_period_end: s.current_period_end,
+        items: s.items.data.map(item => ({
+          price_id: item.price.id,
+          product_id: item.price.product
+        }))
+      }))
+    });
+    
     // Filter for active subscriptions (including trial periods)
     const activeSubscriptions = subscriptions.data.filter(sub => 
       sub.status === 'active' || 
