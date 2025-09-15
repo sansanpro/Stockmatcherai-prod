@@ -118,7 +118,7 @@ serve(async (req) => {
     
     console.log(`[AI-RECOMMEND] Calling OpenAI with ${availableStocks.slice(0, 100).length} stocks`);
 
-    // Call OpenAI GPT-4
+    // Call OpenAI GPT-4.1
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -126,7 +126,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-4.1-2025-04-14',
         messages: [
           {
             role: 'system',
@@ -221,7 +221,7 @@ serve(async (req) => {
         confidenceScore,
         diversificationScore,
         processingTimeMs: processingTime,
-        modelVersion: 'gpt-4'
+        modelVersion: 'gpt-4.1-2025-04-14'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
