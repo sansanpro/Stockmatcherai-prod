@@ -44,6 +44,16 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+    
+    // Detect Stripe environment (test vs live)
+    const isTestMode = stripeKey.startsWith('sk_test_');
+    const isLiveMode = stripeKey.startsWith('sk_live_');
+    logStep("Stripe environment detected", { 
+      isTestMode, 
+      isLiveMode, 
+      keyPrefix: stripeKey.substring(0, 8) + '...' 
+    });
+    
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
     if (customers.data.length === 0) {
@@ -76,11 +86,16 @@ serve(async (req) => {
     // Log detailed subscription information for debugging
     logStep("Raw subscription data", { 
       customer: customerId,
+      environment: isTestMode ? 'test' : (isLiveMode ? 'live' : 'unknown'),
+      totalSubscriptions: subscriptions.data.length,
       subscriptions: subscriptions.data.map(s => ({
         id: s.id,
         status: s.status,
-        current_period_start: s.current_period_start,
-        current_period_end: s.current_period_end,
+        created: new Date(s.created * 1000).toISOString(),
+        current_period_start: new Date(s.current_period_start * 1000).toISOString(),
+        current_period_end: new Date(s.current_period_end * 1000).toISOString(),
+        cancel_at_period_end: s.cancel_at_period_end,
+        canceled_at: s.canceled_at ? new Date(s.canceled_at * 1000).toISOString() : null,
         items: s.items.data.map(item => ({
           price_id: item.price.id,
           product_id: item.price.product
@@ -88,12 +103,40 @@ serve(async (req) => {
       }))
     });
     
-    // Filter for active subscriptions (including trial periods)
-    const activeSubscriptions = subscriptions.data.filter(sub => 
+    // If no subscriptions found at all, log this specifically
+    if (subscriptions.data.length === 0) {
+      logStep("CRITICAL: No subscriptions found for customer", { 
+        customerId,
+        customerEmail: user.email,
+        environment: isTestMode ? 'test' : (isLiveMode ? 'live' : 'unknown'),
+        suggestion: "Check if subscription was created in different Stripe environment"
+      });
+    }
+    
+    // Check ALL possible subscription statuses that could indicate an active subscription
+    const potentiallyActiveSubscriptions = subscriptions.data.filter(sub => 
       sub.status === 'active' || 
       sub.status === 'trialing' || 
-      sub.status === 'past_due'
+      sub.status === 'past_due' ||
+      sub.status === 'incomplete' ||
+      sub.status === 'unpaid'
     );
+    
+    // Also check for recently canceled subscriptions that might still be valid
+    const recentlyCanceledButStillValid = subscriptions.data.filter(sub => 
+      sub.status === 'canceled' && 
+      sub.current_period_end > Math.floor(Date.now() / 1000) && // Still in current period
+      !sub.cancel_at_period_end // Was not set to cancel at period end
+    );
+    
+    logStep("Subscription analysis", { 
+      total: subscriptions.data.length,
+      potentiallyActive: potentiallyActiveSubscriptions.length,
+      recentlyCanceledButValid: recentlyCanceledButStillValid.length,
+      allStatuses: subscriptions.data.map(s => ({ id: s.id, status: s.status }))
+    });
+    
+    const activeSubscriptions = [...potentiallyActiveSubscriptions, ...recentlyCanceledButStillValid];
     logStep("All subscriptions found", { 
       total: subscriptions.data.length, 
       statuses: subscriptions.data.map(s => ({ id: s.id, status: s.status }))
