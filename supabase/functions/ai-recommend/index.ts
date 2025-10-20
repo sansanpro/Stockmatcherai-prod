@@ -7,9 +7,20 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+// Logging helper functions for comprehensive monitoring
+function logInfo(message: string, data?: any) {
+  const timestamp = new Date().toISOString();
+  console.log(`[AI-RECOMMEND] [${timestamp}] ${message}`, data ? JSON.stringify(data, null, 2) : '');
+}
+
+function logError(message: string, error?: any) {
+  const timestamp = new Date().toISOString();
+  console.error(`[AI-RECOMMEND] [${timestamp}] ERROR: ${message}`, error);
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -18,8 +29,13 @@ serve(async (req) => {
   }
 
   try {
-    console.log('[AI-RECOMMEND] Function started');
+    logInfo('Function started');
     const startTime = Date.now();
+    
+    if (!geminiApiKey) {
+      logError('GEMINI_API_KEY not configured');
+      throw new Error('Gemini API key not configured');
+    }
 
     // Initialize Supabase client
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -27,6 +43,7 @@ serve(async (req) => {
     // Authenticate user
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      logError('No authorization header provided');
       throw new Error('No authorization header');
     }
 
@@ -35,10 +52,11 @@ serve(async (req) => {
     );
 
     if (authError || !user) {
+      logError('Authentication failed', authError);
       throw new Error('Authentication failed');
     }
 
-    console.log(`[AI-RECOMMEND] User authenticated: ${user.id}`);
+    logInfo(`User authenticated: ${user.id}`);
 
     // Check subscription status
     const { data: subscription } = await supabase
@@ -48,22 +66,33 @@ serve(async (req) => {
       .maybeSingle();
 
     if (!subscription?.subscribed) {
+      logInfo(`Access denied for user ${user.id} - not subscribed`);
       return new Response(
         JSON.stringify({ error: 'Premium subscription required' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`[AI-RECOMMEND] Premium user verified`);
+    logInfo(`Premium user verified: ${subscription.subscription_tier}`);
 
     // Get request body
     const { userProfile, excludedStocks = [], sessionType = 'ai' } = await req.json();
     
     if (!userProfile) {
+      logError('User profile is required but not provided');
       throw new Error('User profile is required');
     }
 
-    console.log(`[AI-RECOMMEND] Processing recommendation for profile:`, userProfile);
+    logInfo(`Processing recommendation request`, {
+      userId: user.id,
+      excludedStocksCount: excludedStocks.length,
+      sessionType,
+      profileSummary: {
+        age: userProfile.age,
+        experience: userProfile.experience,
+        riskTolerance: userProfile.riskTolerance
+      }
+    });
 
     // Fetch user's extended profile from database
     const { data: dbProfile } = await supabase
@@ -92,7 +121,10 @@ serve(async (req) => {
       }
     }
 
-    console.log(`[AI-RECOMMEND] Loaded ${allStocks.length} stocks from database`);
+    logInfo(`Stock universe loaded`, {
+      totalStocks: allStocks.length,
+      byTable: stockTables.map(t => ({ table: t, count: allStocks.filter(s => s.sector === t.replace('_stocks', '')).length }))
+    });
 
     // Filter out excluded stocks
     const availableStocks = allStocks.filter(stock => 
@@ -100,8 +132,11 @@ serve(async (req) => {
     );
 
     if (availableStocks.length === 0) {
+      logError('No stocks available after filtering', { excludedCount: excludedStocks.length });
       throw new Error('No stocks available for recommendation');
     }
+    
+    logInfo(`Stocks available for AI analysis: ${availableStocks.length}`);
 
     // Create session record
     const sessionId = crypto.randomUUID();
@@ -113,62 +148,108 @@ serve(async (req) => {
         session_type: sessionType
       });
 
-    // Prepare prompt for GPT-4
-    const prompt = createAIPrompt(userProfile, dbProfile, availableStocks.slice(0, 100));
+    // Prepare prompt for Gemini 2.5
+    const stocksToAnalyze = availableStocks.slice(0, 100);
+    const prompt = createAIPrompt(userProfile, dbProfile, stocksToAnalyze);
     
-    console.log(`[AI-RECOMMEND] Calling OpenAI with ${availableStocks.slice(0, 100).length} stocks`);
-
-    // Call OpenAI GPT-4o-mini (free tier compatible)
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert financial advisor AI that analyzes user profiles and recommends personalized stock portfolios. Always return valid JSON responses with exactly the requested format.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: 2000,
-        temperature: 0.7
-      }),
+    logInfo(`Calling Gemini API`, {
+      model: 'gemini-2.5-flash-latest',
+      stockCount: stocksToAnalyze.length,
+      promptLength: prompt.length
     });
 
+    const geminiStartTime = Date.now();
+
+    // Call Google Gemini 2.5 API
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-latest:generateContent?key=${geminiApiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `You are an expert financial advisor AI that analyzes user profiles and recommends personalized stock portfolios. Always return valid JSON responses with exactly the requested format.\n\n${prompt}`
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2000,
+            responseMimeType: 'application/json'
+          }
+        }),
+      }
+    );
+
+    const geminiLatency = Date.now() - geminiStartTime;
+    
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      const errorText = await response.text();
+      logError(`Gemini API error: ${response.status}`, {
+        status: response.status,
+        statusText: response.statusText,
+        errorBody: errorText,
+        latencyMs: geminiLatency
+      });
+      throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
     }
 
-    const aiResponse = await response.json();
-    const aiContent = aiResponse.choices[0].message.content;
+    const geminiResponse = await response.json();
+    logInfo(`Gemini API response received`, {
+      latencyMs: geminiLatency,
+      hasContent: !!geminiResponse.candidates?.[0]?.content
+    });
     
-    console.log(`[AI-RECOMMEND] OpenAI response received`);
+    // Extract text from Gemini's response structure
+    const aiContent = geminiResponse.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!aiContent) {
+      logError('No content in Gemini response', geminiResponse);
+      throw new Error('Invalid Gemini response: no content');
+    }
 
     // Parse AI response
     let recommendations: any[];
     try {
       const parsed = JSON.parse(aiContent);
       recommendations = parsed.recommendations || parsed;
+      logInfo(`AI recommendations parsed successfully`, {
+        count: recommendations.length,
+        tickers: recommendations.map((r: any) => r.ticker)
+      });
     } catch (e) {
-      console.error('[AI-RECOMMEND] Failed to parse AI response:', aiContent);
+      logError('Failed to parse AI response', {
+        error: e.message,
+        responsePreview: aiContent.substring(0, 500)
+      });
       throw new Error('Invalid AI response format');
     }
 
     // Apply diversification rules
     const diversifiedRecommendations = applyDiversificationRules(recommendations);
     
+    logInfo(`Diversification applied`, {
+      beforeCount: recommendations.length,
+      afterCount: diversifiedRecommendations.length
+    });
+    
     // Calculate confidence and diversification scores
     const confidenceScore = calculateConfidenceScore(diversifiedRecommendations, userProfile);
     const diversificationScore = calculateDiversificationScore(diversifiedRecommendations);
     
     const processingTime = Date.now() - startTime;
+    
+    logInfo(`Scoring completed`, {
+      confidenceScore,
+      diversificationScore,
+      totalProcessingTimeMs: processingTime
+    });
 
     // Store AI recommendation in database
     const { data: aiRecommendation } = await supabase
@@ -180,12 +261,17 @@ serve(async (req) => {
         user_profile: { ...userProfile, ...dbProfile },
         confidence_score: confidenceScore,
         diversification_score: diversificationScore,
-        processing_time_ms: processingTime
+        processing_time_ms: processingTime,
+        model_version: 'gemini-2.5-flash-latest'
       })
       .select()
       .single();
 
-    console.log(`[AI-RECOMMEND] Recommendation stored with ID: ${aiRecommendation.id}`);
+    logInfo(`Recommendation stored in database`, {
+      recommendationId: aiRecommendation.id,
+      sessionId,
+      stockCount: diversifiedRecommendations.length
+    });
 
     // Convert to StockRecommendation format
     const formattedRecommendations = diversifiedRecommendations.map((rec: any, index: number) => {
@@ -212,7 +298,11 @@ serve(async (req) => {
       };
     }).filter(Boolean);
 
-    console.log(`[AI-RECOMMEND] Returning ${formattedRecommendations.length} recommendations`);
+    logInfo(`Request completed successfully`, {
+      recommendationCount: formattedRecommendations.length,
+      totalTimeMs: processingTime,
+      geminiLatencyMs: geminiLatency
+    });
 
     return new Response(
       JSON.stringify({ 
@@ -221,15 +311,23 @@ serve(async (req) => {
         confidenceScore,
         diversificationScore,
         processingTimeMs: processingTime,
-        modelVersion: 'gpt-4o-mini'
+        modelVersion: 'gemini-2.5-flash-latest',
+        apiLatencyMs: geminiLatency
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('[AI-RECOMMEND] Error:', error);
+    logError('Function failed', {
+      errorMessage: error.message,
+      errorStack: error.stack,
+      errorType: error.constructor.name
+    });
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        timestamp: new Date().toISOString()
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
