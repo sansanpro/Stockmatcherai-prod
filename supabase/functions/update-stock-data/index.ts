@@ -160,15 +160,16 @@ Deno.serve(async (req) => {
     
     console.log(`⚖️ Balanced sector selection - ${sortedTickers.length} tickers distributed across all sectors`);
 
-    // Optimize for free plan: process more tickers in less time
+    // Optimize for FMP free plan rate limits (5 calls/min)
     let successCount = 0;
     let failCount = 0;
-    const batchSize = 10; // Larger batches for parallel processing
+    const batchSize = 3; // Small batches to respect rate limits
     let processedCount = 0;
+    const delayBetweenCalls = 15000; // 15 seconds between calls (4 calls/min safely)
 
-    console.log(`⚡ Optimized for free plan - targeting ${Math.min(50, sortedTickers.length)} most critical stocks`);
+    console.log(`⚡ Optimized for FMP free plan - processing ${Math.min(20, sortedTickers.length)} stocks with rate limiting`);
 
-    for (let i = 0; i < sortedTickers.length && processedCount < 50; i += batchSize) {
+    for (let i = 0; i < sortedTickers.length && processedCount < 20; i += batchSize) {
       const currentTime = Date.now();
       const elapsedTime = currentTime - startTime;
       
@@ -180,8 +181,8 @@ Deno.serve(async (req) => {
       const batchTickers = sortedTickers.slice(i, i + batchSize);
       console.log(`🔄 Processing batch ${Math.floor(i / batchSize) + 1}: ${batchTickers.join(', ')}`);
 
-      // Process batch in parallel to save time
-      const batchPromises = batchTickers.map(async (ticker) => {
+      // Process tickers SEQUENTIALLY to avoid rate limits
+      for (const ticker of batchTickers) {
         try {
           console.log(`📊 Fetching data for ${ticker}...`);
           
@@ -190,7 +191,9 @@ Deno.serve(async (req) => {
           
           if (!quote) {
             console.log(`⚠️ No quote data received for ${ticker}`);
-            return { ticker, success: false, error: 'No data' };
+            failCount++;
+            processedCount++;
+            continue;
           }
 
           // Parse quote data
@@ -199,7 +202,9 @@ Deno.serve(async (req) => {
           
           if (currentPrice <= 0) {
             console.log(`⚠️ Invalid price data for ${ticker}: ${currentPrice}`);
-            return { ticker, success: false, error: 'Invalid price' };
+            failCount++;
+            processedCount++;
+            continue;
           }
 
           console.log(`💰 ${ticker}: $${currentPrice} (${changePercent > 0 ? '+' : ''}${changePercent}%)`);
@@ -233,33 +238,23 @@ Deno.serve(async (req) => {
             }
           }
 
-          return { ticker, success: updateCount > 0, updateCount, updateErrors };
+          if (updateCount > 0) {
+            successCount += updateCount;
+          } else {
+            failCount++;
+          }
+          processedCount++;
+
+          // Rate limit: wait between each API call
+          if (processedCount < Math.min(20, sortedTickers.length)) {
+            console.log(`⏳ Rate limiting: waiting ${delayBetweenCalls/1000}s before next call...`);
+            await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
+          }
 
         } catch (error) {
           console.error(`❌ Error processing ${ticker}:`, error);
-          return { ticker, success: false, error: error.message };
-        }
-      });
-
-      // Wait for batch to complete
-      const batchResults = await Promise.all(batchPromises);
-      
-      // Process results
-      batchResults.forEach(result => {
-        if (result.success) {
-          successCount += result.updateCount || 1;
-        } else {
           failCount++;
-        }
-        processedCount++;
-      });
-
-      // Minimal delay between batches (reduced from 5s to 1s)
-      if (i + batchSize < sortedTickers.length && processedCount < 50) {
-        const remainingTime = maxProcessingTime - (Date.now() - startTime);
-        if (remainingTime > 10000) { // Only wait if we have time
-          console.log('⏳ Brief pause before next batch...');
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          processedCount++;
         }
       }
     }
