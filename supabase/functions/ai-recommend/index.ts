@@ -341,47 +341,69 @@ function createAIPrompt(userProfile: any, dbProfile: any, stocks: any[]): string
   const lifeStage = age < 30 ? 'early career' : age < 45 ? 'mid-career' : age < 60 ? 'pre-retirement' : 'retirement';
   const incomeLevel = userProfile.salary < 75000 ? 'modest' : userProfile.salary < 150000 ? 'comfortable' : 'high';
 
-  return `You are a personal financial advisor having a one-on-one conversation with your client. Analyze their unique situation and recommend 5-10 stocks that truly fit THEIR specific needs.
+  return `You are a personal financial advisor. Your client is sitting across from you. They need GENUINELY UNIQUE advice for each stock - not templated responses.
 
-CLIENT PROFILE:
-- ${userProfile.age} year old ${userProfile.gender} in ${lifeStage} phase
-- Annual income: $${userProfile.salary.toLocaleString()} (${incomeLevel} income bracket)
+CLIENT SITTING IN FRONT OF YOU:
+- ${userProfile.age} year old ${userProfile.gender} in ${lifeStage} phase with $${userProfile.salary.toLocaleString()} annual income
 - Investment experience: ${userProfile.experience}
-- Risk comfort level: ${userProfile.riskTolerance}
-- Sector interest: ${userProfile.sectorPreference}
-- Primary goal: ${userProfile.investmentGoal}
-${dbProfile ? `- Additional preferences: ${JSON.stringify(dbProfile)}` : ''}
+- Comfortable with ${userProfile.riskTolerance} risk
+- Interested in ${userProfile.sectorPreference} sector
+- Main goal: ${userProfile.investmentGoal}
+${dbProfile ? `- Additional context: ${JSON.stringify(dbProfile)}` : ''}
 
 AVAILABLE STOCKS:
 ${stockList}
 
+CRITICAL INSTRUCTIONS FOR WRITING EXPLANATIONS:
+1. NEVER use the same opening phrase twice (e.g., "As someone in your...")
+2. NEVER repeat the same financial metric structure (vary how you present P/E, returns, dividends)
+3. Each explanation must have a COMPLETELY DIFFERENT style and approach:
+   - Stock 1: Start with what makes the company unique
+   - Stock 2: Start with a real-world example of the product/service
+   - Stock 3: Start with the CEO's leadership or company culture
+   - Stock 4: Start with the financial metrics
+   - Stock 5: Start with industry position
+   - Stock 6+: Mix it up completely
+4. Use the client's ACTUAL numbers dynamically:
+   - Reference their specific age (${userProfile.age}) in different contexts
+   - Mention their exact salary ($${userProfile.salary.toLocaleString()}) when relevant
+   - Connect to their specific experience level (${userProfile.experience})
+   - Address their specific goal (${userProfile.investmentGoal})
+5. For EACH stock, choose ONE unique angle:
+   - Company innovation/products they use
+   - Industry disruption potential
+   - Financial strength/weakness
+   - Alignment with their timeline
+   - CEO/leadership vision
+   - Market positioning
+   - Risk/reward specific to THEM
+
+EXAMPLE VARIETY (notice how different each is):
+Stock A: "You've probably used [product] today. [Company]'s ${stocks[0]?.one_year_return}% growth comes from everyday products becoming indispensable..."
+Stock B: "At ${userProfile.age}, you have ${60 - age} years until typical retirement. [Company]'s stability matters because..."
+Stock C: "[CEO name] transformed this company from [X] to [Y]. The ${stocks[0]?.pe_ratio}x P/E reflects..."
+Stock D: "Your ${userProfile.experience} experience means you can handle [Company]'s complexity. Here's what sets it apart..."
+Stock E: "With $${userProfile.salary.toLocaleString()} income, [Company]'s ${stocks[0]?.dividend_yield}% dividend means..."
+
 YOUR TASK:
-1. Select 5-10 stocks that align with THIS specific client's age, income, experience, risk tolerance, and goals
-2. For each stock, write a PERSONALIZED explanation (100-150 words) that:
-   - Addresses their specific life stage and financial situation
-   - Explains why THIS stock fits THEIR risk tolerance and experience level
-   - Connects to THEIR investment goals and sector preferences
-   - Uses conversational, friendly language (like talking to a friend)
-   - Includes specific numbers and facts about the stock
-   - Avoids generic statements that could apply to anyone
+1. Pick 5-10 stocks that match their profile
+2. Write 100-150 words per stock with ZERO repetition
+3. Ensure max 30% in any sector
+4. Match risk levels to their ${userProfile.riskTolerance} tolerance
 
-3. Ensure portfolio diversification (max 30% in any sector)
-4. Match stock risk levels to client's risk tolerance
-5. Consider their income level for position sizing
-
-RESPOND ONLY WITH VALID JSON (no markdown, no extra text):
+RESPOND ONLY WITH THIS JSON (no markdown formatting, no code blocks):
 {
   "recommendations": [
     {
       "ticker": "AAPL",
       "confidence": 0.95,
-      "explanation": "As someone in your ${lifeStage} phase earning $${userProfile.salary.toLocaleString()}, Apple's stability makes sense for your ${userProfile.riskTolerance} risk tolerance. With a P/E of 28.5 and consistent 15% annual returns, it offers the ${userProfile.investmentGoal} you're targeting. Given your ${userProfile.experience} experience level, Apple's transparent financials and market leadership under Tim Cook make it easy to understand and monitor. The ${userProfile.sectorPreference} sector focus aligns perfectly with your interests.",
+      "explanation": "[COMPLETELY UNIQUE 100-150 word explanation using different structure than other stocks]",
       "allocation_percentage": 15
     }
   ]
 }
 
-Make each explanation unique, personal, and specific to THIS client's situation. Avoid repeating the same phrases across different stocks.`;
+REMEMBER: If I see repeated phrases, templated language, or similar structures across stocks, the recommendations fail. Make each one genuinely different.`;
 }
 
 function applyDiversificationRules(recommendations: any[]): any[] {
