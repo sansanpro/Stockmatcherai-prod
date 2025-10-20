@@ -179,9 +179,8 @@ serve(async (req) => {
             }
           ],
           generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2000,
-            responseMimeType: 'application/json'
+            temperature: 0.9,
+            maxOutputTokens: 3000
           }
         }),
       }
@@ -335,45 +334,54 @@ serve(async (req) => {
 
 function createAIPrompt(userProfile: any, dbProfile: any, stocks: any[]): string {
   const stockList = stocks.map(s => 
-    `${s.ticker} (${s.company_name}): ${s.sector} sector, P/E: ${s.pe_ratio}, Return: ${s.one_year_return}%, Risk: ${s.risk_level}, Price: $${s.price_per_share}, Dividend: ${s.dividend_yield}%`
+    `${s.ticker} (${s.company_name}): ${s.sector} sector, P/E: ${s.pe_ratio}, Return: ${s.one_year_return}%, Risk: ${s.risk_level}, Price: $${s.price_per_share}, Dividend: ${s.dividend_yield}%, Market Cap: ${s.market_cap}, CEO: ${s.ceo_name}`
   ).join('\n');
 
-  return `
-As an expert financial advisor, analyze this user profile and recommend the best 5-10 stocks for their portfolio:
+  const age = userProfile.age;
+  const lifeStage = age < 30 ? 'early career' : age < 45 ? 'mid-career' : age < 60 ? 'pre-retirement' : 'retirement';
+  const incomeLevel = userProfile.salary < 75000 ? 'modest' : userProfile.salary < 150000 ? 'comfortable' : 'high';
 
-USER PROFILE:
-- Age: ${userProfile.age}
-- Salary: $${userProfile.salary}
-- Experience: ${userProfile.experience}
-- Risk Tolerance: ${userProfile.riskTolerance}
-- Sector Preference: ${userProfile.sectorPreference}
-- Investment Goal: ${userProfile.investmentGoal}
-${dbProfile ? `- Additional Profile: ${JSON.stringify(dbProfile)}` : ''}
+  return `You are a personal financial advisor having a one-on-one conversation with your client. Analyze their unique situation and recommend 5-10 stocks that truly fit THEIR specific needs.
+
+CLIENT PROFILE:
+- ${userProfile.age} year old ${userProfile.gender} in ${lifeStage} phase
+- Annual income: $${userProfile.salary.toLocaleString()} (${incomeLevel} income bracket)
+- Investment experience: ${userProfile.experience}
+- Risk comfort level: ${userProfile.riskTolerance}
+- Sector interest: ${userProfile.sectorPreference}
+- Primary goal: ${userProfile.investmentGoal}
+${dbProfile ? `- Additional preferences: ${JSON.stringify(dbProfile)}` : ''}
 
 AVAILABLE STOCKS:
 ${stockList}
 
-REQUIREMENTS:
-1. Select 5-10 stocks that best match the user's profile
-2. Ensure diversification (max 30% in any single sector)
-3. Match risk tolerance with stock risk levels
-4. Consider user's experience level and goals
-5. Provide clear, personalized explanations for each pick
+YOUR TASK:
+1. Select 5-10 stocks that align with THIS specific client's age, income, experience, risk tolerance, and goals
+2. For each stock, write a PERSONALIZED explanation (100-150 words) that:
+   - Addresses their specific life stage and financial situation
+   - Explains why THIS stock fits THEIR risk tolerance and experience level
+   - Connects to THEIR investment goals and sector preferences
+   - Uses conversational, friendly language (like talking to a friend)
+   - Includes specific numbers and facts about the stock
+   - Avoids generic statements that could apply to anyone
 
-RESPOND IN THIS EXACT JSON FORMAT:
+3. Ensure portfolio diversification (max 30% in any sector)
+4. Match stock risk levels to client's risk tolerance
+5. Consider their income level for position sizing
+
+RESPOND ONLY WITH VALID JSON (no markdown, no extra text):
 {
   "recommendations": [
     {
       "ticker": "AAPL",
       "confidence": 0.95,
-      "explanation": "Detailed explanation of why this stock fits the user's profile",
+      "explanation": "As someone in your ${lifeStage} phase earning $${userProfile.salary.toLocaleString()}, Apple's stability makes sense for your ${userProfile.riskTolerance} risk tolerance. With a P/E of 28.5 and consistent 15% annual returns, it offers the ${userProfile.investmentGoal} you're targeting. Given your ${userProfile.experience} experience level, Apple's transparent financials and market leadership under Tim Cook make it easy to understand and monitor. The ${userProfile.sectorPreference} sector focus aligns perfectly with your interests.",
       "allocation_percentage": 15
     }
   ]
 }
 
-Make sure the response is valid JSON and explanations are personalized and specific to this user.
-`;
+Make each explanation unique, personal, and specific to THIS client's situation. Avoid repeating the same phrases across different stocks.`;
 }
 
 function applyDiversificationRules(recommendations: any[]): any[] {
