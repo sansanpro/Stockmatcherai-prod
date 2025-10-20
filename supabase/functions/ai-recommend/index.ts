@@ -153,16 +153,16 @@ serve(async (req) => {
     const prompt = createAIPrompt(userProfile, dbProfile, stocksToAnalyze);
     
     logInfo(`Calling Gemini API`, {
-      model: 'gemini-2.5-flash-latest',
+      model: 'gemini-1.5-flash',
       stockCount: stocksToAnalyze.length,
       promptLength: prompt.length
     });
 
     const geminiStartTime = Date.now();
 
-    // Call Google Gemini 2.5 API
+    // Call Google Gemini 1.5 Flash API
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-latest:generateContent?key=${geminiApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
       {
         method: 'POST',
         headers: {
@@ -262,7 +262,7 @@ serve(async (req) => {
         confidence_score: confidenceScore,
         diversification_score: diversificationScore,
         processing_time_ms: processingTime,
-        model_version: 'gemini-2.5-flash-latest'
+        model_version: 'gemini-1.5-flash'
       })
       .select()
       .single();
@@ -311,7 +311,7 @@ serve(async (req) => {
         confidenceScore,
         diversificationScore,
         processingTimeMs: processingTime,
-        modelVersion: 'gemini-2.5-flash-latest',
+        modelVersion: 'gemini-1.5-flash',
         apiLatencyMs: geminiLatency
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
