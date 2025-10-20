@@ -179,8 +179,10 @@ serve(async (req) => {
             }
           ],
           generationConfig: {
-            temperature: 0.9,
-            maxOutputTokens: 3000
+            temperature: 1.0, // Maximum creativity for unique explanations
+            maxOutputTokens: 4000,
+            topP: 0.95, // Increase diversity
+            topK: 40
           }
         }),
       }
@@ -333,77 +335,109 @@ serve(async (req) => {
 });
 
 function createAIPrompt(userProfile: any, dbProfile: any, stocks: any[]): string {
-  const stockList = stocks.map(s => 
-    `${s.ticker} (${s.company_name}): ${s.sector} sector, P/E: ${s.pe_ratio}, Return: ${s.one_year_return}%, Risk: ${s.risk_level}, Price: $${s.price_per_share}, Dividend: ${s.dividend_yield}%, Market Cap: ${s.market_cap}, CEO: ${s.ceo_name}`
+  const stockList = stocks.map((s, i) => 
+    `[${i+1}] ${s.ticker} (${s.company_name}): ${s.sector}, P/E: ${s.pe_ratio}, 1Y Return: ${s.one_year_return}%, Risk: ${s.risk_level}, Price: $${s.price_per_share}, Div: ${s.dividend_yield}%, MCap: ${s.market_cap}, CEO: ${s.ceo_name}`
   ).join('\n');
 
   const age = userProfile.age;
   const lifeStage = age < 30 ? 'early career' : age < 45 ? 'mid-career' : age < 60 ? 'pre-retirement' : 'retirement';
-  const incomeLevel = userProfile.salary < 75000 ? 'modest' : userProfile.salary < 150000 ? 'comfortable' : 'high';
+  const yearsToRetirement = Math.max(0, 65 - age);
 
-  return `You are a personal financial advisor. Your client is sitting across from you. They need GENUINELY UNIQUE advice for each stock - not templated responses.
+  return `You are an expert wealth advisor having a one-on-one conversation with your client. Write COMPLETELY UNIQUE explanations for each recommended stock.
 
-CLIENT SITTING IN FRONT OF YOU:
-- ${userProfile.age} year old ${userProfile.gender} in ${lifeStage} phase with $${userProfile.salary.toLocaleString()} annual income
-- Investment experience: ${userProfile.experience}
-- Comfortable with ${userProfile.riskTolerance} risk
-- Interested in ${userProfile.sectorPreference} sector
-- Main goal: ${userProfile.investmentGoal}
-${dbProfile ? `- Additional context: ${JSON.stringify(dbProfile)}` : ''}
+📋 CLIENT PROFILE:
+• ${userProfile.age} years old, ${userProfile.gender}
+• ${lifeStage} phase (${yearsToRetirement} years until typical retirement)
+• Annual income: $${userProfile.salary.toLocaleString()}
+• Investment experience: ${userProfile.experience}
+• Risk comfort: ${userProfile.riskTolerance}
+• Sector interest: ${userProfile.sectorPreference}
+• Investment goal: ${userProfile.investmentGoal}
+${dbProfile ? `• Additional insights: ${JSON.stringify(dbProfile)}` : ''}
 
-AVAILABLE STOCKS:
+📊 AVAILABLE STOCKS:
 ${stockList}
 
-CRITICAL INSTRUCTIONS FOR WRITING EXPLANATIONS:
-1. NEVER use the same opening phrase twice (e.g., "As someone in your...")
-2. NEVER repeat the same financial metric structure (vary how you present P/E, returns, dividends)
-3. Each explanation must have a COMPLETELY DIFFERENT style and approach:
-   - Stock 1: Start with what makes the company unique
-   - Stock 2: Start with a real-world example of the product/service
-   - Stock 3: Start with the CEO's leadership or company culture
-   - Stock 4: Start with the financial metrics
-   - Stock 5: Start with industry position
-   - Stock 6+: Mix it up completely
-4. Use the client's ACTUAL numbers dynamically:
-   - Reference their specific age (${userProfile.age}) in different contexts
-   - Mention their exact salary ($${userProfile.salary.toLocaleString()}) when relevant
-   - Connect to their specific experience level (${userProfile.experience})
-   - Address their specific goal (${userProfile.investmentGoal})
-5. For EACH stock, choose ONE unique angle:
-   - Company innovation/products they use
-   - Industry disruption potential
-   - Financial strength/weakness
-   - Alignment with their timeline
-   - CEO/leadership vision
-   - Market positioning
-   - Risk/reward specific to THEM
+🚨 CRITICAL UNIQUENESS RULES - EACH EXPLANATION MUST:
+1. Use a DIFFERENT opening sentence structure:
+   ❌ BANNED PATTERNS (never repeat these):
+      - "As a [age/experience] investor..."
+      - "Given your [attribute]..."
+      - "With your [profile detail]..."
+      - "Your [characteristic] makes this..."
+      - "[Company] is perfect for..."
+   
+   ✅ VARY YOUR OPENINGS (use different ones for each):
+      - Start with a question
+      - Start with a surprising fact about the company
+      - Start with what they might not know
+      - Start with a specific number/metric
+      - Start with a real-world scenario
+      - Start with the company's mission
+      - Start with recent news/developments
+      - Start with competitive advantage
 
-EXAMPLE VARIETY (notice how different each is):
-Stock A: "You've probably used [product] today. [Company]'s ${stocks[0]?.one_year_return}% growth comes from everyday products becoming indispensable..."
-Stock B: "At ${userProfile.age}, you have ${60 - age} years until typical retirement. [Company]'s stability matters because..."
-Stock C: "[CEO name] transformed this company from [X] to [Y]. The ${stocks[0]?.pe_ratio}x P/E reflects..."
-Stock D: "Your ${userProfile.experience} experience means you can handle [Company]'s complexity. Here's what sets it apart..."
-Stock E: "With $${userProfile.salary.toLocaleString()} income, [Company]'s ${stocks[0]?.dividend_yield}% dividend means..."
+2. Tell a DIFFERENT STORY for each stock (never repeat these angles):
+   • Stock 1: Focus on company's innovation/disruption
+   • Stock 2: Focus on personal connection (products they use)
+   • Stock 3: Focus on CEO's vision/leadership style
+   • Stock 4: Focus on financial stability/metrics
+   • Stock 5: Focus on growth trajectory/future potential
+   • Stock 6: Focus on dividend income stream
+   • Stock 7: Focus on market position/moat
+   • Stock 8: Focus on risk/reward balance
+   • Stock 9: Focus on timing/market conditions
+   • Stock 10: Focus on alignment with their goals
 
-YOUR TASK:
-1. Pick 5-10 stocks that match their profile
-2. Write 100-150 words per stock with ZERO repetition
-3. Ensure max 30% in any sector
-4. Match risk levels to their ${userProfile.riskTolerance} tolerance
+3. Use VARIED SENTENCE STRUCTURES:
+   - Mix short punchy sentences with longer analytical ones
+   - Vary passive/active voice
+   - Use different rhetorical devices (questions, statements, scenarios)
+   - Change paragraph flow (some linear, some compare/contrast)
 
-RESPOND ONLY WITH THIS JSON (no markdown formatting, no code blocks):
+4. Reference their SPECIFIC DATA in DIFFERENT CONTEXTS:
+   • Age ${userProfile.age}: Time horizon, life stage, risk capacity
+   • Income $${userProfile.salary.toLocaleString()}: Affordability, dividend impact, diversification
+   • Experience ${userProfile.experience}: Complexity tolerance, due diligence ability
+   • Goal ${userProfile.investmentGoal}: Strategy alignment, timeline fit
+
+5. NO GENERIC PHRASES - BAN THESE:
+   ❌ "Portfolio's best friend"
+   ❌ "Secret sauce"
+   ❌ "Champion of dreams"
+   ❌ "Market magic"
+   ❌ "Golden goose"
+   ❌ "Express to profit town"
+   ❌ Any other cliché investment phrases
+
+🎯 YOUR TASK:
+Select 5-10 stocks that genuinely fit this client's profile. For EACH stock, write 120-160 words that:
+• Sound like you're speaking directly to them in their office
+• Reference specific aspects of their life situation
+• Explain why THIS stock makes sense for THEIR goals
+• Use completely different wording and structure than the others
+• Avoid any investment clichés or marketing speak
+
+📝 RESPONSE FORMAT (pure JSON, no markdown):
 {
   "recommendations": [
     {
       "ticker": "AAPL",
-      "confidence": 0.95,
-      "explanation": "[COMPLETELY UNIQUE 100-150 word explanation using different structure than other stocks]",
+      "confidence": 0.92,
+      "explanation": "[120-160 words in conversational tone, completely unique structure and content]",
       "allocation_percentage": 15
     }
   ]
 }
 
-REMEMBER: If I see repeated phrases, templated language, or similar structures across stocks, the recommendations fail. Make each one genuinely different.`;
+⚠️ QUALITY CHECK: Before finalizing, ensure:
+✓ No two explanations start the same way
+✓ No repeated phrases across any explanations
+✓ Each uses a different storytelling angle
+✓ All reference specific client data in varied contexts
+✓ No investment clichés present
+✓ Maximum 30% allocation to any single sector
+✓ Risk levels match client's ${userProfile.riskTolerance} tolerance`;
 }
 
 function applyDiversificationRules(recommendations: any[]): any[] {
