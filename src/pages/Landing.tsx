@@ -34,7 +34,7 @@ const Landing = () => {
             </h1>
 
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Take control of your financials before you focus on dating.
+              Invest in your future before you invest in somebody else.
             </p>
 
             <p className="text-lg text-muted-foreground max-w-xl mx-auto">
