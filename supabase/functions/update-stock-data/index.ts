@@ -46,8 +46,46 @@ Deno.serve(async (req) => {
 
     const updateType = requestBody.updateType || 'default';
     const source = requestBody.source || 'manual';
+    const skipMarketCheck = requestBody.skipMarketCheck || false;
     
     console.log(`🚀 Stock data update function started - Type: ${updateType}, Source: ${source}`);
+
+    // Check if market is open or within 2 hours of opening (unless skipMarketCheck is true)
+    if (!skipMarketCheck) {
+      const now = new Date();
+      const etDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+      const dayOfWeek = etDate.getDay();
+      const hours = etDate.getHours();
+      const minutes = etDate.getMinutes();
+      const currentTimeInMinutes = hours * 60 + minutes;
+
+      // Market hours: 9:30 AM - 4:00 PM ET (570 - 960 minutes)
+      // Update window: 7:30 AM - 4:00 PM ET (450 - 960 minutes) - 2 hours before open until close
+      const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+      const updateWindowStart = 7 * 60 + 30; // 7:30 AM ET
+      const updateWindowEnd = 16 * 60; // 4:00 PM ET
+      const isInUpdateWindow = currentTimeInMinutes >= updateWindowStart && currentTimeInMinutes <= updateWindowEnd;
+
+      if (!isWeekday || !isInUpdateWindow) {
+        console.log(`⏸️ Market is closed. Current time: ${etDate.toLocaleTimeString('en-US', { timeZone: 'America/New_York' })} ET`);
+        console.log(`📅 Day: ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek]}`);
+        console.log(`🕐 Update window: 7:30 AM - 4:00 PM ET on weekdays`);
+        
+        return new Response(
+          JSON.stringify({ 
+            message: 'Market is closed - skipping update',
+            success: true,
+            updated: 0,
+            failed: 0,
+            marketStatus: 'closed',
+            currentTime: etDate.toLocaleString('en-US', { timeZone: 'America/New_York' })
+          }), 
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log(`✅ Market update window active - ${etDate.toLocaleTimeString('en-US', { timeZone: 'America/New_York' })} ET`);
+    }
     
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
