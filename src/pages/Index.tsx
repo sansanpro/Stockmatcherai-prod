@@ -212,7 +212,7 @@ const IndexContent = () => {
   if (!user) {
     return (
       <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-auto">
-        <Card className="w-full max-w-lg text-center shadow-xl dark:bg-gray-800 dark:border-gray-700">
+        <Card className="w-full max-w-md md:max-w-lg text-center shadow-xl dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="space-y-4">
             <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
               <span className="text-2xl">📈</span>
@@ -369,7 +369,7 @@ const IndexContent = () => {
   if (currentStep === 'welcome' || currentStep === 'profile') {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-auto">
+        <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-auto">
           {currentStep === 'profile' && <AppHeader />}
           <div className="pt-8">
             <UserProfileForm 
@@ -401,7 +401,7 @@ const IndexContent = () => {
     return (
       <ProtectedRoute>
         {!isMobile && <AppHeader />}
-        <div className={`min-h-screen w-full min-w-0 ${useAIMode && subscribed ? 'bg-gradient-to-br from-blue-50 to-purple-100 dark:from-blue-950/20 dark:to-purple-950/20' : 'bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700'} pt-[env(safe-area-inset-top)] overflow-auto ${isMobile ? 'pb-24' : 'pb-[env(safe-area-inset-bottom)]'}`}>
+        <div className={`min-h-screen w-full ${useAIMode && subscribed ? 'bg-gradient-to-br from-blue-50 to-purple-100 dark:from-blue-950/20 dark:to-purple-950/20' : 'bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700'} pt-[env(safe-area-inset-top)] overflow-auto ${isMobile ? 'pb-24' : 'pb-[env(safe-area-inset-bottom)]'}`}>
           {useAIMode && subscribed ? (
             <AIStockMatcher 
               userProfile={userProfile!} 

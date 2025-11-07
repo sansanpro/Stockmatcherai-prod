@@ -219,7 +219,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   if (isFinished) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-400 via-blue-500 to-purple-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 animate-fade-in">
-        <div className="max-w-md mx-auto pt-8">
+        <div className="max-w-md md:max-w-2xl lg:max-w-4xl mx-auto pt-8">
           <div className="text-center mb-8 animate-scale-in">
             <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
               <Heart className="w-10 h-10 text-white fill-current" />
@@ -288,8 +288,8 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const currentStock = allRecommendations[currentIndex];
 
   return (
-    <div className="w-screen h-screen max-w-[1290px] max-h-[2796px] min-w-0 min-h-0 mx-auto pt-safe-area-inset-top pb-safe-area-inset-bottom bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 overflow-auto">
-      <div className="w-full mx-auto">
+    <div className="w-full h-screen mx-auto pt-safe-area-inset-top pb-safe-area-inset-bottom bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 overflow-auto">
+      <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-4 sm:mb-6 pt-8 sm:pt-12 animate-fade-in px-4">
           <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">

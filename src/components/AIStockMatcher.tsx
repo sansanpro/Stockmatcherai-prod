@@ -205,7 +205,7 @@ export const AIStockMatcher: React.FC<AIStockMatcherProps> = ({
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-8">
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-2xl p-8 max-w-md text-center">
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-2xl p-8 max-w-md md:max-w-2xl lg:max-w-4xl text-center">
           <Sparkles className="w-16 h-16 mx-auto mb-4 text-blue-600 animate-pulse" />
           <h3 className="text-xl font-semibold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             AI Analyzing Your Profile
@@ -226,7 +226,7 @@ export const AIStockMatcher: React.FC<AIStockMatcherProps> = ({
   if (currentIndex >= recommendations.length) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-8">
-        <div className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/30 dark:to-blue-950/30 rounded-2xl p-8 max-w-md text-center">
+        <div className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-950/30 dark:to-blue-950/30 rounded-2xl p-8 max-w-md md:max-w-2xl lg:max-w-4xl text-center">
           <Sparkles className="w-16 h-16 mx-auto mb-4 text-green-600" />
           <h3 className="text-xl font-semibold mb-2">AI Analysis Complete!</h3>
           <p className="text-muted-foreground mb-6">
