@@ -717,10 +717,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      trigger_ceo_data_update: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      trigger_ceo_data_update: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
