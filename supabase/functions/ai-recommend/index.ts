@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -76,11 +77,39 @@ serve(async (req) => {
     logInfo(`Premium user verified: ${subscription.subscription_tier}`);
 
     // Get request body
-    const { userProfile, excludedStocks = [], sessionType = 'ai' } = await req.json();
+    const requestBody = await req.json();
+    const { excludedStocks = [], sessionType = 'ai' } = requestBody;
     
-    if (!userProfile) {
-      logError('User profile is required but not provided');
-      throw new Error('User profile is required');
+    // Validate user profile input
+    const userProfileSchema = z.object({
+      age: z.number().int().min(18, 'Age must be at least 18').max(100, 'Age must be at most 100'),
+      salary: z.number().int().min(0, 'Salary must be non-negative').max(100000000, 'Salary value too large'),
+      gender: z.string().min(1).max(50, 'Gender must be less than 50 characters'),
+      experience: z.enum(['none', 'beginner', 'intermediate', 'advanced', 'expert'], {
+        errorMap: () => ({ message: 'Experience must be one of: none, beginner, intermediate, advanced, expert' })
+      }),
+      riskTolerance: z.enum(['low', 'medium', 'high'], {
+        errorMap: () => ({ message: 'Risk tolerance must be one of: low, medium, high' })
+      }),
+      sectorPreference: z.string().min(1).max(50, 'Sector preference must be less than 50 characters'),
+      investmentGoal: z.string().min(1).max(100, 'Investment goal must be less than 100 characters')
+    });
+
+    let userProfile;
+    try {
+      userProfile = userProfileSchema.parse(requestBody.userProfile);
+    } catch (validationError) {
+      logError('Invalid user profile data', validationError);
+      if (validationError instanceof z.ZodError) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Invalid user profile data',
+            details: validationError.errors.map(e => `${e.path.join('.')}: ${e.message}`)
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw new Error('Invalid user profile data');
     }
 
     logInfo(`Processing recommendation request`, {
