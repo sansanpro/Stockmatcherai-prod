@@ -288,10 +288,10 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const currentStock = allRecommendations[currentIndex];
 
   return (
-    <div className="w-full h-screen mx-auto pt-safe-area-inset-top pb-safe-area-inset-bottom bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 overflow-auto">
+    <div className="w-full h-screen mx-auto pt-safe-area-inset-top pb-safe-area-inset-bottom bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 lg:p-2 overflow-auto">
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-4 sm:mb-6 pt-8 sm:pt-12 animate-fade-in px-4">
+        <div className="text-center mb-4 sm:mb-6 lg:mb-2 pt-8 sm:pt-12 lg:pt-2 animate-fade-in px-4 lg:px-2">
           <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
             Stock Matcher 💕
           </h1>
@@ -302,7 +302,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
 
         {/* Stats */}
-        <div className="flex justify-center gap-3 sm:gap-4 mb-4 sm:mb-6 animate-fade-in delay-200 px-4">
+        <div className="flex justify-center gap-3 sm:gap-4 mb-4 sm:mb-6 lg:mb-2 animate-fade-in delay-200 px-4 lg:px-2">
           <div className="bg-green-500/20 backdrop-blur-lg rounded-xl px-3 sm:px-4 py-2 flex items-center gap-2 border border-green-400/30 transform hover:scale-105 transition-all duration-200">
             <Heart className="w-4 h-4 text-green-300 fill-current" />
             <span className="text-white font-medium text-sm sm:text-base">{matches.length}</span>
@@ -315,7 +315,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
         {/* Stock Cards Stack */}
         {allRecommendations.length > 0 && currentStock && (
-          <div className="mb-6 relative h-[65vh] max-h-[550px] min-h-[450px] animate-fade-in delay-300">
+          <div className="mb-6 lg:mb-2 relative h-[65vh] lg:h-[88vh] max-h-[550px] lg:max-h-none min-h-[450px] animate-fade-in delay-300">
             {visibleCards.map((stock, stackIndex) => {
               const cardIndex = currentIndex + stackIndex;
               const isActiveCard = stackIndex === 0;

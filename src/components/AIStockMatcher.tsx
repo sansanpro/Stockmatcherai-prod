@@ -316,7 +316,7 @@ export const AIStockMatcher: React.FC<AIStockMatcherProps> = ({
       </div>
 
       {/* Stock card */}
-      <div className="flex-1 flex items-center justify-center p-4">
+      <div className="flex-1 flex items-center justify-center p-4 lg:p-2">
         <div className={`transition-all duration-300 ${isAnimating ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
           <TinderStockCard 
             stock={currentStock} 
