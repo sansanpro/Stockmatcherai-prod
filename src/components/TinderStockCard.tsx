@@ -214,7 +214,7 @@ const TinderStockCard = ({
         ref={cardRef}
         className={`w-full max-w-[min(95vw,400px)] md:max-w-xl lg:max-w-3xl xl:max-w-4xl mx-auto shadow-2xl border-0 bg-card overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
           isExiting ? 'animate-scale-out' : 'animate-scale-in'
-        } h-full max-h-[70vh] sm:max-h-[75vh] lg:max-h-[calc(100vh-12rem)] rounded-2xl flex flex-col relative`}
+        } h-full rounded-xl sm:rounded-2xl flex flex-col relative`}
         style={{
           transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
           opacity,
@@ -228,94 +228,94 @@ const TinderStockCard = ({
         onTouchEnd={handleTouchEnd}
       >
         <CardContent className="p-0 flex flex-col h-full overflow-y-auto">
-          {/* Header with gradient background */}
+          {/* Header with gradient background - Compact on mobile */}
           <div 
-            className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-4 sm:p-5 lg:p-4 relative overflow-hidden rounded-t-2xl flex-shrink-0`}
+            className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-2.5 sm:p-4 lg:p-4 relative overflow-hidden rounded-t-xl sm:rounded-t-2xl flex-shrink-0`}
           >
-            <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/10 rounded-full -translate-y-6 sm:-translate-y-12 translate-x-6 sm:translate-x-12 animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-12 h-12 sm:w-16 sm:h-16 bg-white/10 rounded-full translate-y-4 sm:translate-y-8 -translate-x-4 sm:-translate-x-8 animate-pulse delay-75"></div>
+            <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-24 lg:h-24 bg-white/10 rounded-full -translate-y-4 sm:-translate-y-6 lg:-translate-y-12 translate-x-4 sm:translate-x-6 lg:translate-x-12 animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-8 h-8 sm:w-12 sm:h-12 lg:w-16 lg:h-16 bg-white/10 rounded-full translate-y-2 sm:translate-y-4 lg:translate-y-8 -translate-x-2 sm:-translate-x-4 lg:-translate-x-8 animate-pulse delay-75"></div>
             
             <div className="relative z-10">
-              <div className="flex justify-between items-start mb-3 gap-2">
+              <div className="flex justify-between items-start mb-1.5 sm:mb-2 lg:mb-3 gap-2">
               <div className="flex-1 min-w-0 animate-fade-in">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight truncate">{stock.companyName}</h2>
-                  <p className="text-white/90 font-medium text-sm sm:text-base lg:text-lg">({stock.ticker})</p>
+                  <h2 className="text-sm sm:text-lg lg:text-2xl font-bold leading-tight truncate">{stock.companyName}</h2>
+                  <p className="text-white/90 font-medium text-xs sm:text-sm lg:text-lg">({stock.ticker})</p>
                 </div>
-                <div className="flex items-center gap-2 animate-fade-in delay-100 flex-shrink-0">
-                  <Badge className="bg-white/20 text-white border-white/30 font-semibold px-2 py-1 backdrop-blur-sm text-xs whitespace-nowrap">
+                <div className="flex items-center gap-1 sm:gap-2 animate-fade-in delay-100 flex-shrink-0">
+                  <Badge className="bg-white/20 text-white border-white/30 font-semibold px-1.5 sm:px-2 py-0.5 sm:py-1 backdrop-blur-sm text-[10px] sm:text-xs whitespace-nowrap">
                     {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()}
                   </Badge>
                   <EducationalTooltip 
                     content={`Risk Level indicates volatility: Low = stable returns, Medium = some fluctuation, High = potential for large gains/losses`}
-                    className="text-white/70 hover:text-white transition-colors"
+                    className="text-white/70 hover:text-white transition-colors hidden sm:block"
                   />
                   {onViewDetails && (
                     <button
                       onClick={handleViewDetails}
-                      className="bg-white/20 hover:bg-white/30 text-white p-1 sm:p-2 rounded-full transition-colors"
+                      className="bg-white/20 hover:bg-white/30 text-white p-1 rounded-full transition-colors"
                     >
-                      <Eye className="w-4 h-4" />
+                      <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                     </button>
                   )}
                 </div>
               </div>
               
-              <div className="flex flex-wrap items-center gap-2 text-white/90 animate-fade-in delay-200 text-xs sm:text-sm">
-                <Building className="w-4 h-4" />
+              <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-white/90 animate-fade-in delay-200 text-[10px] sm:text-xs">
+                <Building className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>{stock.sector}</span>
-                <TrendingUp className="w-4 h-4 ml-2" />
+                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
                 <span className={`font-semibold transition-colors ${stock.oneYearReturn >= 0 ? 'text-green-200' : 'text-red-200'}`}>{stock.oneYearReturn > 0 ? '+' : ''}{stock.oneYearReturn.toFixed(1)}%</span>
                 <EducationalTooltip 
                   content="1-Year Return shows how much the stock price has changed over the past 12 months"
-                  className="text-white/70 hover:text-white transition-colors"
+                  className="text-white/70 hover:text-white transition-colors hidden sm:block"
                 />
               </div>
               
-              <div className="mt-2 animate-fade-in delay-300">
+              <div className="mt-1 sm:mt-2 animate-fade-in delay-300">
                 <DataFreshnessIndicator 
                   lastUpdated={(stock as any).lastUpdated} 
                   variant="inline"
-                  className="bg-black/20 backdrop-blur-sm rounded-full px-2 py-1 text-xs"
+                  className="bg-black/20 backdrop-blur-sm rounded-full px-1.5 sm:px-2 py-0.5 sm:py-1 text-[9px] sm:text-xs"
                 />
               </div>
             </div>
           </div>
 
-          {/* CEO Section with Stylish Initials */}
-          <div className="p-4 sm:p-6 lg:p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-fade-in delay-300">
-            <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 mb-3">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-blue-500/20">
-                <span className="text-white font-bold text-lg sm:text-xl lg:text-2xl tracking-wide">
+          {/* CEO Section with Stylish Initials - Compact on mobile */}
+          <div className="p-2.5 sm:p-4 lg:p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-fade-in delay-300">
+            <div className="flex items-center gap-2 sm:gap-3 lg:gap-5 mb-2 sm:mb-3">
+              <div className="w-10 h-10 sm:w-14 sm:h-14 lg:w-20 lg:h-20 bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-blue-500/20 flex-shrink-0">
+                <span className="text-white font-bold text-sm sm:text-lg lg:text-2xl tracking-wide">
                   {getCeoInitials(stock.ceoName)}
                 </span>
               </div>
-              <div>
-                <h3 className="font-bold text-gray-900 dark:text-white text-base sm:text-lg lg:text-xl">{stock.ceoName}</h3>
-                <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-300">Chief Executive Officer</p>
-                <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400">{stock.companyName}</p>
+              <div className="min-w-0">
+                <h3 className="font-bold text-gray-900 dark:text-white text-xs sm:text-base lg:text-xl truncate">{stock.ceoName}</h3>
+                <p className="text-[10px] sm:text-xs lg:text-base text-gray-600 dark:text-gray-300">CEO</p>
+                <p className="text-[9px] sm:text-xs lg:text-sm text-gray-500 dark:text-gray-400 truncate">{stock.companyName}</p>
               </div>
             </div>
             <div className="relative">
-              <p className={`text-xs sm:text-sm lg:text-base text-gray-700 dark:text-gray-300 leading-relaxed ${
-                isCeoExpanded ? '' : 'line-clamp-6'
+              <p className={`text-[10px] sm:text-xs lg:text-base text-gray-700 dark:text-gray-300 leading-relaxed ${
+                isCeoExpanded ? '' : 'line-clamp-3 sm:line-clamp-6'
               } transition-all duration-300`}>
                 {stock.ceoHighlights}
               </p>
-              {stock.ceoHighlights.split('\n').length > 6 || stock.ceoHighlights.length > 400 ? (
+              {stock.ceoHighlights.split('\n').length > 3 || stock.ceoHighlights.length > 200 ? (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsCeoExpanded(!isCeoExpanded);
                   }}
-                  className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-xs sm:text-sm font-medium flex items-center gap-1 transition-colors"
+                  className="mt-1 sm:mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-[10px] sm:text-xs font-medium flex items-center gap-1 transition-colors"
                 >
                   {isCeoExpanded ? (
                     <>
-                      Show less <ChevronUp className="w-4 h-4" />
+                      Less <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4" />
                     </>
                   ) : (
                     <>
-                      ...More <ChevronDown className="w-4 h-4" />
+                      More <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />
                     </>
                   )}
                 </button>
@@ -323,62 +323,66 @@ const TinderStockCard = ({
             </div>
           </div>
 
-          {/* Financials Grid */}
-          <div className="p-4 sm:p-6 lg:p-3 bg-white dark:bg-gray-800 animate-fade-in delay-400">
-            <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 text-base sm:text-lg lg:text-xl">
-              <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
+          {/* Financials Grid - Compact on mobile */}
+          <div className="p-2.5 sm:p-4 lg:p-3 bg-white dark:bg-gray-800 animate-fade-in delay-400">
+            <h4 className="font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 lg:mb-4 flex items-center gap-1 sm:gap-2 text-xs sm:text-base lg:text-xl">
+              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
               Key Metrics
             </h4>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-3">
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs sm:text-sm lg:text-base text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-3">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-2 sm:p-3 lg:p-3 rounded-lg sm:rounded-xl text-center">
+                <div className="flex items-center justify-center gap-0.5 sm:gap-1 mb-0.5 sm:mb-1">
+                  <p className="text-[10px] sm:text-xs lg:text-base text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
                   <EducationalTooltip 
                     content="P/E Ratio compares a company's share price to its earnings per share. Lower values may indicate undervalued stocks."
+                    className="hidden sm:block"
                   />
                 </div>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
+                <p className="text-sm sm:text-lg lg:text-2xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
               </div>
-              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs sm:text-sm lg:text-base text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-2 sm:p-3 lg:p-3 rounded-lg sm:rounded-xl text-center">
+                <div className="flex items-center justify-center gap-0.5 sm:gap-1 mb-0.5 sm:mb-1">
+                  <p className="text-[10px] sm:text-xs lg:text-base text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
                   <EducationalTooltip 
                     content="Market Capitalization is the total value of all company shares. Larger caps are typically more stable."
+                    className="hidden sm:block"
                   />
                 </div>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
+                <p className="text-sm sm:text-lg lg:text-2xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
               </div>
-              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs sm:text-sm lg:text-base text-green-600 dark:text-green-400 font-medium">Price/Share</p>
+              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-2 sm:p-3 lg:p-3 rounded-lg sm:rounded-xl text-center">
+                <div className="flex items-center justify-center gap-0.5 sm:gap-1 mb-0.5 sm:mb-1">
+                  <p className="text-[10px] sm:text-xs lg:text-base text-green-600 dark:text-green-400 font-medium">Price/Share</p>
                   <EducationalTooltip 
                     content="Current trading price per individual share of the company's stock."
+                    className="hidden sm:block"
                   />
                 </div>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
+                <p className="text-sm sm:text-lg lg:text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
               </div>
               {stock.dividendYield > 0 && (
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <p className="text-xs sm:text-sm lg:text-base text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-2 sm:p-3 lg:p-3 rounded-lg sm:rounded-xl text-center">
+                  <div className="flex items-center justify-center gap-0.5 sm:gap-1 mb-0.5 sm:mb-1">
+                    <p className="text-[10px] sm:text-xs lg:text-base text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
                     <EducationalTooltip 
                       content="Dividend Yield shows the annual dividend payments as a percentage of the stock price. Higher yields provide more regular income."
+                      className="hidden sm:block"
                     />
                   </div>
-                  <p className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-700 dark:text-orange-300">{stock.dividendYield.toFixed(2)}%</p>
+                  <p className="text-sm sm:text-lg lg:text-2xl font-bold text-orange-700 dark:text-orange-300">{stock.dividendYield.toFixed(2)}%</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Why it fits section - More prominent */}
-          <div className="p-4 sm:p-6 lg:p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500 flex-shrink-0">
-            <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-base sm:text-lg lg:text-xl">
-              <span className="text-lg lg:text-xl">💡</span>
+          {/* Why it fits section - Compact on mobile */}
+          <div className="p-2.5 sm:p-4 lg:p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500 flex-shrink-0">
+            <h4 className="font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 flex items-center gap-1 sm:gap-2 text-xs sm:text-base lg:text-xl">
+              <span className="text-sm sm:text-lg lg:text-xl">💡</span>
               Why this matches you
             </h4>
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-5 lg:p-4 rounded-xl border border-white/50 dark:border-gray-600/50 shadow-lg">
-              <p className="text-sm sm:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-2.5 sm:p-4 lg:p-4 rounded-lg sm:rounded-xl border border-white/50 dark:border-gray-600/50 shadow-lg">
+              <p className="text-[10px] sm:text-sm lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
                 {stock.whyItFits}
               </p>
             </div>
