@@ -290,25 +290,22 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   return (
     <div className="w-full h-screen mx-auto pt-safe-area-inset-top pb-safe-area-inset-bottom bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 overflow-hidden flex flex-col">
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto flex flex-col h-full lg:p-2">
-        {/* Header - Compact on mobile */}
-        <div className="text-center pt-2 pb-1 lg:pt-2 lg:pb-2 animate-fade-in px-2 lg:px-2 flex-shrink-0">
-          <h1 className="text-base sm:text-xl lg:text-2xl font-bold text-white mb-0.5 sm:mb-1">
+        {/* Header - Single compact line on mobile */}
+        <div className="text-center pt-1.5 pb-1 lg:pt-2 lg:pb-2 animate-fade-in px-2 lg:px-2 flex-shrink-0">
+          <h1 className="text-sm sm:text-xl lg:text-2xl font-bold text-white">
             Stock Matcher 💕
           </h1>
-          <div className="flex items-center justify-center gap-1 text-white/80 text-[10px] sm:text-xs lg:text-sm">
-            <span className="truncate max-w-[280px]">{userProfile.age}yo • {userProfile.riskTolerance} risk • {userProfile.sectorPreference}</span>
-          </div>
         </div>
 
-        {/* Stats - Compact on mobile */}
-        <div className="flex justify-center gap-2 sm:gap-3 lg:gap-4 py-1 sm:py-2 lg:py-2 animate-fade-in delay-200 px-2 lg:px-2 flex-shrink-0">
-          <div className="bg-green-500/20 backdrop-blur-lg rounded-lg sm:rounded-xl px-2 sm:px-3 lg:px-4 py-1 sm:py-2 flex items-center gap-1 sm:gap-2 border border-green-400/30">
-            <Heart className="w-3 h-3 sm:w-4 sm:h-4 text-green-300 fill-current" />
-            <span className="text-white font-medium text-xs sm:text-sm lg:text-base">{matches.length}</span>
+        {/* Stats - Minimal on mobile */}
+        <div className="flex justify-center gap-2 sm:gap-3 lg:gap-4 py-0.5 sm:py-2 lg:py-2 animate-fade-in delay-200 px-2 lg:px-2 flex-shrink-0">
+          <div className="bg-green-500/20 backdrop-blur-lg rounded-md sm:rounded-lg px-1.5 sm:px-3 lg:px-4 py-0.5 sm:py-2 flex items-center gap-1 sm:gap-2 border border-green-400/30">
+            <Heart className="w-2.5 h-2.5 sm:w-4 sm:h-4 text-green-300 fill-current" />
+            <span className="text-white font-medium text-[10px] sm:text-sm lg:text-base">{matches.length}</span>
           </div>
-          <div className="bg-red-500/20 backdrop-blur-lg rounded-lg sm:rounded-xl px-2 sm:px-3 lg:px-4 py-1 sm:py-2 flex items-center gap-1 sm:gap-2 border border-red-400/30">
-            <X className="w-3 h-3 sm:w-4 sm:h-4 text-red-300" />
-            <span className="text-white font-medium text-xs sm:text-sm lg:text-base">{passes.length}</span>
+          <div className="bg-red-500/20 backdrop-blur-lg rounded-md sm:rounded-lg px-1.5 sm:px-3 lg:px-4 py-0.5 sm:py-2 flex items-center gap-1 sm:gap-2 border border-red-400/30">
+            <X className="w-2.5 h-2.5 sm:w-4 sm:h-4 text-red-300" />
+            <span className="text-white font-medium text-[10px] sm:text-sm lg:text-base">{passes.length}</span>
           </div>
         </div>
 
@@ -337,31 +334,31 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
           </div>
         )}
 
-        {/* Action Buttons - Sticky on mobile */}
+        {/* Action Buttons - Fixed at bottom with proper spacing */}
         {allRecommendations.length > 0 && currentStock && (
-          <div className="flex justify-center gap-4 sm:gap-6 py-3 sm:py-4 lg:py-6 px-2 sm:px-4 animate-fade-in delay-400 flex-shrink-0 bg-gradient-to-t from-purple-600/20 to-transparent backdrop-blur-sm">
+          <div className="flex justify-center gap-3 sm:gap-6 py-3 sm:py-4 lg:py-6 px-2 sm:px-4 animate-fade-in delay-400 flex-shrink-0 bg-gradient-to-t from-purple-600/30 to-transparent backdrop-blur-sm">
             <Button
               onClick={handlePass}
               disabled={animatingCard || !canSwipe}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
             >
-              <X className="w-6 h-6 sm:w-8 sm:h-8" />
+              <X className="w-5 h-5 sm:w-8 sm:h-8" />
             </Button>
             
             <Button
               onClick={handleUndo}
               disabled={currentIndex === 0 || animatingCard}
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-500/80 hover:bg-gray-600 border-0 text-white shadow-xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+              className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-gray-500/80 hover:bg-gray-600 border-0 text-white shadow-xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
             >
-              <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
+              <RotateCcw className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
             </Button>
             
             <Button
               onClick={handleMatch}
               disabled={animatingCard || !canSwipe}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
             >
-              <Heart className="w-6 h-6 sm:w-8 sm:h-8" />
+              <Heart className="w-5 h-5 sm:w-8 sm:h-8" />
             </Button>
           </div>
         )}
