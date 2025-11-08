@@ -214,7 +214,7 @@ const TinderStockCard = ({
         ref={cardRef}
         className={`w-full max-w-[min(95vw,400px)] md:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto shadow-2xl border-0 bg-card overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
           isExiting ? 'animate-scale-out' : 'animate-scale-in'
-        } h-full max-h-[70vh] sm:max-h-[75vh] lg:max-h-[92vh] rounded-2xl flex flex-col relative`}
+        } h-full max-h-[70vh] sm:max-h-[75vh] lg:max-h-[96vh] rounded-2xl flex flex-col relative`}
         style={{
           transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
           opacity,
@@ -230,7 +230,7 @@ const TinderStockCard = ({
         <CardContent className="p-0 flex flex-col h-full overflow-y-auto">
           {/* Header with gradient background */}
           <div 
-            className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-4 sm:p-5 lg:p-5 relative overflow-hidden rounded-t-2xl flex-shrink-0`}
+            className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-4 sm:p-5 lg:p-4 relative overflow-hidden rounded-t-2xl flex-shrink-0`}
           >
             <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/10 rounded-full -translate-y-6 sm:-translate-y-12 translate-x-6 sm:translate-x-12 animate-pulse"></div>
             <div className="absolute bottom-0 left-0 w-12 h-12 sm:w-16 sm:h-16 bg-white/10 rounded-full translate-y-4 sm:translate-y-8 -translate-x-4 sm:-translate-x-8 animate-pulse delay-75"></div>
@@ -282,7 +282,7 @@ const TinderStockCard = ({
           </div>
 
           {/* CEO Section with Stylish Initials */}
-          <div className="p-4 sm:p-6 lg:p-5 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-fade-in delay-300">
+          <div className="p-4 sm:p-6 lg:p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-fade-in delay-300">
             <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 mb-3">
               <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-blue-500/20">
                 <span className="text-white font-bold text-lg sm:text-xl lg:text-2xl tracking-wide">
@@ -324,13 +324,13 @@ const TinderStockCard = ({
           </div>
 
           {/* Financials Grid */}
-          <div className="p-4 sm:p-6 lg:p-5 bg-white dark:bg-gray-800 animate-fade-in delay-400">
+          <div className="p-4 sm:p-6 lg:p-3 bg-white dark:bg-gray-800 animate-fade-in delay-400">
             <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 text-base sm:text-lg lg:text-xl">
               <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
               Key Metrics
             </h4>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-4">
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-3 sm:p-4 lg:p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-3">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <p className="text-xs sm:text-sm lg:text-base text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
                   <EducationalTooltip 
@@ -339,7 +339,7 @@ const TinderStockCard = ({
                 </div>
                 <p className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
               </div>
-              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-3 sm:p-4 lg:p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <p className="text-xs sm:text-sm lg:text-base text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
                   <EducationalTooltip 
@@ -348,7 +348,7 @@ const TinderStockCard = ({
                 </div>
                 <p className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
               </div>
-              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-3 sm:p-4 lg:p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <p className="text-xs sm:text-sm lg:text-base text-green-600 dark:text-green-400 font-medium">Price/Share</p>
                   <EducationalTooltip 
@@ -358,7 +358,7 @@ const TinderStockCard = ({
                 <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
               </div>
               {stock.dividendYield > 0 && (
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-3 sm:p-4 lg:p-4 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
                   <div className="flex items-center justify-center gap-1 mb-1">
                     <p className="text-xs sm:text-sm lg:text-base text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
                     <EducationalTooltip 
@@ -372,12 +372,12 @@ const TinderStockCard = ({
           </div>
 
           {/* Why it fits section - More prominent */}
-          <div className="p-4 sm:p-6 lg:p-5 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500 flex-shrink-0">
+          <div className="p-4 sm:p-6 lg:p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500 flex-shrink-0">
             <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-base sm:text-lg lg:text-xl">
               <span className="text-lg lg:text-xl">💡</span>
               Why this matches you
             </h4>
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-5 lg:p-5 rounded-xl border border-white/50 dark:border-gray-600/50 shadow-lg">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-5 lg:p-4 rounded-xl border border-white/50 dark:border-gray-600/50 shadow-lg">
               <p className="text-sm sm:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
                 {stock.whyItFits}
               </p>
