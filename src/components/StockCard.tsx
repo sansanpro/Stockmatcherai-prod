@@ -60,7 +60,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
   const esgRating = getESGRating(stock.esgScore || 70);
 
   return (
-    <Card className="w-full max-w-md md:max-w-xl lg:max-w-3xl xl:max-w-4xl mx-auto shadow-xl border-0 bg-card overflow-hidden max-h-[85vh] lg:max-h-[calc(100vh-2rem)] overflow-y-auto">
+    <Card className="w-full max-w-md md:max-w-xl lg:max-w-3xl xl:max-w-4xl mx-auto shadow-xl border-0 bg-card overflow-hidden max-h-[85vh] lg:max-h-[calc(100vh-10rem)] overflow-y-auto">
       <CardContent className="p-0">
         {/* Header with company info */}
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 text-white p-4 sm:p-6 lg:p-4">

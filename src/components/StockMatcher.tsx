@@ -315,7 +315,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
         {/* Stock Cards Stack */}
         {allRecommendations.length > 0 && currentStock && (
-          <div className="mb-6 lg:mb-2 relative h-[65vh] lg:h-[88vh] max-h-[550px] lg:max-h-none min-h-[450px] animate-fade-in delay-300">
+          <div className="mb-6 lg:mb-2 relative h-[65vh] lg:h-[72vh] max-h-[550px] lg:max-h-none min-h-[450px] animate-fade-in delay-300">
             {visibleCards.map((stock, stackIndex) => {
               const cardIndex = currentIndex + stackIndex;
               const isActiveCard = stackIndex === 0;
