@@ -24,24 +24,17 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form submitted with profile:', profile);
-    console.log('User ID:', user?.id);
-    console.log('Is profile complete?', isProfileComplete(profile));
-    
     if (!user?.id) {
-      console.log('No user ID found');
       toast.error('You must be logged in to save your profile');
       return;
     }
 
     if (!isProfileComplete(profile)) {
-      console.log('Profile incomplete:', profile);
       toast.error('Please fill in all required fields');
       return;
     }
 
     setLoading(true);
-    console.log('Starting profile save process...');
     
     try {
       // Use the same saving logic as Index.tsx to avoid conflicts
@@ -61,8 +54,6 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
         updated_at: new Date().toISOString()
       };
 
-      console.log('Profile data to save:', profileData);
-
       const { data, error } = await supabase
         .from('user_profiles')
         .upsert(profileData, {
@@ -72,16 +63,13 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
         .single();
 
       if (error) {
-        console.error('Error saving user profile:', error);
         toast.error('Failed to save profile. Please try again.');
         return;
       }
 
-      console.log('Profile saved successfully:', data);
       toast.success(isUpdate ? 'Profile updated successfully!' : 'Profile saved successfully!');
       onComplete(profile as UserProfile);
     } catch (error) {
-      console.error('Error saving profile:', error);
       
       // Provide more specific error messages
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -102,28 +90,7 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
   };
 
   const isProfileComplete = (p: Partial<UserProfile>): p is UserProfile => {
-    const fields = {
-      age: p.age,
-      gender: p.gender,
-      salary: p.salary,
-      experience: p.experience,
-      riskTolerance: p.riskTolerance,
-      sectorPreference: p.sectorPreference,
-      investmentGoal: p.investmentGoal
-    };
-    
-    console.log('Profile completeness check:', fields);
-    
-    const missingFields = Object.entries(fields)
-      .filter(([key, value]) => !value && value !== 0) // Allow 0 salary
-      .map(([key]) => key);
-    
-    console.log('Missing fields:', missingFields);
-    
-    const isComplete = !!(p.age && p.gender && (p.salary || p.salary === 0) && p.experience && p.riskTolerance && p.sectorPreference && p.investmentGoal);
-    console.log('Is profile complete?', isComplete);
-    
-    return isComplete;
+    return !!(p.age && p.gender && (p.salary || p.salary === 0) && p.experience && p.riskTolerance && p.sectorPreference && p.investmentGoal);
   };
 
   return (
@@ -188,17 +155,14 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                   value={profile.salary || ''}
                   onChange={(e) => {
                     const value = e.target.value;
-                    console.log('Salary input raw value:', value);
                     
                     if (value === '') {
-                      console.log('Setting salary to null (empty input)');
                       setProfile(prev => ({ ...prev, salary: null }));
                     } else {
                       // Remove dollar sign, commas, and spaces for parsing
                       const cleanedValue = value.replace(/[$,\s]/g, '');
                       const parsed = parseInt(cleanedValue, 10);
                       const numValue = isNaN(parsed) || parsed < 0 ? null : parsed;
-                      console.log('Salary input changed:', value, '-> cleaned:', cleanedValue, '-> parsed:', numValue);
                       setProfile(prev => ({ ...prev, salary: numValue }));
                     }
                   }}

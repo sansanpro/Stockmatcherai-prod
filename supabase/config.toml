@@ -62,16 +62,16 @@ vector_port = 54328
 verify_jwt = true
 
 [functions.check-subscription]
-verify_jwt = false
+verify_jwt = true
 
 [functions.create-checkout-session]
-verify_jwt = false
+verify_jwt = true
 
 [functions.create-payment-intent]
-verify_jwt = false
+verify_jwt = true
 
 [functions.create-checkout]
-verify_jwt = false
+verify_jwt = true
 
 [functions.update-stock-data]
 verify_jwt = false

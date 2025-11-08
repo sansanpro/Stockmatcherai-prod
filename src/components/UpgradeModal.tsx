@@ -21,37 +21,22 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
 
   const handlePayment = async () => {
     setIsProcessing(true);
-    console.log('🚀 Starting checkout process...');
     
     try {
-      // Step 1: Validate authentication
-      console.log('🔐 Checking authentication state:', {
-        hasUser: !!user,
-        hasSession: !!session,
-        userEmail: user?.email,
-        sessionValid: !!session?.access_token
-      });
-
       if (!user || !session) {
         throw new Error('You must be logged in to upgrade. Please sign in and try again.');
       }
 
       if (!session.access_token) {
-        console.log('🔄 No access token in current session, refreshing session...');
         const { data: refreshedSession, error: refreshError } = await supabase.auth.getSession();
         
         if (refreshError || !refreshedSession.session?.access_token) {
           throw new Error('Authentication session expired. Please sign in again.');
         }
-        
-        console.log('✅ Session refreshed successfully');
       }
 
-      // Step 2: Prepare request
       const accessToken = session.access_token;
-      console.log('📡 Preparing checkout session request with token:', accessToken.substring(0, 20) + '...');
 
-      // Step 3: Call edge function
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -59,15 +44,7 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
         }
       });
 
-      console.log('📦 Edge function response:', {
-        hasData: !!data,
-        hasError: !!error,
-        dataKeys: data ? Object.keys(data) : [],
-        errorDetails: error
-      });
-
       if (error) {
-        console.error('❌ Edge function error:', error);
         throw new Error(`Checkout service error: ${error.message || JSON.stringify(error)}`);
       }
 
@@ -76,19 +53,12 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       }
 
       if (!data.clientSecret) {
-        console.error('❌ Missing client secret in response:', data);
         throw new Error('Invalid checkout response - missing client secret');
       }
 
-      console.log('✅ Received client secret for embedded checkout');
       setClientSecret(data.clientSecret);
       
     } catch (error: any) {
-      console.error('💥 Checkout error:', {
-        message: error?.message,
-        stack: error?.stack,
-        fullError: error
-      });
       
       let userMessage = 'Failed to start checkout process';
       
