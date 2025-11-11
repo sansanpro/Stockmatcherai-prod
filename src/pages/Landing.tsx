@@ -3,9 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, TrendingUp, Heart, Zap, Shield, Target } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
-import appScreenshot1 from "@/assets/app-screenshot-1.png";
-import appScreenshot2 from "@/assets/app-screenshot-2.png";
-import appScreenshot3 from "@/assets/app-screenshot-3.png";
+import appScreenshotMobile from "@/assets/app-screenshot-mobile.png";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -70,24 +68,12 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="flex justify-center max-w-md mx-auto">
             <div className="flex flex-col items-center space-y-4">
               <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-border">
-                <img src={appScreenshot1} alt="Stock matching interface showing personalized stock cards" className="w-full" />
+                <img src={appScreenshotMobile} alt="Stock matching interface preview" className="w-full" />
               </div>
-              <p className="text-center text-muted-foreground">Swipe through personalized stock matches</p>
-            </div>
-            <div className="flex flex-col items-center space-y-4">
-              <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-border">
-                <img src={appScreenshot2} alt="Why this matches you explanation screen" className="w-full" />
-              </div>
-              <p className="text-center text-muted-foreground">Understand why each stock fits your profile</p>
-            </div>
-            <div className="flex flex-col items-center space-y-4">
-              <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-border">
-                <img src={appScreenshot3} alt="Finding perfect matches loading screen" className="w-full" />
-              </div>
-              <p className="text-center text-muted-foreground">AI analyzes your preferences instantly</p>
+              <p className="text-center text-muted-foreground">AI-powered stock matching coming soon</p>
             </div>
           </div>
         </div>
