@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, TrendingUp, Heart, Zap, Shield, Target } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
+import appScreenshot1 from "@/assets/app-screenshot-1.png";
+import appScreenshot2 from "@/assets/app-screenshot-2.png";
+import appScreenshot3 from "@/assets/app-screenshot-3.png";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -41,23 +44,50 @@ const Landing = () => {
               Swipe through stocks tailored to your goals. No jargon, no overwhelm—just smart matches that fit your financial future.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <div className="flex justify-center pt-4">
               <Button 
                 size="lg" 
-                onClick={() => navigate("/auth")}
+                onClick={() => navigate("/waitlist")}
                 className="text-lg px-8 py-6 group"
               >
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                onClick={() => navigate("/auth")}
-                className="text-lg px-8 py-6"
-              >
-                Sign In
-              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* App Preview Section */}
+      <section className="py-20 md:py-32 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+              See It In Action
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              A glimpse of what's coming - your personalized stock matching experience
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-border">
+                <img src={appScreenshot1} alt="Stock matching interface showing personalized stock cards" className="w-full" />
+              </div>
+              <p className="text-center text-muted-foreground">Swipe through personalized stock matches</p>
+            </div>
+            <div className="flex flex-col items-center space-y-4">
+              <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-border">
+                <img src={appScreenshot2} alt="Why this matches you explanation screen" className="w-full" />
+              </div>
+              <p className="text-center text-muted-foreground">Understand why each stock fits your profile</p>
+            </div>
+            <div className="flex flex-col items-center space-y-4">
+              <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-border">
+                <img src={appScreenshot3} alt="Finding perfect matches loading screen" className="w-full" />
+              </div>
+              <p className="text-center text-muted-foreground">AI analyzes your preferences instantly</p>
             </div>
           </div>
         </div>
@@ -137,10 +167,10 @@ const Landing = () => {
             </p>
             <Button 
               size="lg" 
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate("/waitlist")}
               className="text-lg px-8 py-6 mt-8"
             >
-              Start Matching Stocks
+              Join the Waitlist
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
