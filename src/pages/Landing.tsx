@@ -73,7 +73,7 @@ const Landing = () => {
               <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-border">
                 <img src={appScreenshotMobile} alt="Stock matching interface preview" className="w-full" />
               </div>
-              <p className="text-center text-muted-foreground">AI-powered stock matching coming soon</p>
+              <p className="text-center text-muted-foreground">Swipe through stocks, find your perfect match</p>
             </div>
           </div>
         </div>
