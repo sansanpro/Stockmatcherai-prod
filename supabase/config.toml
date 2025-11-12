@@ -75,3 +75,7 @@ verify_jwt = true
 
 [functions.update-stock-data]
 verify_jwt = false
+
+# Cron job to update stock data every 4 hours
+[edge_runtime.cron_jobs]
+update-stock-data = "0 */4 * * *"
