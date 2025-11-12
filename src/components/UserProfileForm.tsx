@@ -246,22 +246,7 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
               </Select>
             </div>
 
-            {/* Debug Info - Remove after fixing */}
-            <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm">
-              <h4 className="font-semibold mb-2">Debug Info:</h4>
-              <div className="space-y-1">
-                <div>Age: {profile.age ? '✅' : '❌'} ({profile.age})</div>
-                <div>Gender: {profile.gender ? '✅' : '❌'} ({profile.gender})</div>
-                <div>Salary: {profile.salary ? '✅' : '❌'} ({profile.salary})</div>
-                <div>Experience: {profile.experience ? '✅' : '❌'} ({profile.experience})</div>
-                <div>Risk Tolerance: {profile.riskTolerance ? '✅' : '❌'} ({profile.riskTolerance})</div>
-                <div>Sector: {profile.sectorPreference ? '✅' : '❌'} ({profile.sectorPreference})</div>
-                <div>Goal: {profile.investmentGoal ? '✅' : '❌'} ({profile.investmentGoal})</div>
-                <div className="font-semibold">Complete: {isProfileComplete(profile) ? '✅' : '❌'}</div>
-              </div>
-            </div>
-
-            <Button 
+            <Button
               type="submit" 
               className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105"
               disabled={!isProfileComplete(profile) || loading}
