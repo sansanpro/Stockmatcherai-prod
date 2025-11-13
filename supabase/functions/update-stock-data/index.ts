@@ -183,7 +183,15 @@ Deno.serve(async (req) => {
       console.log(`🔄 Processing batch ${Math.floor(i / batchSize) + 1}: ${batchTickers.join(', ')}`);
 
       // Process tickers SEQUENTIALLY to avoid rate limits
-      for (const ticker of batchTickers) {
+      for (let tickerIndex = 0; tickerIndex < batchTickers.length; tickerIndex++) {
+        const ticker = batchTickers[tickerIndex];
+        
+        // Add delay between API calls (except for the first ticker in first batch)
+        if (i > 0 || tickerIndex > 0) {
+          console.log(`⏱️ Rate limiting: waiting 10 seconds before ${ticker}...`);
+          await new Promise(resolve => setTimeout(resolve, 10000));
+        }
+        
         try {
           console.log(`📊 Fetching data for ${ticker}...`);
           
