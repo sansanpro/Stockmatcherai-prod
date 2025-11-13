@@ -218,10 +218,10 @@ export class FMPService {
     for (let i = 0; i < symbols.length; i++) {
       const symbol = symbols[i];
       
-      // Rate limiting: FMP allows more calls but still be respectful
+      // Rate limiting: Increased to 3 seconds to avoid 429 errors on free tier
       if (i > 0) {
-        console.log(`Rate limiting: waiting 1 second before quote ${i + 1}...`);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log(`Rate limiting: waiting 3 seconds before quote ${i + 1}...`);
+        await new Promise(resolve => setTimeout(resolve, 3000));
       }
       
       const quote = await this.getQuote(symbol);
@@ -241,10 +241,10 @@ export class FMPService {
     for (let i = 0; i < symbols.length; i++) {
       const symbol = symbols[i];
       
-      // Rate limiting: FMP allows more calls but still be respectful
+      // Rate limiting: Increased to 3 seconds to avoid 429 errors on free tier
       if (i > 0) {
-        console.log(`Rate limiting: waiting 1 second before profile ${i + 1}...`);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log(`Rate limiting: waiting 3 seconds before profile ${i + 1}...`);
+        await new Promise(resolve => setTimeout(resolve, 3000));
       }
       
       const profile = await this.getCompanyProfile(symbol);
