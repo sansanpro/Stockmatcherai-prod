@@ -65,7 +65,7 @@ interface FMPProfile {
   isFund: boolean;
 }
 
-const FMP_BASE_URL = 'https://financialmodelingprep.com/api/v3';
+const FMP_BASE_URL = 'https://financialmodelingprep.com/stable';
 
 export class FMPService {
   private apiKey: string;
@@ -114,7 +114,7 @@ export class FMPService {
 
   async getQuote(symbol: string): Promise<any | null> {
     try {
-      const url = `${FMP_BASE_URL}/quote?symbol=${symbol}&apikey=${this.apiKey}`;
+      const url = `${FMP_BASE_URL}/quote-short?symbol=${symbol}&apikey=${this.apiKey}`;
       const data = await this.fetchWithCache(url, `quote_${symbol}`);
       
       if (!data || !Array.isArray(data) || data.length === 0) {
