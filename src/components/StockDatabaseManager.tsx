@@ -10,7 +10,6 @@ import { syncStaticDataToSupabase, getStockCountsByType } from '@/utils/supabase
 import StockDataImporter from './StockDataImporter';
 import AlphaVantageDataExpander from './AlphaVantageDataExpander';
 import StockExpansionTrigger from './StockExpansionTrigger';
-import StockAdder from './StockAdder';
 import { useToast } from '@/hooks/use-toast';
 import { StockRecommendation } from '@/types/stock-matcher';
 
@@ -152,17 +151,12 @@ const StockDatabaseManager = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="add" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="add">Add Stocks</TabsTrigger>
+      <Tabs defaultValue="expand" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="expand">Expand Stocks</TabsTrigger>
           <TabsTrigger value="sync">Supabase Sync</TabsTrigger>
           <TabsTrigger value="import">Import Data</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="add" className="space-y-4">
-          <StockAdder />
-        </TabsContent>
 
         <TabsContent value="expand" className="space-y-4">
           <StockExpansionTrigger />
