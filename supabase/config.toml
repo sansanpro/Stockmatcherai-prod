@@ -75,3 +75,6 @@ verify_jwt = true
 
 [functions.update-stock-data]
 verify_jwt = false
+
+[functions.add-stocks]
+verify_jwt = false

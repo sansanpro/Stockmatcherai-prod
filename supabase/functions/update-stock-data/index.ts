@@ -161,16 +161,50 @@ Deno.serve(async (req) => {
     
     console.log(`⚖️ Balanced sector selection - ${sortedTickers.length} tickers distributed across all sectors`);
 
-    // Optimize for FMP free plan rate limits (5 calls/min)
+    // Check if another update is already running (lock mechanism)
+    const { data: runningUpdates } = await supabase
+      .from('stock_update_logs')
+      .select('id')
+      .eq('status', 'running')
+      .gte('started_at', new Date(Date.now() - 5 * 60 * 1000).toISOString()); // Check last 5 minutes
+    
+    if (runningUpdates && runningUpdates.length > 0) {
+      console.log('⚠️ Another update is already running, skipping to avoid rate limit conflicts');
+      return new Response(
+        JSON.stringify({ 
+          message: 'Another update is already running',
+          success: true,
+          updated: 0,
+          failed: 0
+        }), 
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create lock entry
+    const { data: lockEntry } = await supabase
+      .from('stock_update_logs')
+      .insert({
+        sector: 'all',
+        update_type: updateType,
+        status: 'running',
+        started_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    const lockId = lockEntry?.id;
+
+    // Optimize for FMP premium plan (300 calls/min = 5 calls/sec)
     let successCount = 0;
     let failCount = 0;
-    const batchSize = 3; // Small batches to respect rate limits
+    const batchSize = 50; // Larger batches for premium tier
     let processedCount = 0;
-    const delayBetweenCalls = 15000; // 15 seconds between calls (4 calls/min safely)
+    const delayBetweenCalls = 200; // 200ms between calls (5 calls/sec)
 
-    console.log(`⚡ Optimized for FMP free plan - processing ${Math.min(20, sortedTickers.length)} stocks with rate limiting`);
+    console.log(`⚡ Optimized for FMP premium - processing up to 150 stocks with rate limiting (5 calls/sec)`);
 
-    for (let i = 0; i < sortedTickers.length && processedCount < 20; i += batchSize) {
+    for (let i = 0; i < sortedTickers.length && processedCount < 150; i += batchSize) {
       const currentTime = Date.now();
       const elapsedTime = currentTime - startTime;
       
@@ -182,14 +216,13 @@ Deno.serve(async (req) => {
       const batchTickers = sortedTickers.slice(i, i + batchSize);
       console.log(`🔄 Processing batch ${Math.floor(i / batchSize) + 1}: ${batchTickers.join(', ')}`);
 
-      // Process tickers SEQUENTIALLY to avoid rate limits
+      // Process tickers with optimized rate limiting
       for (let tickerIndex = 0; tickerIndex < batchTickers.length; tickerIndex++) {
         const ticker = batchTickers[tickerIndex];
         
-        // Add delay between API calls (except for the first ticker in first batch)
+        // Add delay between API calls (200ms for premium tier - 5 calls/sec)
         if (i > 0 || tickerIndex > 0) {
-          console.log(`⏱️ Rate limiting: waiting 10 seconds before ${ticker}...`);
-          await new Promise(resolve => setTimeout(resolve, 10000));
+          await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
         }
         
         try {
@@ -254,18 +287,26 @@ Deno.serve(async (req) => {
           }
           processedCount++;
 
-          // Rate limit: wait between each API call
-          if (processedCount < Math.min(20, sortedTickers.length)) {
-            console.log(`⏳ Rate limiting: waiting ${delayBetweenCalls/1000}s before next call...`);
-            await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
-          }
-
         } catch (error) {
           console.error(`❌ Error processing ${ticker}:`, error);
           failCount++;
           processedCount++;
         }
       }
+    }
+
+    // Release lock
+    if (lockId) {
+      await supabase
+        .from('stock_update_logs')
+        .update({
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+          stocks_updated: successCount,
+          stocks_failed: failCount,
+          api_calls_used: processedCount
+        })
+        .eq('id', lockId);
     }
 
     const summary = {
