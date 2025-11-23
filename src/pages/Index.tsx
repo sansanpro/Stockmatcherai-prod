@@ -4,8 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import UserProfileForm from '@/components/UserProfileForm';
 import StockMatcher from '@/components/StockMatcher';
-import AIStockMatcher from '@/components/AIStockMatcher';
 import Matches from '@/components/Matches';
+import AIAssistantWidget from '@/components/AIAssistantWidget';
 import Settings from '@/components/Settings';
 import NotificationSystem from '@/components/NotificationSystem';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -30,7 +30,6 @@ const IndexContent = () => {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [selectedStockForDetails, setSelectedStockForDetails] = useState<StockRecommendation | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [useAIMode, setUseAIMode] = useState(false);
   const { isDarkMode, toggleDarkMode, addToWatchlist, passStock } = useApp();
   const { user, loading } = useAuth();
   const { subscribed } = useSubscription();
@@ -286,27 +285,6 @@ const IndexContent = () => {
             <Heart className="w-4 h-4 fill-current" />
             Your Likes
           </Button>
-          {subscribed && currentStep === 'matching' && (
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => setUseAIMode(false)}
-                variant={!useAIMode ? 'default' : 'outline'}
-                size="sm"
-                className="text-xs"
-              >
-                Classic
-              </Button>
-              <Button
-                onClick={() => setUseAIMode(true)}
-                variant={useAIMode ? 'default' : 'outline'}
-                size="sm"
-                className="flex items-center gap-1 text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
-                <Sparkles className="w-3 h-3" />
-                AI
-              </Button>
-            </div>
-          )}
         </div>
         <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0 justify-end">
           <StockComparison availableStocks={[]} />
@@ -401,46 +379,12 @@ const IndexContent = () => {
     return (
       <ProtectedRoute>
         {!isMobile && <AppHeader />}
-        <div className={`min-h-screen w-full ${useAIMode && subscribed ? 'bg-gradient-to-br from-blue-50 to-purple-100 dark:from-blue-950/20 dark:to-purple-950/20' : 'bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700'} pt-[env(safe-area-inset-top)] overflow-auto ${isMobile ? 'pb-24' : 'pb-[env(safe-area-inset-bottom)]'}`}>
-          {useAIMode && subscribed ? (
-            <AIStockMatcher 
-              userProfile={userProfile!} 
-              onReset={() => setUseAIMode(false)}
-              onViewDetails={handleViewStockDetails}
-            />
-          ) : (
-            <StockMatcher 
-              userProfile={userProfile!} 
-              onReset={handleUpdateProfile}
-              onViewDetails={handleViewStockDetails}
-            />
-          )}
-          
-          {/* AI Mode Toggle for Mobile */}
-          {isMobile && subscribed && (
-            <div className="fixed top-4 left-4 right-4 z-10 flex justify-center">
-              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl p-1 shadow-lg border">
-                <Button
-                  onClick={() => setUseAIMode(false)}
-                  variant={!useAIMode ? 'default' : 'ghost'}
-                  size="sm"
-                  className="text-xs"
-                >
-                  Classic
-                </Button>
-                <Button
-                  onClick={() => setUseAIMode(true)}
-                  variant={useAIMode ? 'default' : 'ghost'}
-                  size="sm"
-                  className="flex items-center gap-1 text-xs"
-                >
-                  <Sparkles className="w-3 h-3" />
-                  AI
-                  <Badge className="ml-1 text-[10px] bg-gradient-to-r from-blue-600 to-purple-600">PRO</Badge>
-                </Button>
-              </div>
-            </div>
-          )}
+        <div className="min-h-screen w-full bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 pt-[env(safe-area-inset-top)] overflow-auto pb-24 md:pb-[env(safe-area-inset-bottom)]">
+          <StockMatcher 
+            userProfile={userProfile!} 
+            onReset={handleUpdateProfile}
+            onViewDetails={handleViewStockDetails}
+          />
         </div>
         <StockDetailsModal
           stock={selectedStockForDetails}
@@ -450,6 +394,7 @@ const IndexContent = () => {
           onPass={handlePassFromModal}
         />
         {isMobile && user && <BottomNavBar />}
+        <AIAssistantWidget />
       </ProtectedRoute>
     );
   }
@@ -471,6 +416,7 @@ const IndexContent = () => {
           onPass={handlePassFromModal}
         />
         {isMobile && user && <BottomNavBar />}
+        <AIAssistantWidget />
       </ProtectedRoute>
     );
   }
