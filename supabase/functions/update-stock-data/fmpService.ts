@@ -65,7 +65,7 @@ interface FMPProfile {
   isFund: boolean;
 }
 
-const FMP_BASE_URL = 'https://financialmodelingprep.com/stable';
+const FMP_BASE_URL = 'https://financialmodelingprep.com/api/v3';
 
 export class FMPService {
   private apiKey: string;
