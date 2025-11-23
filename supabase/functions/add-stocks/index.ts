@@ -49,18 +49,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { tickers } = await req.json();
-    
-    if (!tickers || !Array.isArray(tickers) || tickers.length === 0) {
-      return new Response(
-        JSON.stringify({ error: 'Please provide an array of ticker symbols' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const body = await req.json();
+    const { tickers, mode = 'manual' } = body;
     
     const fmpApiKey = Deno.env.get('FMP_API_KEY');
     if (!fmpApiKey) {
@@ -69,6 +59,35 @@ Deno.serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    let tickersToAdd: string[] = [];
+
+    // Auto mode: fetch popular stocks from FMP
+    if (mode === 'auto') {
+      console.log('🤖 Auto mode: Fetching popular stocks from FMP...');
+      
+      // Fetch stock gainers (popular/trending stocks)
+      const gainersUrl = `${FMP_BASE_URL}/stock_market/gainers?apikey=${fmpApiKey}`;
+      const gainersResponse = await fetch(gainersUrl);
+      const gainersData = await gainersResponse.json();
+      
+      // Get top 10 gainers
+      tickersToAdd = gainersData.slice(0, 10).map((stock: any) => stock.symbol);
+      console.log(`📈 Found ${tickersToAdd.length} trending stocks:`, tickersToAdd);
+    } else {
+      // Manual mode: use provided tickers
+      if (!tickers || !Array.isArray(tickers) || tickers.length === 0) {
+        return new Response(
+          JSON.stringify({ error: 'Please provide an array of ticker symbols' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      tickersToAdd = tickers;
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Check if update is currently running
     const { data: runningUpdates } = await supabase
@@ -87,13 +106,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`🎯 Adding ${tickers.length} stocks:`, tickers);
+    console.log(`🎯 Adding ${tickersToAdd.length} stocks:`, tickersToAdd);
 
     const results = [];
     const delayBetweenCalls = 200; // 200ms = 5 calls/sec
 
-    for (let i = 0; i < tickers.length; i++) {
-      const ticker = tickers[i].toUpperCase().trim();
+    for (let i = 0; i < tickersToAdd.length; i++) {
+      const ticker = tickersToAdd[i].toUpperCase().trim();
       
       try {
         // Add delay between calls (except first)
