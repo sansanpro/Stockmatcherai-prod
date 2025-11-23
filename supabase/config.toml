@@ -78,3 +78,6 @@ verify_jwt = false
 
 [functions.add-stocks]
 verify_jwt = false
+
+[functions.stock-assistant]
+verify_jwt = true
