@@ -95,14 +95,10 @@ export default function AIAssistantWidget() {
 
       if (response.status === 403) {
         const data = await response.json();
-        // Free user hit limit
-        setFreeMessageCount(prev => prev + 1);
-        setMessages(prev => prev.filter(m => m.id !== assistantMsgId));
-        if (freeMessageCount >= 1) {
-          setShowUpgradeModal(true);
-        } else {
-          toast.info('Try the AI assistant! One free message remaining before upgrade.');
-        }
+        // Free user hit limit - remove the placeholder message and show upgrade
+        setMessages(prev => prev.filter(m => m.id !== assistantMsgId && m.id !== userMsg.id));
+        toast.error(data.message || 'You\'ve reached your free message limit');
+        setShowUpgradeModal(true);
         setIsStreaming(false);
         return;
       }
