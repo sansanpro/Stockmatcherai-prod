@@ -55,8 +55,41 @@ serve(async (req) => {
   }
 
   try {
+    console.log('[stock-assistant] Request received');
+
+    // Check environment variables first
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_PUBLISHABLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY');
+    const fmpApiKey = Deno.env.get('FMP_API_KEY');
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('[stock-assistant] Missing Supabase credentials');
+      return new Response(JSON.stringify({ error: 'Server configuration error: Supabase credentials missing' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!fmpApiKey) {
+      console.error('[stock-assistant] Missing FMP_API_KEY');
+      return new Response(JSON.stringify({ error: 'Server configuration error: FMP API key missing' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!lovableApiKey) {
+      console.error('[stock-assistant] Missing LOVABLE_API_KEY');
+      return new Response(JSON.stringify({ error: 'Server configuration error: Lovable API key missing' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.log('[stock-assistant] No authorization header');
       return new Response(JSON.stringify({ error: 'No authorization header' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -64,20 +97,22 @@ serve(async (req) => {
     }
 
     // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    console.log('[stock-assistant] Initializing Supabase client');
     const supabase = createClient(supabaseUrl, supabaseKey, {
       global: { headers: { Authorization: authHeader } }
     });
 
     // Get user
+    console.log('[stock-assistant] Verifying user');
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
+      console.error('[stock-assistant] User auth failed:', userError);
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    console.log('[stock-assistant] User authenticated:', user.id);
 
     // Check subscription status
     const { data: subscription } = await supabase
@@ -141,8 +176,7 @@ serve(async (req) => {
       .single();
 
     // Initialize FMP service
-    const fmpApiKey = Deno.env.get('FMP_API_KEY');
-    if (!fmpApiKey) throw new Error('FMP_API_KEY not configured');
+    console.log('[stock-assistant] Initializing FMP service');
     const fmpService = new FMPService(fmpApiKey);
 
     // Define tools for AI
@@ -227,9 +261,7 @@ Format responses:
 Current date: ${new Date().toISOString().split('T')[0]}`;
 
     // Call Lovable AI with streaming
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!lovableApiKey) throw new Error('LOVABLE_API_KEY not configured');
-
+    console.log('[stock-assistant] Calling Lovable AI');
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
