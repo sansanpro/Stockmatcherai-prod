@@ -98,13 +98,12 @@ serve(async (req) => {
 
     // Initialize Supabase client
     console.log('[stock-assistant] Initializing Supabase client');
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      global: { headers: { Authorization: authHeader } }
-    });
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get user
+    // Get user - extract JWT from Authorization header
     console.log('[stock-assistant] Verifying user');
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     if (userError || !user) {
       console.error('[stock-assistant] User auth failed:', userError);
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
