@@ -77,12 +77,13 @@ export default function AIAssistantWidget() {
       }
 
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stock-assistant`,
+        'https://lswusuoiwyxtswnbllgk.supabase.co/functions/v1/stock-assistant',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzd3VzdW9pd3l4dHN3bmJsbGdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwNjU1MjgsImV4cCI6MjA2NjY0MTUyOH0.g7DgedllsJSFJyGYHfeYq_r9YWSjzCYXdHC7F4SL6Ao'
           },
           body: JSON.stringify({
             message: userMessage,
@@ -121,7 +122,9 @@ export default function AIAssistantWidget() {
       }
 
       if (!response.ok) {
-        throw new Error('Failed to get AI response');
+        const errorText = await response.text();
+        console.error('AI response error:', response.status, errorText);
+        throw new Error(`Failed to get AI response: ${response.status}`);
       }
 
       const reader = response.body!.getReader();
