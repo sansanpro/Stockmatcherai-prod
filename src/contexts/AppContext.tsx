@@ -39,7 +39,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     passes: 0,
     matchRate: 0
   });
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -53,8 +53,10 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     if (savedStats) {
       setSwipeStats(JSON.parse(savedStats));
     }
-    if (savedDarkMode) {
+    if (savedDarkMode !== null) {
       setIsDarkMode(JSON.parse(savedDarkMode));
+    } else {
+      setIsDarkMode(true); // Default to dark mode
     }
   }, []);
 

@@ -11,7 +11,6 @@ import NotificationSystem from '@/components/NotificationSystem';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UserMenu from '@/components/UserMenu';
 import StockDetailsModal from '@/components/StockDetailsModal';
-import StockComparison from '@/components/StockComparison';
 import { AppProvider, useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { SubscriptionProvider, useSubscription } from '@/contexts/SubscriptionContext';
@@ -21,7 +20,7 @@ import { Heart, Sparkles, Crown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { User as UserIcon, Scale, Heart as HeartIcon, Home } from 'lucide-react';
+import { User as UserIcon, Heart as HeartIcon, Home } from 'lucide-react';
 
 const IndexContent = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -226,8 +225,12 @@ const IndexContent = () => {
             </p>
             <div className="space-y-2 text-sm text-gray-500 dark:text-gray-400">
               <div className="flex items-center justify-center gap-2">
-                <span>✨</span>
+            <span>✨</span>
                 <span>AI-powered matching</span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <span>🤖</span>
+                <span>24/7 AI Research Assistant</span>
               </div>
               <div className="flex items-center justify-center gap-2">
                 <span>👤</span>
@@ -279,7 +282,6 @@ const IndexContent = () => {
           </Button>
         </div>
         <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0 justify-end">
-          <StockComparison availableStocks={[]} />
           <NotificationSystem />
           <UserMenu onOpenSettings={handleOpenSettings} />
         </div>
@@ -316,13 +318,6 @@ const IndexContent = () => {
       >
         <UserIcon className="w-5 h-5 mb-1" />
         <span className="text-[10px] font-medium">Profile</span>
-      </button>
-      <button 
-        onClick={handleOpenSettings} 
-        className="flex flex-col items-center min-h-[44px] min-w-[44px] justify-center text-muted-foreground transition-colors"
-      >
-        <Scale className="w-5 h-5 mb-1" />
-        <span className="text-[10px] font-medium">Compare</span>
       </button>
     </nav>
   );
