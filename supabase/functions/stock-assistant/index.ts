@@ -97,8 +97,10 @@ serve(async (req) => {
     }
 
     // Initialize Supabase client
-    console.log('[stock-assistant] Initializing Supabase client');
-    const supabase = createClient(supabaseUrl, supabaseKey);
+  console.log('[stock-assistant] Initializing Supabase client');
+  // Use service role key to bypass RLS for subscription checks
+  const supabaseServiceRole = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Get user - extract JWT from Authorization header
     console.log('[stock-assistant] Verifying user');
@@ -113,9 +115,9 @@ serve(async (req) => {
     }
     console.log('[stock-assistant] User authenticated:', user.id);
 
-    // Check subscription status
+    // Check subscription status using service role to bypass RLS
     console.log('[stock-assistant] Checking subscription for user:', user.id);
-    const { data: subscription, error: subError } = await supabase
+    const { data: subscription, error: subError } = await supabaseServiceRole
       .from('subscribers')
       .select('subscribed, subscription_tier, subscription_end')
       .eq('user_id', user.id)
