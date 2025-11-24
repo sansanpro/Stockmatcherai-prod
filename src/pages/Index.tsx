@@ -17,7 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { SubscriptionProvider, useSubscription } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
-import { Moon, Heart, Sparkles, Crown } from 'lucide-react';
+import { Heart, Sparkles, Crown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -244,14 +244,6 @@ const IndexContent = () => {
                   Get Started 🚀
                 </Button>
               </Link>
-              <Button
-                onClick={toggleDarkMode}
-                variant="outline"
-                className="w-full flex items-center justify-center gap-2 dark:border-gray-600 dark:text-gray-300"
-              >
-                <Moon className="w-4 h-4" />
-                {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-              </Button>
             </div>
           </CardContent>
         </Card>
@@ -289,14 +281,6 @@ const IndexContent = () => {
         <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0 justify-end">
           <StockComparison availableStocks={[]} />
           <NotificationSystem />
-          <Button
-            onClick={toggleDarkMode}
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <Moon className="w-4 h-4" />
-          </Button>
           <UserMenu onOpenSettings={handleOpenSettings} />
         </div>
       </div>
