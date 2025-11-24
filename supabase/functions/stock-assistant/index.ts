@@ -173,7 +173,7 @@ serve(async (req) => {
       console.log('[stock-assistant] Free user has', 2 - messagesUsedIncludingCurrent + 1, 'messages remaining');
     }
 
-    console.log('[stock-assistant] User is premium, proceeding with AI request');
+    console.log('[stock-assistant] Proceeding with AI request');
 
     // Create authenticated Supabase client for user-specific operations
     const supabaseAuth = createClient(supabaseUrl, supabaseKey, {
@@ -187,6 +187,7 @@ serve(async (req) => {
     // Get or create conversation
     let convId = conversationId;
     if (!convId) {
+      console.log('[stock-assistant] Creating new conversation');
       const { data: newConv, error: convError } = await supabaseAuth
         .from('ai_chat_conversations')
         .insert({
@@ -196,16 +197,26 @@ serve(async (req) => {
         .select()
         .single();
 
-      if (convError) throw convError;
+      if (convError) {
+        console.error('[stock-assistant] Error creating conversation:', convError);
+        throw convError;
+      }
       convId = newConv.id;
+      console.log('[stock-assistant] Created conversation:', convId);
     }
 
     // Save user message using authenticated client
-    await supabaseAuth.from('ai_chat_messages').insert({
+    console.log('[stock-assistant] Saving user message');
+    const { error: msgError } = await supabaseAuth.from('ai_chat_messages').insert({
       conversation_id: convId,
       role: 'user',
       content: message
     });
+    
+    if (msgError) {
+      console.error('[stock-assistant] Error saving message:', msgError);
+      throw msgError;
+    }
 
     // Load conversation history
     const { data: messages } = await supabaseAuth
@@ -334,6 +345,9 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
     });
 
     if (!aiResponse.ok) {
+      const errorBody = await aiResponse.text();
+      console.error('[stock-assistant] AI gateway error:', aiResponse.status, errorBody);
+      
       if (aiResponse.status === 429) {
         return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }), {
           status: 429,
@@ -346,8 +360,13 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      throw new Error(`AI gateway error: ${aiResponse.status}`);
+      return new Response(JSON.stringify({ error: `AI service error: ${aiResponse.status}` }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
+    
+    console.log('[stock-assistant] AI response received, starting stream');
 
     // Stream response back to client
     const stream = new ReadableStream({
