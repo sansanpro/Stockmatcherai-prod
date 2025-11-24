@@ -9,6 +9,7 @@ import { useSubscription } from '@/contexts/SubscriptionContext';
 import UpgradeModal from '@/components/UpgradeModal';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   id: string;
@@ -66,13 +67,22 @@ export default function AIAssistantWidget() {
     try {
       abortControllerRef.current = new AbortController();
 
+      // Get current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error('Please sign in to use the AI assistant');
+        setMessages(prev => prev.filter(m => m.id !== assistantMsgId));
+        setIsStreaming(false);
+        return;
+      }
+
       const response = await fetch(
-        'https://lswusuoiwyxtswnbllgk.supabase.co/functions/v1/stock-assistant',
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stock-assistant`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('sb-lswusuoiwyxtswnbllgk-auth-token') ? JSON.parse(localStorage.getItem('sb-lswusuoiwyxtswnbllgk-auth-token')!).access_token : ''}`
+            'Authorization': `Bearer ${session.access_token}`
           },
           body: JSON.stringify({
             message: userMessage,
@@ -197,7 +207,7 @@ export default function AIAssistantWidget() {
       {!isOpen && (
         <Button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-14 w-14 rounded-full shadow-lg z-50"
+          className="fixed bottom-20 right-4 md:bottom-24 md:right-6 h-14 w-14 rounded-full shadow-lg z-40"
           size="icon"
         >
           <Sparkles className="h-6 w-6" />
@@ -206,7 +216,7 @@ export default function AIAssistantWidget() {
 
       {/* Chat Widget */}
       {isOpen && (
-        <Card className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-[calc(100vw-2rem)] md:w-[400px] h-[600px] max-h-[calc(100vh-2rem)] shadow-xl z-50 flex flex-col">
+        <Card className="fixed bottom-20 right-4 md:bottom-24 md:right-6 w-[calc(100vw-2rem)] md:w-[400px] h-[600px] max-h-[calc(100vh-8rem)] shadow-xl z-40 flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-2">
