@@ -147,10 +147,19 @@ serve(async (req) => {
 
     console.log('[stock-assistant] User is premium, proceeding with AI request');
 
+    // Create authenticated Supabase client for user-specific operations
+    const supabaseAuth = createClient(supabaseUrl, supabaseKey, {
+      global: {
+        headers: {
+          Authorization: authHeader
+        }
+      }
+    });
+
     // Get or create conversation
     let convId = conversationId;
     if (!convId) {
-      const { data: newConv, error: convError } = await supabase
+      const { data: newConv, error: convError } = await supabaseAuth
         .from('ai_chat_conversations')
         .insert({
           user_id: user.id,
@@ -163,22 +172,22 @@ serve(async (req) => {
       convId = newConv.id;
     }
 
-    // Save user message
-    await supabase.from('ai_chat_messages').insert({
+    // Save user message using authenticated client
+    await supabaseAuth.from('ai_chat_messages').insert({
       conversation_id: convId,
       role: 'user',
       content: message
     });
 
     // Load conversation history
-    const { data: messages } = await supabase
+    const { data: messages } = await supabaseAuth
       .from('ai_chat_messages')
       .select('role, content')
       .eq('conversation_id', convId)
       .order('created_at', { ascending: true });
 
     // Get user profile for context
-    const { data: profile } = await supabase
+    const { data: profile } = await supabaseAuth
       .from('user_profiles')
       .select('*')
       .eq('user_id', user.id)
@@ -384,7 +393,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
 
           // Save assistant message
           if (assistantMessage) {
-            await supabase.from('ai_chat_messages').insert({
+            await supabaseAuth.from('ai_chat_messages').insert({
               conversation_id: convId,
               role: 'assistant',
               content: assistantMessage,
