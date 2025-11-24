@@ -88,9 +88,9 @@ Deno.serve(async (req) => {
       'utilities_stocks'
     ];
 
-    // Get all stocks older than 4 hours
-    const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
-    console.log(`⏰ Looking for stocks updated before: ${fourHoursAgo}`);
+    // Get all stocks older than 15 minutes
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    console.log(`⏰ Looking for stocks updated before: ${fifteenMinutesAgo}`);
 
     let allStaleStocks: DatabaseStock[] = [];
     
@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
         const { data: staleStocks, error } = await supabase
           .from(table)
           .select('*')
-          .lt('updated_at', fourHoursAgo);
+          .lt('updated_at', fifteenMinutesAgo);
 
         if (error) {
           console.error(`❌ Error fetching stale stocks from ${table}:`, error);
@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
     console.log(`🔍 Total stale stocks found: ${allStaleStocks.length}`);
 
     if (allStaleStocks.length === 0) {
-      console.log('✅ All stock data is up to date (less than 4 hours old)');
+      console.log('✅ All stock data is up to date (less than 15 minutes old)');
       return new Response(
         JSON.stringify({ 
           message: 'All stock data is up to date',
