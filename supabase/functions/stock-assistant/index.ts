@@ -253,16 +253,23 @@ serve(async (req) => {
 CRITICAL RULES:
 1. EDUCATIONAL FOCUS - Explain concepts, don't give financial advice. Never say "buy" or "sell".
 2. USE TOOLS - Always fetch real-time data when discussing specific stocks using the available tools.
-3. BE CONVERSATIONAL - Friendly, encouraging, use analogies for complex concepts.
-4. CITE SOURCES - Reference the data you fetch ("According to today's data...", "Currently trading at...").
-5. DISCLAIMERS - Remind users this is educational content, not investment advice.
-6. USER CONTEXT - Consider their experience level: ${profile?.investment_experience || 'beginner'}
+3. ANALYZE THE DATA - When you receive tool results, provide YOUR OWN analysis and insights.
+4. BE CONVERSATIONAL - Friendly, encouraging, use analogies for complex concepts.
+5. CITE SOURCES - Reference the data you fetch ("According to today's data...", "Currently trading at...").
+6. DISCLAIMERS - Remind users this is educational content, not investment advice.
+7. USER CONTEXT - Consider their experience level: ${profile?.investment_experience || 'beginner'}
 
 User Profile Summary:
 - Risk Tolerance: ${profile?.risk_tolerance || 'moderate'}
 - Investment Goals: ${profile?.investment_goals?.join(', ') || 'not specified'}
 - Experience: ${profile?.investment_experience || 'beginner'}
 - Interests: ${profile?.sectors_of_interest?.join(', ') || 'not specified'}
+
+RESPONSE GUIDELINES:
+- For PRICE questions ("What's the price of X?"): Give a direct answer with the current price, change, and volume.
+- For PERFORMANCE questions ("How is X performing?"): Analyze the data and explain what the numbers mean - is the stock up or down? By how much? What's the context?
+- For COMPARISON questions: Fetch multiple stocks and compare their metrics side by side.
+- Always interpret the raw data - explain what the numbers tell us about the stock's movement.
 
 When users ask about stocks:
 - Use get_stock_quote for current prices and changes
@@ -271,9 +278,10 @@ When users ask about stocks:
 - Compare stocks using data from multiple calls
 
 Format responses:
-- Use bullet points for clarity
+- Start with the direct answer to their question
+- Use bullet points for additional details
 - Short paragraphs (2-3 sentences)
-- Use markdown for emphasis
+- Use markdown for emphasis (**bold** for key numbers)
 - Include disclaimers
 
 Current date: ${new Date().toISOString().split('T')[0]}`;
@@ -319,13 +327,17 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
         const reader = aiResponse.body!.getReader();
         const decoder = new TextDecoder();
         let buffer = '';
-        let assistantMessage = '';
-        let toolCalls: any[] = [];
+        let collectedToolCalls: any[] = [];
+        let toolCallsComplete = false;
 
         try {
+          // PHASE 1: Collect tool calls from initial response
           while (true) {
             const { done, value } = await reader.read();
-            if (done) break;
+            if (done) {
+              toolCallsComplete = true;
+              break;
+            }
 
             buffer += decoder.decode(value, { stream: true });
             const lines = buffer.split('\n');
@@ -336,28 +348,22 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
               if (!line.startsWith('data: ')) continue;
 
               const data = line.slice(6).trim();
-              if (data === '[DONE]') continue;
+              if (data === '[DONE]') {
+                toolCallsComplete = true;
+                break;
+              }
 
               try {
                 const parsed = JSON.parse(data);
                 const choice = parsed.choices?.[0];
 
-                // Handle content delta
-                if (choice?.delta?.content) {
-                  assistantMessage += choice.delta.content;
-                  controller.enqueue(
-                    new TextEncoder().encode(
-                      `data: ${JSON.stringify({ type: 'content_delta', delta: choice.delta.content })}\n\n`
-                    )
-                  );
-                }
-
-                // Handle tool calls
+                // Collect tool calls
                 if (choice?.delta?.tool_calls) {
                   for (const toolCall of choice.delta.tool_calls) {
                     if (toolCall.function?.name) {
                       const toolName = toolCall.function.name;
                       const toolArgs = JSON.parse(toolCall.function.arguments || '{}');
+                      const toolId = toolCall.id || `call_${Date.now()}_${Math.random()}`;
 
                       console.log(`[Tool Call] ${toolName}`, toolArgs);
 
@@ -376,9 +382,14 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                         toolResult = { error: `Unable to fetch data: ${toolError.message}` };
                       }
 
-                      toolCalls.push({ name: toolName, args: toolArgs, result: toolResult });
+                      collectedToolCalls.push({ 
+                        id: toolId,
+                        name: toolName, 
+                        args: toolArgs, 
+                        result: toolResult 
+                      });
 
-                      // Send tool call to client
+                      // Send tool call to client for visibility
                       controller.enqueue(
                         new TextEncoder().encode(
                           `data: ${JSON.stringify({ 
@@ -394,16 +405,103 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                 console.error('Error parsing SSE:', e);
               }
             }
+
+            if (toolCallsComplete) break;
           }
 
-          // Save assistant message
-          if (assistantMessage) {
-            await supabaseAuth.from('ai_chat_messages').insert({
-              conversation_id: convId,
-              role: 'assistant',
-              content: assistantMessage,
-              tool_calls: toolCalls.length > 0 ? toolCalls : null
+          // PHASE 2: If we have tool calls, make follow-up request with results
+          if (collectedToolCalls.length > 0) {
+            console.log('[stock-assistant] Making follow-up call with tool results');
+
+            // Build messages array with tool results
+            const followUpMessages = [
+              { role: 'system', content: systemPrompt },
+              ...(messages || []),
+              {
+                role: 'assistant',
+                content: '',
+                tool_calls: collectedToolCalls.map(tc => ({
+                  id: tc.id,
+                  type: 'function',
+                  function: {
+                    name: tc.name,
+                    arguments: JSON.stringify(tc.args)
+                  }
+                }))
+              },
+              ...collectedToolCalls.map(tc => ({
+                role: 'tool',
+                tool_call_id: tc.id,
+                content: JSON.stringify(tc.result)
+              }))
+            ];
+
+            // Make follow-up API call for analysis
+            const followUpResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${lovableApiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                model: 'google/gemini-2.5-flash',
+                messages: followUpMessages,
+                stream: true,
+              }),
             });
+
+            if (!followUpResponse.ok) {
+              throw new Error(`Follow-up AI request failed: ${followUpResponse.status}`);
+            }
+
+            // Stream the follow-up response
+            const followUpReader = followUpResponse.body!.getReader();
+            let followUpBuffer = '';
+            let assistantMessage = '';
+
+            while (true) {
+              const { done, value } = await followUpReader.read();
+              if (done) break;
+
+              followUpBuffer += decoder.decode(value, { stream: true });
+              const followUpLines = followUpBuffer.split('\n');
+              followUpBuffer = followUpLines.pop() || '';
+
+              for (const line of followUpLines) {
+                if (!line.trim() || line.startsWith(':')) continue;
+                if (!line.startsWith('data: ')) continue;
+
+                const data = line.slice(6).trim();
+                if (data === '[DONE]') continue;
+
+                try {
+                  const parsed = JSON.parse(data);
+                  const choice = parsed.choices?.[0];
+
+                  // Stream content delta
+                  if (choice?.delta?.content) {
+                    assistantMessage += choice.delta.content;
+                    controller.enqueue(
+                      new TextEncoder().encode(
+                        `data: ${JSON.stringify({ type: 'content_delta', delta: choice.delta.content })}\n\n`
+                      )
+                    );
+                  }
+                } catch (e) {
+                  console.error('Error parsing follow-up SSE:', e);
+                }
+              }
+            }
+
+            // Save assistant message with tool calls
+            if (assistantMessage) {
+              await supabaseAuth.from('ai_chat_messages').insert({
+                conversation_id: convId,
+                role: 'assistant',
+                content: assistantMessage,
+                tool_calls: collectedToolCalls.length > 0 ? collectedToolCalls : null
+              });
+            }
           }
 
           controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
