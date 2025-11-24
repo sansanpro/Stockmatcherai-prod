@@ -325,9 +325,16 @@ Format responses:
 
 Current date: ${new Date().toISOString().split('T')[0]}`;
 
-    // Call Lovable AI with streaming
-    console.log('[stock-assistant] Calling Lovable AI');
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    // Call Lovable AI with streaming and timeout
+    console.log(`[stock-assistant] [${new Date().toISOString()}] Calling Lovable AI`);
+    const aiCallStart = Date.now();
+    
+    // Create timeout promise (45 seconds)
+    const timeoutPromise = new Promise<never>((_, reject) => 
+      setTimeout(() => reject(new Error('AI request timeout after 45 seconds')), 45000)
+    );
+    
+    const fetchPromise = fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${lovableApiKey}`,
@@ -343,6 +350,8 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
         stream: true,
       }),
     });
+    
+    const aiResponse = await Promise.race([fetchPromise, timeoutPromise]);
 
     if (!aiResponse.ok) {
       const errorBody = await aiResponse.text();
@@ -366,7 +375,8 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
       });
     }
     
-    console.log('[stock-assistant] AI response received, starting stream');
+    const aiCallDuration = Date.now() - aiCallStart;
+    console.log(`[stock-assistant] [${new Date().toISOString()}] AI response received in ${aiCallDuration}ms, starting stream`);
 
     // Stream response back to client
     const stream = new ReadableStream({
@@ -412,7 +422,8 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                       const toolArgs = JSON.parse(toolCall.function.arguments || '{}');
                       const toolId = toolCall.id || `call_${Date.now()}_${Math.random()}`;
 
-                      console.log(`[Tool Call] ${toolName}`, toolArgs);
+                      const toolCallStart = Date.now();
+                      console.log(`[${new Date().toISOString()}] [Tool Call] ${toolName}`, toolArgs);
 
                       // Execute tool with error handling
                       let toolResult;
@@ -428,6 +439,9 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                         console.error(`[Tool Error] ${toolName}:`, toolError);
                         toolResult = { error: `Unable to fetch data: ${toolError.message}` };
                       }
+                      
+                      const toolCallDuration = Date.now() - toolCallStart;
+                      console.log(`[${new Date().toISOString()}] [Tool Call Complete] ${toolName} took ${toolCallDuration}ms`);
 
                       collectedToolCalls.push({ 
                         id: toolId,
@@ -458,7 +472,14 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
 
           // PHASE 2: If we have tool calls, make follow-up request with results
           if (collectedToolCalls.length > 0) {
-            console.log('[stock-assistant] Making follow-up call with tool results');
+            console.log(`[${new Date().toISOString()}] [stock-assistant] Making follow-up call with tool results`);
+            
+            // Send analyzing status to client
+            controller.enqueue(
+              new TextEncoder().encode(
+                `data: ${JSON.stringify({ type: 'analyzing' })}\n\n`
+              )
+            );
 
             // Build messages array with tool results
             const followUpMessages = [
@@ -483,8 +504,13 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
               }))
             ];
 
-            // Make follow-up API call for analysis
-            const followUpResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+            // Make follow-up API call for analysis with timeout
+            const followUpStart = Date.now();
+            const followUpTimeoutPromise = new Promise<never>((_, reject) => 
+              setTimeout(() => reject(new Error('Follow-up AI request timeout after 45 seconds')), 45000)
+            );
+            
+            const followUpFetchPromise = fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${lovableApiKey}`,
@@ -496,6 +522,10 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                 stream: true,
               }),
             });
+
+            const followUpResponse = await Promise.race([followUpFetchPromise, followUpTimeoutPromise]);
+            const followUpDuration = Date.now() - followUpStart;
+            console.log(`[${new Date().toISOString()}] [stock-assistant] Follow-up response received in ${followUpDuration}ms`);
 
             if (!followUpResponse.ok) {
               throw new Error(`Follow-up AI request failed: ${followUpResponse.status}`);
@@ -552,9 +582,25 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
           }
 
           controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
+          console.log(`[${new Date().toISOString()}] [stock-assistant] Stream completed successfully`);
           controller.close();
         } catch (e) {
-          console.error('Stream error:', e);
+          console.error(`[${new Date().toISOString()}] [stock-assistant] Stream error:`, e);
+          
+          // Send error to client
+          try {
+            controller.enqueue(
+              new TextEncoder().encode(
+                `data: ${JSON.stringify({ 
+                  type: 'error', 
+                  message: e instanceof Error ? e.message : 'Unknown error occurred' 
+                })}\n\n`
+              )
+            );
+          } catch (encodeError) {
+            console.error('Failed to send error to client:', encodeError);
+          }
+          
           controller.error(e);
         }
       }
