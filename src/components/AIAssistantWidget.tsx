@@ -17,6 +17,7 @@ interface Message {
   content: string;
   timestamp: Date;
   toolCalls?: Array<{ name: string; args: any; result: any }>;
+  status?: 'fetching' | 'analyzing' | 'generating' | 'complete' | 'error';
 }
 
 export default function AIAssistantWidget() {
@@ -27,11 +28,13 @@ export default function AIAssistantWidget() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [freeMessageCount, setFreeMessageCount] = useState(0);
+  const [currentStatus, setCurrentStatus] = useState<string>('');
   
   const { user } = useAuth();
   const { subscribed } = useSubscription();
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const timeoutRef = useRef<number | null>(null);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -42,6 +45,7 @@ export default function AIAssistantWidget() {
 
   const streamMessage = async (userMessage: string) => {
     setIsStreaming(true);
+    setCurrentStatus('Connecting...');
 
     // Add user message to UI
     const userMsg: Message = {
@@ -60,12 +64,28 @@ export default function AIAssistantWidget() {
       role: 'assistant',
       content: '',
       timestamp: new Date(),
-      toolCalls: []
+      toolCalls: [],
+      status: 'fetching'
     };
     setMessages(prev => [...prev, assistantMsg]);
 
     try {
       abortControllerRef.current = new AbortController();
+      
+      // Set 60-second timeout
+      timeoutRef.current = window.setTimeout(() => {
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+          toast.error('Request timed out. This query may be too complex. Please try a simpler question.');
+          setMessages(prev => prev.map(m => 
+            m.id === assistantMsgId 
+              ? { ...m, status: 'error', content: 'Request timed out after 60 seconds. Please try asking a simpler question or breaking this into multiple questions.' }
+              : m
+          ));
+          setIsStreaming(false);
+          setCurrentStatus('');
+        }
+      }, 60000); // 60 seconds
 
       // Get current session token
       const { data: { session } } = await supabase.auth.getSession();
@@ -159,18 +179,29 @@ export default function AIAssistantWidget() {
             const chunk = JSON.parse(jsonStr);
 
             if (chunk.type === 'content_delta') {
+              setCurrentStatus('Generating response...');
               setMessages(prev => prev.map(msg =>
                 msg.id === assistantMsgId
-                  ? { ...msg, content: msg.content + chunk.delta }
+                  ? { ...msg, content: msg.content + chunk.delta, status: 'generating' }
                   : msg
               ));
             } else if (chunk.type === 'tool_call') {
+              const toolName = chunk.tool.name.replace('get_', '').replace('_', ' ');
+              setCurrentStatus(`Fetching ${toolName}...`);
               setMessages(prev => prev.map(msg =>
                 msg.id === assistantMsgId
                   ? { 
                       ...msg, 
-                      toolCalls: [...(msg.toolCalls || []), chunk.tool]
+                      toolCalls: [...(msg.toolCalls || []), chunk.tool],
+                      status: 'fetching'
                     }
+                  : msg
+              ));
+            } else if (chunk.type === 'analyzing') {
+              setCurrentStatus('Analyzing data...');
+              setMessages(prev => prev.map(msg =>
+                msg.id === assistantMsgId
+                  ? { ...msg, status: 'analyzing' }
                   : msg
               ));
             }
@@ -179,16 +210,30 @@ export default function AIAssistantWidget() {
           }
         }
       }
+      
+      // Mark as complete
+      setMessages(prev => prev.map(msg =>
+        msg.id === assistantMsgId
+          ? { ...msg, status: 'complete' }
+          : msg
+      ));
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.log('Stream aborted');
+        // Error message already set by timeout handler
       } else {
         console.error('Stream error:', error);
         toast.error('Failed to get response. Please try again.');
         setMessages(prev => prev.filter(m => m.id !== assistantMsgId));
       }
     } finally {
+      // Clear timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       setIsStreaming(false);
+      setCurrentStatus('');
       abortControllerRef.current = null;
     }
   };
@@ -314,10 +359,15 @@ export default function AIAssistantWidget() {
                 {isStreaming && (
                   <div className="flex justify-start">
                     <div className="bg-muted rounded-lg p-3">
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                        {currentStatus && (
+                          <span className="text-xs text-muted-foreground">{currentStatus}</span>
+                        )}
                       </div>
                     </div>
                   </div>
