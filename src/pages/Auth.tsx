@@ -58,55 +58,58 @@ const Auth = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+      <div className="dark min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="dark min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="mb-6">
-          <Link to="/" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+          <Link to="/" className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Link>
         </div>
         
-        <Card className="shadow-xl dark:bg-gray-800 dark:border-gray-700">
-          <CardHeader className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-2xl">📈</span>
+        <Card className="shadow-2xl bg-gray-800/50 border-gray-700/50 backdrop-blur-sm">
+          <CardHeader className="text-center space-y-4 pb-6">
+            <div className="mx-auto w-20 h-20 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
+              <span className="text-3xl">📈</span>
             </div>
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Stock Matcher AI
-            </CardTitle>
+            <div>
+              <CardTitle className="text-3xl font-bold text-white mb-2">
+                Stock Matcher AI
+              </CardTitle>
+              <p className="text-sm text-gray-400">Your AI-powered investment companion</p>
+            </div>
           </CardHeader>
           
-          <CardContent>
+          <CardContent className="pt-6">
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 bg-gray-900/50 p-1">
+                <TabsTrigger value="signin" className="data-[state=active]:bg-primary data-[state=active]:text-white">Sign In</TabsTrigger>
+                <TabsTrigger value="signup" className="data-[state=active]:bg-primary data-[state=active]:text-white">Sign Up</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="signin" className="space-y-4">
-                <form onSubmit={handleSignIn} className="space-y-4">
+              <TabsContent value="signin" className="space-y-5 mt-6">
+                <form onSubmit={handleSignIn} className="space-y-5">
                   <div className="space-y-2">
-                    <Label htmlFor="signin-email">Email</Label>
+                    <Label htmlFor="signin-email" className="text-gray-200">Email</Label>
                     <Input
                       id="signin-email"
                       name="email"
                       type="email"
                       placeholder="Enter your email"
                       required
-                      className="dark:bg-gray-700 dark:border-gray-600"
+                      className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-primary focus:ring-primary"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password">Password</Label>
+                    <Label htmlFor="signin-password" className="text-gray-200">Password</Label>
                     <div className="relative">
                       <Input
                         id="signin-password"
@@ -114,12 +117,12 @@ const Auth = () => {
                         type={showPassword ? "text" : "password"}
                         placeholder="Enter your password"
                         required
-                        className="dark:bg-gray-700 dark:border-gray-600 pr-10"
+                        className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-primary focus:ring-primary pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary transition-colors"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -128,7 +131,7 @@ const Auth = () => {
                   
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                    className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg shadow-primary/20 transition-all"
                     disabled={isLoading}
                   >
                     {isLoading ? 'Signing In...' : 'Sign In'}
@@ -136,28 +139,30 @@ const Auth = () => {
                 </form>
                 
                 <Tabs defaultValue="" className="w-full">
-                  <TabsList className="grid w-full grid-cols-1">
-                    <TabsTrigger value="reset">Forgot Password?</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-1 bg-transparent p-0 h-auto">
+                    <TabsTrigger value="reset" className="text-sm text-primary hover:text-primary/80 data-[state=active]:bg-transparent data-[state=active]:shadow-none justify-start p-0">
+                      Forgot Password?
+                    </TabsTrigger>
                   </TabsList>
                   
-                  <TabsContent value="reset" className="space-y-4">
+                  <TabsContent value="reset" className="space-y-4 mt-4">
                     <form onSubmit={handleResetPassword} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="reset-email">Email</Label>
+                        <Label htmlFor="reset-email" className="text-gray-200">Email</Label>
                         <Input
                           id="reset-email"
                           name="email"
                           type="email"
                           placeholder="Enter your email"
                           required
-                          className="dark:bg-gray-700 dark:border-gray-600"
+                          className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-primary focus:ring-primary"
                         />
                       </div>
                       
                       <Button
                         type="submit"
                         variant="outline"
-                        className="w-full"
+                        className="w-full border-gray-700 text-white hover:bg-gray-900/50 hover:text-primary"
                         disabled={isLoading}
                       >
                         {isLoading ? 'Sending...' : 'Send Reset Email'}
@@ -167,34 +172,34 @@ const Auth = () => {
                 </Tabs>
               </TabsContent>
               
-              <TabsContent value="signup" className="space-y-4">
-                <form onSubmit={handleSignUp} className="space-y-4">
+              <TabsContent value="signup" className="space-y-5 mt-6">
+                <form onSubmit={handleSignUp} className="space-y-5">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-name">Full Name</Label>
+                    <Label htmlFor="signup-name" className="text-gray-200">Full Name</Label>
                     <Input
                       id="signup-name"
                       name="fullName"
                       type="text"
                       placeholder="Enter your full name"
                       required
-                      className="dark:bg-gray-700 dark:border-gray-600"
+                      className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-primary focus:ring-primary"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
+                    <Label htmlFor="signup-email" className="text-gray-200">Email</Label>
                     <Input
                       id="signup-email"
                       name="email"
                       type="email"
                       placeholder="Enter your email"
                       required
-                      className="dark:bg-gray-700 dark:border-gray-600"
+                      className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-primary focus:ring-primary"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
+                    <Label htmlFor="signup-password" className="text-gray-200">Password</Label>
                     <div className="relative">
                       <Input
                         id="signup-password"
@@ -203,24 +208,24 @@ const Auth = () => {
                         placeholder="Create a password"
                         required
                         minLength={6}
-                        className="dark:bg-gray-700 dark:border-gray-600 pr-10"
+                        className="bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-primary focus:ring-primary pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary transition-colors"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-400">
                       Password must be at least 6 characters
                     </p>
                   </div>
                   
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                    className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg shadow-primary/20 transition-all"
                     disabled={isLoading}
                   >
                     {isLoading ? 'Creating Account...' : 'Create Account'}
@@ -231,7 +236,7 @@ const Auth = () => {
           </CardContent>
         </Card>
         
-        <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
+        <p className="text-center text-sm text-gray-400 mt-6">
           By signing up, you agree to our Terms of Service and Privacy Policy
         </p>
       </div>
