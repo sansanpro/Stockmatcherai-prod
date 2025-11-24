@@ -120,7 +120,20 @@ export default function AIAssistantWidget() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('AI response error:', response.status, errorText);
-        throw new Error(`Failed to get AI response: ${response.status}`);
+        
+        // Parse error message if it's JSON
+        let errorMessage = 'Failed to get AI response. Please try again.';
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // Not JSON, use default message
+        }
+        
+        toast.error(errorMessage);
+        setMessages(prev => prev.filter(m => m.id !== assistantMsgId));
+        setIsStreaming(false);
+        return;
       }
 
       const reader = response.body!.getReader();
