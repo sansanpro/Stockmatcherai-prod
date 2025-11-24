@@ -34,17 +34,17 @@ class FMPService {
   }
 
   async getQuote(symbol: string) {
-    const url = `https://financialmodelingprep.com/api/v3/quote-short/${symbol}?apikey=${this.apiKey}`;
+    const url = `https://financialmodelingprep.com/stable/quote-short?symbol=${symbol}&apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `quote_${symbol}`);
   }
 
   async getProfile(symbol: string) {
-    const url = `https://financialmodelingprep.com/api/v3/profile/${symbol}?apikey=${this.apiKey}`;
+    const url = `https://financialmodelingprep.com/stable/profile?symbol=${symbol}&apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `profile_${symbol}`);
   }
 
   async getMarketMovers(type: 'gainers' | 'losers') {
-    const url = `https://financialmodelingprep.com/api/v3/stock_market/${type}?apikey=${this.apiKey}`;
+    const url = `https://financialmodelingprep.com/stable/stock_market/${type}?apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `movers_${type}`);
   }
 }
@@ -361,14 +361,19 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
 
                       console.log(`[Tool Call] ${toolName}`, toolArgs);
 
-                      // Execute tool
+                      // Execute tool with error handling
                       let toolResult;
-                      if (toolName === 'get_stock_quote') {
-                        toolResult = await fmpService.getQuote(toolArgs.symbol);
-                      } else if (toolName === 'get_company_profile') {
-                        toolResult = await fmpService.getProfile(toolArgs.symbol);
-                      } else if (toolName === 'get_market_movers') {
-                        toolResult = await fmpService.getMarketMovers(toolArgs.type);
+                      try {
+                        if (toolName === 'get_stock_quote') {
+                          toolResult = await fmpService.getQuote(toolArgs.symbol);
+                        } else if (toolName === 'get_company_profile') {
+                          toolResult = await fmpService.getProfile(toolArgs.symbol);
+                        } else if (toolName === 'get_market_movers') {
+                          toolResult = await fmpService.getMarketMovers(toolArgs.type);
+                        }
+                      } catch (toolError) {
+                        console.error(`[Tool Error] ${toolName}:`, toolError);
+                        toolResult = { error: `Unable to fetch data: ${toolError.message}` };
                       }
 
                       toolCalls.push({ name: toolName, args: toolArgs, result: toolResult });
