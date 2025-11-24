@@ -83,7 +83,7 @@ const Auth = () => {
               <CardTitle className="text-3xl font-bold text-white mb-2">
                 Stock Matcher AI
               </CardTitle>
-              <p className="text-sm text-gray-400">Your AI-powered investment companion</p>
+              <p className="text-sm text-gray-400">Your AI-powered investment companion with <span className="text-primary font-semibold">real-time research assistant</span></p>
             </div>
           </CardHeader>
           

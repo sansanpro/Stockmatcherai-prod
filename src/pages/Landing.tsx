@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, TrendingUp, Heart, Zap, Shield, Target } from "lucide-react";
+import { ArrowRight, TrendingUp, Heart, Zap, Shield, Target, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import appScreenshotMobile from "@/assets/app-screenshot-mobile.png";
@@ -39,7 +39,7 @@ const Landing = () => {
             </p>
 
             <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              Swipe through stocks tailored to your goals. No jargon, no overwhelm—just smart matches that fit your financial future.
+              Swipe through stocks tailored to your goals. Chat with your <span className="text-primary font-semibold">AI Research Assistant 24/7</span>. No jargon, no overwhelm—just instant insights that power your financial future.
             </p>
 
             <div className="flex justify-center pt-4">
@@ -91,7 +91,13 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            <FeatureCard
+              icon={<Sparkles className="h-8 w-8" />}
+              title="AI Research Assistant"
+              description="Get instant, real-time stock insights from your personal AI advisor. Ask anything, anytime—live market intelligence at your fingertips."
+              featured
+            />
             <FeatureCard
               icon={<Heart className="h-8 w-8" />}
               title="Swipe to Match"
@@ -173,13 +179,27 @@ const Landing = () => {
   );
 };
 
-const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => (
-  <div className="p-6 rounded-lg bg-card border border-border hover:border-primary/50 transition-all hover:shadow-lg">
-    <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-4">
-      {icon}
+const FeatureCard = ({ icon, title, description, featured }: { icon: React.ReactNode; title: string; description: string; featured?: boolean }) => (
+  <div className={`p-6 rounded-lg bg-card border transition-all hover:shadow-lg ${
+    featured 
+      ? 'border-primary/70 shadow-lg shadow-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5' 
+      : 'border-border hover:border-primary/50'
+  }`}>
+    <div className={`h-12 w-12 rounded-lg flex items-center justify-center text-primary mb-4 ${
+      featured ? 'bg-gradient-to-br from-primary to-purple-500' : 'bg-primary/10'
+    }`}>
+      <div className={featured ? 'text-white' : ''}>
+        {icon}
+      </div>
     </div>
     <h3 className="text-xl font-semibold mb-2">{title}</h3>
     <p className="text-muted-foreground">{description}</p>
+    {featured && (
+      <div className="mt-3 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-xs font-medium text-primary">
+        <Sparkles className="h-3 w-3" />
+        Premium Feature
+      </div>
+    )}
   </div>
 );
 

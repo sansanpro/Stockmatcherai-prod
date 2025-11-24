@@ -131,19 +131,23 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500" />
+                    <span className="text-sm font-semibold">24/7 AI Stock Research Assistant</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500" />
+                    <span className="text-sm">Unlimited instant AI insights</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500" />
                     <span className="text-sm">Unlimited daily swipes</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-sm">Advanced filtering options</span>
+                    <span className="text-sm">Advanced filtering & analytics</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-sm">Detailed analytics</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-sm">Portfolio tracking</span>
+                    <span className="text-sm">Real-time portfolio tracking</span>
                   </div>
                 </div>
               </div>
