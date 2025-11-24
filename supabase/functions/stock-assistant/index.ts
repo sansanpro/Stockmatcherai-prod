@@ -134,42 +134,43 @@ serve(async (req) => {
 
     // For free users, check message limit (2 free messages)
     if (!isPremium) {
-      // Count user's previous messages
-      const { data: messageCount } = await supabaseServiceRole
-        .from('ai_chat_messages')
-        .select('id', { count: 'exact', head: true })
-        .eq('conversation_id', conversationId || 'none') // If no conversation, count will be 0
-        .eq('role', 'user');
+      // Get all user's conversation IDs
+      const { data: userConversations } = await supabaseServiceRole
+        .from('ai_chat_conversations')
+        .select('id')
+        .eq('user_id', user.id);
+
+      const conversationIds = userConversations?.map(c => c.id) || [];
 
       // Count all user messages across all conversations
-      const { count: totalUserMessages } = await supabaseServiceRole
-        .from('ai_chat_messages')
-        .select('id', { count: 'exact', head: true })
-        .eq('role', 'user')
-        .in('conversation_id', 
-          await supabaseServiceRole
-            .from('ai_chat_conversations')
-            .select('id')
-            .eq('user_id', user.id)
-            .then(res => res.data?.map(c => c.id) || [])
-        );
+      let totalUserMessages = 0;
+      if (conversationIds.length > 0) {
+        const { count } = await supabaseServiceRole
+          .from('ai_chat_messages')
+          .select('id', { count: 'exact', head: true })
+          .eq('role', 'user')
+          .in('conversation_id', conversationIds);
+        
+        totalUserMessages = count || 0;
+      }
 
-      const messagesUsed = totalUserMessages || 0;
-      console.log('[stock-assistant] Free user messages used:', messagesUsed);
+      // Add 1 to account for the current message being sent
+      const messagesUsedIncludingCurrent = totalUserMessages + 1;
+      console.log('[stock-assistant] Free user messages (including current):', messagesUsedIncludingCurrent);
 
-      if (messagesUsed >= 2) {
+      if (messagesUsedIncludingCurrent > 2) {
         console.log('[stock-assistant] User exceeded free message limit');
         return new Response(JSON.stringify({
           type: 'upgrade_required',
-          message: 'Unlock unlimited AI stock education with Premium! Get real-time analysis, personalized insights, and expert market guidance.',
-          freeMessagesSent: messagesUsed
+          message: 'You\'ve used your 2 free AI messages! Upgrade to Premium for unlimited AI stock research, real-time analysis, and expert market guidance.',
+          freeMessagesSent: messagesUsedIncludingCurrent - 1
         }), {
           status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
 
-      console.log('[stock-assistant] Free user has', 2 - messagesUsed, 'messages remaining');
+      console.log('[stock-assistant] Free user has', 2 - messagesUsedIncludingCurrent + 1, 'messages remaining');
     }
 
     console.log('[stock-assistant] User is premium, proceeding with AI request');
