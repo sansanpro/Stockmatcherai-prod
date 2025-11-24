@@ -114,19 +114,25 @@ serve(async (req) => {
     console.log('[stock-assistant] User authenticated:', user.id);
 
     // Check subscription status
-    const { data: subscription } = await supabase
+    console.log('[stock-assistant] Checking subscription for user:', user.id);
+    const { data: subscription, error: subError } = await supabase
       .from('subscribers')
-      .select('subscribed, subscription_tier')
+      .select('subscribed, subscription_tier, subscription_end')
       .eq('user_id', user.id)
       .single();
 
-    const isPremium = subscription?.subscribed === true;
+    console.log('[stock-assistant] Subscription data:', JSON.stringify(subscription));
+    console.log('[stock-assistant] Subscription error:', subError);
+
+    const isPremium = subscription?.subscribed === true || subscription?.subscription_tier === 'premium';
+    console.log('[stock-assistant] isPremium:', isPremium);
 
     // Parse request body
     const { message, conversationId } = await req.json();
 
     // For free users, return upgrade prompt after they send a message
     if (!isPremium) {
+      console.log('[stock-assistant] User is not premium, returning upgrade prompt');
       return new Response(JSON.stringify({
         type: 'upgrade_required',
         message: 'Unlock unlimited AI stock education with Premium! Get real-time analysis, personalized insights, and expert market guidance.',
@@ -136,6 +142,8 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    console.log('[stock-assistant] User is premium, proceeding with AI request');
 
     // Get or create conversation
     let convId = conversationId;
