@@ -44,7 +44,8 @@ class FMPService {
   }
 
   async getMarketMovers(type: 'gainers' | 'losers') {
-    const url = `https://financialmodelingprep.com/stable/stock_market/${type}?apikey=${this.apiKey}`;
+    const endpoint = type === 'gainers' ? 'biggest-gainers' : 'biggest-losers';
+    const url = `https://financialmodelingprep.com/stable/${endpoint}?apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `movers_${type}`);
   }
 
