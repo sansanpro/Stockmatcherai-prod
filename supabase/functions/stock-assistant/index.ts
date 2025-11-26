@@ -469,8 +469,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                           toolResult = await fmpService.getProfile(toolArgs.symbol);
                         } else if (toolName === 'get_market_movers') {
                           toolResult = await fmpService.getMarketMovers(toolArgs.type);
-                        }
-                      } else if (toolName === 'get_historical_prices') {
+                        } else if (toolName === 'get_historical_prices') {
                           toolResult = await fmpService.getHistoricalPrices(toolArgs.symbol, toolArgs.days || 30);
                         }
                       } catch (toolError) {
