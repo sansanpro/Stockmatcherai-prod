@@ -47,6 +47,11 @@ class FMPService {
     const url = `https://financialmodelingprep.com/stable/stock_market/${type}?apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `movers_${type}`);
   }
+
+  async getHistoricalPrices(symbol: string, days: number = 30) {
+    const url = `https://financialmodelingprep.com/stable/historical-price-full/${symbol}?timeseries=${days}&apikey=${this.apiKey}`;
+    return this.fetchWithCache(url, `historical_${symbol}_${days}d`);
+  }
 }
 
 serve(async (req) => {
@@ -283,6 +288,25 @@ serve(async (req) => {
             required: ["type"]
           }
         }
+      },
+      {
+        type: "function",
+        function: {
+          name: "get_historical_prices",
+          description: "Get historical daily price data for a stock to analyze trends, trajectory, and performance over time",
+          parameters: {
+            type: "object",
+            properties: {
+              symbol: { type: "string", description: "Stock ticker symbol" },
+              days: { 
+                type: "number", 
+                description: "Number of days of historical data (default: 30, max: 365)",
+                default: 30
+              }
+            },
+            required: ["symbol"]
+          }
+        }
       }
     ];
 
@@ -386,9 +410,10 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
         let buffer = '';
         let collectedToolCalls: any[] = [];
         let toolCallsComplete = false;
+        let directContent = ''; // Capture text-only responses
 
         try {
-          // PHASE 1: Collect tool calls from initial response
+          // PHASE 1: Collect tool calls AND stream any direct content
           while (true) {
             const { done, value } = await reader.read();
             if (done) {
@@ -414,6 +439,16 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                 const parsed = JSON.parse(data);
                 const choice = parsed.choices?.[0];
 
+                // Stream direct content immediately (text-only responses)
+                if (choice?.delta?.content) {
+                  directContent += choice.delta.content;
+                  controller.enqueue(
+                    new TextEncoder().encode(
+                      `data: ${JSON.stringify({ type: 'content_delta', delta: choice.delta.content })}\n\n`
+                    )
+                  );
+                }
+
                 // Collect tool calls
                 if (choice?.delta?.tool_calls) {
                   for (const toolCall of choice.delta.tool_calls) {
@@ -434,6 +469,9 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                           toolResult = await fmpService.getProfile(toolArgs.symbol);
                         } else if (toolName === 'get_market_movers') {
                           toolResult = await fmpService.getMarketMovers(toolArgs.type);
+                        }
+                      } else if (toolName === 'get_historical_prices') {
+                          toolResult = await fmpService.getHistoricalPrices(toolArgs.symbol, toolArgs.days || 30);
                         }
                       } catch (toolError) {
                         console.error(`[Tool Error] ${toolName}:`, toolError);
@@ -579,6 +617,14 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                 tool_calls: collectedToolCalls.length > 0 ? collectedToolCalls : null
               });
             }
+          } else if (directContent) {
+            // No tool calls, but we have direct content - save it
+            console.log('[stock-assistant] Text-only response, saving to DB');
+            await supabaseAuth.from('ai_chat_messages').insert({
+              conversation_id: convId,
+              role: 'assistant',
+              content: directContent
+            });
           }
 
           controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
