@@ -66,6 +66,26 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
     }
   };
 
+  // Map income ranges to representative values for database storage
+  const incomeRangeMap: { [key: string]: number } = {
+    '0-50000': 25000,
+    '50000-85000': 67500,
+    '85000-100000': 92500,
+    '100000-150000': 125000,
+    '150000-200000': 175000,
+    '200000+': 250000,
+  };
+
+  const getIncomeRangeFromSalary = (salary: number | null | undefined): string => {
+    if (!salary) return '';
+    if (salary < 50000) return '0-50000';
+    if (salary < 85000) return '50000-85000';
+    if (salary < 100000) return '85000-100000';
+    if (salary < 150000) return '100000-150000';
+    if (salary < 200000) return '150000-200000';
+    return '200000+';
+  };
+
   const handleInputChange = (field: keyof UserProfile, value: string | number) => {
     if (!profile) return;
     
@@ -142,14 +162,26 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="salary">Annual Salary</Label>
-                    <Input
-                      id="salary"
-                      type="number"
-                      value={profile.salary}
-                      onChange={(e) => handleInputChange('salary', parseInt(e.target.value))}
-                      placeholder="Enter annual salary"
-                    />
+                    <Label htmlFor="salary">Annual Income</Label>
+                    <Select 
+                      value={getIncomeRangeFromSalary(profile.salary)} 
+                      onValueChange={(value) => {
+                        const salaryValue = incomeRangeMap[value];
+                        handleInputChange('salary', salaryValue);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your income range" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0-50000">$0 - $50,000</SelectItem>
+                        <SelectItem value="50000-85000">$50,000 - $85,000</SelectItem>
+                        <SelectItem value="85000-100000">$85,000 - $100,000</SelectItem>
+                        <SelectItem value="100000-150000">$100,000 - $150,000</SelectItem>
+                        <SelectItem value="150000-200000">$150,000 - $200,000</SelectItem>
+                        <SelectItem value="200000+">$200,000+</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
