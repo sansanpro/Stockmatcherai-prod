@@ -93,19 +93,39 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
     return !!(p.age && p.gender && (p.salary || p.salary === 0) && p.experience && p.riskTolerance && p.sectorPreference && p.investmentGoal);
   };
 
+  // Map income ranges to representative values for database storage
+  const incomeRangeMap: { [key: string]: number } = {
+    '0-50000': 25000,
+    '50000-85000': 67500,
+    '85000-100000': 92500,
+    '100000-150000': 125000,
+    '150000-200000': 175000,
+    '200000+': 250000,
+  };
+
+  const getIncomeRangeFromSalary = (salary: number | null | undefined): string => {
+    if (!salary) return '';
+    if (salary < 50000) return '0-50000';
+    if (salary < 85000) return '50000-85000';
+    if (salary < 100000) return '85000-100000';
+    if (salary < 150000) return '100000-150000';
+    if (salary < 200000) return '150000-200000';
+    return '200000+';
+  };
+
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card className="shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            {isUpdate ? 'Update your profile 📝' : 'Tell us about yourself 📋'}
+    <div className="max-w-2xl mx-auto p-4">
+      <Card className="border-border/50">
+        <CardHeader className="space-y-1 pb-6">
+          <CardTitle className="text-3xl font-bold text-center">
+            {isUpdate ? 'Update your profile' : 'Tell us about yourself'}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="age">Age 🎂</Label>
+                <Label htmlFor="age">Age</Label>
                 <Input
                   id="age"
                   type="number"
@@ -123,13 +143,13 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                     
                     setProfile(prev => ({ ...prev, age: numValue }));
                   }}
-                  placeholder="25"
+                  placeholder="29"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="gender">Gender 👤</Label>
+                <Label htmlFor="gender">Gender</Label>
                 <Select 
                   onValueChange={(value) => setProfile(prev => ({ ...prev, gender: value }))}
                   value={profile.gender}
@@ -148,31 +168,30 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="salary">Annual Salary 💰</Label>
-                <Input
-                  id="salary"
-                  type="text"
-                  value={profile.salary || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    
-                    if (value === '') {
-                      setProfile(prev => ({ ...prev, salary: null }));
-                    } else {
-                      // Remove dollar sign, commas, and spaces for parsing
-                      const cleanedValue = value.replace(/[$,\s]/g, '');
-                      const parsed = parseInt(cleanedValue, 10);
-                      const numValue = isNaN(parsed) || parsed < 0 ? null : parsed;
-                      setProfile(prev => ({ ...prev, salary: numValue }));
-                    }
-                  }}
-                  placeholder="$60,000"
-                  required
-                />
+              <Label>Annual Income</Label>
+              <Select 
+                onValueChange={(value) => {
+                  const salaryValue = incomeRangeMap[value];
+                  setProfile(prev => ({ ...prev, salary: salaryValue }));
+                }}
+                value={getIncomeRangeFromSalary(profile.salary)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your income range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0-50000">$0 - $50,000</SelectItem>
+                  <SelectItem value="50000-85000">$50,000 - $85,000</SelectItem>
+                  <SelectItem value="85000-100000">$85,000 - $100,000</SelectItem>
+                  <SelectItem value="100000-150000">$100,000 - $150,000</SelectItem>
+                  <SelectItem value="150000-200000">$150,000 - $200,000</SelectItem>
+                  <SelectItem value="200000+">$200,000+</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Investment Experience 📚</Label>
+              <Label>Investment Experience</Label>
               <Select 
                 onValueChange={(value) => setProfile(prev => ({ ...prev, experience: value }))}
                 value={profile.experience}
@@ -190,7 +209,7 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
             </div>
 
             <div className="space-y-2">
-              <Label>Risk Tolerance ⚖️</Label>
+              <Label>Risk Tolerance</Label>
               <Select 
                 onValueChange={(value) => setProfile(prev => ({ ...prev, riskTolerance: value }))}
                 value={profile.riskTolerance}
@@ -199,15 +218,15 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
                   <SelectValue placeholder="How much risk are you comfortable with?" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Low - I prefer stable, predictable returns</SelectItem>
-                  <SelectItem value="medium">Medium - I can handle some volatility</SelectItem>
-                  <SelectItem value="high">High - I want maximum growth potential</SelectItem>
+                  <SelectItem value="low">Low - Stable, predictable returns</SelectItem>
+                  <SelectItem value="medium">Medium - Some volatility acceptable</SelectItem>
+                  <SelectItem value="high">High - Maximum growth potential</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Preferred Sector 🏢</Label>
+              <Label>Preferred Sector</Label>
               <Select 
                 onValueChange={(value) => setProfile(prev => ({ ...prev, sectorPreference: value }))}
                 value={profile.sectorPreference}
@@ -228,7 +247,7 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
             </div>
 
             <div className="space-y-2">
-              <Label>Investment Goal 🎯</Label>
+              <Label>Investment Goal</Label>
               <Select 
                 onValueChange={(value) => setProfile(prev => ({ ...prev, investmentGoal: value }))}
                 value={profile.investmentGoal}
@@ -248,10 +267,11 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
 
             <Button
               type="submit" 
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105"
+              className="w-full"
+              size="lg"
               disabled={!isProfileComplete(profile) || loading}
             >
-              {loading ? 'Saving...' : (isUpdate ? 'Update Profile ✨' : 'Find My Stock Matches ✨')}
+              {loading ? 'Saving...' : (isUpdate ? 'Update Profile' : 'Find My Stock Matches')}
             </Button>
           </form>
         </CardContent>
