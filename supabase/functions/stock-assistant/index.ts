@@ -34,23 +34,22 @@ class FMPService {
   }
 
   async getQuote(symbol: string) {
-    const url = `https://financialmodelingprep.com/stable/quote-short?symbol=${symbol}&apikey=${this.apiKey}`;
+    const url = `https://financialmodelingprep.com/api/v3/quote/${symbol}?apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `quote_${symbol}`);
   }
 
   async getProfile(symbol: string) {
-    const url = `https://financialmodelingprep.com/stable/profile?symbol=${symbol}&apikey=${this.apiKey}`;
+    const url = `https://financialmodelingprep.com/api/v3/profile/${symbol}?apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `profile_${symbol}`);
   }
 
   async getMarketMovers(type: 'gainers' | 'losers') {
-    const endpoint = type === 'gainers' ? 'biggest-gainers' : 'biggest-losers';
-    const url = `https://financialmodelingprep.com/stable/${endpoint}?apikey=${this.apiKey}`;
+    const url = `https://financialmodelingprep.com/api/v3/stock_market/${type}?apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `movers_${type}`);
   }
 
   async getHistoricalPrices(symbol: string, days: number = 30) {
-    const url = `https://financialmodelingprep.com/stable/historical-price-full/${symbol}?timeseries=${days}&apikey=${this.apiKey}`;
+    const url = `https://financialmodelingprep.com/api/v3/historical-price-full/${symbol}?timeseries=${days}&apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `historical_${symbol}_${days}d`);
   }
 }
