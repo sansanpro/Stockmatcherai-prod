@@ -217,6 +217,22 @@ export default function AIAssistantWidget() {
           ? { ...msg, status: 'complete' }
           : msg
       ));
+
+      // Handle empty response
+      const finalMessage = messages.find(m => m.id === assistantMsgId);
+      if (finalMessage && !finalMessage.content.trim()) {
+        setMessages(prev => prev.map(m => 
+          m.id === assistantMsgId 
+            ? { ...m, content: "I couldn't generate a response. Please try rephrasing your question.", status: 'error' }
+            : m
+        ));
+        toast.error('Received empty response. Please try again.');
+      } else {
+        // Increment free message count on successful response
+        if (!subscribed) {
+          setFreeMessageCount(prev => prev + 1);
+        }
+      }
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.log('Stream aborted');
