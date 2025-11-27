@@ -138,7 +138,7 @@ serve(async (req) => {
     // Parse request body
     const { message, conversationId } = await req.json();
 
-    // For free users, check message limit (2 free messages)
+    // For free users, check message limit (2 free messages per 24 hours)
     if (!isPremium) {
       // Get all user's conversation IDs
       const { data: userConversations } = await supabaseServiceRole
@@ -148,27 +148,30 @@ serve(async (req) => {
 
       const conversationIds = userConversations?.map(c => c.id) || [];
 
-      // Count all user messages across all conversations
+      // Count user messages from the last 24 hours only
       let totalUserMessages = 0;
       if (conversationIds.length > 0) {
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        
         const { count } = await supabaseServiceRole
           .from('ai_chat_messages')
           .select('id', { count: 'exact', head: true })
           .eq('role', 'user')
-          .in('conversation_id', conversationIds);
+          .in('conversation_id', conversationIds)
+          .gte('created_at', twentyFourHoursAgo);
         
         totalUserMessages = count || 0;
       }
 
       // Add 1 to account for the current message being sent
       const messagesUsedIncludingCurrent = totalUserMessages + 1;
-      console.log('[stock-assistant] Free user messages (including current):', messagesUsedIncludingCurrent);
+      console.log('[stock-assistant] Free user messages in last 24h (including current):', messagesUsedIncludingCurrent);
 
       if (messagesUsedIncludingCurrent > 2) {
         console.log('[stock-assistant] User exceeded free message limit');
         return new Response(JSON.stringify({
           type: 'upgrade_required',
-          message: 'You\'ve used your 2 free AI messages! Upgrade to Premium for unlimited AI stock research, real-time analysis, and expert market guidance.',
+          message: 'You\'ve used your 2 free AI messages in the last 24 hours! Your limit will reset automatically, or upgrade to Premium for unlimited AI stock research, real-time analysis, and expert market guidance.',
           freeMessagesSent: messagesUsedIncludingCurrent - 1
         }), {
           status: 403,
@@ -176,7 +179,7 @@ serve(async (req) => {
         });
       }
 
-      console.log('[stock-assistant] Free user has', 2 - messagesUsedIncludingCurrent + 1, 'messages remaining');
+      console.log('[stock-assistant] Free user has', 2 - messagesUsedIncludingCurrent + 1, 'messages remaining in next 24h');
     }
 
     console.log('[stock-assistant] Proceeding with AI request');

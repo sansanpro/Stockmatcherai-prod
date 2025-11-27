@@ -43,6 +43,43 @@ export default function AIAssistantWidget() {
     }
   }, [messages]);
 
+  // Fetch actual message count from last 24 hours when widget opens
+  useEffect(() => {
+    const fetchMessageCount = async () => {
+      if (!user || subscribed || !isOpen) return;
+
+      try {
+        // Get user's conversations
+        const { data: conversations } = await supabase
+          .from('ai_chat_conversations')
+          .select('id')
+          .eq('user_id', user.id);
+
+        if (!conversations || conversations.length === 0) {
+          setFreeMessageCount(0);
+          return;
+        }
+
+        const conversationIds = conversations.map(c => c.id);
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+        // Count messages from last 24 hours
+        const { count } = await supabase
+          .from('ai_chat_messages')
+          .select('id', { count: 'exact', head: true })
+          .eq('role', 'user')
+          .in('conversation_id', conversationIds)
+          .gte('created_at', twentyFourHoursAgo);
+
+        setFreeMessageCount(count || 0);
+      } catch (error) {
+        console.error('Error fetching message count:', error);
+      }
+    };
+
+    fetchMessageCount();
+  }, [user, subscribed, isOpen]);
+
   const streamMessage = async (userMessage: string) => {
     setIsStreaming(true);
     setCurrentStatus('Connecting...');
@@ -269,7 +306,7 @@ export default function AIAssistantWidget() {
   const handleNewChat = () => {
     setConversationId(null);
     setMessages([]);
-    setFreeMessageCount(0);
+    // Don't reset freeMessageCount - it persists across conversations in 24h period
   };
 
   if (!user) return null;
