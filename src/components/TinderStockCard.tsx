@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { StockRecommendation } from '@/types/stock-matcher';
-import { Heart, X, TrendingUp, DollarSign, Building, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { Heart, X, TrendingUp, DollarSign, Building, Eye, ChevronDown, ChevronUp, Minimize2 } from 'lucide-react';
 import EducationalTooltip from '@/components/EducationalTooltip';
 import DataFreshnessIndicator from '@/components/DataFreshnessIndicator';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 interface TinderStockCardProps {
   stock: StockRecommendation;
@@ -31,7 +31,10 @@ const TinderStockCard = ({
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [isExiting, setIsExiting] = useState(false);
   const [isCeoExpanded, setIsCeoExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [hasDragged, setHasDragged] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const tapThreshold = 10; // pixels - if drag is less than this, it's a tap
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -72,6 +75,7 @@ const TinderStockCard = ({
 
   const handleStart = (clientX: number, clientY: number) => {
     setIsDragging(true);
+    setHasDragged(false);
     setStartPos({ x: clientX, y: clientY });
   };
 
@@ -80,6 +84,12 @@ const TinderStockCard = ({
     
     const deltaX = clientX - startPos.x;
     const deltaY = clientY - startPos.y;
+    
+    // Check if we've moved enough to consider it a drag
+    if (Math.abs(deltaX) > tapThreshold || Math.abs(deltaY) > tapThreshold) {
+      setHasDragged(true);
+    }
+    
     setDragOffset({ x: deltaX, y: deltaY });
   };
 
@@ -87,6 +97,15 @@ const TinderStockCard = ({
     if (!isDragging) return;
     
     const threshold = 100;
+    
+    // If it was a tap (not a drag), expand the card
+    if (!hasDragged && Math.abs(dragOffset.x) < tapThreshold && Math.abs(dragOffset.y) < tapThreshold) {
+      setIsExpanded(true);
+      setIsDragging(false);
+      setDragOffset({ x: 0, y: 0 });
+      return;
+    }
+    
     if (Math.abs(dragOffset.x) > threshold) {
       setIsExiting(true);
       setTimeout(() => {
@@ -166,17 +185,150 @@ const TinderStockCard = ({
   const opacity = isExiting ? 0 : Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300);
   const cardScale = isExiting ? 0.8 : scale;
 
+  // Render the expanded fullscreen content
+  const renderExpandedContent = () => (
+    <div className="flex flex-col h-full overflow-y-auto">
+      {/* Header with gradient background */}
+      <div 
+        className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-5 relative overflow-hidden flex-shrink-0`}
+      >
+        <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12"></div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8"></div>
+        
+        <div className="relative z-10">
+          <div className="flex justify-between items-start mb-3 gap-2">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-2xl font-bold leading-tight">{stock.companyName}</h2>
+              <p className="text-white/90 font-medium text-lg">({stock.ticker})</p>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Badge className="bg-white/20 text-white border-white/30 font-semibold px-3 py-1.5 backdrop-blur-sm">
+                {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()}
+              </Badge>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-2 text-white/90 text-sm">
+            <Building className="w-4 h-4" />
+            <span>{stock.sector}</span>
+            <TrendingUp className="w-4 h-4 ml-2" />
+            <span className={`font-semibold ${stock.oneYearReturn >= 0 ? 'text-green-200' : 'text-red-200'}`}>
+              {stock.oneYearReturn > 0 ? '+' : ''}{stock.oneYearReturn.toFixed(1)}%
+            </span>
+          </div>
+          
+          <div className="mt-3">
+            <DataFreshnessIndicator 
+              lastUpdated={(stock as any).lastUpdated} 
+              variant="inline"
+              className="bg-black/20 backdrop-blur-sm rounded-full px-3 py-1.5 text-sm"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* CEO Section */}
+      <div className="p-5 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-20 h-20 bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-blue-500/20">
+            <span className="text-white font-bold text-2xl tracking-wide">
+              {getCeoInitials(stock.ceoName)}
+            </span>
+          </div>
+          <div>
+            <h3 className="font-bold text-gray-900 dark:text-white text-xl">{stock.ceoName}</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Chief Executive Officer</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{stock.companyName}</p>
+          </div>
+        </div>
+        <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+          {stock.ceoHighlights}
+        </p>
+      </div>
+
+      {/* Financials Grid */}
+      <div className="p-5 bg-white dark:bg-gray-800">
+        <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 text-xl">
+          <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
+          Key Metrics
+        </h4>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-xl text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
+              <EducationalTooltip content="P/E Ratio compares a company's share price to its earnings per share. Lower values may indicate undervalued stocks." />
+            </div>
+            <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
+          </div>
+          <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-4 rounded-xl text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
+              <EducationalTooltip content="Market Capitalization is the total value of all company shares. Larger caps are typically more stable." />
+            </div>
+            <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
+          </div>
+          <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-xl text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <p className="text-sm text-green-600 dark:text-green-400 font-medium">Price/Share</p>
+              <EducationalTooltip content="Current trading price per individual share of the company's stock." />
+            </div>
+            <p className="text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
+          </div>
+          {stock.dividendYield > 0 && (
+            <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-4 rounded-xl text-center">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
+                <EducationalTooltip content="Dividend Yield shows the annual dividend payments as a percentage of the stock price. Higher yields provide more regular income." />
+              </div>
+              <p className="text-2xl font-bold text-orange-700 dark:text-orange-300">{stock.dividendYield.toFixed(2)}%</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Why it fits section */}
+      <div className="p-5 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 flex-1">
+        <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-xl">
+          <span className="text-xl">💡</span>
+          Why this matches you
+        </h4>
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-5 rounded-xl border border-white/50 dark:border-gray-600/50 shadow-lg">
+          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+            {stock.whyItFits}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div 
-      className={`absolute inset-0 transition-all duration-500 ease-out ${
-        isVisible ? 'opacity-100' : 'opacity-0'
-      }`}
-      style={{ 
-        zIndex,
-        transform: `scale(${cardScale})`,
-        filter: zIndex === 1 ? 'none' : 'brightness(0.9)',
-      }}
-    >
+    <>
+      {/* Expanded fullscreen sheet */}
+      <Sheet open={isExpanded} onOpenChange={setIsExpanded}>
+        <SheetContent side="bottom" className="h-[95vh] p-0 rounded-t-3xl">
+          <div className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-10">
+            <h3 className="font-semibold text-lg">Stock Details</h3>
+            <button
+              onClick={() => setIsExpanded(false)}
+              className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+            >
+              <Minimize2 className="w-5 h-5" />
+            </button>
+          </div>
+          {renderExpandedContent()}
+        </SheetContent>
+      </Sheet>
+
+      <div 
+        className={`absolute inset-0 transition-all duration-500 ease-out ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+        style={{ 
+          zIndex,
+          transform: `scale(${cardScale})`,
+          filter: zIndex === 1 ? 'none' : 'brightness(0.9)',
+        }}
+      >
       {/* Overlay indicators */}
       {isDragging && (
         <>
@@ -382,10 +534,18 @@ const TinderStockCard = ({
                 {stock.whyItFits}
               </p>
             </div>
+            
+            {/* Tap to expand hint */}
+            <div className="mt-4 text-center">
+              <p className="text-xs text-gray-500 dark:text-gray-400 animate-pulse">
+                Tap to expand • Swipe to match or pass
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   );
 };
 
