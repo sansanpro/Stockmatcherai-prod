@@ -1,8 +1,9 @@
-
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import { getStocksFromSupabase } from './supabaseStockManager';
 import { filterStocksByProfile } from './stockFilters';
-import { generatePersonalizedExplanation } from './explanationGenerator';
+import { generatePersonalizedExplanation, clearUsedExplanations } from './explanationGenerator';
+import { getRecentlySwipedTickers } from './recentlySwipedService';
+import { supabase } from '@/integrations/supabase/client';
 
 export const generateStockRecommendations = async (
   userProfile: UserProfile,
@@ -12,6 +13,17 @@ export const generateStockRecommendations = async (
   console.log('Excluded stocks:', excludedStocks);
 
   try {
+    // Get recently swiped stocks (within 24 hours) to exclude
+    let recentlySwipedTickers: string[] = [];
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      recentlySwipedTickers = await getRecentlySwipedTickers(user.id);
+      console.log(`Found ${recentlySwipedTickers.length} recently swiped stocks to exclude`);
+    }
+    
+    // Combine exclusions
+    const allExclusions = [...new Set([...excludedStocks, ...recentlySwipedTickers])];
+    
     let stocksToFilter: Omit<StockRecommendation, 'whyItFits'>[] = [];
     
     // Get stocks from preferred sector first
@@ -44,9 +56,9 @@ export const generateStockRecommendations = async (
     const filteredStocks = filterStocksByProfile(stocksToFilter, userProfile);
     console.log(`Filtered to ${filteredStocks.length} stocks from ${stocksToFilter.length} total`);
 
-    // Remove excluded stocks
+    // Remove excluded stocks (including recently swiped within 24 hours)
     const availableStocks = filteredStocks.filter(stock => 
-      !excludedStocks.includes(stock.ticker)
+      !allExclusions.includes(stock.ticker)
     );
     console.log(`Available stocks after exclusions: ${availableStocks.length}`);
 

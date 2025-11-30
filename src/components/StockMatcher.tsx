@@ -5,9 +5,12 @@ import TinderStockCard from '@/components/TinderStockCard';
 import { generateStockRecommendations } from '@/utils/stockMatcher';
 import { useApp } from '@/contexts/AppContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { recordSwipe } from '@/utils/recentlySwipedService';
 import UpgradeModal from '@/components/UpgradeModal';
 import { Heart, X, RotateCcw, TrendingUp, Plus, Crown } from 'lucide-react';
 import { toast } from 'sonner';
+import { Json } from '@/integrations/supabase/types';
 
 interface StockMatcherProps {
   userProfile: UserProfile;
@@ -27,6 +30,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
   const { canSwipe, incrementSwipeCount, dailySwipesUsed, dailySwipeLimit } = useSubscription();
+  const { user } = useAuth();
 
   // Pre-load all recommendations once
   useEffect(() => {
@@ -82,6 +86,18 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     // Increment swipe count for free users
     await incrementSwipeCount();
     
+    // Record swipe to backend (for 24-hour cooldown)
+    if (user) {
+      const stockData = {
+        ticker: currentStock.ticker,
+        companyName: currentStock.companyName,
+        sector: currentStock.sector,
+        pricePerShare: currentStock.pricePerShare,
+        oneYearReturn: currentStock.oneYearReturn
+      } as Json;
+      await recordSwipe(user.id, currentStock.ticker, currentStock.companyName, true, stockData, currentStock.whyItFits);
+    }
+    
     // Add to seen stocks
     setSeenStockTickers(prev => new Set(prev).add(currentStock.ticker));
     setMatches(prev => [...prev, currentStock]);
@@ -123,6 +139,18 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     
     // Increment swipe count for free users
     await incrementSwipeCount();
+    
+    // Record swipe to backend (for 24-hour cooldown)
+    if (user) {
+      const stockData = {
+        ticker: currentStock.ticker,
+        companyName: currentStock.companyName,
+        sector: currentStock.sector,
+        pricePerShare: currentStock.pricePerShare,
+        oneYearReturn: currentStock.oneYearReturn
+      } as Json;
+      await recordSwipe(user.id, currentStock.ticker, currentStock.companyName, false, stockData);
+    }
     
     // Add to seen stocks
     setSeenStockTickers(prev => new Set(prev).add(currentStock.ticker));
@@ -301,17 +329,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
         </div>
 
 
-        {/* Stats */}
-        <div className="flex justify-center gap-3 sm:gap-4 mb-4 sm:mb-6 lg:mb-2 animate-fade-in delay-200 px-4 lg:px-2">
-          <div className="bg-green-500/20 backdrop-blur-lg rounded-xl px-3 sm:px-4 py-2 flex items-center gap-2 border border-green-400/30 transform hover:scale-105 transition-all duration-200">
-            <Heart className="w-4 h-4 text-green-300 fill-current" />
-            <span className="text-white font-medium text-sm sm:text-base">{matches.length}</span>
-          </div>
-          <div className="bg-red-500/20 backdrop-blur-lg rounded-xl px-3 sm:px-4 py-2 flex items-center gap-2 border border-red-400/30 transform hover:scale-105 transition-all duration-200">
-            <X className="w-4 h-4 text-red-300" />
-            <span className="text-white font-medium text-sm sm:text-base">{passes.length}</span>
-          </div>
-        </div>
+        {/* Card counter removed - tracking still happens in backend */}
 
         {/* Stock Cards Stack */}
         {allRecommendations.length > 0 && currentStock && (
