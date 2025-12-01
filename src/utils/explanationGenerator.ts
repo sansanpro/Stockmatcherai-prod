@@ -1,10 +1,41 @@
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
+import { 
+  analyzeStockFactors, 
+  FactorAnalysis, 
+  getPerformanceComparison, 
+  getYieldComparison 
+} from './stockFactorAnalyzer';
+import { 
+  getAllTemplates, 
+  ExplanationTemplate,
+  strengthLeadTemplates,
+  userLeadTemplates,
+  comparisonTemplates,
+  ceoLeadTemplates,
+  esgLeadTemplates,
+  affordabilityTemplates,
+  timeHorizonTemplates,
+  combinationTemplates,
+} from './explanationTemplates';
 
-// Track used explanations to ensure uniqueness within a session
-const usedExplanations = new Set<string>();
+// Track used template IDs and explanation hashes for uniqueness
+const usedTemplateIds = new Set<string>();
+const usedExplanationHashes = new Set<string>();
 
 export const clearUsedExplanations = () => {
-  usedExplanations.clear();
+  usedTemplateIds.clear();
+  usedExplanationHashes.clear();
+};
+
+// Simple hash function for explanation uniqueness
+const hashExplanation = (text: string): string => {
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    const char = text.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return hash.toString();
 };
 
 export const generatePersonalizedExplanation = (
@@ -14,201 +45,225 @@ export const generatePersonalizedExplanation = (
 ): string => {
   // Clear cache at start of new batch
   if (isFirstInBatch) {
-    usedExplanations.clear();
+    clearUsedExplanations();
   }
 
-  // Generate multiple candidate explanations and pick a unique one
-  const candidates = generateAllCandidates(stock, profile);
+  // Analyze the stock-user combination
+  const analysis = analyzeStockFactors(stock, profile);
   
-  // Find the first unused explanation
-  for (const candidate of candidates) {
-    if (!usedExplanations.has(candidate)) {
-      usedExplanations.add(candidate);
-      return candidate;
-    }
+  // Get candidate templates based on analysis
+  const candidateTemplates = selectCandidateTemplates(analysis, profile, stock);
+  
+  // Try each candidate template until we find a unique explanation
+  for (const template of candidateTemplates) {
+    // Skip if template ID already used
+    if (usedTemplateIds.has(template.id)) continue;
+    
+    // Fill in the template with actual data
+    const explanation = fillTemplate(template, stock, profile, analysis);
+    
+    // Check if this exact explanation was already generated
+    const hash = hashExplanation(explanation);
+    if (usedExplanationHashes.has(hash)) continue;
+    
+    // Mark as used and return
+    usedTemplateIds.add(template.id);
+    usedExplanationHashes.add(hash);
+    return explanation;
   }
   
-  // Fallback: generate a ticker-specific explanation
-  const fallback = `${stock.ticker} shows ${stock.oneYearReturn > 0 ? 'positive' : 'resilient'} momentum at $${stock.pricePerShare.toFixed(0)}/share.`;
-  usedExplanations.add(fallback);
-  return fallback;
+  // Fallback: generate a unique ticker-specific explanation
+  return generateFallback(stock, profile, analysis);
 };
 
-const generateAllCandidates = (
-  stock: Omit<StockRecommendation, 'whyItFits'>,
-  profile: UserProfile
-): string[] => {
-  const candidates: string[] = [];
+const selectCandidateTemplates = (
+  analysis: FactorAnalysis,
+  profile: UserProfile,
+  stock: Omit<StockRecommendation, 'whyItFits'>
+): ExplanationTemplate[] => {
+  const candidates: ExplanationTemplate[] = [];
+  const topFactorNames = analysis.topFactors.map(f => f.name);
   
-  // Performance-based explanations
-  candidates.push(...getPerformanceReasons(stock, profile));
+  // Prioritize templates based on top factors
+  const allTemplates = getAllTemplates();
   
-  // Value-based explanations
-  candidates.push(...getValueReasons(stock, profile));
+  // First: Add combination templates that match multiple top factors
+  const matchingCombos = combinationTemplates.filter(t => {
+    const matchCount = t.requiredFactors.filter(f => 
+      topFactorNames.includes(f) || hasFactorData(f, stock, profile, analysis)
+    ).length;
+    return matchCount >= 2;
+  });
+  candidates.push(...shuffleArray(matchingCombos));
   
-  // Income-based explanations
-  candidates.push(...getIncomeReasons(stock, profile));
+  // Second: Add user-lead templates if goal/risk/sector are strong
+  if (analysis.scores.goalAlignment >= 70 || analysis.scores.riskAlignment >= 80) {
+    const matchingUserTemplates = userLeadTemplates.filter(t =>
+      t.requiredFactors.every(f => hasFactorData(f, stock, profile, analysis))
+    );
+    candidates.push(...shuffleArray(matchingUserTemplates));
+  }
   
-  // Risk-aligned explanations
-  candidates.push(...getRiskReasons(stock, profile));
+  // Third: Add strength-lead templates based on top factors
+  const matchingStrengthTemplates = strengthLeadTemplates.filter(t =>
+    t.requiredFactors.some(f => topFactorNames.includes(f)) &&
+    t.requiredFactors.every(f => hasFactorData(f, stock, profile, analysis))
+  );
+  candidates.push(...shuffleArray(matchingStrengthTemplates));
   
-  // Goal-based explanations
-  candidates.push(...getGoalReasons(stock, profile));
+  // Fourth: Add comparison templates
+  const matchingComparisonTemplates = comparisonTemplates.filter(t =>
+    t.requiredFactors.every(f => hasFactorData(f, stock, profile, analysis))
+  );
+  candidates.push(...shuffleArray(matchingComparisonTemplates));
   
-  // Shuffle to add variety
-  return candidates.sort(() => Math.random() - 0.5);
+  // Fifth: Add time-horizon templates based on age
+  const timeTemplates = getTimeHorizonTemplates(profile.age);
+  const matchingTimeTemplates = timeTemplates.filter(t =>
+    t.requiredFactors.every(f => hasFactorData(f, stock, profile, analysis))
+  );
+  candidates.push(...shuffleArray(matchingTimeTemplates));
+  
+  // Sixth: Add CEO templates if we have CEO data
+  if (analysis.ceoKeyword && stock.ceoName) {
+    candidates.push(...shuffleArray(ceoLeadTemplates));
+  }
+  
+  // Seventh: Add ESG templates if score is good
+  if (analysis.scores.esgScore >= 75 && stock.esgScore) {
+    candidates.push(...shuffleArray(esgLeadTemplates));
+  }
+  
+  // Eighth: Add affordability templates if price is accessible
+  if (analysis.scores.affordabilityScore >= 70) {
+    candidates.push(...shuffleArray(affordabilityTemplates));
+  }
+  
+  // Add remaining templates as fallback
+  const remainingTemplates = allTemplates.filter(t => 
+    !candidates.some(c => c.id === t.id) &&
+    t.requiredFactors.every(f => hasFactorData(f, stock, profile, analysis))
+  );
+  candidates.push(...shuffleArray(remainingTemplates));
+  
+  return candidates;
 };
 
-const getPerformanceReasons = (
+const hasFactorData = (
+  factor: string,
   stock: Omit<StockRecommendation, 'whyItFits'>,
-  profile: UserProfile
-): string[] => {
-  const reasons: string[] = [];
-  const ret = stock.oneYearReturn;
-  
-  if (ret > 50) {
-    reasons.push(`Up ${ret.toFixed(0)}% this year — ${stock.companyName} is on a tear.`);
-    reasons.push(`${stock.ticker} surged ${ret.toFixed(0)}% in 12 months. Strong momentum play.`);
-  } else if (ret > 25) {
-    reasons.push(`${ret.toFixed(0)}% annual gain shows ${stock.companyName} is outperforming the market.`);
-    reasons.push(`Solid ${ret.toFixed(0)}% yearly return from ${stock.ticker}. Growth is real.`);
-  } else if (ret > 10) {
-    reasons.push(`${stock.ticker} delivered ${ret.toFixed(0)}% returns — beating most savings accounts.`);
-    reasons.push(`Steady ${ret.toFixed(0)}% growth from ${stock.companyName}. Consistent performer.`);
-  } else if (ret > 0) {
-    reasons.push(`${stock.companyName} held positive at +${ret.toFixed(1)}% when others dropped.`);
-    reasons.push(`${stock.ticker} staying green (+${ret.toFixed(1)}%) in a tough market.`);
-  } else if (ret > -10) {
-    reasons.push(`${stock.ticker} dipped ${ret.toFixed(1)}% — potential entry point for believers.`);
-    reasons.push(`${stock.companyName} down slightly (${ret.toFixed(1)}%). Could be undervalued.`);
+  profile: UserProfile,
+  analysis: FactorAnalysis
+): boolean => {
+  switch (factor) {
+    case 'performance':
+      return true; // Always have return data
+    case 'value':
+      return stock.peRatio > 0;
+    case 'income':
+      return stock.dividendYield > 0.5;
+    case 'risk':
+      return true; // Always have risk data
+    case 'goal':
+      return !!profile.investmentGoal;
+    case 'sector':
+      return profile.sectorPreference === stock.sector;
+    case 'affordability':
+      return analysis.scores.affordabilityScore >= 50;
+    case 'esg':
+      return !!stock.esgScore && stock.esgScore >= 70;
+    default:
+      return true;
+  }
+};
+
+const getTimeHorizonTemplates = (age: number): ExplanationTemplate[] => {
+  if (age < 35) {
+    return timeHorizonTemplates.filter(t => 
+      t.id.includes('young') || t.id.includes('mid-1')
+    );
+  } else if (age < 50) {
+    return timeHorizonTemplates.filter(t => t.id.includes('mid'));
   } else {
-    reasons.push(`${stock.ticker} is down ${Math.abs(ret).toFixed(0)}% — high risk, potential rebound.`);
+    return timeHorizonTemplates.filter(t => t.id.includes('mature'));
   }
-  
-  return reasons;
 };
 
-const getValueReasons = (
+const fillTemplate = (
+  template: ExplanationTemplate,
   stock: Omit<StockRecommendation, 'whyItFits'>,
-  profile: UserProfile
-): string[] => {
-  const reasons: string[] = [];
-  const pe = stock.peRatio;
-  const price = stock.pricePerShare;
+  profile: UserProfile,
+  analysis: FactorAnalysis
+): string => {
+  let result = template.template;
   
-  if (pe > 0 && pe < 15) {
-    reasons.push(`P/E of ${pe.toFixed(1)} suggests ${stock.ticker} may be undervalued.`);
-    reasons.push(`Trading at just ${pe.toFixed(1)}x earnings. Value investors take note.`);
-  } else if (pe >= 15 && pe < 25) {
-    reasons.push(`${stock.ticker} at ${pe.toFixed(1)}x earnings — fairly valued with room to grow.`);
-  } else if (pe >= 25 && pe < 40) {
-    reasons.push(`Higher P/E (${pe.toFixed(1)}) reflects market confidence in ${stock.companyName}.`);
-  }
+  // Stock data replacements
+  result = result.replace(/{ticker}/g, stock.ticker);
+  result = result.replace(/{company}/g, stock.companyName);
+  result = result.replace(/{sector}/g, stock.sector);
+  result = result.replace(/{return}/g, formatReturn(stock.oneYearReturn));
+  result = result.replace(/{pe}/g, stock.peRatio.toFixed(1));
+  result = result.replace(/{dividend}/g, stock.dividendYield.toFixed(1) + '%');
+  result = result.replace(/{price}/g, '$' + stock.pricePerShare.toFixed(0));
+  result = result.replace(/{risk}/g, stock.riskLevel);
+  result = result.replace(/{marketCap}/g, analysis.marketCapTier);
+  result = result.replace(/{ceoName}/g, stock.ceoName || 'leadership');
+  result = result.replace(/{ceoKeyword}/g, analysis.ceoKeyword || 'innovation');
+  result = result.replace(/{esg}/g, stock.esgScore?.toString() || '75');
   
-  if (price < 50) {
-    reasons.push(`At $${price.toFixed(0)}/share, ${stock.ticker} is accessible for building positions.`);
-  } else if (price > 500) {
-    reasons.push(`Premium stock at $${price.toFixed(0)} — ${stock.companyName} commands investor confidence.`);
-  }
+  // User data replacements
+  result = result.replace(/{goal}/g, profile.investmentGoal || 'growth');
   
-  return reasons;
+  // Comparison text replacements
+  result = result.replace(/{comparison}/g, getPerformanceComparison(stock.oneYearReturn));
+  result = result.replace(/{yieldComparison}/g, getYieldComparison(stock.dividendYield));
+  
+  return result;
 };
 
-const getIncomeReasons = (
-  stock: Omit<StockRecommendation, 'whyItFits'>,
-  profile: UserProfile
-): string[] => {
-  const reasons: string[] = [];
-  const div = stock.dividendYield;
-  
-  if (div > 4) {
-    reasons.push(`${div.toFixed(1)}% dividend yield — ${stock.ticker} pays you while you wait.`);
-    reasons.push(`High ${div.toFixed(1)}% yield from ${stock.companyName}. Real passive income.`);
-    if (profile.investmentGoal === 'income') {
-      reasons.push(`${div.toFixed(1)}% dividends align perfectly with your income goals.`);
-    }
-  } else if (div > 2) {
-    reasons.push(`${stock.ticker} pays ${div.toFixed(1)}% dividends — beat inflation while growing.`);
-    reasons.push(`${div.toFixed(1)}% yield plus ${stock.oneYearReturn > 0 ? 'growth' : 'recovery potential'} from ${stock.companyName}.`);
-  } else if (div > 0) {
-    reasons.push(`Small ${div.toFixed(1)}% dividend, but ${stock.companyName} reinvests for growth.`);
+const formatReturn = (ret: number): string => {
+  if (ret >= 0) {
+    return '+' + ret.toFixed(1) + '%';
   }
-  
-  return reasons;
+  return ret.toFixed(1) + '%';
 };
 
-const getRiskReasons = (
+const generateFallback = (
   stock: Omit<StockRecommendation, 'whyItFits'>,
-  profile: UserProfile
-): string[] => {
-  const reasons: string[] = [];
-  const risk = stock.riskLevel;
-  const userRisk = profile.riskTolerance;
+  profile: UserProfile,
+  analysis: FactorAnalysis
+): string => {
+  // Generate unique fallback based on top factors
+  const topFactor = analysis.topFactors[0];
   
-  if (risk === 'low' && userRisk === 'low') {
-    reasons.push(`${stock.ticker}'s stability matches your conservative approach.`);
-    reasons.push(`Low volatility ${stock.sector} stock for your risk-averse portfolio.`);
-  } else if (risk === 'low') {
-    reasons.push(`${stock.companyName} offers a stable anchor for any portfolio.`);
+  if (topFactor) {
+    switch (topFactor.name) {
+      case 'performance':
+        return `${stock.ticker} delivered ${formatReturn(stock.oneYearReturn)} — ${topFactor.context} in ${stock.sector}.`;
+      case 'income':
+        return `${stock.dividendYield.toFixed(1)}% yield from ${stock.companyName} provides steady income.`;
+      case 'value':
+        return `${stock.ticker} at ${stock.peRatio.toFixed(1)}x earnings looks ${topFactor.context}.`;
+      case 'risk':
+        return `${stock.companyName} offers ${stock.riskLevel}-risk exposure to ${stock.sector}.`;
+      case 'goal':
+        return `${stock.ticker} aligns with your ${profile.investmentGoal} investment strategy.`;
+      default:
+        break;
+    }
   }
   
-  if (risk === 'medium') {
-    reasons.push(`${stock.ticker} balances growth opportunity with manageable risk.`);
-    reasons.push(`Mid-risk ${stock.sector} play — not too wild, not too boring.`);
-  }
-  
-  if (risk === 'high' && userRisk === 'high') {
-    reasons.push(`${stock.ticker}'s volatility could reward your high-risk tolerance.`);
-    reasons.push(`High-growth potential in ${stock.sector} — built for aggressive investors like you.`);
-  } else if (risk === 'high') {
-    reasons.push(`${stock.companyName} is volatile but could deliver outsized returns.`);
-  }
-  
-  return reasons;
+  // Ultimate fallback
+  const direction = stock.oneYearReturn > 0 ? 'positive momentum' : 'value opportunity';
+  return `${stock.companyName} (${stock.ticker}) shows ${direction} at $${stock.pricePerShare.toFixed(0)}/share.`;
 };
 
-const getGoalReasons = (
-  stock: Omit<StockRecommendation, 'whyItFits'>,
-  profile: UserProfile
-): string[] => {
-  const reasons: string[] = [];
-  const goal = profile.investmentGoal;
-  
-  if (goal === 'growth') {
-    if (stock.oneYearReturn > 15) {
-      reasons.push(`${stock.oneYearReturn.toFixed(0)}% returns prove ${stock.ticker} can deliver the growth you want.`);
-    }
-    reasons.push(`${stock.companyName} in ${stock.sector} — positioned for the growth you're seeking.`);
+// Fisher-Yates shuffle
+const shuffleArray = <T>(array: T[]): T[] => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-  
-  if (goal === 'income') {
-    if (stock.dividendYield > 2) {
-      reasons.push(`${stock.dividendYield.toFixed(1)}% yield supports your passive income strategy.`);
-    }
-    reasons.push(`${stock.ticker} can contribute to your income-generating portfolio.`);
-  }
-  
-  if (goal === 'balance') {
-    if (stock.dividendYield > 1 && stock.oneYearReturn > 5) {
-      reasons.push(`${stock.ticker} offers both ${stock.oneYearReturn.toFixed(0)}% growth and ${stock.dividendYield.toFixed(1)}% income.`);
-    }
-    reasons.push(`${stock.companyName} fits your balanced approach — growth with some stability.`);
-  }
-  
-  if (goal === 'preservation') {
-    if (stock.riskLevel === 'low') {
-      reasons.push(`${stock.ticker}'s low volatility protects what you've built.`);
-    }
-    reasons.push(`${stock.sector} sector stability helps preserve your capital.`);
-  }
-  
-  // Age-based reasoning
-  if (profile.age < 30 && stock.oneYearReturn > 10) {
-    reasons.push(`Time is on your side — ${stock.ticker}'s growth can compound for decades.`);
-  }
-  if (profile.age >= 50 && stock.dividendYield > 2) {
-    reasons.push(`${stock.dividendYield.toFixed(1)}% dividends support your retirement income needs.`);
-  }
-  
-  return reasons;
+  return shuffled;
 };
