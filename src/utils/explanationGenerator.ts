@@ -157,21 +157,29 @@ const hasFactorData = (
 ): boolean => {
   switch (factor) {
     case 'performance':
-      return true; // Always have return data
+      // Only use performance templates if return is meaningful (not 0 or near-zero)
+      return Math.abs(stock.oneYearReturn) >= 1;
     case 'value':
-      return stock.peRatio > 0;
+      // Only use value templates if PE ratio is valid and positive
+      return stock.peRatio > 0 && stock.peRatio < 500;
     case 'income':
-      return stock.dividendYield > 0.5;
+      // Only use income templates if dividend yield is meaningful
+      return stock.dividendYield >= 1;
     case 'risk':
-      return true; // Always have risk data
+      // Always have risk data if risk level is defined
+      return !!stock.riskLevel && ['low', 'medium', 'high'].includes(stock.riskLevel);
     case 'goal':
-      return !!profile.investmentGoal;
+      // Only use goal templates if user has set a goal
+      return !!profile.investmentGoal && profile.investmentGoal !== '';
     case 'sector':
-      return profile.sectorPreference === stock.sector;
+      // Only use sector templates if there's a meaningful sector match
+      return !!stock.sector && (profile.sectorPreference === stock.sector || profile.sectorPreference === 'any');
     case 'affordability':
-      return analysis.scores.affordabilityScore >= 50;
+      // Only use affordability templates if score is decent and price is valid
+      return analysis.scores.affordabilityScore >= 50 && stock.pricePerShare > 0;
     case 'esg':
-      return !!stock.esgScore && stock.esgScore >= 70;
+      // Only use ESG templates if we have a valid ESG score
+      return !!stock.esgScore && stock.esgScore >= 70 && stock.esgScore <= 100;
     default:
       return true;
   }
@@ -197,19 +205,45 @@ const fillTemplate = (
 ): string => {
   let result = template.template;
   
-  // Stock data replacements
-  result = result.replace(/{ticker}/g, stock.ticker);
-  result = result.replace(/{company}/g, stock.companyName);
-  result = result.replace(/{sector}/g, stock.sector);
-  result = result.replace(/{return}/g, formatReturn(stock.oneYearReturn));
-  result = result.replace(/{pe}/g, stock.peRatio.toFixed(1));
-  result = result.replace(/{dividend}/g, stock.dividendYield.toFixed(1) + '%');
-  result = result.replace(/{price}/g, '$' + stock.pricePerShare.toFixed(0));
-  result = result.replace(/{risk}/g, stock.riskLevel);
+  // Stock data replacements with validation
+  result = result.replace(/{ticker}/g, stock.ticker || 'Stock');
+  result = result.replace(/{company}/g, stock.companyName || stock.ticker || 'Company');
+  result = result.replace(/{sector}/g, stock.sector || 'sector');
+  
+  // Only show return if meaningful
+  const returnText = Math.abs(stock.oneYearReturn) >= 1 
+    ? formatReturn(stock.oneYearReturn) 
+    : 'positive momentum';
+  result = result.replace(/{return}/g, returnText);
+  
+  // Only show PE if valid
+  const peText = stock.peRatio > 0 && stock.peRatio < 500 
+    ? stock.peRatio.toFixed(1) 
+    : 'attractive';
+  result = result.replace(/{pe}/g, peText);
+  
+  // Only show dividend if meaningful
+  const dividendText = stock.dividendYield >= 0.5 
+    ? stock.dividendYield.toFixed(1) + '%' 
+    : 'growing';
+  result = result.replace(/{dividend}/g, dividendText);
+  
+  // Format price properly
+  const priceText = stock.pricePerShare > 0 
+    ? '$' + stock.pricePerShare.toFixed(0) 
+    : 'accessible price';
+  result = result.replace(/{price}/g, priceText);
+  
+  result = result.replace(/{risk}/g, stock.riskLevel || 'moderate');
   result = result.replace(/{marketCap}/g, analysis.marketCapTier);
   result = result.replace(/{ceoName}/g, stock.ceoName || 'leadership');
   result = result.replace(/{ceoKeyword}/g, analysis.ceoKeyword || 'innovation');
-  result = result.replace(/{esg}/g, stock.esgScore?.toString() || '75');
+  
+  // Only show ESG if valid
+  const esgText = stock.esgScore && stock.esgScore >= 50 && stock.esgScore <= 100 
+    ? stock.esgScore.toString() 
+    : 'strong';
+  result = result.replace(/{esg}/g, esgText);
   
   // User data replacements
   result = result.replace(/{goal}/g, profile.investmentGoal || 'growth');

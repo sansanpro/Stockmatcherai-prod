@@ -136,8 +136,8 @@ const identifyTopFactors = (
 ): TopFactor[] => {
   const factors: TopFactor[] = [];
   
-  // Performance factor
-  if (scores.performanceStrength >= 60) {
+  // Performance factor - only if return is meaningful (not near zero)
+  if (scores.performanceStrength >= 60 && Math.abs(stock.oneYearReturn) >= 1) {
     factors.push({
       name: 'performance',
       score: scores.performanceStrength,
@@ -146,8 +146,8 @@ const identifyTopFactors = (
     });
   }
   
-  // Risk alignment factor
-  if (scores.riskAlignment >= 70) {
+  // Risk alignment factor - only if risk level is valid
+  if (scores.riskAlignment >= 70 && stock.riskLevel && ['low', 'medium', 'high'].includes(stock.riskLevel)) {
     factors.push({
       name: 'risk',
       score: scores.riskAlignment,
@@ -156,8 +156,8 @@ const identifyTopFactors = (
     });
   }
   
-  // Value factor
-  if (scores.valueScore >= 70 && stock.peRatio > 0) {
+  // Value factor - only if PE is valid and meaningful
+  if (scores.valueScore >= 70 && stock.peRatio > 0 && stock.peRatio < 500) {
     factors.push({
       name: 'value',
       score: scores.valueScore,
@@ -166,8 +166,8 @@ const identifyTopFactors = (
     });
   }
   
-  // Income factor
-  if (scores.incomeScore >= 60 && stock.dividendYield > 1) {
+  // Income factor - only if dividend is meaningful (>= 1%)
+  if (scores.incomeScore >= 60 && stock.dividendYield >= 1) {
     factors.push({
       name: 'income',
       score: scores.incomeScore,
@@ -176,8 +176,8 @@ const identifyTopFactors = (
     });
   }
   
-  // Affordability factor
-  if (scores.affordabilityScore >= 70) {
+  // Affordability factor - only if price is valid
+  if (scores.affordabilityScore >= 70 && stock.pricePerShare > 0) {
     factors.push({
       name: 'affordability',
       score: scores.affordabilityScore,
@@ -186,8 +186,8 @@ const identifyTopFactors = (
     });
   }
   
-  // Goal alignment factor
-  if (scores.goalAlignment >= 75) {
+  // Goal alignment factor - only if goal is set
+  if (scores.goalAlignment >= 75 && profile.investmentGoal) {
     factors.push({
       name: 'goal',
       score: scores.goalAlignment,
@@ -197,7 +197,7 @@ const identifyTopFactors = (
   }
   
   // Sector match factor
-  if (scores.sectorMatch === 100) {
+  if (scores.sectorMatch === 100 && stock.sector) {
     factors.push({
       name: 'sector',
       score: scores.sectorMatch,
@@ -206,8 +206,8 @@ const identifyTopFactors = (
     });
   }
   
-  // ESG factor
-  if (scores.esgScore >= 80 && stock.esgScore) {
+  // ESG factor - only if ESG score is valid
+  if (scores.esgScore >= 80 && stock.esgScore && stock.esgScore >= 70 && stock.esgScore <= 100) {
     factors.push({
       name: 'esg',
       score: scores.esgScore,

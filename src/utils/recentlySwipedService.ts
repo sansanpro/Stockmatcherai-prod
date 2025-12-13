@@ -1,11 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Json } from '@/integrations/supabase/types';
 
-const COOLDOWN_HOURS = 24;
+const COOLDOWN_DAYS = 7;
 
 export const getRecentlySwipedTickers = async (userId: string): Promise<string[]> => {
   const cutoffTime = new Date();
-  cutoffTime.setHours(cutoffTime.getHours() - COOLDOWN_HOURS);
+  cutoffTime.setDate(cutoffTime.getDate() - COOLDOWN_DAYS);
   
   try {
     const { data, error } = await supabase
