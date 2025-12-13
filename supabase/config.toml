@@ -81,3 +81,6 @@ verify_jwt = false
 
 [functions.stock-assistant]
 verify_jwt = true
+
+[functions.fmp-data]
+verify_jwt = false

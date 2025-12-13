@@ -53,6 +53,18 @@ class FMPService {
     const url = `https://financialmodelingprep.com/stable/historical-price-full?symbol=${symbol}&timeseries=${days}&apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `historical_${symbol}_${days}d`);
   }
+
+  // NEW: Get company news for a specific stock
+  async getCompanyNews(symbol: string, limit: number = 5) {
+    const url = `https://financialmodelingprep.com/stable/stock-news?symbol=${symbol}&limit=${limit}&apikey=${this.apiKey}`;
+    return this.fetchWithCache(url, `news_${symbol}_${limit}`);
+  }
+
+  // NEW: Get general market news
+  async getMarketNews(limit: number = 10) {
+    const url = `https://financialmodelingprep.com/stable/general-news?limit=${limit}&apikey=${this.apiKey}`;
+    return this.fetchWithCache(url, `market_news_${limit}`);
+  }
 }
 
 serve(async (req) => {
@@ -265,13 +277,42 @@ serve(async (req) => {
         type: "function",
         function: {
           name: "get_company_profile",
-          description: "Get detailed company information including sector, industry, CEO, description, market cap",
+          description: "Get detailed company information including sector, industry, CEO, description, market cap, number of employees, business overview, and company history",
           parameters: {
             type: "object",
             properties: {
               symbol: { type: "string", description: "Stock ticker symbol" }
             },
             required: ["symbol"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "get_company_news",
+          description: "Get recent news articles and headlines for a specific stock. Use this to provide context about what's happening with the company",
+          parameters: {
+            type: "object",
+            properties: {
+              symbol: { type: "string", description: "Stock ticker symbol" },
+              limit: { type: "number", description: "Number of news items to fetch (default: 5, max: 20)", default: 5 }
+            },
+            required: ["symbol"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "get_market_news",
+          description: "Get general market news and updates. Use this to provide context about overall market conditions, economic news, and market sentiment",
+          parameters: {
+            type: "object",
+            properties: {
+              limit: { type: "number", description: "Number of news items to fetch (default: 10, max: 20)", default: 10 }
+            },
+            required: []
           }
         }
       },
@@ -325,6 +366,7 @@ CRITICAL RULES:
 5. CITE SOURCES - Reference the data you fetch ("According to today's data...", "Currently trading at...").
 6. DISCLAIMERS - Remind users this is educational content, not investment advice.
 7. USER CONTEXT - Consider their experience level: ${profile?.investment_experience || 'beginner'}
+8. USE NEWS CONTEXT - When discussing stocks, use get_company_news to provide recent developments. Use get_market_news for market condition questions.
 
 User Profile Summary:
 - Risk Tolerance: ${profile?.risk_tolerance || 'moderate'}
@@ -335,14 +377,23 @@ User Profile Summary:
 RESPONSE GUIDELINES:
 - For PRICE questions ("What's the price of X?"): Give a direct answer with the current price, change, and volume.
 - For PERFORMANCE questions ("How is X performing?"): Analyze the data and explain what the numbers mean - is the stock up or down? By how much? What's the context?
+- For COMPANY questions ("Tell me about X"): Use get_company_profile for details AND get_company_news for recent developments.
+- For MARKET questions ("How's the market?"): Use get_market_news for general market conditions and get_market_movers for top performers.
 - For COMPARISON questions: Fetch multiple stocks and compare their metrics side by side.
 - Always interpret the raw data - explain what the numbers tell us about the stock's movement.
 
 When users ask about stocks:
 - Use get_stock_quote for current prices and changes
-- Use get_company_profile for company details
+- Use get_company_profile for company details (sector, industry, CEO, description, employees)
+- Use get_company_news for recent news about a specific stock
+- Use get_market_news for general market conditions and sentiment
 - Use get_market_movers for market trends
 - Compare stocks using data from multiple calls
+
+NEWS HANDLING:
+- Summarize key headlines, don't list raw data
+- Explain how news might relate to the user's investment profile
+- Connect news to stock performance when relevant
 
 Format responses:
 - Start with the direct answer to their question
@@ -471,6 +522,10 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                           toolResult = await fmpService.getQuote(toolArgs.symbol);
                         } else if (toolName === 'get_company_profile') {
                           toolResult = await fmpService.getProfile(toolArgs.symbol);
+                        } else if (toolName === 'get_company_news') {
+                          toolResult = await fmpService.getCompanyNews(toolArgs.symbol, toolArgs.limit || 5);
+                        } else if (toolName === 'get_market_news') {
+                          toolResult = await fmpService.getMarketNews(toolArgs.limit || 10);
                         } else if (toolName === 'get_market_movers') {
                           toolResult = await fmpService.getMarketMovers(toolArgs.type);
                         } else if (toolName === 'get_historical_prices') {
