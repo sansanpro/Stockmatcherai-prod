@@ -13,7 +13,7 @@ export const generateStockRecommendations = async (
   console.log('Excluded stocks:', excludedStocks);
 
   try {
-    // Get recently swiped stocks (within 24 hours) to exclude
+    // Get recently swiped stocks (within 7 days) to exclude
     let recentlySwipedTickers: string[] = [];
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -56,7 +56,7 @@ export const generateStockRecommendations = async (
     const filteredStocks = filterStocksByProfile(stocksToFilter, userProfile);
     console.log(`Filtered to ${filteredStocks.length} stocks from ${stocksToFilter.length} total`);
 
-    // Remove excluded stocks (including recently swiped within 24 hours)
+    // Remove excluded stocks (including recently swiped within 7 days)
     const availableStocks = filteredStocks.filter(stock => 
       !allExclusions.includes(stock.ticker)
     );
