@@ -6,6 +6,7 @@ import { Heart, X, TrendingUp, DollarSign, Building, Eye, ChevronDown, ChevronUp
 import EducationalTooltip from '@/components/EducationalTooltip';
 import DataFreshnessIndicator from '@/components/DataFreshnessIndicator';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import StockNewsPill from '@/components/StockNewsPill';
 
 interface TinderStockCardProps {
   stock: StockRecommendation;
@@ -217,12 +218,13 @@ const TinderStockCard = ({
             </span>
           </div>
           
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <DataFreshnessIndicator 
               lastUpdated={(stock as any).lastUpdated} 
               variant="inline"
               className="bg-black/20 backdrop-blur-sm rounded-full px-3 py-1.5 text-sm"
             />
+            <StockNewsPill ticker={stock.ticker} companyName={stock.companyName} />
           </div>
         </div>
       </div>
@@ -423,12 +425,13 @@ const TinderStockCard = ({
                 />
               </div>
               
-              <div className="mt-2 animate-fade-in delay-300">
+              <div className="mt-2 flex flex-wrap items-center gap-2 animate-fade-in delay-300">
                 <DataFreshnessIndicator 
                   lastUpdated={(stock as any).lastUpdated} 
                   variant="inline"
                   className="bg-black/20 backdrop-blur-sm rounded-full px-2 py-1 text-xs"
                 />
+                <StockNewsPill ticker={stock.ticker} companyName={stock.companyName} />
               </div>
             </div>
           </div>
