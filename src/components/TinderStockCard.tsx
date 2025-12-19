@@ -150,6 +150,9 @@ const TinderStockCard = ({
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging) {
+      e.preventDefault(); // Prevent background scrolling while swiping
+    }
     const touch = e.touches[0];
     handleMove(touch.clientX, touch.clientY);
   };
