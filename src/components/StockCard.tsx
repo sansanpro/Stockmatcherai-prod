@@ -1,9 +1,9 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { StockRecommendation } from '@/types/stock-matcher';
 import { Eye, Star, Leaf } from 'lucide-react';
+import StockNewsPill from '@/components/StockNewsPill';
 
 interface StockCardProps {
   stock: StockRecommendation;
@@ -87,9 +87,10 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
             </div>
           </div>
           
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex flex-wrap items-center gap-2 text-sm">
             <span>🏢</span>
             <span className="text-blue-100 dark:text-blue-200">{stock.sector}</span>
+            <StockNewsPill ticker={stock.ticker} companyName={stock.companyName} />
           </div>
         </div>
 
