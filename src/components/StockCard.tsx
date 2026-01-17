@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { StockRecommendation } from '@/types/stock-matcher';
 import { Eye, Star, Leaf } from 'lucide-react';
 import StockNewsPill from '@/components/StockNewsPill';
+import CompanySnapshot from '@/components/CompanySnapshot';
 
 interface StockCardProps {
   stock: StockRecommendation;
@@ -37,15 +38,6 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
       return `$${(num / 1000000).toFixed(1)}M`;
     }
     return `$${num.toFixed(2)}`;
-  };
-
-  const getCeoInitials = (ceoName: string) => {
-    return ceoName
-      .split(' ')
-      .map(name => name[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
   };
 
   const getESGRating = (score: number) => {
@@ -115,24 +107,13 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
           </div>
         </div>
 
-        {/* CEO Section with Stylish Initials */}
-        <div className="p-4 sm:p-6 lg:p-4 border-b bg-gray-50 dark:bg-gray-700/50 dark:border-gray-700">
-          <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 mb-3">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-slate-600 to-slate-800 dark:from-slate-500 dark:to-slate-700 rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-gray-600 flex-shrink-0">
-              <span className="text-white font-bold text-base sm:text-xl lg:text-2xl tracking-wide">
-                {getCeoInitials(stock.ceoName)}
-              </span>
-            </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-gray-900 dark:text-white text-base sm:text-lg lg:text-xl truncate">{stock.ceoName}</h3>
-              <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400">Chief Executive Officer</p>
-              <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-500 truncate">{stock.companyName}</p>
-            </div>
-          </div>
-          <p className="text-xs sm:text-sm lg:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-            {stock.ceoHighlights}
-          </p>
-        </div>
+        {/* Company Snapshot */}
+        <CompanySnapshot 
+          ticker={stock.ticker} 
+          companyName={stock.companyName} 
+          sector={stock.sector}
+          variant="compact" 
+        />
 
         {/* Financials */}
         <div className="p-4 sm:p-6 lg:p-4 border-b dark:border-gray-700">
