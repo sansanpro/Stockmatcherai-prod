@@ -19,6 +19,9 @@ export interface FMPCompanyProfile {
   ipoDate: string;
   exchange: string;
   image: string;
+  city?: string;
+  state?: string;
+  address?: string;
 }
 
 export interface FMPNewsItem {

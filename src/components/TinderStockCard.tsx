@@ -2,11 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { StockRecommendation } from '@/types/stock-matcher';
-import { Heart, X, TrendingUp, DollarSign, Building, Eye, ChevronDown, ChevronUp, Minimize2 } from 'lucide-react';
+import { Heart, X, TrendingUp, DollarSign, Building, Eye, Minimize2 } from 'lucide-react';
 import EducationalTooltip from '@/components/EducationalTooltip';
 import DataFreshnessIndicator from '@/components/DataFreshnessIndicator';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import StockNewsPill from '@/components/StockNewsPill';
+import CompanySnapshot from '@/components/CompanySnapshot';
 
 interface TinderStockCardProps {
   stock: StockRecommendation;
@@ -31,7 +32,6 @@ const TinderStockCard = ({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [isExiting, setIsExiting] = useState(false);
-  const [isCeoExpanded, setIsCeoExpanded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasDragged, setHasDragged] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -63,15 +63,6 @@ const TinderStockCard = ({
       return `$${(num / 1000000).toFixed(1)}M`;
     }
     return `$${num.toFixed(2)}`;
-  };
-
-  const getCeoInitials = (ceoName: string) => {
-    return ceoName
-      .split(' ')
-      .map(name => name[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
   };
 
   const handleStart = (clientX: number, clientY: number) => {
@@ -232,24 +223,13 @@ const TinderStockCard = ({
         </div>
       </div>
 
-      {/* CEO Section */}
-      <div className="p-5 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-20 h-20 bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-blue-500/20">
-            <span className="text-white font-bold text-2xl tracking-wide">
-              {getCeoInitials(stock.ceoName)}
-            </span>
-          </div>
-          <div>
-            <h3 className="font-bold text-gray-900 dark:text-white text-xl">{stock.ceoName}</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Chief Executive Officer</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{stock.companyName}</p>
-          </div>
-        </div>
-        <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-          {stock.ceoHighlights}
-        </p>
-      </div>
+      {/* Company Snapshot - Expanded */}
+      <CompanySnapshot 
+        ticker={stock.ticker} 
+        companyName={stock.companyName} 
+        sector={stock.sector}
+        variant="expanded" 
+      />
 
       {/* Financials Grid */}
       <div className="p-5 bg-white dark:bg-gray-800">
@@ -439,47 +419,13 @@ const TinderStockCard = ({
             </div>
           </div>
 
-          {/* CEO Section with Stylish Initials */}
-          <div className="p-4 sm:p-6 lg:p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-fade-in delay-300">
-            <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 mb-3">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-slate-600 to-slate-800 rounded-full flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-blue-500/20">
-                <span className="text-white font-bold text-lg sm:text-xl lg:text-2xl tracking-wide">
-                  {getCeoInitials(stock.ceoName)}
-                </span>
-              </div>
-              <div>
-                <h3 className="font-bold text-gray-900 dark:text-white text-base sm:text-lg lg:text-xl">{stock.ceoName}</h3>
-                <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-300">Chief Executive Officer</p>
-                <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400">{stock.companyName}</p>
-              </div>
-            </div>
-            <div className="relative">
-              <p className={`text-xs sm:text-sm lg:text-base text-gray-700 dark:text-gray-300 leading-relaxed ${
-                isCeoExpanded ? '' : 'line-clamp-6'
-              } transition-all duration-300`}>
-                {stock.ceoHighlights}
-              </p>
-              {stock.ceoHighlights.split('\n').length > 6 || stock.ceoHighlights.length > 400 ? (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsCeoExpanded(!isCeoExpanded);
-                  }}
-                  className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-xs sm:text-sm font-medium flex items-center gap-1 transition-colors"
-                >
-                  {isCeoExpanded ? (
-                    <>
-                      Show less <ChevronUp className="w-4 h-4" />
-                    </>
-                  ) : (
-                    <>
-                      ...More <ChevronDown className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              ) : null}
-            </div>
-          </div>
+          {/* Company Snapshot - Compact */}
+          <CompanySnapshot 
+            ticker={stock.ticker} 
+            companyName={stock.companyName} 
+            sector={stock.sector}
+            variant="compact" 
+          />
 
           {/* Financials Grid */}
           <div className="p-4 sm:p-6 lg:p-3 bg-white dark:bg-gray-800 animate-fade-in delay-400">
