@@ -803,7 +803,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      trigger_ceo_data_update: { Args: never; Returns: undefined }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
