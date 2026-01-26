@@ -76,16 +76,18 @@ serve(async (req) => {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
         }
+        // Use correct endpoint: /stable/news with tickers parameter
         result = await fetchWithCache(
-          `${FMP_BASE_URL}/stock-news?symbol=${symbol}&limit=${limit}`,
+          `${FMP_BASE_URL}/news?tickers=${symbol}&limit=${limit}`,
           `news_${symbol}_${limit}`,
           fmpApiKey
         );
         break;
 
       case 'market_news':
+        // Use correct endpoint: /stable/news without tickers for general news
         result = await fetchWithCache(
-          `${FMP_BASE_URL}/general-news?limit=${limit}`,
+          `${FMP_BASE_URL}/news?limit=${limit}`,
           `market_news_${limit}`,
           fmpApiKey
         );

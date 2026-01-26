@@ -50,19 +50,27 @@ class FMPService {
   }
 
   async getHistoricalPrices(symbol: string, days: number = 30) {
-    const url = `https://financialmodelingprep.com/stable/historical-price-full?symbol=${symbol}&timeseries=${days}&apikey=${this.apiKey}`;
+    // Use correct endpoint: /stable/historical-price-eod/full with from/to dates
+    const toDate = new Date();
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - days);
+    const fromStr = fromDate.toISOString().split('T')[0];
+    const toStr = toDate.toISOString().split('T')[0];
+    const url = `https://financialmodelingprep.com/stable/historical-price-eod/full?symbol=${symbol}&from=${fromStr}&to=${toStr}&apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `historical_${symbol}_${days}d`);
   }
 
-  // NEW: Get company news for a specific stock
+  // Get company news for a specific stock
   async getCompanyNews(symbol: string, limit: number = 5) {
-    const url = `https://financialmodelingprep.com/stable/stock-news?symbol=${symbol}&limit=${limit}&apikey=${this.apiKey}`;
+    // Use correct endpoint: /stable/news with tickers parameter
+    const url = `https://financialmodelingprep.com/stable/news?tickers=${symbol}&limit=${limit}&apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `news_${symbol}_${limit}`);
   }
 
-  // NEW: Get general market news
+  // Get general market news
   async getMarketNews(limit: number = 10) {
-    const url = `https://financialmodelingprep.com/stable/general-news?limit=${limit}&apikey=${this.apiKey}`;
+    // Use correct endpoint: /stable/news without tickers for general news
+    const url = `https://financialmodelingprep.com/stable/news?limit=${limit}&apikey=${this.apiKey}`;
     return this.fetchWithCache(url, `market_news_${limit}`);
   }
 }
