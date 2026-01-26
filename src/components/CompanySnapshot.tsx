@@ -14,10 +14,20 @@ interface CompanySnapshotProps {
 const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: CompanySnapshotProps) => {
   const { profile, isLoading, error } = useCompanyProfile(ticker);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  // Reset image error when profile changes
+  const currentImageUrl = profile?.image;
+  const [lastImageUrl, setLastImageUrl] = useState<string | undefined>(undefined);
+  
+  if (currentImageUrl !== lastImageUrl) {
+    setLastImageUrl(currentImageUrl);
+    setImageError(false);
+  }
 
   // Get ticker initials as fallback for logo
-  const getTickerInitials = (ticker: string) => {
-    return ticker.slice(0, 2).toUpperCase();
+  const getTickerInitials = (tickerSymbol: string) => {
+    return tickerSymbol.slice(0, 2).toUpperCase();
   };
 
   // Render logo with fallback
@@ -26,22 +36,16 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
       ? 'w-20 h-20 text-2xl' 
       : 'w-14 h-14 sm:w-16 sm:h-16 text-lg sm:text-xl';
 
-    if (profile?.image) {
+    const hasValidImage = profile?.image && !imageError;
+
+    if (hasValidImage) {
       return (
         <div className={`${sizeClasses} rounded-xl overflow-hidden bg-white shadow-lg border-2 border-white ring-2 ring-blue-500/20 flex-shrink-0`}>
           <img 
             src={profile.image} 
             alt={`${companyName} logo`}
             className="w-full h-full object-contain p-1"
-            onError={(e) => {
-              // Fallback to initials on image load error
-              e.currentTarget.style.display = 'none';
-              const parent = e.currentTarget.parentElement;
-              if (parent) {
-                parent.innerHTML = `<span class="text-white font-bold ${size === 'lg' ? 'text-2xl' : 'text-lg sm:text-xl'} tracking-wide">${getTickerInitials(ticker)}</span>`;
-                parent.className = `${sizeClasses} bg-gradient-to-br from-blue-600 to-indigo-800 rounded-xl flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-blue-500/20 flex-shrink-0`;
-              }
-            }}
+            onError={() => setImageError(true)}
           />
         </div>
       );
