@@ -45,5 +45,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>StockMatcherAI may use the camera to scan payment cards for secure checkout.</string>
 </dict>
 </plist>
