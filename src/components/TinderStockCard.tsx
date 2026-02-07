@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { StockRecommendation } from '@/types/stock-matcher';
-import { Heart, X, TrendingUp, DollarSign, Building, Eye, Minimize2 } from 'lucide-react';
+import { Heart, X, TrendingUp, DollarSign, Building, Eye, Minimize2, ThumbsUp } from 'lucide-react';
 import EducationalTooltip from '@/components/EducationalTooltip';
 import DataFreshnessIndicator from '@/components/DataFreshnessIndicator';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
@@ -17,6 +17,7 @@ interface TinderStockCardProps {
   isVisible?: boolean;
   zIndex?: number;
   scale?: number;
+  isHighMatch?: boolean;
 }
 
 const TinderStockCard = ({ 
@@ -26,7 +27,8 @@ const TinderStockCard = ({
   onViewDetails,
   isVisible = true, 
   zIndex = 1,
-  scale = 1 
+  scale = 1,
+  isHighMatch = false
 }: TinderStockCardProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -322,12 +324,20 @@ const TinderStockCard = ({
               dragOffset.x > 50 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             style={{
-              background: 'linear-gradient(45deg, rgba(34, 197, 94, 0.9), rgba(22, 163, 74, 0.9))'
+              background: isHighMatch
+                ? 'linear-gradient(45deg, rgba(236, 72, 153, 0.9), rgba(219, 39, 119, 0.9))'
+                : 'linear-gradient(45deg, rgba(59, 130, 246, 0.9), rgba(6, 182, 212, 0.9))'
             }}
           >
             <div className="text-white text-center animate-pulse">
-              <Heart className="w-16 h-16 mx-auto mb-2 fill-current drop-shadow-lg" />
-              <div className="text-2xl font-bold drop-shadow-md">MATCH!</div>
+              {isHighMatch ? (
+                <Heart className="w-16 h-16 mx-auto mb-2 fill-current drop-shadow-lg" />
+              ) : (
+                <ThumbsUp className="w-16 h-16 mx-auto mb-2 drop-shadow-lg" />
+              )}
+              <div className="text-2xl font-bold drop-shadow-md">
+                {isHighMatch ? 'MATCHED!' : 'LIKED!'}
+              </div>
             </div>
           </div>
           
