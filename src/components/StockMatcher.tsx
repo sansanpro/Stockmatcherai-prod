@@ -8,6 +8,8 @@ import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { recordSwipe } from '@/utils/recentlySwipedService';
 import UpgradeModal from '@/components/UpgradeModal';
+import MatchOverlay from '@/components/MatchOverlay';
+import { calculateCompatibilityScore, isHighCompatibilityMatch } from '@/utils/stockCompatibility';
 import { Heart, X, RotateCcw, TrendingUp, Plus, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Json } from '@/integrations/supabase/types';
@@ -27,6 +29,8 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [animatingCard, setAnimatingCard] = useState(false);
   const [seenStockTickers, setSeenStockTickers] = useState<Set<string>>(new Set());
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [matchOverlayStock, setMatchOverlayStock] = useState<StockRecommendation | null>(null);
+  const [matchOverlayScore, setMatchOverlayScore] = useState(0);
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
   const { canSwipe, incrementSwipeCount, dailySwipesUsed, dailySwipeLimit } = useSubscription();
@@ -110,7 +114,14 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     // Update swipe statistics
     updateSwipeStats(true);
     
-    console.log(`Matched ${currentStock.ticker}, adding to seen stocks`);
+    // Check if this is a high-compatibility match
+    const score = calculateCompatibilityScore(currentStock, userProfile);
+    if (isHighCompatibilityMatch(currentStock, userProfile)) {
+      setMatchOverlayStock(currentStock);
+      setMatchOverlayScore(score);
+    }
+
+    console.log(`Matched ${currentStock.ticker} (compatibility: ${score}%), adding to seen stocks`);
     
     // Delay to allow exit animation
     setTimeout(() => {
@@ -396,6 +407,16 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
           setShowUpgradeModal(false);
         }}
       />
+
+      {/* Match Overlay */}
+      {matchOverlayStock && (
+        <MatchOverlay
+          stock={matchOverlayStock}
+          compatibilityScore={matchOverlayScore}
+          onClose={() => setMatchOverlayStock(null)}
+          onViewDetails={onViewDetails}
+        />
+      )}
     </div>
   );
 };
