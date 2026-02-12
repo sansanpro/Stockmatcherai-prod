@@ -1,33 +1,29 @@
 
-# Fix App Store Connect Rejection - Missing Privacy Keys
 
-## Problem
-Apple rejected your app because the Stripe Capacitor plugin includes references to camera APIs (used for credit card scanning), but your `Info.plist` is missing the required `NSCameraUsageDescription` privacy usage string.
+# Fix Stock Matching - Lower Threshold and Stabilize Overlays
 
-## Solution
-Add the required privacy usage description to `ios/App/App/Info.plist`. This is a simple one-line fix.
+## Root Cause
+The compatibility threshold of 75% is too strict. The scoring algorithm requires a stock to score well across all 6 dimensions (risk tolerance, sector, investment goals, age, affordability, and valuation), which is very difficult to achieve. As a result, every right-swipe falls below the threshold and only triggers "Liked!" instead of "Matched!".
 
-## What I'll Do
+There is also a secondary bug: the MatchOverlay's auto-dismiss timer resets on every parent re-render because the `onClose` callback is an inline function that changes reference each render.
 
-### Update `ios/App/App/Info.plist`
-Add the `NSCameraUsageDescription` key with an appropriate user-facing message:
+## Changes
 
-```xml
-<key>NSCameraUsageDescription</key>
-<string>StockMatcherAI may use the camera to scan payment cards for secure checkout.</string>
-```
+### 1. Lower the match threshold (src/utils/stockCompatibility.ts)
+- Reduce `MATCH_THRESHOLD` from 75 to 65. This makes roughly 20-30% of stocks trigger "Matched!" instead of nearly 0%.
+- Optionally, slightly boost base scores in categories where partial matches currently earn too few points (e.g., give 5 points in the sector category even when the sector doesn't match, instead of 0).
 
-## After I Make This Change
+### 2. Fix MatchOverlay timer bug (src/components/MatchOverlay.tsx)
+- Remove `onClose` from the useEffect dependency array and use a ref instead, so the auto-dismiss timer doesn't restart on every parent re-render.
 
-You'll need to:
-1. **Pull the changes** to your local project (`git pull`)
-2. **Sync Capacitor** by running `npx cap sync ios`
-3. **Rebuild in Xcode**: Open the project with `npx cap open ios`, then Product → Archive
-4. **Upload a new build** to App Store Connect with an incremented build number (e.g., Build 2)
+### 3. Fix LikedOverlay timer bug (src/components/LikedOverlay.tsx)
+- Apply the same ref-based fix to the LikedOverlay for consistency.
 
-## About the SDK Warning
-The second message about iOS 18.5 SDK is just a heads-up for the future (April 2026). Your current build will still be accepted - Apple is just letting you know that eventually you'll need to update Xcode. No action needed right now.
+### 4. Add debug logging (src/components/StockMatcher.tsx)
+- Log the compatibility score for each swiped stock so you can verify match/like decisions in the console.
 
----
+## Expected Result
+- Stocks that are a good (but not perfect) fit for the user will trigger the full-screen "It's a Match!" overlay with hearts, sparkles, and the compatibility score bar.
+- Stocks that are a weaker fit will continue showing the "Liked!" overlay.
+- Both overlays will reliably auto-dismiss without timer glitches.
 
-**Technical Note**: The Stripe plugin (`@capacitor-community/stripe`) includes card scanning functionality that references the camera API, which triggers Apple's privacy check even if your app doesn't actively use that feature.
