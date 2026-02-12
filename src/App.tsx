@@ -21,7 +21,7 @@ const App = () => {
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <div className="w-full h-full min-h-screen min-w-0 bg-background text-foreground transition-colors pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+        <div className="w-full h-full min-h-screen min-w-0 bg-background text-foreground transition-colors">
           <Toaster />
           <Sonner />
           <BrowserRouter>

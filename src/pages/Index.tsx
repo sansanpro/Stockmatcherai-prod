@@ -209,7 +209,7 @@ const IndexContent = () => {
   // Show welcome screen for unauthenticated users
   if (!user) {
     return (
-      <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-auto">
+      <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 pt-[env(safe-area-inset-top)] overflow-auto">
         <Card className="w-full max-w-md md:max-w-lg text-center shadow-xl dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="space-y-4">
             <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -256,32 +256,27 @@ const IndexContent = () => {
 
   // Header for authenticated app navigation
   const AppHeader = () => (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-2 py-2 w-full overflow-x-hidden pt-[env(safe-area-inset-top)] pb-2">
-      <div className="w-full flex flex-wrap items-center justify-between gap-1 sm:gap-4">
-        <div className="flex-1 min-w-0"></div>
-        <div className="flex flex-wrap items-center gap-1 sm:gap-4 justify-center w-full sm:w-auto">
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 w-full pt-[env(safe-area-inset-top)]">
+      <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
           <Button
             onClick={() => setCurrentStep('matching')}
             variant={currentStep === 'matching' ? 'default' : 'ghost'}
-            size="sm"
-            disabled={!userProfile}
-            className="flex items-center gap-2 px-4 sm:px-6"
+            className="flex items-center gap-2 px-6 py-3 min-h-[44px] min-w-[44px] text-base"
           >
-            <Heart className="w-4 h-4" />
+            <Heart className="w-5 h-5" />
             Match
           </Button>
           <Button
             onClick={() => setCurrentStep('matches')}
             variant={currentStep === 'matches' ? 'default' : 'ghost'}
-            size="sm"
-            disabled={!userProfile}
-            className="flex items-center gap-2 px-4 sm:px-6"
+            className="flex items-center gap-2 px-6 py-3 min-h-[44px] min-w-[44px] text-base"
           >
-            <Heart className="w-4 h-4 fill-current" />
+            <Heart className="w-5 h-5 fill-current" />
             Your Likes
           </Button>
         </div>
-        <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0 justify-end">
+        <div className="flex items-center gap-3">
           <NotificationSystem />
           <UserMenu onOpenSettings={handleOpenSettings} />
         </div>
@@ -326,7 +321,7 @@ const IndexContent = () => {
   if (currentStep === 'welcome' || currentStep === 'profile') {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] overflow-auto">
+        <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 pt-[env(safe-area-inset-top)] overflow-auto">
           {currentStep === 'profile' && <AppHeader />}
           <div className="pt-8">
             <UserProfileForm 
@@ -358,7 +353,7 @@ const IndexContent = () => {
     return (
       <ProtectedRoute>
         {!isMobile && <AppHeader />}
-        <div className="min-h-screen w-full bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 pt-[env(safe-area-inset-top)] overflow-auto pb-24 md:pb-[env(safe-area-inset-bottom)]">
+        <div className="min-h-screen w-full bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 pt-[env(safe-area-inset-top)] overflow-auto pb-24 md:pb-4">
           <StockMatcher 
             userProfile={userProfile!} 
             onReset={handleUpdateProfile}
@@ -382,7 +377,7 @@ const IndexContent = () => {
     return (
       <ProtectedRoute>
         {!isMobile && <AppHeader />}
-        <div className={`min-h-screen w-full min-w-0 bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 px-4 pt-[env(safe-area-inset-top)] overflow-auto overflow-x-hidden ${isMobile ? 'pb-24' : 'pb-[env(safe-area-inset-bottom)]'}`}>
+        <div className={`min-h-screen w-full min-w-0 bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 px-4 pt-[env(safe-area-inset-top)] overflow-auto ${isMobile ? 'pb-24' : 'pb-4'}`}>
           <div className="w-full pt-4">
             <Matches onViewDetails={handleViewStockDetails} />
           </div>
