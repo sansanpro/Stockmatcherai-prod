@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Heart, Sparkles, TrendingUp } from 'lucide-react';
 import { StockRecommendation } from '@/types/stock-matcher';
 import { Button } from '@/components/ui/button';
@@ -12,22 +12,22 @@ interface MatchOverlayProps {
 
 const MatchOverlay = ({ stock, compatibilityScore, onClose, onViewDetails }: MatchOverlayProps) => {
   const [phase, setPhase] = useState<'enter' | 'show' | 'exit'>('enter');
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
-    // Enter animation
     const showTimer = setTimeout(() => setPhase('show'), 100);
     
-    // Auto-dismiss after 4 seconds
     const exitTimer = setTimeout(() => {
       setPhase('exit');
-      setTimeout(onClose, 500);
+      setTimeout(() => onCloseRef.current(), 500);
     }, 4000);
 
     return () => {
       clearTimeout(showTimer);
       clearTimeout(exitTimer);
     };
-  }, [onClose]);
+  }, []);
 
   const handleDismiss = () => {
     setPhase('exit');
