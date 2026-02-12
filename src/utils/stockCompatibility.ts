@@ -29,6 +29,8 @@ export const calculateCompatibilityScore = (
     score += 15; // Neutral bonus for "any"
   } else if (stock.sector.toLowerCase().includes(profile.sectorPreference.toLowerCase())) {
     score += 20;
+  } else {
+    score += 5; // Base points even for non-matching sectors
   }
 
   // 3. Investment goal alignment (max 20 points)
@@ -96,7 +98,7 @@ export const calculateCompatibilityScore = (
 };
 
 /** Threshold above which a stock triggers the "It's a Match!" overlay */
-export const MATCH_THRESHOLD = 75;
+export const MATCH_THRESHOLD = 65;
 
 /** Determines if a stock is a high-compatibility match */
 export const isHighCompatibilityMatch = (

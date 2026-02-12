@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ThumbsUp, Sparkles } from 'lucide-react';
 import { StockRecommendation } from '@/types/stock-matcher';
 import { Button } from '@/components/ui/button';
@@ -10,21 +10,22 @@ interface LikedOverlayProps {
 
 const LikedOverlay = ({ stock, onClose }: LikedOverlayProps) => {
   const [phase, setPhase] = useState<'enter' | 'show' | 'exit'>('enter');
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     const showTimer = setTimeout(() => setPhase('show'), 100);
 
-    // Auto-dismiss after 2.5 seconds (shorter than MatchOverlay)
     const exitTimer = setTimeout(() => {
       setPhase('exit');
-      setTimeout(onClose, 400);
+      setTimeout(() => onCloseRef.current(), 400);
     }, 2500);
 
     return () => {
       clearTimeout(showTimer);
       clearTimeout(exitTimer);
     };
-  }, [onClose]);
+  }, []);
 
   const handleDismiss = () => {
     setPhase('exit');
