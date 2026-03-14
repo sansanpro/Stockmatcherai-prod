@@ -425,13 +425,6 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
         />
       )}
 
-      {/* Liked Overlay - regular likes */}
-      {likedOverlayStock && (
-        <LikedOverlay
-          stock={likedOverlayStock}
-          onClose={() => setLikedOverlayStock(null)}
-        />
-      )}
     </div>
   );
 };

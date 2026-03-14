@@ -99,7 +99,7 @@ export const calculateCompatibilityScore = (
 };
 
 /** Threshold above which a stock triggers the "It's a Match!" overlay */
-export const MATCH_THRESHOLD = 65;
+export const MATCH_THRESHOLD = 50;
 
 /** Determines if a stock is a high-compatibility match */
 export const isHighCompatibilityMatch = (
