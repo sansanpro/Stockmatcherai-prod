@@ -121,7 +121,10 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       setMatchOverlayStock(currentStock);
       setMatchOverlayScore(score);
     } else {
-      setLikedOverlayStock(currentStock);
+      toast(`👍 ${currentStock.ticker} liked`, {
+        description: `${currentStock.companyName} added to watchlist`,
+        duration: 2000,
+      });
     }
 
     console.log(`Matched ${currentStock.ticker} (compatibility: ${score}%), adding to seen stocks`);
