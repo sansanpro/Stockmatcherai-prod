@@ -59,6 +59,7 @@ export const calculateCompatibilityScore = (
     case 'balance':
       if (stock.dividendYield > 1 && stock.oneYearReturn > 5 && stock.oneYearReturn < 20) score += 20;
       else if (stock.riskLevel === 'medium') score += 12;
+      else score += 5;
       break;
     default:
       score += 10;
