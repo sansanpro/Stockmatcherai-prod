@@ -30,7 +30,7 @@ export const calculateCompatibilityScore = (
   } else if (stock.sector.toLowerCase().includes(profile.sectorPreference.toLowerCase())) {
     score += 20;
   } else {
-    score += 5; // Base points even for non-matching sectors
+    score += 8; // Base points even for non-matching sectors
   }
 
   // 3. Investment goal alignment (max 20 points)
@@ -59,6 +59,7 @@ export const calculateCompatibilityScore = (
     case 'balance':
       if (stock.dividendYield > 1 && stock.oneYearReturn > 5 && stock.oneYearReturn < 20) score += 20;
       else if (stock.riskLevel === 'medium') score += 12;
+      else score += 5;
       break;
     default:
       score += 10;
@@ -98,7 +99,7 @@ export const calculateCompatibilityScore = (
 };
 
 /** Threshold above which a stock triggers the "It's a Match!" overlay */
-export const MATCH_THRESHOLD = 65;
+export const MATCH_THRESHOLD = 50;
 
 /** Determines if a stock is a high-compatibility match */
 export const isHighCompatibilityMatch = (

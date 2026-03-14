@@ -9,7 +9,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { recordSwipe } from '@/utils/recentlySwipedService';
 import UpgradeModal from '@/components/UpgradeModal';
 import MatchOverlay from '@/components/MatchOverlay';
-import LikedOverlay from '@/components/LikedOverlay';
 import { calculateCompatibilityScore, isHighCompatibilityMatch } from '@/utils/stockCompatibility';
 import { Heart, X, RotateCcw, TrendingUp, Plus, Crown } from 'lucide-react';
 import { toast } from 'sonner';
@@ -32,7 +31,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [matchOverlayStock, setMatchOverlayStock] = useState<StockRecommendation | null>(null);
   const [matchOverlayScore, setMatchOverlayScore] = useState(0);
-  const [likedOverlayStock, setLikedOverlayStock] = useState<StockRecommendation | null>(null);
+  
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
   const { canSwipe, incrementSwipeCount, dailySwipesUsed, dailySwipeLimit } = useSubscription();
@@ -122,7 +121,10 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       setMatchOverlayStock(currentStock);
       setMatchOverlayScore(score);
     } else {
-      setLikedOverlayStock(currentStock);
+      toast(`👍 ${currentStock.ticker} liked`, {
+        description: `${currentStock.companyName} added to watchlist`,
+        duration: 2000,
+      });
     }
 
     console.log(`Matched ${currentStock.ticker} (compatibility: ${score}%), adding to seen stocks`);
@@ -423,13 +425,6 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
         />
       )}
 
-      {/* Liked Overlay - regular likes */}
-      {likedOverlayStock && (
-        <LikedOverlay
-          stock={likedOverlayStock}
-          onClose={() => setLikedOverlayStock(null)}
-        />
-      )}
     </div>
   );
 };
