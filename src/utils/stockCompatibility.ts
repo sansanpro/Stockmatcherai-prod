@@ -30,7 +30,7 @@ export const calculateCompatibilityScore = (
   } else if (stock.sector.toLowerCase().includes(profile.sectorPreference.toLowerCase())) {
     score += 20;
   } else {
-    score += 5; // Base points even for non-matching sectors
+    score += 8; // Base points even for non-matching sectors
   }
 
   // 3. Investment goal alignment (max 20 points)
