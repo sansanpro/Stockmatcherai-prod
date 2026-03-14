@@ -9,7 +9,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { recordSwipe } from '@/utils/recentlySwipedService';
 import UpgradeModal from '@/components/UpgradeModal';
 import MatchOverlay from '@/components/MatchOverlay';
-import LikedOverlay from '@/components/LikedOverlay';
 import { calculateCompatibilityScore, isHighCompatibilityMatch } from '@/utils/stockCompatibility';
 import { Heart, X, RotateCcw, TrendingUp, Plus, Crown } from 'lucide-react';
 import { toast } from 'sonner';
