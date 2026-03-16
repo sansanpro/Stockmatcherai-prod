@@ -40,6 +40,7 @@ const App = () => {
                 <>
                   <Route path="/" element={<Landing />} />
                   <Route path="/waitlist" element={<Waitlist />} />
+                  <Route path="/support" element={<Support />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/app" element={<Index />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
