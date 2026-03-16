@@ -20,7 +20,7 @@ const Landing = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/15" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/15 pointer-events-none" />
         
         <div className="container relative mx-auto px-4 py-20 md:py-32">
           <div className="max-w-4xl mx-auto text-center space-y-8">
@@ -46,7 +46,8 @@ const Landing = () => {
               <Button 
                 size="lg" 
                 onClick={() => navigate("/waitlist")}
-                className="text-lg px-8 py-6 group"
+                onTouchEnd={(e) => { e.preventDefault(); navigate("/waitlist"); }}
+                className="text-lg px-8 py-6 group relative z-10 min-h-[44px] min-w-[44px]"
               >
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -160,7 +161,8 @@ const Landing = () => {
             <Button 
               size="lg" 
               onClick={() => navigate("/waitlist")}
-              className="text-lg px-8 py-6 mt-8"
+              onTouchEnd={(e) => { e.preventDefault(); navigate("/waitlist"); }}
+              className="text-lg px-8 py-6 mt-8 relative z-10 min-h-[44px] min-w-[44px]"
             >
               Join the Waitlist
               <ArrowRight className="ml-2 h-5 w-5" />

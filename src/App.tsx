@@ -9,6 +9,7 @@ import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Waitlist from "./pages/Waitlist";
+import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => {
                 <>
                   <Route path="/" element={<Landing />} />
                   <Route path="/waitlist" element={<Waitlist />} />
+                  <Route path="/support" element={<Support />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/app" element={<Index />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
