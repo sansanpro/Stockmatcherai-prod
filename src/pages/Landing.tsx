@@ -161,7 +161,8 @@ const Landing = () => {
             <Button 
               size="lg" 
               onClick={() => navigate("/waitlist")}
-              className="text-lg px-8 py-6 mt-8"
+              onTouchEnd={(e) => { e.preventDefault(); navigate("/waitlist"); }}
+              className="text-lg px-8 py-6 mt-8 relative z-10 min-h-[44px] min-w-[44px]"
             >
               Join the Waitlist
               <ArrowRight className="ml-2 h-5 w-5" />
