@@ -46,7 +46,8 @@ const Landing = () => {
               <Button 
                 size="lg" 
                 onClick={() => navigate("/waitlist")}
-                className="text-lg px-8 py-6 group"
+                onTouchEnd={(e) => { e.preventDefault(); navigate("/waitlist"); }}
+                className="text-lg px-8 py-6 group relative z-10 min-h-[44px] min-w-[44px]"
               >
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
