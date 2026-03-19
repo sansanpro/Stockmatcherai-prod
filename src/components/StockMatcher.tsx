@@ -350,7 +350,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
           <div className="space-y-3 animate-fade-in delay-400">
             <Button 
-              onClick={loadMoreRecommendations}
+              onClick={() => loadMoreRecommendations(false)}
               className="w-full bg-white/20 hover:bg-white/30 text-white border-0 h-12 rounded-xl backdrop-blur-lg transform hover:scale-105 transition-all duration-200"
             >
               <RotateCcw className="w-5 h-5 mr-2" />
