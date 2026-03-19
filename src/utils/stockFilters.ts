@@ -3,7 +3,8 @@ import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 
 export const filterStocksByProfile = (
   stocks: Omit<StockRecommendation, 'whyItFits'>[],
-  profile: UserProfile
+  profile: UserProfile,
+  relaxed: boolean = false
 ): Omit<StockRecommendation, 'whyItFits'>[] => {
   // Validate input
   if (!stocks || stocks.length === 0) {
