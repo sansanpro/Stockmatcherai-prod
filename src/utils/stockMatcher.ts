@@ -58,8 +58,8 @@ export const generateStockRecommendations = async (
     }
 
     // Filter stocks based on user profile
-    const filteredStocks = filterStocksByProfile(stocksToFilter, userProfile);
-    console.log(`Filtered to ${filteredStocks.length} stocks from ${stocksToFilter.length} total`);
+    const filteredStocks = filterStocksByProfile(stocksToFilter, userProfile, relaxFilters);
+    console.log(`Filtered to ${filteredStocks.length} stocks from ${stocksToFilter.length} total (relaxed: ${relaxFilters})`);
 
     // Remove excluded stocks (including recently swiped within 7 days)
     const availableStocks = filteredStocks.filter(stock => 
