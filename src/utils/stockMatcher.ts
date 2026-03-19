@@ -7,7 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const generateStockRecommendations = async (
   userProfile: UserProfile,
-  excludedStocks: string[] = []
+  excludedStocks: string[] = [],
+  relaxFilters: boolean = false
 ): Promise<StockRecommendation[]> => {
   console.log('Generating stock recommendations for user profile:', userProfile);
   console.log('Excluded stocks:', excludedStocks);
