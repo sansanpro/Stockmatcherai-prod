@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, TrendingUp, Heart, Zap, Shield, Target, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
-import appScreenshotMobile from "@/assets/app-screenshot-mobile.png";
+import ScreenshotShowcase from "@/components/landing/ScreenshotShowcase";
 
 const Landing = () => {
   const navigate = useNavigate();
