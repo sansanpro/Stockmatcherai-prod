@@ -7,22 +7,27 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const generateStockRecommendations = async (
   userProfile: UserProfile,
-  excludedStocks: string[] = []
+  excludedStocks: string[] = [],
+  relaxFilters: boolean = false
 ): Promise<StockRecommendation[]> => {
   console.log('Generating stock recommendations for user profile:', userProfile);
   console.log('Excluded stocks:', excludedStocks);
 
   try {
-    // Get recently swiped stocks (within 7 days) to exclude
+    // When filters are relaxed, skip the recently swiped exclusion
     let recentlySwipedTickers: string[] = [];
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
+    if (user && !relaxFilters) {
       recentlySwipedTickers = await getRecentlySwipedTickers(user.id);
       console.log(`Found ${recentlySwipedTickers.length} recently swiped stocks to exclude`);
+    } else if (relaxFilters) {
+      console.log('Relaxed mode: skipping recently swiped exclusions');
     }
     
     // Combine exclusions
-    const allExclusions = [...new Set([...excludedStocks, ...recentlySwipedTickers])];
+    const allExclusions = relaxFilters 
+      ? [...excludedStocks] // In relaxed mode, only exclude current session stocks
+      : [...new Set([...excludedStocks, ...recentlySwipedTickers])];
     
     let stocksToFilter: Omit<StockRecommendation, 'whyItFits'>[] = [];
     
@@ -53,8 +58,8 @@ export const generateStockRecommendations = async (
     }
 
     // Filter stocks based on user profile
-    const filteredStocks = filterStocksByProfile(stocksToFilter, userProfile);
-    console.log(`Filtered to ${filteredStocks.length} stocks from ${stocksToFilter.length} total`);
+    const filteredStocks = filterStocksByProfile(stocksToFilter, userProfile, relaxFilters);
+    console.log(`Filtered to ${filteredStocks.length} stocks from ${stocksToFilter.length} total (relaxed: ${relaxFilters})`);
 
     // Remove excluded stocks (including recently swiped within 7 days)
     const availableStocks = filteredStocks.filter(stock => 

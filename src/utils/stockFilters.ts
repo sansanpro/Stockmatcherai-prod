@@ -3,7 +3,8 @@ import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 
 export const filterStocksByProfile = (
   stocks: Omit<StockRecommendation, 'whyItFits'>[],
-  profile: UserProfile
+  profile: UserProfile,
+  relaxed: boolean = false
 ): Omit<StockRecommendation, 'whyItFits'>[] => {
   // Validate input
   if (!stocks || stocks.length === 0) {
@@ -38,13 +39,15 @@ export const filterStocksByProfile = (
   // Since we're already getting sector-specific stocks from the database,
   // we don't need to filter by sector again - just apply other filters
   let filteredStocks = stocks.filter(stock => {
-    // Affordability filter - exclude stocks that cost more than threshold
-    if (stock.pricePerShare > affordabilityThreshold) {
+    // In relaxed mode, skip affordability filter entirely
+    if (!relaxed && stock.pricePerShare > affordabilityThreshold) {
       return false;
     }
 
-    // FLEXIBLE Risk tolerance filtering - prefer user's risk level but don't be too restrictive
-    // This ensures good variety while still prioritizing preferences
+    // In relaxed mode, use a much more generous affordability threshold (10x)
+    if (relaxed && stock.pricePerShare > affordabilityThreshold * 10) {
+      return false;
+    }
 
     // Performance filter - exclude stocks with catastrophic performance
     if (stock.oneYearReturn < -80) {

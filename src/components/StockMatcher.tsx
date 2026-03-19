@@ -207,15 +207,15 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     setCurrentIndex(previousIndex);
   };
 
-  const loadMoreRecommendations = async () => {
+  const loadMoreRecommendations = async (relaxed: boolean = false) => {
     setLoading(true);
     
     // Keep all seen stock tickers for exclusion
     const exclusionsArray = Array.from(seenStockTickers);
-    console.log(`Loading more recommendations, excluding ${exclusionsArray.length} seen stocks`);
+    console.log(`Loading more recommendations, excluding ${exclusionsArray.length} seen stocks, relaxed: ${relaxed}`);
     
     // Load fresh recommendations excluding all previously seen stocks
-    const newStocks = await generateStockRecommendations(userProfile, exclusionsArray);
+    const newStocks = await generateStockRecommendations(userProfile, exclusionsArray, relaxed);
     
     // Filter out invalid stocks
     const validStocks = newStocks.filter(stock => {
@@ -226,14 +226,48 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       return true;
     });
     
+    // If no stocks found with current exclusions, try with relaxed filters
+    if (validStocks.length === 0 && !relaxed) {
+      console.log('No stocks found, retrying with relaxed filters...');
+      return loadMoreRecommendations(true);
+    }
+    
+    // If still no stocks even with relaxed filters, reset seen stocks and try again
+    if (validStocks.length === 0 && relaxed) {
+      console.log('No stocks even with relaxed filters, resetting seen stocks...');
+      setSeenStockTickers(new Set());
+      const freshStocks = await generateStockRecommendations(userProfile, [], false);
+      const freshValid = freshStocks.filter(stock => 
+        stock.companyName && stock.companyName.trim() !== '' && stock.companyName !== 'Unknown Company'
+      );
+      setTimeout(() => {
+        setAllRecommendations(freshValid);
+        setCurrentIndex(0);
+        setLoading(false);
+        if (freshValid.length > 0) {
+          toast('Fresh recommendations loaded!', { description: 'We\'ve refreshed your stock pool.' });
+        }
+      }, 300);
+      return;
+    }
+    
     setTimeout(() => {
-      // Reset to beginning with new stocks, but keep seen stocks memory
       setAllRecommendations(validStocks);
       setCurrentIndex(0);
-      // Don't reset matches and passes - keep the user's history
       setLoading(false);
+      if (relaxed) {
+        toast('More stocks found!', { description: 'We expanded the filters to find you more matches.' });
+      }
     }, 300);
   };
+
+  // Auto-reload when stocks run out
+  useEffect(() => {
+    if (!loading && allRecommendations.length > 0 && currentIndex >= allRecommendations.length) {
+      console.log('Auto-reloading: user has swiped through all recommendations');
+      loadMoreRecommendations(false);
+    }
+  }, [currentIndex, allRecommendations.length, loading]);
 
   if (loading) {
     return (
@@ -316,7 +350,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
           <div className="space-y-3 animate-fade-in delay-400">
             <Button 
-              onClick={loadMoreRecommendations}
+              onClick={() => loadMoreRecommendations(false)}
               className="w-full bg-white/20 hover:bg-white/30 text-white border-0 h-12 rounded-xl backdrop-blur-lg transform hover:scale-105 transition-all duration-200"
             >
               <RotateCcw className="w-5 h-5 mr-2" />
