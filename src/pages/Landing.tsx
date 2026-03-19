@@ -58,27 +58,7 @@ const Landing = () => {
       </section>
 
       {/* App Preview Section */}
-      <section className="py-20 md:py-32 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              See It In Action
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              A glimpse of what's coming - your personalized stock matching experience
-            </p>
-          </div>
-
-          <div className="flex justify-center max-w-md mx-auto">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-border">
-                <img src={appScreenshotMobile} alt="Stock matching interface preview" className="w-full" />
-              </div>
-              <p className="text-center text-muted-foreground">Swipe through stocks, find your perfect match</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ScreenshotShowcase />
 
       {/* Features Section */}
       <section className="py-20 md:py-32 bg-muted/30">
