@@ -10,9 +10,12 @@ import { recordSwipe } from '@/utils/recentlySwipedService';
 import UpgradeModal from '@/components/UpgradeModal';
 import MatchOverlay from '@/components/MatchOverlay';
 import { calculateCompatibilityScore, isHighCompatibilityMatch } from '@/utils/stockCompatibility';
-import { Heart, X, RotateCcw, TrendingUp, Plus, Crown } from 'lucide-react';
+import { Heart, X, RotateCcw, TrendingUp, Plus, Crown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Json } from '@/integrations/supabase/types';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 
 interface StockMatcherProps {
   userProfile: UserProfile;
@@ -31,11 +34,18 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [matchOverlayStock, setMatchOverlayStock] = useState<StockRecommendation | null>(null);
   const [matchOverlayScore, setMatchOverlayScore] = useState(0);
-  
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
+  const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
   const { canSwipe, incrementSwipeCount, dailySwipesUsed, dailySwipeLimit } = useSubscription();
   const { user } = useAuth();
+
+  // Auto-hide swipe hint after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSwipeHint(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Pre-load all recommendations once
   useEffect(() => {
@@ -86,6 +96,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     }
     
     setAnimatingCard(true);
+    if (!hasSwipedOnce) setHasSwipedOnce(true);
     const currentStock = allRecommendations[currentIndex];
     
     // Increment swipe count for free users
@@ -152,6 +163,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     }
     
     setAnimatingCard(true);
+    if (!hasSwipedOnce) setHasSwipedOnce(true);
     const currentStock = allRecommendations[currentIndex];
     
     // Increment swipe count for free users
@@ -369,14 +381,66 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   return (
     <div className="w-full h-screen mx-auto pt-safe-area-inset-top pb-safe-area-inset-bottom bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 lg:p-2 overflow-auto">
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
-        {/* Header */}
+        {/* Header with profile chips */}
         <div className="text-center mb-4 sm:mb-6 lg:mb-2 pt-8 sm:pt-12 lg:pt-2 animate-fade-in px-4 lg:px-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-white mb-3">
             Stock Matcher 💕
           </h1>
-          <div className="flex items-center justify-center gap-1 sm:gap-2 text-white/80 text-xs sm:text-sm">
-            <span className="truncate max-w-[300px]">{userProfile.age}yo • {userProfile.riskTolerance} risk • {userProfile.sectorPreference}</span>
-          </div>
+          <TooltipProvider>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Avatar className="w-7 h-7 border-2 border-white/30">
+                <AvatarFallback className="bg-white/20 text-white text-xs font-bold">
+                  {user?.email?.charAt(0).toUpperCase() || '?'}
+                </AvatarFallback>
+              </Avatar>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button onClick={onReset}>
+                    <Badge className="bg-blue-500/30 text-white border-blue-300/40 hover:bg-blue-500/50 cursor-pointer transition-colors text-xs">
+                      {userProfile.age}yo
+                    </Badge>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Tap to edit profile</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button onClick={onReset}>
+                    <Badge className={`border-white/30 hover:opacity-80 cursor-pointer transition-colors text-xs ${
+                      userProfile.riskTolerance === 'high' ? 'bg-red-500/30 text-white border-red-300/40' :
+                      userProfile.riskTolerance === 'medium' ? 'bg-yellow-500/30 text-white border-yellow-300/40' :
+                      'bg-green-500/30 text-white border-green-300/40'
+                    }`}>
+                      {userProfile.riskTolerance} risk
+                    </Badge>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Tap to edit profile</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button onClick={onReset}>
+                    <Badge className="bg-purple-500/30 text-white border-purple-300/40 hover:bg-purple-500/50 cursor-pointer transition-colors text-xs">
+                      {userProfile.sectorPreference}
+                    </Badge>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Tap to edit profile</TooltipContent>
+              </Tooltip>
+              {userProfile.investmentGoal && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button onClick={onReset}>
+                      <Badge className="bg-emerald-500/30 text-white border-emerald-300/40 hover:bg-emerald-500/50 cursor-pointer transition-colors text-xs">
+                        {userProfile.investmentGoal}
+                      </Badge>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Tap to edit profile</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          </TooltipProvider>
         </div>
 
 
@@ -385,6 +449,17 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
         {/* Stock Cards Stack */}
         {allRecommendations.length > 0 && currentStock && (
           <div className="mb-6 lg:mb-2 relative h-[65vh] lg:h-[72vh] max-h-[550px] lg:max-h-none min-h-[450px] animate-fade-in delay-300">
+            {/* Swipe direction chevrons */}
+            {!hasSwipedOnce && (
+              <>
+                <div className="absolute left-2 top-1/2 -translate-y-1/2 z-20 opacity-30 animate-bounce pointer-events-none">
+                  <ChevronLeft className="w-8 h-8 text-white" />
+                </div>
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 opacity-30 animate-bounce pointer-events-none">
+                  <ChevronRight className="w-8 h-8 text-white" />
+                </div>
+              </>
+            )}
             {visibleCards.map((stock, stackIndex) => {
               const cardIndex = currentIndex + stackIndex;
               const isActiveCard = stackIndex === 0;
@@ -410,30 +485,38 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
         {/* Action Buttons */}
         {allRecommendations.length > 0 && currentStock && (
-          <div className="flex justify-center gap-6 mb-6 px-4 animate-fade-in delay-400">
-            <Button
-              onClick={handlePass}
-              disabled={animatingCard || !canSwipe}
-              className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
-            >
-              <X className="w-8 h-8" />
-            </Button>
-            
-            <Button
-              onClick={handleUndo}
-              disabled={currentIndex === 0 || animatingCard}
-              className="w-12 h-12 rounded-full bg-gray-500/80 hover:bg-gray-600 border-0 text-white shadow-xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
-            >
-              <RotateCcw className="w-5 h-5" />
-            </Button>
-            
-            <Button
-              onClick={handleMatch}
-              disabled={animatingCard || !canSwipe}
-              className="w-16 h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
-            >
-              <Heart className="w-8 h-8" />
-            </Button>
+          <div className="mb-6 px-4 animate-fade-in delay-400">
+            <div className="flex justify-center gap-6 mb-2">
+              <Button
+                onClick={handlePass}
+                disabled={animatingCard || !canSwipe}
+                className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none ring-2 ring-red-400/50 animate-pulse"
+              >
+                <X className="w-8 h-8" />
+              </Button>
+              
+              <Button
+                onClick={handleUndo}
+                disabled={currentIndex === 0 || animatingCard}
+                className="w-12 h-12 rounded-full bg-gray-500/80 hover:bg-gray-600 border-0 text-white shadow-xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+              >
+                <RotateCcw className="w-5 h-5" />
+              </Button>
+              
+              <Button
+                onClick={handleMatch}
+                disabled={animatingCard || !canSwipe}
+                className="w-16 h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none ring-2 ring-green-400/50 animate-pulse"
+              >
+                <Heart className="w-8 h-8" />
+              </Button>
+            </div>
+            {/* Swipe hint text */}
+            {showSwipeHint && (
+              <p className="text-center text-white/40 text-xs transition-opacity duration-500">
+                ← Swipe left to pass · Swipe right to like →
+              </p>
+            )}
           </div>
         )}
 
