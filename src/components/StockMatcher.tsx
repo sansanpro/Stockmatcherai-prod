@@ -41,6 +41,12 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const { canSwipe, incrementSwipeCount, dailySwipesUsed, dailySwipeLimit } = useSubscription();
   const { user } = useAuth();
 
+  // Auto-hide swipe hint after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSwipeHint(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Pre-load all recommendations once
   useEffect(() => {
     const loadAllRecommendations = async () => {
