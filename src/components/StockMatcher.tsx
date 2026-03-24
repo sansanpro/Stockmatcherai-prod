@@ -485,30 +485,38 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
         {/* Action Buttons */}
         {allRecommendations.length > 0 && currentStock && (
-          <div className="flex justify-center gap-6 mb-6 px-4 animate-fade-in delay-400">
-            <Button
-              onClick={handlePass}
-              disabled={animatingCard || !canSwipe}
-              className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
-            >
-              <X className="w-8 h-8" />
-            </Button>
-            
-            <Button
-              onClick={handleUndo}
-              disabled={currentIndex === 0 || animatingCard}
-              className="w-12 h-12 rounded-full bg-gray-500/80 hover:bg-gray-600 border-0 text-white shadow-xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
-            >
-              <RotateCcw className="w-5 h-5" />
-            </Button>
-            
-            <Button
-              onClick={handleMatch}
-              disabled={animatingCard || !canSwipe}
-              className="w-16 h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
-            >
-              <Heart className="w-8 h-8" />
-            </Button>
+          <div className="mb-6 px-4 animate-fade-in delay-400">
+            <div className="flex justify-center gap-6 mb-2">
+              <Button
+                onClick={handlePass}
+                disabled={animatingCard || !canSwipe}
+                className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none ring-2 ring-red-400/50 animate-pulse"
+              >
+                <X className="w-8 h-8" />
+              </Button>
+              
+              <Button
+                onClick={handleUndo}
+                disabled={currentIndex === 0 || animatingCard}
+                className="w-12 h-12 rounded-full bg-gray-500/80 hover:bg-gray-600 border-0 text-white shadow-xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+              >
+                <RotateCcw className="w-5 h-5" />
+              </Button>
+              
+              <Button
+                onClick={handleMatch}
+                disabled={animatingCard || !canSwipe}
+                className="w-16 h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none ring-2 ring-green-400/50 animate-pulse"
+              >
+                <Heart className="w-8 h-8" />
+              </Button>
+            </div>
+            {/* Swipe hint text */}
+            {showSwipeHint && (
+              <p className="text-center text-white/40 text-xs transition-opacity duration-500">
+                ← Swipe left to pass · Swipe right to like →
+              </p>
+            )}
           </div>
         )}
 
