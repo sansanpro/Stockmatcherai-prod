@@ -46,7 +46,6 @@ const Landing = () => {
               <Button 
                 size="lg" 
                 onClick={() => navigate("/waitlist")}
-                onTouchEnd={(e) => { e.preventDefault(); navigate("/waitlist"); }}
                 className="text-lg px-8 py-6 group relative z-10 min-h-[44px] min-w-[44px]"
               >
                 Get Started Free
