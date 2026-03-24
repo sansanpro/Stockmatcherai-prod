@@ -49,5 +49,7 @@
 	<string>StockMatcherAI may use the camera to scan payment cards for secure checkout.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>We use this to show you relevant stock investing ads and improve your experience.</string>
 </dict>
 </plist>

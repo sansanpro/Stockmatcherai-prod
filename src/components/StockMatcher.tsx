@@ -140,6 +140,12 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       });
     }
 
+    // Meta Pixel tracking
+    trackFirstSwipe(currentStock.ticker, 'right');
+    trackWatchlistAdd(currentStock.ticker, currentStock.companyName);
+    swipeCountRef.current += 1;
+    trackDeepSwipeSession(swipeCountRef.current);
+
     console.log(`Matched ${currentStock.ticker} (compatibility: ${score}%), adding to seen stocks`);
     
     // Delay to allow exit animation

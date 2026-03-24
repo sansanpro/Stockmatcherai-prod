@@ -43,6 +43,7 @@ const Auth = () => {
     const fullName = formData.get('fullName') as string;
 
     await signUp(email, password, fullName);
+    trackRegistration('email');
     setIsLoading(false);
   };
 
