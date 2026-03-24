@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Capacitor } from "@capacitor/core";
+import { requestTrackingPermission } from "@/lib/att";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -17,6 +19,26 @@ const queryClient = new QueryClient();
 const App = () => {
   // Detect if running on native mobile platform (iOS/Android)
   const isNativeMobile = Capacitor.isNativePlatform();
+
+  // Request ATT permission on first user interaction (iOS only)
+  useEffect(() => {
+    if (localStorage.getItem('att_status')) return;
+    
+    const handleFirstInteraction = async () => {
+      const status = await requestTrackingPermission();
+      localStorage.setItem('att_status', status);
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+    };
+
+    document.addEventListener('click', handleFirstInteraction, { once: true });
+    document.addEventListener('touchstart', handleFirstInteraction, { once: true });
+    
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+    };
+  }, []);
 
   return (
   <QueryClientProvider client={queryClient}>

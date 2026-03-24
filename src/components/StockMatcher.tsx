@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import TinderStockCard from '@/components/TinderStockCard';
@@ -16,6 +16,7 @@ import { Json } from '@/integrations/supabase/types';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { trackFirstSwipe, trackWatchlistAdd, trackDeepSwipeSession } from '@/lib/metaPixel';
 
 interface StockMatcherProps {
   userProfile: UserProfile;
@@ -36,6 +37,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [matchOverlayScore, setMatchOverlayScore] = useState(0);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
+  const swipeCountRef = useRef(0);
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
   const { canSwipe, incrementSwipeCount, dailySwipesUsed, dailySwipeLimit } = useSubscription();
@@ -138,6 +140,12 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       });
     }
 
+    // Meta Pixel tracking
+    trackFirstSwipe(currentStock.ticker, 'right');
+    trackWatchlistAdd(currentStock.ticker, currentStock.companyName);
+    swipeCountRef.current += 1;
+    trackDeepSwipeSession(swipeCountRef.current);
+
     console.log(`Matched ${currentStock.ticker} (compatibility: ${score}%), adding to seen stocks`);
     
     // Delay to allow exit animation
@@ -188,6 +196,11 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     // Update swipe statistics
     updateSwipeStats(false);
     
+    // Meta Pixel tracking
+    trackFirstSwipe(currentStock.ticker, 'left');
+    swipeCountRef.current += 1;
+    trackDeepSwipeSession(swipeCountRef.current);
+
     console.log(`Passed ${currentStock.ticker}, adding to seen stocks`);
     
     // Delay to allow exit animation
