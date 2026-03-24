@@ -449,6 +449,17 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
         {/* Stock Cards Stack */}
         {allRecommendations.length > 0 && currentStock && (
           <div className="mb-6 lg:mb-2 relative h-[65vh] lg:h-[72vh] max-h-[550px] lg:max-h-none min-h-[450px] animate-fade-in delay-300">
+            {/* Swipe direction chevrons */}
+            {!hasSwipedOnce && (
+              <>
+                <div className="absolute left-2 top-1/2 -translate-y-1/2 z-20 opacity-30 animate-bounce pointer-events-none">
+                  <ChevronLeft className="w-8 h-8 text-white" />
+                </div>
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 opacity-30 animate-bounce pointer-events-none">
+                  <ChevronRight className="w-8 h-8 text-white" />
+                </div>
+              </>
+            )}
             {visibleCards.map((stock, stackIndex) => {
               const cardIndex = currentIndex + stackIndex;
               const isActiveCard = stackIndex === 0;
