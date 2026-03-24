@@ -1,42 +1,37 @@
 
 
-# Fix Nested Button/Link and Touch Handler Issues Across the App
-
-## Problem
-Apple rejects the app because the "Get Started" button is unresponsive on iPad. There are two distinct anti-patterns causing tap issues on iPadOS WebViews:
-
-1. **Nested interactive elements** in `src/pages/Index.tsx` — a `<Button>` inside a `<Link>` creates invalid `<a>` wrapping `<button>` HTML
-2. **Dual touch handlers** in `src/pages/Landing.tsx` — buttons use both `onClick` and `onTouchEnd`, which can cause competing/cancelled events on iPadOS
-
-## All Instances Found
-
-| File | Line(s) | Issue |
-|------|---------|-------|
-| `src/pages/Index.tsx` | 245-249 | `<Link>` wrapping `<Button>` — nested interactive elements |
-| `src/pages/Landing.tsx` | 46-54 | Hero CTA with redundant `onTouchEnd` handler |
-| `src/pages/Landing.tsx` | 141-149 | Bottom CTA with redundant `onTouchEnd` handler |
-
-No other instances of these patterns exist in the codebase. The `onTouchEnd` in `TinderStockCard.tsx` is a legitimate swipe gesture handler and should not be changed.
+# Enhance Action Buttons and Filter Bar in StockMatcher
 
 ## Changes
 
-### 1. Fix nested button/link in `src/pages/Index.tsx` (line 245-249)
-Replace `<Link><Button>` with the `asChild` pattern — a single interactive element:
-```tsx
-<Button asChild className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105">
-  <Link to="/auth">Get Started 🚀</Link>
-</Button>
-```
+### 1. Action button micro-animations (`src/components/StockMatcher.tsx`, lines 413-437)
+- Add `active:scale-90` to X, undo, and heart buttons for tactile press feedback
+- Add a pulsing ring glow to X (`ring-2 ring-red-400 animate-pulse`) and heart (`ring-2 ring-green-400 animate-pulse`) buttons
+- Below the button row, add a swipe hint: `← Swipe left to pass · Swipe right to like →` in `text-white/40 text-xs`, auto-hidden after 5 seconds via `useState`/`useEffect`
 
-### 2. Remove `onTouchEnd` from Landing.tsx hero CTA (line 49)
-Remove the `onTouchEnd` prop. Keep only `onClick={() => navigate("/waitlist")}`.
+### 2. Swipe direction chevrons on card area (`src/components/StockMatcher.tsx`, lines 386-408)
+- Add `ChevronLeft` and `ChevronRight` icons positioned absolute on left/right edges of the card stack container
+- Style: `opacity-30 animate-bounce`, hidden after the user's first swipe (track via a `hasSwipedOnce` state set in `handleMatch`/`handlePass`)
 
-### 3. Remove `onTouchEnd` from Landing.tsx bottom CTA (line 144)
-Same fix — remove the `onTouchEnd` prop, keep `onClick` only.
+### 3. Redesign filter bar as profile chip bar (`src/components/StockMatcher.tsx`, lines 377-379)
+- Add `Avatar`/`AvatarFallback` with user initial (from auth context email) to the left
+- Replace plain text with colored `Badge` chips:
+  - Age (blue): `{userProfile.age}yo`
+  - Risk (red/yellow/green by level): `{userProfile.riskTolerance} risk`
+  - Sector (purple): `{userProfile.sectorPreference}`
+  - Goal (green): `{userProfile.investmentGoal}`
+- Chips are tappable — clicking any chip calls `onReset` to edit profile, with a `Tooltip` saying "Tap to edit"
+- Layout: `flex flex-wrap items-center justify-center gap-2`
 
-## After Implementation
-1. Publish the updated app
-2. Run `npx cap sync ios` and rebuild in Xcode
-3. Update Support URL in App Store Connect to `https://stockmatcherai.com/support`
-4. Resubmit with incremented build number
+### 4. Faint arrow indicators on card edges (`src/components/TinderStockCard.tsx`)
+- When idle (not dragging), render faint `ChevronLeft`/`ChevronRight` at card edges with `opacity-20`
+- Hide during drag (already handled by existing drag state)
+
+### Technical details
+- Import `Avatar`, `AvatarFallback` from `@/components/ui/avatar`
+- Import `Tooltip`, `TooltipTrigger`, `TooltipContent`, `TooltipProvider` from `@/components/ui/tooltip`
+- Import `ChevronLeft`, `ChevronRight` from `lucide-react`
+- Import `useAuth` from `@/contexts/AuthContext` for user email initials
+- New state: `showSwipeHint` (boolean, default true, set false after 5s timer), `hasSwipedOnce` (boolean, set true on first swipe)
+- All animations use existing Tailwind utilities — no custom keyframes needed
 
