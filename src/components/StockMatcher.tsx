@@ -10,9 +10,12 @@ import { recordSwipe } from '@/utils/recentlySwipedService';
 import UpgradeModal from '@/components/UpgradeModal';
 import MatchOverlay from '@/components/MatchOverlay';
 import { calculateCompatibilityScore, isHighCompatibilityMatch } from '@/utils/stockCompatibility';
-import { Heart, X, RotateCcw, TrendingUp, Plus, Crown } from 'lucide-react';
+import { Heart, X, RotateCcw, TrendingUp, Plus, Crown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Json } from '@/integrations/supabase/types';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 
 interface StockMatcherProps {
   userProfile: UserProfile;
