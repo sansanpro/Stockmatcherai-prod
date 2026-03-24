@@ -242,11 +242,9 @@ const IndexContent = () => {
               </div>
             </div>
             <div className="space-y-3">
-              <Link to="/auth">
-                <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105">
-                  Get Started 🚀
-                </Button>
-              </Link>
+              <Button asChild className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105">
+                <Link to="/auth">Get Started 🚀</Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
