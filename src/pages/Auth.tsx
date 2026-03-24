@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { trackRegistration } from '@/lib/metaPixel';
 
 const Auth = () => {
   const { user, signIn, signUp, resetPassword, loading } = useAuth();
