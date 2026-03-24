@@ -374,6 +374,17 @@ const TinderStockCard = ({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
+        {/* Faint edge chevrons when idle */}
+        {!isDragging && !isExiting && (
+          <>
+            <div className="absolute left-1 top-1/2 -translate-y-1/2 z-10 opacity-15 pointer-events-none">
+              <ChevronLeft className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <div className="absolute right-1 top-1/2 -translate-y-1/2 z-10 opacity-15 pointer-events-none">
+              <ChevronRight className="w-6 h-6 text-muted-foreground" />
+            </div>
+          </>
+        )}
         <CardContent className="p-0 flex flex-col h-full overflow-y-auto">
           {/* Header with gradient background */}
           <div 
