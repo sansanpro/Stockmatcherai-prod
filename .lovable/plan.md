@@ -1,37 +1,61 @@
 
 
-# Enhance Action Buttons and Filter Bar in StockMatcher
+# Implement Meta Pixel Event Tracking with iOS ATT
 
-## Changes
+## Overview
+Add Meta Pixel (fbq) tracking to the web app running inside the Capacitor WebView, gated behind Apple's App Tracking Transparency prompt on iOS.
 
-### 1. Action button micro-animations (`src/components/StockMatcher.tsx`, lines 413-437)
-- Add `active:scale-90` to X, undo, and heart buttons for tactile press feedback
-- Add a pulsing ring glow to X (`ring-2 ring-red-400 animate-pulse`) and heart (`ring-2 ring-green-400 animate-pulse`) buttons
-- Below the button row, add a swipe hint: `← Swipe left to pass · Swipe right to like →` in `text-white/40 text-xs`, auto-hidden after 5 seconds via `useState`/`useEffect`
+## Files to Create
 
-### 2. Swipe direction chevrons on card area (`src/components/StockMatcher.tsx`, lines 386-408)
-- Add `ChevronLeft` and `ChevronRight` icons positioned absolute on left/right edges of the card stack container
-- Style: `opacity-30 animate-bounce`, hidden after the user's first swipe (track via a `hasSwipedOnce` state set in `handleMatch`/`handlePass`)
+### 1. `src/lib/att.ts` — ATT permission handler
+Exports `requestTrackingPermission()` and `getTrackingStatus()` using `@capacitor-community/app-tracking-transparency`. Returns `'authorized'` on web (non-native).
 
-### 3. Redesign filter bar as profile chip bar (`src/components/StockMatcher.tsx`, lines 377-379)
-- Add `Avatar`/`AvatarFallback` with user initial (from auth context email) to the left
-- Replace plain text with colored `Badge` chips:
-  - Age (blue): `{userProfile.age}yo`
-  - Risk (red/yellow/green by level): `{userProfile.riskTolerance} risk`
-  - Sector (purple): `{userProfile.sectorPreference}`
-  - Goal (green): `{userProfile.investmentGoal}`
-- Chips are tappable — clicking any chip calls `onReset` to edit profile, with a `Tooltip` saying "Tap to edit"
-- Layout: `flex flex-wrap items-center justify-center gap-2`
+### 2. `src/lib/metaPixel.ts` — Pixel helper utility
+All tracking functions with ATT gating (`canTrack()` checks `localStorage.att_status`):
+- `trackRegistration(method)` → `CompleteRegistration`
+- `trackFirstSwipe(ticker, direction)` → `ViewContent` (fires once via localStorage flag)
+- `trackWatchlistAdd(ticker, name)` → `AddToWishlist`
+- `trackPaywallReached(trigger)` → `InitiateCheckout` (once per day)
+- `trackSubscriptionPurchase(plan, value)` → `Purchase` (production only)
+- `trackAIAnalysisViewed(ticker, tier)` → custom `AIAnalysisViewed`
+- `trackDeepSwipeSession(count)` → custom `DeepSwipeSession` (fires at 10+ swipes, once per day)
 
-### 4. Faint arrow indicators on card edges (`src/components/TinderStockCard.tsx`)
-- When idle (not dragging), render faint `ChevronLeft`/`ChevronRight` at card edges with `opacity-20`
-- Hide during drag (already handled by existing drag state)
+### 3. `src/types/fbq.d.ts` — TypeScript declaration
+Declares `window.fbq` on the global `Window` interface.
 
-### Technical details
-- Import `Avatar`, `AvatarFallback` from `@/components/ui/avatar`
-- Import `Tooltip`, `TooltipTrigger`, `TooltipContent`, `TooltipProvider` from `@/components/ui/tooltip`
-- Import `ChevronLeft`, `ChevronRight` from `lucide-react`
-- Import `useAuth` from `@/contexts/AuthContext` for user email initials
-- New state: `showSwipeHint` (boolean, default true, set false after 5s timer), `hasSwipedOnce` (boolean, set true on first swipe)
-- All animations use existing Tailwind utilities — no custom keyframes needed
+## Files to Modify
+
+### 4. `index.html` — Meta Pixel base code
+Add the fbq snippet in `<head>` with pixel ID `1458046222663408`. Fires `PageView` on load.
+
+### 5. `ios/App/App/Info.plist` — ATT usage description
+Add `NSUserTrackingUsageDescription` key with the provided string.
+
+### 6. `src/App.tsx` — ATT prompt on first interaction
+- Import `requestTrackingPermission` from `@/lib/att`
+- On mount (inside `useEffect`), listen for the first user interaction (`click`/`touchstart`), then call `requestTrackingPermission()` and store result in `localStorage.att_status`
+- Only fires once (guard with localStorage check)
+
+### 7. `src/pages/Auth.tsx` — Registration event
+Call `trackRegistration('email')` after successful `signUp` (line ~44, after the `await signUp` call when no error).
+
+### 8. `src/components/StockMatcher.tsx` — Swipe events
+- In `handleMatch` (~line 100): call `trackFirstSwipe(ticker, 'right')` and `trackWatchlistAdd(ticker, companyName)`
+- In `handlePass` (~line 166): call `trackFirstSwipe(ticker, 'left')`
+- Track running swipe count in state; after each swipe call `trackDeepSwipeSession(count)`
+
+### 9. `src/components/UpgradeModal.tsx` — Paywall event
+Call `trackPaywallReached('swipe_limit')` in a `useEffect` that fires when `isOpen` becomes `true`.
+
+### 10. `src/components/StripeCheckout.tsx` — Purchase event
+In the `session.status === 'complete'` callback (~line 56), call `trackSubscriptionPurchase('pro_monthly', 9.99)`.
+
+### 11. `package.json` — New dependency
+Add `@capacitor-community/app-tracking-transparency` (user must run `npx cap sync ios` after).
+
+## Post-implementation
+User must:
+1. Run `npx cap sync ios` to sync ATT plugin
+2. Rebuild in Xcode with incremented build number
+3. Verify in Meta Events Manager that test events appear
 
