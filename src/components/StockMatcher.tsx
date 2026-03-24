@@ -37,6 +37,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [matchOverlayScore, setMatchOverlayScore] = useState(0);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
+  const swipeCountRef = useRef(0);
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
   const { canSwipe, incrementSwipeCount, dailySwipesUsed, dailySwipeLimit } = useSubscription();
