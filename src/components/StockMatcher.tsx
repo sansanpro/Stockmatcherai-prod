@@ -196,6 +196,11 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     // Update swipe statistics
     updateSwipeStats(false);
     
+    // Meta Pixel tracking
+    trackFirstSwipe(currentStock.ticker, 'left');
+    swipeCountRef.current += 1;
+    trackDeepSwipeSession(swipeCountRef.current);
+
     console.log(`Passed ${currentStock.ticker}, adding to seen stocks`);
     
     // Delay to allow exit animation

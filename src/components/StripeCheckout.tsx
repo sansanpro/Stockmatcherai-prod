@@ -46,6 +46,7 @@ const StripeCheckout = ({ clientSecret, onComplete }: StripeCheckoutProps) => {
           onComplete: async () => {
             console.log('🎉 Payment completed successfully!');
             toast.success('Payment successful! Welcome to Premium!');
+            trackSubscriptionPurchase('pro_monthly', 9.99);
             
             try {
               console.log('🔄 Refreshing subscription status after payment...');

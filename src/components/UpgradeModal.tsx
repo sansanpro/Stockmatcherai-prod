@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
@@ -7,6 +7,7 @@ import { Crown, Check, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import StripeCheckout from './StripeCheckout';
+import { trackPaywallReached } from '@/lib/metaPixel';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -18,6 +19,13 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const { user, session } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+
+  // Track paywall event when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      trackPaywallReached('swipe_limit');
+    }
+  }, [isOpen]);
 
   const handlePayment = async () => {
     setIsProcessing(true);
