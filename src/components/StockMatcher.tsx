@@ -381,14 +381,66 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   return (
     <div className="w-full h-screen mx-auto pt-safe-area-inset-top pb-safe-area-inset-bottom bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 lg:p-2 overflow-auto">
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
-        {/* Header */}
+        {/* Header with profile chips */}
         <div className="text-center mb-4 sm:mb-6 lg:mb-2 pt-8 sm:pt-12 lg:pt-2 animate-fade-in px-4 lg:px-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-white mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-white mb-3">
             Stock Matcher 💕
           </h1>
-          <div className="flex items-center justify-center gap-1 sm:gap-2 text-white/80 text-xs sm:text-sm">
-            <span className="truncate max-w-[300px]">{userProfile.age}yo • {userProfile.riskTolerance} risk • {userProfile.sectorPreference}</span>
-          </div>
+          <TooltipProvider>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Avatar className="w-7 h-7 border-2 border-white/30">
+                <AvatarFallback className="bg-white/20 text-white text-xs font-bold">
+                  {user?.email?.charAt(0).toUpperCase() || '?'}
+                </AvatarFallback>
+              </Avatar>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button onClick={onReset}>
+                    <Badge className="bg-blue-500/30 text-white border-blue-300/40 hover:bg-blue-500/50 cursor-pointer transition-colors text-xs">
+                      {userProfile.age}yo
+                    </Badge>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Tap to edit profile</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button onClick={onReset}>
+                    <Badge className={`border-white/30 hover:opacity-80 cursor-pointer transition-colors text-xs ${
+                      userProfile.riskTolerance === 'high' ? 'bg-red-500/30 text-white border-red-300/40' :
+                      userProfile.riskTolerance === 'medium' ? 'bg-yellow-500/30 text-white border-yellow-300/40' :
+                      'bg-green-500/30 text-white border-green-300/40'
+                    }`}>
+                      {userProfile.riskTolerance} risk
+                    </Badge>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Tap to edit profile</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button onClick={onReset}>
+                    <Badge className="bg-purple-500/30 text-white border-purple-300/40 hover:bg-purple-500/50 cursor-pointer transition-colors text-xs">
+                      {userProfile.sectorPreference}
+                    </Badge>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Tap to edit profile</TooltipContent>
+              </Tooltip>
+              {userProfile.investmentGoal && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button onClick={onReset}>
+                      <Badge className="bg-emerald-500/30 text-white border-emerald-300/40 hover:bg-emerald-500/50 cursor-pointer transition-colors text-xs">
+                        {userProfile.investmentGoal}
+                      </Badge>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Tap to edit profile</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          </TooltipProvider>
         </div>
 
 
