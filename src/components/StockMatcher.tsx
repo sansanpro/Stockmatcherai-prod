@@ -157,6 +157,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     }
     
     setAnimatingCard(true);
+    if (!hasSwipedOnce) setHasSwipedOnce(true);
     const currentStock = allRecommendations[currentIndex];
     
     // Increment swipe count for free users
