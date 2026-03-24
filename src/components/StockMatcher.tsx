@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import TinderStockCard from '@/components/TinderStockCard';
@@ -16,6 +16,7 @@ import { Json } from '@/integrations/supabase/types';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { trackFirstSwipe, trackWatchlistAdd, trackDeepSwipeSession } from '@/lib/metaPixel';
 
 interface StockMatcherProps {
   userProfile: UserProfile;
