@@ -359,9 +359,9 @@ const TinderStockCard = ({
 
       <Card 
         ref={cardRef}
-        className={`w-full max-w-[min(95vw,400px)] md:max-w-xl lg:max-w-3xl xl:max-w-4xl mx-auto shadow-2xl border-0 bg-card overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
+className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[min(85vw,800px)] xl:max-w-[min(80vw,900px)] mx-auto shadow-2xl border-0 bg-card overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
           isExiting ? 'animate-scale-out' : 'animate-scale-in'
-        } h-full max-h-[70vh] sm:max-h-[75vh] lg:max-h-[calc(100vh-12rem)] rounded-2xl flex flex-col relative`}
+        } h-full max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh] lg:max-h-[calc(100vh-10rem)] rounded-2xl flex flex-col relative`}
         style={{
           transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
           opacity,

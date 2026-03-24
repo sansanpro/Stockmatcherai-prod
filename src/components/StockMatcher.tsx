@@ -448,7 +448,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
         {/* Stock Cards Stack */}
         {allRecommendations.length > 0 && currentStock && (
-          <div className="mb-6 lg:mb-2 relative h-[65vh] lg:h-[72vh] max-h-[550px] lg:max-h-none min-h-[450px] animate-fade-in delay-300">
+          <div className="mb-6 lg:mb-2 relative h-[65vh] md:h-[70vh] lg:h-[75vh] xl:h-[78vh] max-h-[550px] md:max-h-[700px] lg:max-h-[800px] xl:max-h-none min-h-[450px] md:min-h-[550px] animate-fade-in delay-300">
             {/* Swipe direction chevrons */}
             {!hasSwipedOnce && (
               <>
@@ -490,7 +490,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
               <Button
                 onClick={handlePass}
                 disabled={animatingCard || !canSwipe}
-                className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none ring-2 ring-red-400/50 animate-pulse"
+                className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
               >
                 <X className="w-8 h-8" />
               </Button>
@@ -506,7 +506,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
               <Button
                 onClick={handleMatch}
                 disabled={animatingCard || !canSwipe}
-                className="w-16 h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none ring-2 ring-green-400/50 animate-pulse"
+                className="w-16 h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
               >
                 <Heart className="w-8 h-8" />
               </Button>
