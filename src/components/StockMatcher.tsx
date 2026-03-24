@@ -490,7 +490,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
               <Button
                 onClick={handlePass}
                 disabled={animatingCard || !canSwipe}
-                className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none ring-2 ring-red-400/50 animate-pulse"
+                className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
               >
                 <X className="w-8 h-8" />
               </Button>
