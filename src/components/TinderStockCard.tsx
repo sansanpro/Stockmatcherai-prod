@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { StockRecommendation } from '@/types/stock-matcher';
-import { Heart, X, TrendingUp, DollarSign, Building, Eye, Minimize2, ThumbsUp } from 'lucide-react';
+import { Heart, X, TrendingUp, DollarSign, Building, Eye, Minimize2, ThumbsUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import EducationalTooltip from '@/components/EducationalTooltip';
 import DataFreshnessIndicator from '@/components/DataFreshnessIndicator';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
