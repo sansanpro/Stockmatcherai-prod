@@ -260,7 +260,7 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
               </div>
 
               <div className="text-center text-xs text-gray-500">
-                Secure payment processed by Stripe
+                {isIOSNative ? 'Payment managed by Apple' : 'Secure payment processed by Stripe'}
               </div>
             </div>
           )}

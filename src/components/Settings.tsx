@@ -312,6 +312,64 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
               {loading ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
+
+          {/* Danger Zone */}
+          <Card className="border-destructive/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-destructive">
+                <AlertTriangle className="w-5 h-5" />
+                Danger Zone
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Permanently delete your account and all associated data. This action cannot be undone.
+              </p>
+              <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="flex items-center gap-2">
+                    <Trash2 className="w-4 h-4" />
+                    Delete Account
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription className="space-y-3">
+                      <p>This will permanently delete your account and all data including:</p>
+                      <ul className="list-disc pl-5 space-y-1 text-sm">
+                        <li>Your investment profile</li>
+                        <li>All matched stocks and watchlists</li>
+                        <li>AI chat history</li>
+                        <li>Subscription data</li>
+                      </ul>
+                      <p className="font-semibold text-foreground pt-2">
+                        Type <span className="font-mono bg-muted px-1 rounded">DELETE</span> to confirm:
+                      </p>
+                      <Input
+                        value={deleteConfirmText}
+                        onChange={(e) => setDeleteConfirmText(e.target.value)}
+                        placeholder="Type DELETE to confirm"
+                        className="mt-2"
+                      />
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setDeleteConfirmText('')}>
+                      Cancel
+                    </AlertDialogCancel>
+                    <Button
+                      variant="destructive"
+                      onClick={handleDeleteAccount}
+                      disabled={deleteConfirmText !== 'DELETE' || isDeleting}
+                    >
+                      {isDeleting ? 'Deleting...' : 'Delete My Account'}
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </CardContent>
+          </Card>
           </div>
         </div>
     </div>

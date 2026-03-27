@@ -484,6 +484,13 @@ export default function AIAssistantWidget() {
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
       />
+
+      {/* AI Data Consent Dialog */}
+      <AIDataConsentDialog
+        isOpen={showConsentDialog}
+        onConsent={handleConsentGranted}
+        onCancel={handleConsentDenied}
+      />
     </>
   );
 }
