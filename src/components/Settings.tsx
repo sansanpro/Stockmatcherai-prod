@@ -8,8 +8,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAuth } from '@/contexts/AuthContext';
 import { UserProfile } from '@/types/stock-matcher';
 import { toast } from 'sonner';
-import { User, Save, ArrowLeft } from 'lucide-react';
+import { User, Save, ArrowLeft, Trash2, AlertTriangle } from 'lucide-react';
 import { saveUserProfile, getUserProfile } from '@/utils/profileManager';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface SettingsProps {
   onBack: () => void;
