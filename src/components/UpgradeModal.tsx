@@ -16,18 +16,67 @@ interface UpgradeModalProps {
   onClose: () => void;
 }
 
+const isIOSNative = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+
 const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const { checkSubscription } = useSubscription();
   const { user, session } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [applePrice, setApplePrice] = useState<string>('$9.99/month');
 
   // Track paywall event when modal opens
   useEffect(() => {
     if (isOpen) {
       trackPaywallReached('swipe_limit');
+      if (isIOSNative) {
+        loadAppleProduct();
+      }
     }
   }, [isOpen]);
+
+  const loadAppleProduct = async () => {
+    try {
+      const products = await getAppleProducts();
+      if (products.length > 0) {
+        setApplePrice(products[0].displayPrice + '/month');
+      }
+    } catch (e) {
+      console.error('Failed to load Apple product:', e);
+    }
+  };
+
+  const handleApplePurchase = async () => {
+    setIsProcessing(true);
+    try {
+      const result = await purchaseAppleSubscription(user?.id);
+      
+      // Verify with backend
+      const { error } = await supabase.functions.invoke('verify-apple-receipt', {
+        body: {
+          jwsToken: result.jwsRepresentation,
+          transactionId: result.transactionId,
+          productId: result.productIdentifier,
+          expirationDate: result.expirationDate,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success('Subscription activated!');
+      await checkSubscription();
+      onClose();
+    } catch (error: any) {
+      console.error('Apple purchase error:', error);
+      if (error?.message?.includes('cancelled') || error?.code === 'USER_CANCELLED') {
+        // User cancelled - no error toast
+      } else {
+        toast.error('Purchase failed. Please try again.');
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const handlePayment = async () => {
     setIsProcessing(true);
