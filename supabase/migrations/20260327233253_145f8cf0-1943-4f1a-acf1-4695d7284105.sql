@@ -1,0 +1,1 @@
+ALTER TABLE public.subscribers ADD COLUMN IF NOT EXISTS subscription_source text DEFAULT 'stripe';
