@@ -30,6 +30,8 @@ export default function AIAssistantWidget() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [freeMessageCount, setFreeMessageCount] = useState(0);
   const [currentStatus, setCurrentStatus] = useState<string>('');
+  const [showConsentDialog, setShowConsentDialog] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   
   const { user } = useAuth();
   const { subscribed } = useSubscription();
