@@ -3,11 +3,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Crown, Check, CreditCard } from 'lucide-react';
+import { Crown, Check, CreditCard, Apple } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import StripeCheckout from './StripeCheckout';
 import { trackPaywallReached } from '@/lib/metaPixel';
+import { Capacitor } from '@capacitor/core';
+import { getAppleProducts, purchaseAppleSubscription } from '@/services/appleIAPService';
 
 interface UpgradeModalProps {
   isOpen: boolean;
