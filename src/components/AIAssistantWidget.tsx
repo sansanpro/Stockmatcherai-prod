@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sparkles, Send, X, Minimize2, Crown } from 'lucide-react';
+import AIDataConsentDialog from '@/components/AIDataConsentDialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -29,6 +30,8 @@ export default function AIAssistantWidget() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [freeMessageCount, setFreeMessageCount] = useState(0);
   const [currentStatus, setCurrentStatus] = useState<string>('');
+  const [showConsentDialog, setShowConsentDialog] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   
   const { user } = useAuth();
   const { subscribed } = useSubscription();
@@ -293,7 +296,26 @@ export default function AIAssistantWidget() {
 
   const handleSend = () => {
     if (!inputValue.trim() || isStreaming) return;
+    const hasConsent = localStorage.getItem('ai_data_consent') === 'true';
+    if (!hasConsent) {
+      setPendingMessage(inputValue.trim());
+      setShowConsentDialog(true);
+      return;
+    }
     streamMessage(inputValue.trim());
+  };
+
+  const handleConsentGranted = () => {
+    setShowConsentDialog(false);
+    if (pendingMessage) {
+      streamMessage(pendingMessage);
+      setPendingMessage(null);
+    }
+  };
+
+  const handleConsentDenied = () => {
+    setShowConsentDialog(false);
+    setPendingMessage(null);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -461,6 +483,13 @@ export default function AIAssistantWidget() {
       <UpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
+      />
+
+      {/* AI Data Consent Dialog */}
+      <AIDataConsentDialog
+        isOpen={showConsentDialog}
+        onConsent={handleConsentGranted}
+        onCancel={handleConsentDenied}
       />
     </>
   );

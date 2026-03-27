@@ -3,29 +3,80 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Crown, Check, CreditCard } from 'lucide-react';
+import { Crown, Check, CreditCard, Apple } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import StripeCheckout from './StripeCheckout';
 import { trackPaywallReached } from '@/lib/metaPixel';
+import { Capacitor } from '@capacitor/core';
+import { getAppleProducts, purchaseAppleSubscription } from '@/services/appleIAPService';
 
 interface UpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const isIOSNative = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+
 const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const { checkSubscription } = useSubscription();
   const { user, session } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [applePrice, setApplePrice] = useState<string>('$9.99/month');
 
   // Track paywall event when modal opens
   useEffect(() => {
     if (isOpen) {
       trackPaywallReached('swipe_limit');
+      if (isIOSNative) {
+        loadAppleProduct();
+      }
     }
   }, [isOpen]);
+
+  const loadAppleProduct = async () => {
+    try {
+      const products = await getAppleProducts();
+      if (products.length > 0) {
+        setApplePrice(products[0].displayPrice + '/month');
+      }
+    } catch (e) {
+      console.error('Failed to load Apple product:', e);
+    }
+  };
+
+  const handleApplePurchase = async () => {
+    setIsProcessing(true);
+    try {
+      const result = await purchaseAppleSubscription(user?.id);
+      
+      // Verify with backend
+      const { error } = await supabase.functions.invoke('verify-apple-receipt', {
+        body: {
+          jwsToken: result.jwsRepresentation,
+          transactionId: result.transactionId,
+          productId: result.productIdentifier,
+          expirationDate: result.expirationDate,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success('Subscription activated!');
+      await checkSubscription();
+      onClose();
+    } catch (error: any) {
+      console.error('Apple purchase error:', error);
+      if (error?.message?.includes('cancelled') || error?.code === 'USER_CANCELLED') {
+        // User cancelled - no error toast
+      } else {
+        toast.error('Purchase failed. Please try again.');
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const handlePayment = async () => {
     setIsProcessing(true);
@@ -161,23 +212,43 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
               </div>
 
               <div className="space-y-3">
-                <Button 
-                  onClick={handlePayment}
-                  disabled={isProcessing}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
-                      Loading checkout...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Upgrade Now
-                    </>
-                  )}
-                </Button>
+                {isIOSNative ? (
+                  <Button 
+                    onClick={handleApplePurchase}
+                    disabled={isProcessing}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Apple className="w-4 h-4 mr-2" />
+                        Subscribe via App Store — {applePrice}
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={handlePayment}
+                    disabled={isProcessing}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
+                        Loading checkout...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Upgrade Now
+                      </>
+                    )}
+                  </Button>
+                )}
                 
                 <Button 
                   onClick={handleClose}
@@ -189,7 +260,7 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
               </div>
 
               <div className="text-center text-xs text-gray-500">
-                Secure payment processed by Stripe
+                {isIOSNative ? 'Payment managed by Apple' : 'Secure payment processed by Stripe'}
               </div>
             </div>
           )}

@@ -104,11 +104,10 @@ const Support = () => {
             <AccordionItem value="account">
               <AccordionTrigger>How do I delete my account?</AccordionTrigger>
               <AccordionContent>
-                You can request account deletion by emailing us at{" "}
-                <a href="mailto:support@stockmatcherai.com" className="text-primary underline">
-                  support@stockmatcherai.com
-                </a>
-                . We will process your request and delete all associated data within 30 days.
+                You can delete your account directly in the app by going to{" "}
+                <strong>Settings → Danger Zone → Delete Account</strong>. This will
+                permanently remove all your data including your profile, matches, watchlists,
+                and chat history.
               </AccordionContent>
             </AccordionItem>
 
@@ -155,6 +154,30 @@ const Support = () => {
               <li>To communicate important updates about the service</li>
               <li>To process subscriptions and payments</li>
             </ul>
+
+            <h3 className="text-foreground font-semibold text-base">Third-Party AI Services</h3>
+            <p>
+              Our AI Stock Assistant feature uses <strong>Google Gemini</strong>, a third-party
+              AI service provided by Google, to generate personalized stock education responses.
+            </p>
+            <p><strong>Data shared with the AI service:</strong></p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Your investment profile (risk tolerance, investment goals, experience level, sector interests)</li>
+              <li>Chat messages you send to the AI assistant</li>
+            </ul>
+            <p><strong>How this data is used:</strong></p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Solely to generate personalized educational responses about stocks</li>
+              <li>Your data is not used for third-party marketing or advertising</li>
+              <li>You must provide explicit consent before any data is shared with the AI service</li>
+              <li>You can revoke consent at any time by clearing your app data or contacting support</li>
+            </ul>
+            <p>
+              Google Gemini processes your data in accordance with{" "}
+              <a href="https://policies.google.com/privacy" className="text-primary underline" target="_blank" rel="noopener noreferrer">
+                Google's Privacy Policy
+              </a>.
+            </p>
 
             <h3 className="text-foreground font-semibold text-base">Data Security</h3>
             <p>

@@ -12,6 +12,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
+  deleteAccount: () => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -116,6 +117,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const deleteAccount = async () => {
+    try {
+      const { error } = await supabase.functions.invoke('delete-account');
+      if (error) {
+        toast.error('Failed to delete account. Please try again.');
+        return { error };
+      }
+      // Clear all local data
+      localStorage.clear();
+      setUser(null);
+      setSession(null);
+      toast.success('Your account has been deleted.');
+      return { error: null };
+    } catch (error) {
+      toast.error('An error occurred while deleting your account.');
+      return { error };
+    }
+  };
+
   const value = {
     user,
     session,
@@ -124,6 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signOut,
     resetPassword,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
