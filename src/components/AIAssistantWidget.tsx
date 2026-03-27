@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sparkles, Send, X, Minimize2, Crown } from 'lucide-react';
+import AIDataConsentDialog from '@/components/AIDataConsentDialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
