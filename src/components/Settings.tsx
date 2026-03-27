@@ -29,10 +29,23 @@ interface SettingsProps {
 }
 
 const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
-  const { user } = useAuth();
+  const { user, deleteAccount } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(userProfile);
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
   const [loading, setLoading] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') return;
+    setIsDeleting(true);
+    const { error } = await deleteAccount();
+    setIsDeleting(false);
+    if (!error) {
+      onBack();
+    }
+  };
 
   useEffect(() => {
     if (userProfile) {
