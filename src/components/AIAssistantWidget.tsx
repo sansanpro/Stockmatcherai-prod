@@ -296,7 +296,26 @@ export default function AIAssistantWidget() {
 
   const handleSend = () => {
     if (!inputValue.trim() || isStreaming) return;
+    const hasConsent = localStorage.getItem('ai_data_consent') === 'true';
+    if (!hasConsent) {
+      setPendingMessage(inputValue.trim());
+      setShowConsentDialog(true);
+      return;
+    }
     streamMessage(inputValue.trim());
+  };
+
+  const handleConsentGranted = () => {
+    setShowConsentDialog(false);
+    if (pendingMessage) {
+      streamMessage(pendingMessage);
+      setPendingMessage(null);
+    }
+  };
+
+  const handleConsentDenied = () => {
+    setShowConsentDialog(false);
+    setPendingMessage(null);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
