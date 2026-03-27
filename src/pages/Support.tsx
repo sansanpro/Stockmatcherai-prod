@@ -104,11 +104,10 @@ const Support = () => {
             <AccordionItem value="account">
               <AccordionTrigger>How do I delete my account?</AccordionTrigger>
               <AccordionContent>
-                You can request account deletion by emailing us at{" "}
-                <a href="mailto:support@stockmatcherai.com" className="text-primary underline">
-                  support@stockmatcherai.com
-                </a>
-                . We will process your request and delete all associated data within 30 days.
+                You can delete your account directly in the app by going to{" "}
+                <strong>Settings → Danger Zone → Delete Account</strong>. This will
+                permanently remove all your data including your profile, matches, watchlists,
+                and chat history.
               </AccordionContent>
             </AccordionItem>
 
