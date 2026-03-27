@@ -212,23 +212,43 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
               </div>
 
               <div className="space-y-3">
-                <Button 
-                  onClick={handlePayment}
-                  disabled={isProcessing}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
-                      Loading checkout...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Upgrade Now
-                    </>
-                  )}
-                </Button>
+                {isIOSNative ? (
+                  <Button 
+                    onClick={handleApplePurchase}
+                    disabled={isProcessing}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Apple className="w-4 h-4 mr-2" />
+                        Subscribe via App Store — {applePrice}
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={handlePayment}
+                    disabled={isProcessing}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
+                        Loading checkout...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Upgrade Now
+                      </>
+                    )}
+                  </Button>
+                )}
                 
                 <Button 
                   onClick={handleClose}
