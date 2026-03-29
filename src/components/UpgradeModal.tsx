@@ -70,6 +70,8 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       console.error('Apple purchase error:', error);
       if (error?.message?.includes('cancelled') || error?.code === 'USER_CANCELLED') {
         // User cancelled - no error toast
+      } else if (error?.code === 'UNIMPLEMENTED') {
+        toast.error('In-App Purchase is not available. Please ensure the app is up to date.');
       } else {
         toast.error('Purchase failed. Please try again.');
       }
