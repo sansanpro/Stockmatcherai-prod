@@ -48,7 +48,15 @@ export async function purchaseAppleSubscription(appAccountToken?: string) {
   const result = await Subscriptions.purchaseProduct({
     productIdentifier: PRODUCT_ID,
     appAccountToken,
-  });
+  }) as any;
+  
+  // capacitor-subscriptions may resolve with an error object instead of rejecting
+  if (result?.responseCode && result.responseCode !== 0) {
+    const error: any = new Error(result.responseMessage || 'Purchase failed');
+    error.code = result.responseCode === 2 ? 'USER_CANCELLED' : 'PURCHASE_ERROR';
+    throw error;
+  }
+  
   return result;
 }
 
