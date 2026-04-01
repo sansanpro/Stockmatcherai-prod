@@ -43,6 +43,35 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    const { data: existingSubscriber, error: subscriberLookupError } = await supabaseClient
+      .from("subscribers")
+      .select("subscribed, subscription_tier, subscription_end, subscription_source")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (subscriberLookupError) {
+      logStep("Existing subscriber lookup failed", { message: subscriberLookupError.message });
+    }
+
+    const hasActiveAppleSubscription = Boolean(
+      existingSubscriber?.subscription_source === 'apple' &&
+      existingSubscriber?.subscribed &&
+      existingSubscriber?.subscription_end &&
+      new Date(existingSubscriber.subscription_end).getTime() > Date.now()
+    );
+
+    if (hasActiveAppleSubscription) {
+      logStep("Active Apple subscription found", existingSubscriber);
+      return new Response(JSON.stringify({
+        subscribed: true,
+        subscription_tier: existingSubscriber?.subscription_tier || 'premium',
+        subscription_end: existingSubscriber?.subscription_end || null,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
     // Detect Stripe environment (test vs live)
@@ -58,6 +87,17 @@ serve(async (req) => {
     
     if (customers.data.length === 0) {
       logStep("No customer found, updating unsubscribed state");
+      if (existingSubscriber?.subscription_source === 'apple') {
+        return new Response(JSON.stringify({
+          subscribed: false,
+          subscription_tier: existingSubscriber?.subscription_tier || 'free',
+          subscription_end: existingSubscriber?.subscription_end || null,
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+
       await supabaseClient.from("subscribers").upsert({
         email: user.email,
         user_id: user.id,
