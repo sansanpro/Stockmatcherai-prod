@@ -268,9 +268,9 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
                     <p>Payment will be charged to your Apple ID account at confirmation of purchase.</p>
                     <p>Manage or cancel anytime in Settings → Apple ID → Subscriptions.</p>
                     <p className="mt-1">
-                      <a href="https://stockmatcherai.lovable.app/support" className="underline">Privacy Policy</a>
+                      <a href="https://stockmatcherai.com/support" className="underline">Privacy Policy</a>
                       {' · '}
-                      <a href="https://stockmatcherai.lovable.app/support" className="underline">Terms of Service</a>
+                      <a href="https://stockmatcherai.com/support" className="underline">Terms of Service</a>
                     </p>
                   </>
                 ) : (
