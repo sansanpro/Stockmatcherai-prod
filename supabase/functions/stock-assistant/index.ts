@@ -474,6 +474,9 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
         let collectedToolCalls: any[] = [];
         let toolCallsComplete = false;
         let directContent = ''; // Capture text-only responses
+        
+        // Accumulate streaming tool calls by index
+        const pendingToolCalls: Map<number, { id: string; name: string; arguments: string }> = new Map();
 
         try {
           // PHASE 1: Collect tool calls AND stream any direct content
@@ -512,60 +515,84 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                   );
                 }
 
-                // Collect tool calls
+                // Accumulate tool calls across streaming chunks
                 if (choice?.delta?.tool_calls) {
                   for (const toolCall of choice.delta.tool_calls) {
-                    if (toolCall.function?.name) {
-                      const toolName = toolCall.function.name;
-                      const toolArgs = JSON.parse(toolCall.function.arguments || '{}');
-                      const toolId = toolCall.id || `call_${Date.now()}_${Math.random()}`;
-
-                      const toolCallStart = Date.now();
-                      console.log(`[${new Date().toISOString()}] [Tool Call] ${toolName}`, toolArgs);
-
-                      // Execute tool with error handling
-                      let toolResult;
-                      try {
-                        if (toolName === 'get_stock_quote') {
-                          toolResult = await fmpService.getQuote(toolArgs.symbol);
-                        } else if (toolName === 'get_company_profile') {
-                          toolResult = await fmpService.getProfile(toolArgs.symbol);
-                        } else if (toolName === 'get_company_news') {
-                          toolResult = await fmpService.getCompanyNews(toolArgs.symbol, toolArgs.limit || 5);
-                        } else if (toolName === 'get_market_news') {
-                          toolResult = await fmpService.getMarketNews(toolArgs.limit || 10);
-                        } else if (toolName === 'get_market_movers') {
-                          toolResult = await fmpService.getMarketMovers(toolArgs.type);
-                        } else if (toolName === 'get_historical_prices') {
-                          toolResult = await fmpService.getHistoricalPrices(toolArgs.symbol, toolArgs.days || 30);
-                        }
-                      } catch (toolError) {
-                        console.error(`[Tool Error] ${toolName}:`, toolError);
-                        toolResult = { error: `Unable to fetch data: ${toolError.message}` };
-                      }
-                      
-                      const toolCallDuration = Date.now() - toolCallStart;
-                      console.log(`[${new Date().toISOString()}] [Tool Call Complete] ${toolName} took ${toolCallDuration}ms`);
-
-                      collectedToolCalls.push({ 
-                        id: toolId,
-                        name: toolName, 
-                        args: toolArgs, 
-                        result: toolResult 
-                      });
-
-                      // Send tool call to client for visibility
-                      controller.enqueue(
-                        new TextEncoder().encode(
-                          `data: ${JSON.stringify({ 
-                            type: 'tool_call', 
-                            tool: { name: toolName, args: toolArgs, result: toolResult }
-                          })}\n\n`
-                        )
-                      );
+                    const idx = toolCall.index ?? 0;
+                    if (!pendingToolCalls.has(idx)) {
+                      pendingToolCalls.set(idx, { id: '', name: '', arguments: '' });
                     }
+                    const pending = pendingToolCalls.get(idx)!;
+                    if (toolCall.id) pending.id = toolCall.id;
+                    if (toolCall.function?.name) pending.name += toolCall.function.name;
+                    if (toolCall.function?.arguments) pending.arguments += toolCall.function.arguments;
                   }
                 }
+
+                // Check if streaming finished (finish_reason)
+                if (choice?.finish_reason === 'tool_calls' || choice?.finish_reason === 'stop') {
+                  toolCallsComplete = true;
+                  break;
+                }
+              } catch (e) {
+                console.error('Error parsing SSE:', e);
+              }
+            }
+
+            if (toolCallsComplete) break;
+          }
+
+          // Execute accumulated tool calls after stream completes
+          for (const [, pending] of pendingToolCalls) {
+            if (!pending.name) continue;
+            const toolName = pending.name;
+            const toolArgs = JSON.parse(pending.arguments || '{}');
+            const toolId = pending.id || `call_${Date.now()}_${Math.random()}`;
+
+            const toolCallStart = Date.now();
+            console.log(`[${new Date().toISOString()}] [Tool Call] ${toolName}`, toolArgs);
+
+            // Execute tool with error handling
+            let toolResult;
+            try {
+              if (toolName === 'get_stock_quote') {
+                toolResult = await fmpService.getQuote(toolArgs.symbol);
+              } else if (toolName === 'get_company_profile') {
+                toolResult = await fmpService.getProfile(toolArgs.symbol);
+              } else if (toolName === 'get_company_news') {
+                toolResult = await fmpService.getCompanyNews(toolArgs.symbol, toolArgs.limit || 5);
+              } else if (toolName === 'get_market_news') {
+                toolResult = await fmpService.getMarketNews(toolArgs.limit || 10);
+              } else if (toolName === 'get_market_movers') {
+                toolResult = await fmpService.getMarketMovers(toolArgs.type);
+              } else if (toolName === 'get_historical_prices') {
+                toolResult = await fmpService.getHistoricalPrices(toolArgs.symbol, toolArgs.days || 30);
+              }
+            } catch (toolError) {
+              console.error(`[Tool Error] ${toolName}:`, toolError);
+              toolResult = { error: `Unable to fetch data: ${toolError.message}` };
+            }
+            
+            const toolCallDuration = Date.now() - toolCallStart;
+            console.log(`[${new Date().toISOString()}] [Tool Call Complete] ${toolName} took ${toolCallDuration}ms`);
+
+            collectedToolCalls.push({ 
+              id: toolId,
+              name: toolName, 
+              args: toolArgs, 
+              result: toolResult 
+            });
+
+            // Send tool call to client for visibility
+            controller.enqueue(
+              new TextEncoder().encode(
+                `data: ${JSON.stringify({ 
+                  type: 'tool_call', 
+                  tool: { name: toolName, args: toolArgs, result: toolResult }
+                })}\n\n`
+              )
+            );
+          }
               } catch (e) {
                 console.error('Error parsing SSE:', e);
               }
