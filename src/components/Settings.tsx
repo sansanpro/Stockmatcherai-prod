@@ -184,6 +184,22 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
                 />
                 <p className="text-sm text-gray-500 mt-1">Email cannot be changed</p>
               </div>
+              {isIOSNative && (
+                <div className="pt-2 border-t">
+                  <Button
+                    onClick={handleRestorePurchases}
+                    disabled={isRestoring}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <RotateCcw className={`w-4 h-4 ${isRestoring ? 'animate-spin' : ''}`} />
+                    {isRestoring ? 'Restoring...' : 'Restore Purchases'}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Restore previously purchased subscriptions
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 

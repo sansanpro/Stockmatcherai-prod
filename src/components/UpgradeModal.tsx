@@ -261,8 +261,21 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
                 </Button>
               </div>
 
-              <div className="text-center text-xs text-gray-500">
-                {isIOSNative ? 'Payment managed by Apple' : 'Secure payment processed by Stripe'}
+              <div className="text-center text-xs text-gray-500 space-y-1">
+                {isIOSNative ? (
+                  <>
+                    <p>Subscription auto-renews monthly at {applePrice} until cancelled.</p>
+                    <p>Payment will be charged to your Apple ID account at confirmation of purchase.</p>
+                    <p>Manage or cancel anytime in Settings → Apple ID → Subscriptions.</p>
+                    <p className="mt-1">
+                      <a href="https://stockmatcherai.lovable.app/support" className="underline">Privacy Policy</a>
+                      {' · '}
+                      <a href="https://stockmatcherai.lovable.app/support" className="underline">Terms of Service</a>
+                    </p>
+                  </>
+                ) : (
+                  <p>Secure payment processed by Stripe</p>
+                )}
               </div>
             </div>
           )}
