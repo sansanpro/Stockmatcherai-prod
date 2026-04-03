@@ -6,10 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 import { UserProfile } from '@/types/stock-matcher';
 import { toast } from 'sonner';
-import { User, Save, ArrowLeft, Trash2, AlertTriangle } from 'lucide-react';
+import { User, Save, ArrowLeft, Trash2, AlertTriangle, RotateCcw } from 'lucide-react';
 import { saveUserProfile, getUserProfile } from '@/utils/profileManager';
+import { Capacitor } from '@capacitor/core';
+import { restoreApplePurchases } from '@/services/appleIAPService';
 import {
   AlertDialog,
   AlertDialogAction,
