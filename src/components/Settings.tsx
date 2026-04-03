@@ -31,14 +31,32 @@ interface SettingsProps {
   onProfileUpdate: (profile: UserProfile) => void;
 }
 
+const isIOSNative = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+
 const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
   const { user, deleteAccount } = useAuth();
+  const { checkSubscription } = useSubscription();
   const [profile, setProfile] = useState<UserProfile | null>(userProfile);
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
   const [loading, setLoading] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
+
+  const handleRestorePurchases = async () => {
+    setIsRestoring(true);
+    try {
+      await restoreApplePurchases();
+      await checkSubscription();
+      toast.success('Purchases restored successfully!');
+    } catch (error: any) {
+      console.error('Restore purchases error:', error);
+      toast.error(error?.message || 'Unable to restore purchases. Please try again.');
+    } finally {
+      setIsRestoring(false);
+    }
+  };
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== 'DELETE') return;
