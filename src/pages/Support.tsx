@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Mail, MessageCircle, Shield, HelpCircle } from "lucide-react";
+import { ArrowLeft, Mail, MessageCircle, Shield, HelpCircle, FileText } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
