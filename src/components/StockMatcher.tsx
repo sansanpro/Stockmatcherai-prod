@@ -530,6 +530,10 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
                 ← Swipe left to pass · Swipe right to like →
               </p>
             )}
+            {/* Financial disclaimer */}
+            <p className="text-center text-white/30 text-[10px] mt-2">
+              For educational purposes only. Not financial advice.
+            </p>
           </div>
         )}
 

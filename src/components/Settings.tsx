@@ -6,10 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 import { UserProfile } from '@/types/stock-matcher';
 import { toast } from 'sonner';
-import { User, Save, ArrowLeft, Trash2, AlertTriangle } from 'lucide-react';
+import { User, Save, ArrowLeft, Trash2, AlertTriangle, RotateCcw } from 'lucide-react';
 import { saveUserProfile, getUserProfile } from '@/utils/profileManager';
+import { Capacitor } from '@capacitor/core';
+import { restoreApplePurchases } from '@/services/appleIAPService';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,14 +31,32 @@ interface SettingsProps {
   onProfileUpdate: (profile: UserProfile) => void;
 }
 
+const isIOSNative = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+
 const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
   const { user, deleteAccount } = useAuth();
+  const { checkSubscription } = useSubscription();
   const [profile, setProfile] = useState<UserProfile | null>(userProfile);
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
   const [loading, setLoading] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
+
+  const handleRestorePurchases = async () => {
+    setIsRestoring(true);
+    try {
+      await restoreApplePurchases();
+      await checkSubscription();
+      toast.success('Purchases restored successfully!');
+    } catch (error: any) {
+      console.error('Restore purchases error:', error);
+      toast.error(error?.message || 'Unable to restore purchases. Please try again.');
+    } finally {
+      setIsRestoring(false);
+    }
+  };
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== 'DELETE') return;
@@ -163,6 +184,22 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
                 />
                 <p className="text-sm text-gray-500 mt-1">Email cannot be changed</p>
               </div>
+              {isIOSNative && (
+                <div className="pt-2 border-t">
+                  <Button
+                    onClick={handleRestorePurchases}
+                    disabled={isRestoring}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <RotateCcw className={`w-4 h-4 ${isRestoring ? 'animate-spin' : ''}`} />
+                    {isRestoring ? 'Restoring...' : 'Restore Purchases'}
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Restore previously purchased subscriptions
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
