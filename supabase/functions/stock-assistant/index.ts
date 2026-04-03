@@ -593,13 +593,6 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
               )
             );
           }
-              } catch (e) {
-                console.error('Error parsing SSE:', e);
-              }
-            }
-
-            if (toolCallsComplete) break;
-          }
 
           // PHASE 2: If we have tool calls, make follow-up request with results
           if (collectedToolCalls.length > 0) {
