@@ -1,0 +1,41 @@
+{
+  "identifier" : "8B2E3F4A-1234-5678-9ABC-DEF012345678",
+  "type" : "com.apple.storekit.testing",
+  "version" : 3,
+  "localizations" : [],
+  "settings" : {
+    "_applicationInternalID" : "6743140230",
+    "_developerTeamID" : "YOUR_TEAM_ID"
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "premium_group",
+      "localizations" : [],
+      "name" : "Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [],
+          "codeOffers" : [],
+          "displayPrice" : "9.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "premium_monthly_001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Unlimited swipes and AI insights",
+              "displayName" : "Premium Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.hassanomar.stockmatcherai.premium.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Premium Monthly",
+          "subscriptionGroupID" : "premium_group",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : []
+        }
+      ]
+    }
+  ]
+}
