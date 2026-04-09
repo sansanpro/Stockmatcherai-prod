@@ -74,6 +74,11 @@ export function trackSubscriptionPurchase(
     log('Purchase (skipped — not production)', { plan, value });
     return;
   }
+  track('Subscribe', {
+    value,
+    currency: 'USD',
+    predicted_ltv: plan === 'pro_annual' ? value : value * 12,
+  });
   track('Purchase', {
     value,
     currency: 'USD',
