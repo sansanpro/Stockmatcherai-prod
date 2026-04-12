@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Waitlist from "./pages/Waitlist";
 import Support from "./pages/Support";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => {
                 <>
                   <Route path="/" element={<Navigate to="/app" replace />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/terms" element={<Terms />} />
                   <Route path="/app" element={<Index />} />
                   <Route path="*" element={<Navigate to="/app" replace />} />
                 </>
@@ -63,6 +65,7 @@ const App = () => {
                   <Route path="/" element={<Landing />} />
                   <Route path="/waitlist" element={<Waitlist />} />
                   <Route path="/support" element={<Support />} />
+                  <Route path="/terms" element={<Terms />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/app" element={<Index />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
