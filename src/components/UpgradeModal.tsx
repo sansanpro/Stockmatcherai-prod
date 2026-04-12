@@ -270,7 +270,7 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
                     <p className="mt-1">
                       <a href="https://stockmatcherai.com/support" className="underline">Privacy Policy</a>
                       {' · '}
-                      <a href="https://stockmatcherai.com/support" className="underline">Terms of Service</a>
+                      <a href="https://stockmatcherai.com/terms" className="underline">Terms of Service</a>
                     </p>
                   </>
                 ) : (
