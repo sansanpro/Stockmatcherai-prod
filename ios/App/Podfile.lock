@@ -8,6 +8,8 @@ PODS:
     - StripeApplePay (~> 24.15.0)
     - StripePaymentSheet (~> 24.15.0)
   - CapacitorCordova (7.4.0)
+  - CapacitorSubscriptions (1.0.3-alpha):
+    - Capacitor
   - Stripe (24.15.0):
     - StripeApplePay (= 24.15.0)
     - StripeCore (= 24.15.0)
@@ -39,6 +41,7 @@ DEPENDENCIES:
   - "CapacitorBrowser (from `../../node_modules/@capacitor/browser`)"
   - "CapacitorCommunityStripe (from `../../node_modules/@capacitor-community/stripe`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - CapacitorSubscriptions (from `../../node_modules/capacitor-subscriptions`)
   - Stripe (~> 24.15.0)
   - StripePaymentSheet (~> 24.15.0)
 
@@ -61,12 +64,15 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor-community/stripe"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
+  CapacitorSubscriptions:
+    :path: "../../node_modules/capacitor-subscriptions"
 
 SPEC CHECKSUMS:
   Capacitor: 10feab36396883c55373328124a677f118cd4b5f
   CapacitorBrowser: 22541e48442de44dc629c214388290d6eecc6ae9
   CapacitorCommunityStripe: 034985b6787b536683851b1afbc378544da5ceb3
   CapacitorCordova: 723e017d8a80ab2ede9959fbe37556c35ac860d5
+  CapacitorSubscriptions: e6a4724df998bd02084c680646891e22964be897
   Stripe: 6f0047bdd52bbeecc3c87a9c0d429bf5bb2b1b86
   StripeApplePay: e7a2f5fa07cbdba9c56cb7586cbfd4e7e32ed895
   StripeCore: 224f995bb108e3be3bdf6cfab918657edf325559
@@ -75,6 +81,6 @@ SPEC CHECKSUMS:
   StripePaymentsUI: d0549558424d3884b3fb7b8f3905ea685e750600
   StripeUICore: dbd893086aa4fe697517624af2f1f0cea3218ac8
 
-PODFILE CHECKSUM: 153b99c608f5fa6ee8ac501c4336fbcf30b13115
+PODFILE CHECKSUM: 71fc576cb47ae3f3bc82cc5b342068f51c9a8c22
 
 COCOAPODS: 1.16.2

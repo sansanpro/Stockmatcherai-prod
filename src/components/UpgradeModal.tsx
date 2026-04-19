@@ -24,6 +24,7 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [applePrice, setApplePrice] = useState<string>('$9.99/month');
+  const [appleProductAvailable, setAppleProductAvailable] = useState(true);
 
   // Track paywall event when modal opens
   useEffect(() => {
@@ -40,9 +41,13 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       const products = await getAppleProducts();
       if (products.length > 0) {
         setApplePrice(products[0].displayPrice + '/month');
+        setAppleProductAvailable(true);
+      } else {
+        setAppleProductAvailable(false);
       }
     } catch (e) {
       console.error('Failed to load Apple product:', e);
+      setAppleProductAvailable(false);
     }
   };
 
@@ -215,9 +220,10 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
 
               <div className="space-y-3">
                 {isIOSNative ? (
-                  <Button 
+                  <>
+                  <Button
                     onClick={handleApplePurchase}
-                    disabled={isProcessing}
+                    disabled={isProcessing || !appleProductAvailable}
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
                   >
                     {isProcessing ? (
@@ -232,6 +238,10 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
                       </>
                     )}
                   </Button>
+                  {!appleProductAvailable && (
+                    <p className="text-sm text-red-500 text-center">Subscription is temporarily unavailable. Please try again later.</p>
+                  )}
+                  </>
                 ) : (
                   <Button 
                     onClick={handlePayment}

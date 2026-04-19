@@ -64,7 +64,7 @@ function createPurchaseError(responseCode?: number, responseMessage?: string) {
   return error;
 }
 
-async function loadLatestTransaction(retries = 3): Promise<ApplePurchaseResult> {
+async function loadLatestTransaction(retries = 5): Promise<ApplePurchaseResult> {
   for (let attempt = 0; attempt < retries; attempt += 1) {
     const result = await Subscriptions.getLatestTransaction({
       productIdentifier: PRODUCT_ID,
@@ -80,7 +80,7 @@ async function loadLatestTransaction(retries = 3): Promise<ApplePurchaseResult> 
     }
 
     if (attempt < retries - 1) {
-      await new Promise(resolve => setTimeout(resolve, 400));
+      await new Promise(resolve => setTimeout(resolve, 1500));
     }
   }
 
