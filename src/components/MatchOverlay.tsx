@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Heart, Sparkles, TrendingUp } from 'lucide-react';
+import { Heart, Sparkles, TrendingUp, X } from 'lucide-react';
 import { StockRecommendation } from '@/types/stock-matcher';
 import { Button } from '@/components/ui/button';
 
@@ -21,7 +21,7 @@ const MatchOverlay = ({ stock, compatibilityScore, onClose, onViewDetails }: Mat
     const exitTimer = setTimeout(() => {
       setPhase('exit');
       setTimeout(() => onCloseRef.current(), 500);
-    }, 4000);
+    }, 8000);
 
     return () => {
       clearTimeout(showTimer);
@@ -74,6 +74,15 @@ const MatchOverlay = ({ stock, compatibilityScore, onClose, onViewDetails }: Mat
           </div>
         ))}
       </div>
+
+      {/* X close button */}
+      <button
+        onClick={handleDismiss}
+        aria-label="Close match overlay"
+        className="absolute top-6 right-6 z-20 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors"
+      >
+        <X className="w-5 h-5" />
+      </button>
 
       {/* Main content */}
       <div

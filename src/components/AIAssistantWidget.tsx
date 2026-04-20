@@ -382,18 +382,33 @@ export default function AIAssistantWidget() {
           {/* Messages */}
           <ScrollArea className="flex-1 p-4" ref={scrollRef}>
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center gap-4 p-6">
-                <Sparkles className="h-12 w-12 text-primary opacity-50" />
+              <div className="flex flex-col items-center justify-center h-full text-center gap-4 p-4">
+                <Sparkles className="h-10 w-10 text-primary opacity-50" />
                 <div>
-                  <p className="font-semibold mb-2">
+                  <p className="font-semibold mb-1">
                     {subscribed ? 'Ask me anything about stocks!' : 'Try the AI Assistant'}
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    {subscribed 
-                      ? 'Get real-time market data, company insights, and educational guidance.'
-                      : 'Send a message to try the AI assistant. Upgrade for unlimited access!'
-                    }
+                  <p className="text-xs text-muted-foreground mb-4">
+                    {subscribed
+                      ? 'Real-time data, company insights, and market analysis.'
+                      : 'Upgrade for unlimited access. Try a question below!'}
                   </p>
+                </div>
+                {/* Suggested prompts */}
+                <div className="w-full space-y-2">
+                  {[
+                    "Why is NVIDIA a good match for me?",
+                    "What's the safest dividend stock right now?",
+                    "Explain P/E ratio in simple terms",
+                  ].map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => setInputValue(prompt)}
+                      className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-colors text-muted-foreground hover:text-foreground"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
                 </div>
               </div>
             ) : (

@@ -414,7 +414,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
                     </Badge>
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Tap to edit profile</TooltipContent>
+                <TooltipContent>Tap to update your profile</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -428,7 +428,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
                     </Badge>
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Tap to edit profile</TooltipContent>
+                <TooltipContent>Tap to update your profile</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -438,7 +438,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
                     </Badge>
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Tap to edit profile</TooltipContent>
+                <TooltipContent>Tap to update your profile</TooltipContent>
               </Tooltip>
               {userProfile.investmentGoal && (
                 <Tooltip>
@@ -449,7 +449,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
                       </Badge>
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent>Tap to edit profile</TooltipContent>
+                  <TooltipContent>Tap to update your profile</TooltipContent>
                 </Tooltip>
               )}
             </div>
@@ -500,29 +500,59 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
         {allRecommendations.length > 0 && currentStock && (
           <div className="mb-6 px-4 animate-fade-in delay-400">
             <div className="flex justify-center gap-6 mb-2">
-              <Button
-                onClick={handlePass}
-                disabled={animatingCard || !canSwipe}
-                className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
-              >
-                <X className="w-8 h-8" />
-              </Button>
-              
-              <Button
-                onClick={handleUndo}
-                disabled={currentIndex === 0 || animatingCard}
-                className="w-12 h-12 rounded-full bg-gray-500/80 hover:bg-gray-600 border-0 text-white shadow-xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
-              >
-                <RotateCcw className="w-5 h-5" />
-              </Button>
-              
-              <Button
-                onClick={handleMatch}
-                disabled={animatingCard || !canSwipe}
-                className="w-16 h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
-              >
-                <Heart className="w-8 h-8" />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      onClick={handlePass}
+                      disabled={animatingCard || !canSwipe}
+                      aria-label="Pass"
+                      className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+                    >
+                      <X className="w-8 h-8" />
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {!canSwipe ? "Daily limit reached — upgrade for unlimited swipes" : "Pass"}
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      onClick={handleUndo}
+                      disabled={currentIndex === 0 || animatingCard}
+                      aria-label="Undo last swipe"
+                      className="w-12 h-12 rounded-full bg-gray-500/80 hover:bg-gray-600 border-0 text-white shadow-xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+                    >
+                      <RotateCcw className="w-5 h-5" />
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {currentIndex === 0 ? "Nothing to undo yet" : "Undo last swipe"}
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button
+                      onClick={handleMatch}
+                      disabled={animatingCard || !canSwipe}
+                      aria-label="Like this stock"
+                      className="w-16 h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+                    >
+                      <Heart className="w-8 h-8" />
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {!canSwipe ? "Daily limit reached — upgrade for unlimited swipes" : "Like this stock"}
+                </TooltipContent>
+              </Tooltip>
             </div>
             {/* Swipe hint text */}
             {showSwipeHint && (

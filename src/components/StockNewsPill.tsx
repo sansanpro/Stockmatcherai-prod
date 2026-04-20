@@ -75,7 +75,7 @@ const StockNewsPill = ({ ticker, companyName }: StockNewsPillProps) => {
       >
         <Newspaper className="w-3 h-3" />
         {isLoading ? (
-          <span className="animate-pulse">Loading...</span>
+          <span className="w-12 h-2.5 bg-blue-400/40 rounded-full animate-pulse inline-block" />
         ) : (
           <>
             <span>{news.length} update{news.length !== 1 ? 's' : ''}</span>
