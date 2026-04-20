@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Apple Sign-In key generation (never commit)
+*.p8
+gen-apple-secret.js
