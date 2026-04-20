@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Navigate } from 'react-router-dom';
 import UserProfileForm from '@/components/UserProfileForm';
 import StockMatcher from '@/components/StockMatcher';
 import Matches from '@/components/Matches';
@@ -17,7 +17,6 @@ import { SubscriptionProvider, useSubscription } from '@/contexts/SubscriptionCo
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import { Heart, Sparkles, Crown } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { User as UserIcon, Heart as HeartIcon, Home } from 'lucide-react';
@@ -206,72 +205,34 @@ const IndexContent = () => {
     );
   }
 
-  // Show welcome screen for unauthenticated users
+  // Redirect unauthenticated users straight into the onboarding flow
   if (!user) {
-    return (
-      <div className="min-h-screen w-full min-w-0 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 pt-[env(safe-area-inset-top)] overflow-auto">
-        <Card className="w-full max-w-md md:max-w-lg text-center shadow-xl dark:bg-gray-800 dark:border-gray-700">
-          <CardHeader className="space-y-4">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-2xl">📈</span>
-            </div>
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Stock Matcher AI
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <p className="text-lg text-gray-600 dark:text-gray-300">
-              Get personalized stock recommendations based on your profile, risk tolerance, and preferences.
-            </p>
-            <div className="space-y-2 text-sm text-gray-500 dark:text-gray-400">
-              <div className="flex items-center justify-center gap-2">
-            <span>✨</span>
-                <span>AI-powered matching</span>
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                <span>🤖</span>
-                <span>24/7 AI Research Assistant</span>
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                <span>👤</span>
-                <span>Executive insights</span>
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                <span>📊</span>
-                <span>Visual risk indicators</span>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <Button asChild className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-105">
-                <Link to="/auth">Get Started 🚀</Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <Navigate to="/auth" replace />;
   }
 
-  // Header for authenticated app navigation
+  // Header for authenticated app navigation (desktop)
   const AppHeader = () => (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 w-full pt-[env(safe-area-inset-top)]">
+    <div className="bg-background/80 backdrop-blur-md border-b border-border px-4 py-3 w-full pt-[env(safe-area-inset-top)] sticky top-0 z-40">
       <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1">
+          <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mr-3">
+            StockMatch
+          </span>
           <Button
             onClick={() => setCurrentStep('matching')}
             variant={currentStep === 'matching' ? 'default' : 'ghost'}
-            className="flex items-center gap-2 px-6 py-3 min-h-[44px] min-w-[44px] text-base"
+            className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matching' ? 'bg-gradient-to-r from-primary to-purple-600 text-white shadow-md shadow-primary/20' : ''}`}
           >
-            <Heart className="w-5 h-5" />
+            <Heart className="w-4 h-4" />
             Match
           </Button>
           <Button
             onClick={() => setCurrentStep('matches')}
             variant={currentStep === 'matches' ? 'default' : 'ghost'}
-            className="flex items-center gap-2 px-6 py-3 min-h-[44px] min-w-[44px] text-base"
+            className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matches' ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md shadow-pink-500/20' : ''}`}
           >
-            <Heart className="w-5 h-5 fill-current" />
-            Your Likes
+            <Heart className="w-4 h-4 fill-current" />
+            Likes
           </Button>
         </div>
         <div className="flex items-center gap-3">
@@ -283,51 +244,44 @@ const IndexContent = () => {
   );
 
   // Bottom navigation bar for mobile
-  const BottomNavBar = () => (
-    <nav className="fixed bottom-0 left-0 w-full z-50 bg-background/95 backdrop-blur-sm border-t border-border flex justify-around items-center py-3 pb-safe-area-inset-bottom shadow-lg" style={{ fontFamily: 'SF Pro Text, SF Pro Display, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif' }}>
-      <button 
-        onClick={() => setCurrentStep('matching')} 
-        className={`flex flex-col items-center min-h-[44px] min-w-[44px] justify-center transition-colors ${
-          currentStep === 'matching' ? 'text-primary' : 'text-muted-foreground'
-        }`}
-      >
-        <Home className="w-5 h-5 mb-1" />
-        <span className="text-[10px] font-medium">Match</span>
-      </button>
-      <button 
-        onClick={() => setCurrentStep('matches')} 
-        className={`flex flex-col items-center min-h-[44px] min-w-[44px] justify-center transition-colors ${
-          currentStep === 'matches' ? 'text-primary' : 'text-muted-foreground'
-        }`}
-      >
-        <HeartIcon className="w-5 h-5 mb-1" />
-        <span className="text-[10px] font-medium">Likes</span>
-      </button>
-      <button 
-        onClick={() => setCurrentStep('settings')} 
-        className={`flex flex-col items-center min-h-[44px] min-w-[44px] justify-center transition-colors ${
-          currentStep === 'settings' ? 'text-primary' : 'text-muted-foreground'
-        }`}
-      >
-        <UserIcon className="w-5 h-5 mb-1" />
-        <span className="text-[10px] font-medium">Profile</span>
-      </button>
-    </nav>
-  );
+  const BottomNavBar = () => {
+    const navItems = [
+      { step: 'matching' as const, icon: Home, label: 'Match' },
+      { step: 'matches' as const, icon: HeartIcon, label: 'Likes' },
+      { step: 'settings' as const, icon: UserIcon, label: 'Profile' },
+    ];
+    return (
+      <nav className="fixed bottom-0 left-0 w-full z-50 pb-safe-area-inset-bottom"
+        style={{ fontFamily: 'SF Pro Text, SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif' }}>
+        <div className="mx-3 mb-3 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/10 shadow-2xl flex justify-around items-center py-2 px-2">
+          {navItems.map(({ step, icon: Icon, label }) => {
+            const active = currentStep === step;
+            return (
+              <button key={step} onClick={() => setCurrentStep(step)}
+                className={`flex flex-col items-center min-h-[44px] min-w-[52px] justify-center rounded-xl transition-all duration-200 ${
+                  active ? 'bg-primary/20 text-primary scale-105' : 'text-white/40 hover:text-white/70'
+                }`}>
+                <Icon className={`w-5 h-5 mb-0.5 ${active && step === 'matches' ? 'fill-current' : ''}`} />
+                <span className={`text-[10px] font-semibold ${active ? 'text-primary' : ''}`}>{label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+    );
+  };
 
   // Show profile setup for authenticated users without profile
   if (currentStep === 'welcome' || currentStep === 'profile') {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 pt-[env(safe-area-inset-top)] overflow-auto">
+        <div className="min-h-screen w-full bg-gradient-to-br from-[#0f0a1e] via-[#130d2a] to-[#0a0614] pt-[env(safe-area-inset-top)] overflow-auto">
           {currentStep === 'profile' && <AppHeader />}
-          <div className="pt-8">
-            <UserProfileForm 
-              onComplete={handleProfileComplete} 
-              existingProfile={userProfile || undefined}
-              isUpdate={isUpdatingProfile}
-            />
-          </div>
+          <UserProfileForm
+            onComplete={handleProfileComplete}
+            existingProfile={userProfile || undefined}
+            isUpdate={isUpdatingProfile}
+          />
         </div>
       </ProtectedRoute>
     );
@@ -375,7 +329,7 @@ const IndexContent = () => {
     return (
       <ProtectedRoute>
         {!isMobile && <AppHeader />}
-        <div className={`min-h-screen w-full min-w-0 bg-gradient-to-br from-pink-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 px-4 pt-[env(safe-area-inset-top)] overflow-auto ${isMobile ? 'pb-24' : 'pb-4'}`}>
+        <div className={`min-h-screen w-full min-w-0 bg-gradient-to-br from-[#0f0a1e] via-[#130d2a] to-[#0a0614] dark:from-[#0f0a1e] dark:via-[#130d2a] dark:to-[#0a0614] px-4 pt-[env(safe-area-inset-top)] overflow-auto ${isMobile ? 'pb-28' : 'pb-4'}`}>
           <div className="w-full pt-4">
             <Matches onViewDetails={handleViewStockDetails} />
           </div>

@@ -55,7 +55,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
     <Card className="w-full max-w-md md:max-w-xl lg:max-w-3xl xl:max-w-4xl mx-auto shadow-xl border-0 bg-card overflow-hidden max-h-[85vh] lg:max-h-[calc(100vh-10rem)] overflow-y-auto">
       <CardContent className="p-0">
         {/* Header with company info */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 text-white p-4 sm:p-6 lg:p-4">
+        <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 text-white p-4 sm:p-6 lg:p-4">
           <div className="flex justify-between items-start mb-3 sm:mb-4 lg:mb-4">
             <div className="min-w-0 flex-1 mr-2">
               <h2 className="text-lg sm:text-xl lg:text-2xl font-bold truncate">{stock.companyName}</h2>
@@ -87,7 +87,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
         </div>
 
         {/* Expert Insights Banner */}
-        <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-3 sm:p-4 border-b dark:border-gray-700">
+        <div className="bg-gradient-to-r from-emerald-50 to-cyan-50 dark:from-emerald-900/20 dark:to-cyan-900/20 p-3 sm:p-4 border-b border-border">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
               <div className="flex items-center gap-2">
@@ -116,47 +116,47 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
         />
 
         {/* Financials */}
-        <div className="p-4 sm:p-6 lg:p-4 border-b dark:border-gray-700">
-          <h4 className="font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 lg:mb-4 flex items-center gap-2 text-sm sm:text-base lg:text-lg">
+        <div className="p-4 sm:p-6 lg:p-4 border-b border-border">
+          <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
             <span>💰</span>
             Key Financials
           </h4>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-3">
-            <div className="text-center p-3 sm:p-4 lg:p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400 mb-1">P/E Ratio</p>
-              <p className="font-bold text-sm sm:text-base lg:text-lg text-blue-600 dark:text-blue-400">{stock.peRatio}</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-center p-3 bg-violet-50 dark:bg-violet-900/20 rounded-xl border border-violet-100 dark:border-violet-800/30">
+              <p className="text-xs text-muted-foreground mb-1">P/E Ratio</p>
+              <p className="font-bold text-sm text-violet-600 dark:text-violet-400">{stock.peRatio}</p>
             </div>
-            <div className="text-center p-3 sm:p-4 lg:p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-              <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400 mb-1">Market Cap</p>
-              <p className="font-bold text-sm sm:text-base lg:text-lg text-purple-600 dark:text-purple-400">{stock.marketCap}</p>
+            <div className="text-center p-3 bg-fuchsia-50 dark:bg-fuchsia-900/20 rounded-xl border border-fuchsia-100 dark:border-fuchsia-800/30">
+              <p className="text-xs text-muted-foreground mb-1">Market Cap</p>
+              <p className="font-bold text-sm text-fuchsia-600 dark:text-fuchsia-400">{stock.marketCap}</p>
             </div>
-            <div className="text-center p-3 sm:p-4 lg:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400 mb-1">1-Year Return</p>
-              <p className={`font-bold text-sm sm:text-base lg:text-lg ${stock.oneYearReturn >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            <div className="text-center p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
+              <p className="text-xs text-muted-foreground mb-1">1-Year Return</p>
+              <p className={`font-bold text-sm ${stock.oneYearReturn >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}`}>
                 {stock.oneYearReturn > 0 ? '+' : ''}{stock.oneYearReturn.toFixed(1)}%
               </p>
             </div>
-            <div className="text-center p-3 sm:p-4 lg:p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-              <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400 mb-1">Price/Share</p>
-              <p className="font-bold text-sm sm:text-base lg:text-lg text-orange-600 dark:text-orange-400">{formatNumber(stock.pricePerShare)}</p>
+            <div className="text-center p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-xl border border-cyan-100 dark:border-cyan-800/30">
+              <p className="text-xs text-muted-foreground mb-1">Price/Share</p>
+              <p className="font-bold text-sm text-cyan-600 dark:text-cyan-400">{formatNumber(stock.pricePerShare)}</p>
             </div>
           </div>
-          
+
           {stock.dividendYield > 0 && (
-            <div className="mt-3 sm:mt-4 lg:mt-4 col-span-2 text-center p-3 sm:p-4 lg:p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-              <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400 mb-1">Dividend Yield</p>
-              <p className="font-bold text-sm sm:text-base lg:text-lg text-yellow-600 dark:text-yellow-400">{stock.dividendYield.toFixed(2)}%</p>
+            <div className="mt-3 text-center p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-800/30">
+              <p className="text-xs text-muted-foreground mb-1">Dividend Yield</p>
+              <p className="font-bold text-sm text-amber-600 dark:text-amber-400">{stock.dividendYield.toFixed(2)}%</p>
             </div>
           )}
         </div>
 
         {/* Why it fits */}
         <div className="p-4 sm:p-6 lg:p-4">
-          <h4 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-sm sm:text-base lg:text-lg">
+          <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
             <span>💡</span>
             Why this fits you
           </h4>
-          <p className="text-xs sm:text-sm lg:text-base text-gray-700 dark:text-gray-300 leading-relaxed bg-blue-50 dark:bg-blue-900/20 p-4 sm:p-5 lg:p-4 rounded-lg">
+          <p className="text-xs sm:text-sm leading-relaxed bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/10 p-4 rounded-xl">
             {stock.whyItFits}
           </p>
         </div>
