@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { signInWithApple as appleSignIn } from '@/services/appleAuthService';
 import { toast } from 'sonner';
 
 interface AuthContextType {
@@ -10,6 +11,7 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithApple: () => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
   deleteAccount: () => Promise<{ error: any }>;
@@ -88,6 +90,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const signInWithApple = async () => {
+    try {
+      await appleSignIn();
+      toast.success('Welcome!');
+    } catch (error: any) {
+      // User cancelled — no toast. Any other error is shown.
+      if (error?.code !== '1001' && error?.message !== 'The operation couldn't be completed. (com.apple.AuthenticationServices.AuthorizationError error 1001.)') {
+        toast.error(error?.message || 'Apple Sign-In failed. Please try again.');
+      }
+    }
+  };
+
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -142,6 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signUp,
     signIn,
+    signInWithApple,
     signOut,
     resetPassword,
     deleteAccount,
