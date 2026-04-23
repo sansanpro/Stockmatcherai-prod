@@ -96,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.success('Welcome!');
     } catch (error: any) {
       // User cancelled — no toast. Any other error is shown.
-      if (error?.code !== '1001' && error?.message !== 'The operation couldn't be completed. (com.apple.AuthenticationServices.AuthorizationError error 1001.)') {
+      if (error?.code !== '1001' && !error?.message?.includes('AuthorizationError error 1001')) {
         toast.error(error?.message || 'Apple Sign-In failed. Please try again.');
       }
     }
