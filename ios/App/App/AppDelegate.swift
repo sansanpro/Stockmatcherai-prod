@@ -43,7 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         guard !hasRequestedTracking else { return }
         hasRequestedTracking = true
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             ATTrackingManager.requestTrackingAuthorization { [weak self] status in
                 let statusString: String
                 switch status {
