@@ -24,18 +24,8 @@ export default defineConfig(({ mode }) => ({
       include: [/node_modules/],
       transformMixedEsModules: true
     },
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'stripe': ['@stripe/stripe-js']
-        }
-      }
-    },
   },
   optimizeDeps: {
-    include: [
-      '@stripe/stripe-js'
-    ],
     esbuildOptions: {
       target: 'es2020'
     }
