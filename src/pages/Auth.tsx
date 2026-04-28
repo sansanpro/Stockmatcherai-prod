@@ -6,7 +6,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { trackRegistration } from '@/lib/metaPixel';
 import { Capacitor } from '@capacitor/core';
 
 // Onboarding step types
@@ -87,7 +86,6 @@ const Auth = () => {
     // Store onboarding answers so profile form can pre-populate
     localStorage.setItem('onboarding_answers', JSON.stringify(answers));
     await signUp(data.get('email') as string, data.get('password') as string, data.get('fullName') as string);
-    trackRegistration('email');
     setIsLoading(false);
   };
 

@@ -7,7 +7,6 @@ import { Crown, Check, CreditCard, Apple } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import StripeCheckout from './StripeCheckout';
-import { trackPaywallReached } from '@/lib/metaPixel';
 import { Capacitor } from '@capacitor/core';
 import { getAppleProducts, purchaseAppleSubscription } from '@/services/appleIAPService';
 
@@ -29,7 +28,6 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   // Track paywall event when modal opens
   useEffect(() => {
     if (isOpen) {
-      trackPaywallReached('swipe_limit');
       if (isIOSNative) {
         loadAppleProduct();
       }

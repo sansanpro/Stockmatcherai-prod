@@ -16,7 +16,6 @@ import { Json } from '@/integrations/supabase/types';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
-import { trackFirstSwipe, trackWatchlistAdd, trackDeepSwipeSession } from '@/lib/metaPixel';
 
 interface StockMatcherProps {
   userProfile: UserProfile;
@@ -140,11 +139,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       });
     }
 
-    // Meta Pixel tracking
-    trackFirstSwipe(currentStock.ticker, 'right');
-    trackWatchlistAdd(currentStock.ticker, currentStock.companyName);
     swipeCountRef.current += 1;
-    trackDeepSwipeSession(swipeCountRef.current);
 
     console.log(`Matched ${currentStock.ticker} (compatibility: ${score}%), adding to seen stocks`);
     
@@ -196,10 +191,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
     // Update swipe statistics
     updateSwipeStats(false);
     
-    // Meta Pixel tracking
-    trackFirstSwipe(currentStock.ticker, 'left');
     swipeCountRef.current += 1;
-    trackDeepSwipeSession(swipeCountRef.current);
 
     console.log(`Passed ${currentStock.ticker}, adding to seen stocks`);
     

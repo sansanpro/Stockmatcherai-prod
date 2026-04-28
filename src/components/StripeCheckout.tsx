@@ -4,7 +4,6 @@ import { useSubscription } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import './StripeCheckout.css';
-import { trackSubscriptionPurchase } from '@/lib/metaPixel';
 
 const stripePromise = loadStripe('pk_test_51QWQmbP8fWHxbLTpXgcT9fRAcRO6Xrwpj7dIc0j2UaKnwqr1DbgP5gG9bWJWm65hWO6XSLdtYWaAZKJTHpEAi8pj0004R8VEfI');
 
@@ -46,7 +45,6 @@ const StripeCheckout = ({ clientSecret, onComplete }: StripeCheckoutProps) => {
           onComplete: async () => {
             console.log('🎉 Payment completed successfully!');
             toast.success('Payment successful! Welcome to Premium!');
-            trackSubscriptionPurchase('pro_monthly', 9.99);
             
             try {
               console.log('🔄 Refreshing subscription status after payment...');
