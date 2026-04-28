@@ -81,7 +81,7 @@
               "locale" : "en_US"
             }
           ],
-          "productID" : "com.hassanomar.stockmatcherai.premium.monthly",
+          "productID" : "com.hassanomar.stockmatcherai.pro.monthly",
           "recurringSubscriptionPeriod" : "P1M",
           "referenceName" : "StockMatcherAI Premium",
           "subscriptionGroupID" : "22003490",

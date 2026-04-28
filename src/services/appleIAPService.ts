@@ -56,7 +56,7 @@ interface SubscriptionsPlugin {
 
 const Subscriptions = registerPlugin<SubscriptionsPlugin>('Subscriptions');
 
-const PRODUCT_ID = 'com.hassanomar.stockmatcherai.premium.monthly';
+const PRODUCT_ID = 'com.hassanomar.stockmatcherai.pro.monthly';
 
 function createPurchaseError(responseCode?: number, responseMessage?: string) {
   const error: any = new Error(responseMessage || 'Purchase failed');
