@@ -177,7 +177,8 @@ const Auth = () => {
         <p className="text-xs text-gray-600 mt-8 max-w-xs">
           By continuing, you agree to our{' '}
           <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
-          {' '}and Privacy Policy.
+          {' '}and{' '}
+          <a href="https://stockmatcherai.com/support" className="text-primary hover:underline">Privacy Policy</a>.
         </p>
       </div>
     );

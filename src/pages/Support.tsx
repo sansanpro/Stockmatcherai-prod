@@ -252,10 +252,6 @@ const Support = () => {
               current billing period. You can manage or cancel your subscription in your
               device's Settings → Apple ID → Subscriptions.
             </p>
-            <p>
-              On the web, payments are processed securely by Stripe. Subscription terms and
-              cancellation options are available in the App's Settings page.
-            </p>
 
             <h3 className="text-foreground font-semibold text-base">User Responsibilities</h3>
             <ul className="list-disc pl-5 space-y-1">
