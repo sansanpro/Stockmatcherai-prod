@@ -36,7 +36,6 @@ export const signInWithAppleNative = async () => {
 
   const result = await SignInWithApple.authorize({
     clientId: 'com.hassanomar.stockmatcherai',
-    redirectURI: '',
     scopes: 'email name',
     nonce: hashedNonce,
   });

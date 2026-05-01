@@ -96,8 +96,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.success('Welcome!');
     } catch (error: any) {
       // User cancelled — no toast. Any other error is shown.
-      if (error?.code !== '1001' && !error?.message?.includes('AuthorizationError error 1001')) {
-        toast.error(error?.message || 'Apple Sign-In failed. Please try again.');
+      const isCancelled =
+        error?.code === '1001' ||
+        error?.code === 1001 ||
+        error?.message?.includes('AuthorizationError error 1001') ||
+        error?.message?.includes('cancelled') ||
+        error?.message?.includes('canceled');
+      if (!isCancelled) {
+        const msg = error?.message || error?.localizedDescription || JSON.stringify(error);
+        toast.error(msg || 'Apple Sign-In failed. Please try again.');
       }
     }
   };
