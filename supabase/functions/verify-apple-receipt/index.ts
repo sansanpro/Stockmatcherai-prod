@@ -65,8 +65,11 @@ Deno.serve(async (req) => {
       }
     }
 
-    const expectedProductId = 'com.hassanomar.stockmatcherai.premium.monthly';
-    if (decodedProductId && decodedProductId !== expectedProductId) {
+    const validProductIds = [
+      'com.hassanomar.stockmatcherai.pro.monthly',
+      'com.hassanomar.stockmatcherai.premium.monthly',
+    ];
+    if (decodedProductId && !validProductIds.includes(decodedProductId)) {
       return new Response(JSON.stringify({ error: 'Invalid product ID' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

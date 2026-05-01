@@ -16,7 +16,7 @@ interface UpgradeModalProps {
 
 const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const { checkSubscription } = useSubscription();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [applePrice, setApplePrice] = useState<string>('$9.99/month');
   const [appleProductAvailable, setAppleProductAvailable] = useState(true);
@@ -48,6 +48,9 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       const result = await purchaseAppleSubscription(user?.id);
 
       const { error } = await supabase.functions.invoke('verify-apple-receipt', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
         body: {
           jwsToken: result.jwsRepresentation,
           transactionId: result.transactionId,
