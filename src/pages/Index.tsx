@@ -28,7 +28,7 @@ const IndexContent = () => {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [selectedStockForDetails, setSelectedStockForDetails] = useState<StockRecommendation | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const { isDarkMode, toggleDarkMode, addToWatchlist, passStock } = useApp();
+  const { isDarkMode, toggleDarkMode, addToWatchlist, passStock, watchlist } = useApp();
   const { user, loading } = useAuth();
   const { subscribed } = useSubscription();
   const isMobile = useIsMobile();
@@ -261,7 +261,14 @@ const IndexContent = () => {
                 className={`flex flex-col items-center min-h-[44px] min-w-[52px] justify-center rounded-xl transition-all duration-200 ${
                   active ? 'bg-primary/20 text-primary scale-105' : 'text-white/40 hover:text-white/70'
                 }`}>
-                <Icon className={`w-5 h-5 mb-0.5 ${active && step === 'matches' ? 'fill-current' : ''}`} />
+                <div className="relative">
+                  <Icon className={`w-5 h-5 mb-0.5 ${active && step === 'matches' ? 'fill-current' : ''}`} />
+                  {step === 'matches' && watchlist.length > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 bg-pink-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
+                      {watchlist.length > 99 ? '99+' : watchlist.length}
+                    </span>
+                  )}
+                </div>
                 <span className={`text-[10px] font-semibold ${active ? 'text-primary' : ''}`}>{label}</span>
               </button>
             );
@@ -329,7 +336,7 @@ const IndexContent = () => {
     return (
       <ProtectedRoute>
         {!isMobile && <AppHeader />}
-        <div className={`min-h-screen w-full min-w-0 bg-gradient-to-br from-[#0f0a1e] via-[#130d2a] to-[#0a0614] dark:from-[#0f0a1e] dark:via-[#130d2a] dark:to-[#0a0614] px-4 pt-[env(safe-area-inset-top)] overflow-auto ${isMobile ? 'pb-28' : 'pb-4'}`}>
+        <div className={`min-h-screen w-full min-w-0 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 px-4 pt-[env(safe-area-inset-top)] overflow-auto ${isMobile ? 'pb-28' : 'pb-4'}`}>
           <div className="w-full pt-4">
             <Matches onViewDetails={handleViewStockDetails} />
           </div>

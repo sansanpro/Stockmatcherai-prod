@@ -39,7 +39,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const swipeCountRef = useRef(0);
   
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
-  const { canSwipe, incrementSwipeCount, dailySwipesUsed, dailySwipeLimit } = useSubscription();
+  const { canSwipe, incrementSwipeCount, dailySwipesUsed, dailySwipeLimit, subscribed } = useSubscription();
   const { user } = useAuth();
 
   // Auto-hide swipe hint after 5 seconds
@@ -388,7 +388,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
         {/* Header with profile chips */}
         <div className="text-center mb-4 sm:mb-6 lg:mb-2 pt-8 sm:pt-12 lg:pt-2 animate-fade-in px-4 lg:px-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-white mb-3">
+          <h1 className="hidden sm:block text-xl sm:text-2xl font-bold text-white mb-3">
             Stock Matcher 💕
           </h1>
           <TooltipProvider>
@@ -491,6 +491,15 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
         {/* Action Buttons */}
         {allRecommendations.length > 0 && currentStock && (
           <div className="mb-6 px-4 animate-fade-in delay-400">
+            {/* Running-low swipes banner */}
+            {!subscribed && canSwipe && dailySwipesUsed >= dailySwipeLimit - 3 && (
+              <div className="flex justify-center mb-3">
+                <span className="inline-flex items-center gap-1.5 bg-amber-500/20 border border-amber-400/30 text-amber-200 text-xs font-medium px-3 py-1.5 rounded-full">
+                  <Crown className="w-3 h-3" />
+                  {dailySwipeLimit - dailySwipesUsed} swipe{dailySwipeLimit - dailySwipesUsed !== 1 ? 's' : ''} left — upgrade for unlimited
+                </span>
+              </div>
+            )}
             <div className="flex justify-center gap-6 mb-2">
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -550,6 +559,12 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
             {showSwipeHint && (
               <p className="text-center text-white/40 text-xs transition-opacity duration-500">
                 ← Swipe left to pass · Swipe right to like →
+              </p>
+            )}
+            {/* Swipe counter for free users */}
+            {!subscribed && (
+              <p className="text-center text-white/50 text-xs mt-1">
+                {dailySwipesUsed} / {dailySwipeLimit} swipes used today
               </p>
             )}
             {/* Financial disclaimer */}

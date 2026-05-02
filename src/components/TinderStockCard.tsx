@@ -448,56 +448,8 @@ className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[
             variant="compact" 
           />
 
-          {/* Financials Grid */}
-          <div className="p-4 sm:p-6 lg:p-3 bg-white dark:bg-gray-800 animate-fade-in delay-400">
-            <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 text-base sm:text-lg lg:text-xl">
-              <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
-              Key Metrics
-            </h4>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-3">
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs sm:text-sm lg:text-base text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
-                  <EducationalTooltip 
-                    content="P/E Ratio compares a company's share price to its earnings per share. Lower values may indicate undervalued stocks."
-                  />
-                </div>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
-              </div>
-              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs sm:text-sm lg:text-base text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
-                  <EducationalTooltip 
-                    content="Market Capitalization is the total value of all company shares. Larger caps are typically more stable."
-                  />
-                </div>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
-              </div>
-              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs sm:text-sm lg:text-base text-green-600 dark:text-green-400 font-medium">Price/Share</p>
-                  <EducationalTooltip 
-                    content="Current trading price per individual share of the company's stock."
-                  />
-                </div>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
-              </div>
-              {stock.dividendYield > 0 && (
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <p className="text-xs sm:text-sm lg:text-base text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
-                    <EducationalTooltip 
-                      content="Dividend Yield shows the annual dividend payments as a percentage of the stock price. Higher yields provide more regular income."
-                    />
-                  </div>
-                  <p className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-700 dark:text-orange-300">{stock.dividendYield.toFixed(2)}%</p>
-                </div>
-              )}
-            </div>
-          </div>
-
           {/* Why it fits section - More prominent */}
-          <div className="p-4 sm:p-6 lg:p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-500 flex-shrink-0">
+          <div className="p-4 sm:p-6 lg:p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-400 flex-shrink-0">
             <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-base sm:text-lg lg:text-xl">
               <span className="text-lg lg:text-xl">💡</span>
               Why this matches you
@@ -507,12 +459,60 @@ className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[
                 {stock.whyItFits}
               </p>
             </div>
-            
+
             {/* Tap to expand hint */}
-            <div className="mt-4 text-center">
+            <div className="mt-3 text-center">
               <p className="text-xs text-gray-500 dark:text-gray-400 animate-pulse">
                 Tap to expand • Swipe to match or pass
               </p>
+            </div>
+          </div>
+
+          {/* Financials Grid */}
+          <div className="p-4 sm:p-6 lg:p-3 bg-white dark:bg-gray-800 animate-fade-in delay-500">
+            <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 text-base sm:text-lg lg:text-xl">
+              <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
+              Key Metrics
+            </h4>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-3">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <p className="text-xs sm:text-sm lg:text-base text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
+                  <EducationalTooltip
+                    content="P/E Ratio compares a company's share price to its earnings per share. Lower values may indicate undervalued stocks."
+                  />
+                </div>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
+              </div>
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <p className="text-xs sm:text-sm lg:text-base text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
+                  <EducationalTooltip
+                    content="Market Capitalization is the total value of all company shares. Larger caps are typically more stable."
+                  />
+                </div>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
+              </div>
+              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <p className="text-xs sm:text-sm lg:text-base text-green-600 dark:text-green-400 font-medium">Price/Share</p>
+                  <EducationalTooltip
+                    content="Current trading price per individual share of the company's stock."
+                  />
+                </div>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
+              </div>
+              {stock.dividendYield > 0 && (
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <p className="text-xs sm:text-sm lg:text-base text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
+                    <EducationalTooltip
+                      content="Dividend Yield shows the annual dividend payments as a percentage of the stock price. Higher yields provide more regular income."
+                    />
+                  </div>
+                  <p className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-700 dark:text-orange-300">{stock.dividendYield.toFixed(2)}%</p>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
