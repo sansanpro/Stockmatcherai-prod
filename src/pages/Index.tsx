@@ -11,6 +11,7 @@ import NotificationSystem from '@/components/NotificationSystem';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UserMenu from '@/components/UserMenu';
 import StockDetailsModal from '@/components/StockDetailsModal';
+import OnboardingTutorial from '@/components/OnboardingTutorial';
 import { AppProvider, useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { SubscriptionProvider, useSubscription } from '@/contexts/SubscriptionContext';
@@ -328,6 +329,7 @@ const IndexContent = () => {
         />
         {isMobile && user && <BottomNavBar />}
         <AIAssistantWidget />
+        <OnboardingTutorial />
       </ProtectedRoute>
     );
   }

@@ -32,6 +32,9 @@ export default function AIAssistantWidget() {
   const [currentStatus, setCurrentStatus] = useState<string>('');
   const [showConsentDialog, setShowConsentDialog] = useState(false);
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+  const [hasOpenedWidget, setHasOpenedWidget] = useState(() =>
+    localStorage.getItem('ai_widget_opened') === 'true'
+  );
   
   const { user } = useAuth();
   const { subscribed } = useSubscription();
@@ -337,13 +340,28 @@ export default function AIAssistantWidget() {
     <>
       {/* Floating Button */}
       {!isOpen && (
-        <Button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-20 right-4 md:bottom-24 md:right-6 h-14 w-14 rounded-full shadow-lg z-40"
-          size="icon"
+        <button
+          onClick={() => {
+            setIsOpen(true);
+            if (!hasOpenedWidget) {
+              setHasOpenedWidget(true);
+              localStorage.setItem('ai_widget_opened', 'true');
+            }
+          }}
+          aria-label="Open AI Assistant"
+          className="fixed bottom-20 right-4 md:bottom-24 md:right-6 z-40 flex items-center gap-2 h-14 rounded-full shadow-xl px-4
+            bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700
+            text-white transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none"
         >
-          <Sparkles className="h-6 w-6" />
-        </Button>
+          {/* Pulsing attention ring for new users */}
+          {!hasOpenedWidget && (
+            <span className="absolute inset-0 rounded-full bg-purple-400/50 animate-ping pointer-events-none" />
+          )}
+          <Sparkles className="h-5 w-5 flex-shrink-0" />
+          {!hasOpenedWidget && (
+            <span className="text-sm font-semibold pr-1 whitespace-nowrap">Ask AI</span>
+          )}
+        </button>
       )}
 
       {/* Chat Widget */}
