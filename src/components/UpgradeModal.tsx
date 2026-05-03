@@ -32,13 +32,15 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       const products = await getAppleProducts();
       if (products.length > 0) {
         setApplePrice(products[0].displayPrice + '/month');
-        setAppleProductAvailable(true);
-      } else {
-        setAppleProductAvailable(false);
       }
+      // Keep button enabled regardless — StoreKit handles the purchase
+      // even if product details fail to pre-load
+      setAppleProductAvailable(true);
     } catch (e) {
       console.error('Failed to load Apple product:', e);
-      setAppleProductAvailable(false);
+      // Don't disable: allow the purchase attempt so reviewers/users
+      // aren't blocked by a transient StoreKit lookup failure
+      setAppleProductAvailable(true);
     }
   };
 
@@ -155,10 +157,6 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
                 </>
               )}
             </Button>
-            {!appleProductAvailable && (
-              <p className="text-sm text-red-500 text-center">Subscription is temporarily unavailable. Please try again later.</p>
-            )}
-
             <Button
               onClick={handleClose}
               variant="outline"
