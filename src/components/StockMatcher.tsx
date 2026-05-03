@@ -20,7 +20,10 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/comp
 interface StockMatcherProps {
   userProfile: UserProfile;
   onReset: () => void;
-  onViewDetails?: (stock: StockRecommendation) => void;
+  // advance(liked) is called by the details modal when the user taps
+  // "Add to Watchlist" (liked=true) or "Pass" (liked=false), so the
+  // card advances without requiring a second swipe gesture.
+  onViewDetails?: (stock: StockRecommendation, advance: (liked: boolean) => void) => void;
 }
 
 const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps) => {
@@ -37,7 +40,11 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
   const swipeCountRef = useRef(0);
-  
+  // Refs to the latest match/pass handlers — keeps the view-details advance
+  // callback from going stale across re-renders.
+  const handleMatchRef = useRef<() => void>(() => {});
+  const handlePassRef  = useRef<() => void>(() => {});
+
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
   const { canSwipe, incrementSwipeCount, dailySwipesUsed, dailySwipeLimit, subscribed } = useSubscription();
   const { user } = useAuth();
@@ -201,6 +208,10 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       setAnimatingCard(false);
     }, 400);
   };
+
+  // Keep refs pointing at the latest closures
+  useEffect(() => { handleMatchRef.current = handleMatch; });
+  useEffect(() => { handlePassRef.current  = handlePass;  });
 
   const handleUndo = () => {
     if (currentIndex === 0 || animatingCard) return;
@@ -477,7 +488,9 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
                   stock={stock} 
                   onMatch={isActiveCard ? handleMatch : () => {}}
                   onPass={isActiveCard ? handlePass : () => {}}
-                  onViewDetails={isActiveCard && onViewDetails ? onViewDetails : undefined}
+                  onViewDetails={isActiveCard && onViewDetails
+                    ? (s) => onViewDetails(s, (liked) => liked ? handleMatchRef.current() : handlePassRef.current())
+                    : undefined}
                   isVisible={true}
                   zIndex={zIndex}
                   scale={scale}

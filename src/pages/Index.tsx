@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Navigate } from 'react-router-dom';
 import UserProfileForm from '@/components/UserProfileForm';
@@ -114,6 +114,9 @@ const IndexContent = () => {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [selectedStockForDetails, setSelectedStockForDetails] = useState<StockRecommendation | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  // Stores the advance callback provided by StockMatcher when a card's
+  // "View Details" is tapped — used to advance the card from the modal.
+  const advanceCardRef = useRef<((liked: boolean) => void) | null>(null);
   const { addToWatchlist, passStock, watchlist } = useApp();
   const { user, loading } = useAuth();
   const isMobile = useIsMobile();
@@ -235,13 +238,22 @@ const IndexContent = () => {
     setCurrentStep(userProfile ? 'matching' : 'welcome');
   };
 
-  const handleViewStockDetails = (stock: StockRecommendation) => {
+  const handleViewStockDetails = (stock: StockRecommendation, advance?: (liked: boolean) => void) => {
     setSelectedStockForDetails(stock);
+    advanceCardRef.current = advance ?? null;
     setIsDetailsModalOpen(true);
   };
 
-  const handleMatchFromModal = (stock: StockRecommendation) => addToWatchlist(stock);
-  const handlePassFromModal = (stock: StockRecommendation) => passStock(stock);
+  // Delegate to StockMatcher's own handlers so the card advances and all
+  // side-effects (watchlist add, toast, swipe recording) happen exactly once.
+  const handleMatchFromModal = (_stock: StockRecommendation) => {
+    advanceCardRef.current?.(true);
+    advanceCardRef.current = null;
+  };
+  const handlePassFromModal = (_stock: StockRecommendation) => {
+    advanceCardRef.current?.(false);
+    advanceCardRef.current = null;
+  };
 
   // Clear state when user signs out
   useEffect(() => {
