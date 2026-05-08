@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import UpgradeModal from '@/components/UpgradeModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { UserProfile } from '@/types/stock-matcher';
@@ -60,6 +61,7 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const handleRestorePurchases = async () => {
     setIsRestoring(true);
@@ -143,6 +145,28 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
       </div>
 
       <div className="max-w-2xl mx-auto p-4 space-y-4 pb-24">
+        {/* Upgrade banner — only shown to free users */}
+        {!subscribed && (
+          <section className="rounded-2xl overflow-hidden border border-yellow-400/30 bg-gradient-to-r from-yellow-400/10 to-orange-500/10">
+            <div className="p-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center flex-shrink-0">
+                <Crown className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-white">Upgrade to Premium</p>
+                <p className="text-xs text-white/60">Unlimited swipes, AI assistant & more</p>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => setShowUpgradeModal(true)}
+                className="flex-shrink-0 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-semibold border-0"
+              >
+                Upgrade
+              </Button>
+            </div>
+          </section>
+        )}
+
         {/* Account section */}
         <section className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm">
           <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2">
@@ -339,6 +363,11 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
           </div>
         </section>
       </div>
+
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+      />
     </div>
   );
 };
