@@ -226,12 +226,13 @@ const StepAbout = ({ profile, set }: { profile: Partial<UserProfile>; set: (f: k
       <div className="space-y-2">
         <Label htmlFor="age">Age</Label>
         <Input id="age" type="number" min="18" max="100" placeholder="29"
+          inputMode="numeric"
           value={profile.age || ''}
           onChange={e => {
             const v = e.target.value;
             const n = v === '' ? null : parseInt(v, 10);
             set('age', isNaN(n as number) ? null : n);
-          }} required />
+          }} required className="text-base" />
       </div>
       <div className="space-y-2">
         <Label>Gender</Label>

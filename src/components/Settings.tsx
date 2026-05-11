@@ -180,7 +180,9 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
               <Label className="text-xs text-white/60 uppercase tracking-wide">Name</Label>
               <Input value={fullName} onChange={e => setFullName(e.target.value)}
                 placeholder="Your name"
-                className="bg-white/8 border-white/15 text-white placeholder:text-white/30 focus:border-primary rounded-xl h-11" />
+                autoCorrect="off"
+                autoComplete="name"
+                className="bg-white/8 border-white/15 text-white placeholder:text-white/30 focus:border-primary rounded-xl h-11 text-base" />
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-white/60 uppercase tracking-wide">Email</Label>
@@ -212,8 +214,9 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
                 <div className="space-y-1.5">
                   <Label className="text-xs text-white/60 uppercase tracking-wide">Age</Label>
                   <Input type="number" min="18" max="100" value={profile.age}
+                    inputMode="numeric"
                     onChange={e => set('age', parseInt(e.target.value))}
-                    className="bg-white/8 border-white/15 text-white rounded-xl h-11" />
+                    className="bg-white/8 border-white/15 text-white rounded-xl h-11 text-base" />
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs text-white/60 uppercase tracking-wide">Gender</Label>

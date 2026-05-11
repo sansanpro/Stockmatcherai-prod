@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { StockRecommendation } from '@/types/stock-matcher';
@@ -102,8 +103,10 @@ const TinderStockCard = ({
     
     if (Math.abs(dragOffset.x) > threshold) {
       setIsExiting(true);
+      const isMatch = dragOffset.x > 0;
+      Haptics.impact({ style: isMatch ? ImpactStyle.Medium : ImpactStyle.Light }).catch(() => {});
       setTimeout(() => {
-        if (dragOffset.x > 0) {
+        if (isMatch) {
           onMatch();
         } else {
           onPass();
@@ -297,7 +300,7 @@ const TinderStockCard = ({
             <h3 className="font-semibold text-lg">Stock Details</h3>
             <button
               onClick={() => setIsExpanded(false)}
-              className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-muted hover:bg-muted/80 active:scale-95 transition-all"
             >
               <Minimize2 className="w-5 h-5" />
             </button>

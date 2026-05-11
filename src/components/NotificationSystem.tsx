@@ -61,11 +61,11 @@ const NotificationSystem = () => {
         onClick={() => setShowNotifications(!showNotifications)}
         variant="outline"
         size="sm"
-        className="relative w-8 h-8 sm:w-10 sm:h-10 p-0"
+        className="relative w-11 h-11 p-0"
       >
         <Bell className="w-4 h-4" />
         {notifications.length > 0 && (
-          <Badge className="absolute -top-2 -right-2 w-4 h-4 sm:w-5 sm:h-5 p-0 flex items-center justify-center bg-red-500 text-xs">
+          <Badge className="absolute -top-1.5 -right-1.5 w-5 h-5 p-0 flex items-center justify-center bg-red-500 text-[10px]">
             {notifications.length}
           </Badge>
         )}
@@ -87,7 +87,7 @@ const NotificationSystem = () => {
                     onClick={() => dismissNotification(index)}
                     variant="ghost"
                     size="sm"
-                    className="absolute top-1 right-1 w-6 h-6 p-0"
+                    className="absolute top-1 right-1 w-9 h-9 p-0"
                   >
                     <X className="w-3 h-3" />
                   </Button>

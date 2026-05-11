@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Button } from '@/components/ui/button';
 import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
 import TinderStockCard from '@/components/TinderStockCard';
@@ -518,7 +519,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
                 <TooltipTrigger asChild>
                   <span>
                     <Button
-                      onClick={handlePass}
+                      onClick={() => { Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); handlePass(); }}
                       disabled={animatingCard || !canSwipe}
                       aria-label="Pass"
                       className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
@@ -554,7 +555,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
                 <TooltipTrigger asChild>
                   <span>
                     <Button
-                      onClick={handleMatch}
+                      onClick={() => { Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {}); handleMatch(); }}
                       disabled={animatingCard || !canSwipe}
                       aria-label="Like this stock"
                       className="w-16 h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
@@ -581,7 +582,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
               </p>
             )}
             {/* Financial disclaimer */}
-            <p className="text-center text-white/30 text-[10px] mt-2">
+            <p className="text-center text-white/30 text-xs mt-2">
               For educational purposes only. Not financial advice.
             </p>
           </div>

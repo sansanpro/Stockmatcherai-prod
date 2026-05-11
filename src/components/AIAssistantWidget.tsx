@@ -494,7 +494,11 @@ export default function AIAssistantWidget() {
                 onKeyPress={handleKeyPress}
                 placeholder={subscribed ? "Ask about stocks..." : "Try asking about a stock..."}
                 disabled={isStreaming}
-                className="flex-1"
+                autoCorrect="off"
+                autoComplete="off"
+                autoCapitalize="sentences"
+                spellCheck={false}
+                className="flex-1 text-base"
               />
               <Button
                 onClick={handleSend}
