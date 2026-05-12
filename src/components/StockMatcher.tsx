@@ -396,10 +396,10 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const currentStock = allRecommendations[currentIndex];
 
   return (
-    <div className="w-full h-screen mx-auto pt-safe-area-inset-top pb-safe-area-inset-bottom bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-4 lg:p-2 overflow-auto">
-      <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
+    <div className="w-full h-full flex flex-col pt-[env(safe-area-inset-top)] bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700">
+      <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto flex flex-col flex-1 min-h-0 px-4 lg:px-2">
         {/* Header with profile chips */}
-        <div className="text-center mb-4 sm:mb-6 lg:mb-2 pt-8 sm:pt-12 lg:pt-2 animate-fade-in px-4 lg:px-2">
+        <div className="text-center mb-2 pt-3 flex-shrink-0 animate-fade-in">
           <h1 className="hidden sm:block text-xl sm:text-2xl font-bold text-white mb-3">
             Stock Matcher 💕
           </h1>
@@ -465,7 +465,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
         {/* Stock Cards Stack */}
         {allRecommendations.length > 0 && currentStock && (
-          <div className="mb-6 lg:mb-2 relative h-[65vh] md:h-[70vh] lg:h-[75vh] xl:h-[78vh] max-h-[550px] md:max-h-[700px] lg:max-h-[800px] xl:max-h-none min-h-[450px] md:min-h-[550px] animate-fade-in delay-300">
+          <div className="flex-1 min-h-0 relative mb-2 animate-fade-in delay-300">
             {/* Swipe direction chevrons */}
             {!hasSwipedOnce && (
               <>
@@ -504,7 +504,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
 
         {/* Action Buttons */}
         {allRecommendations.length > 0 && currentStock && (
-          <div className="mb-6 px-4 animate-fade-in delay-400">
+          <div className="flex-shrink-0 px-4 pb-[max(env(safe-area-inset-bottom),6rem)] animate-fade-in delay-400">
             {/* Running-low swipes banner */}
             {!subscribed && canSwipe && dailySwipesUsed >= dailySwipeLimit - 3 && (
               <div className="flex justify-center mb-3">

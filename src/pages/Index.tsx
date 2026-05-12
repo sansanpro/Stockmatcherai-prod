@@ -276,7 +276,7 @@ const IndexContent = () => {
   if (currentStep === 'welcome' || currentStep === 'profile') {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen w-full bg-gradient-to-br from-[#0f0a1e] via-[#130d2a] to-[#0a0614] pt-[env(safe-area-inset-top)] overflow-auto">
+        <div className={`min-h-screen w-full bg-gradient-to-br from-[#0f0a1e] via-[#130d2a] to-[#0a0614] overflow-auto ${currentStep === 'welcome' ? 'pt-[env(safe-area-inset-top)]' : ''}`}>
           {currentStep === 'profile' && (
             <AppHeader
               currentStep="matching"
@@ -327,15 +327,13 @@ const IndexContent = () => {
       {/* Matching tab — hidden but mounted when not active */}
       <div
         aria-hidden={currentStep !== 'matching'}
-        style={{ display: currentStep === 'matching' ? 'block' : 'none' }}
+        style={{ display: currentStep === 'matching' ? 'flex' : 'none', flexDirection: 'column', height: '100dvh', overflow: 'hidden' }}
       >
-        <div className="min-h-screen w-full bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 pt-[env(safe-area-inset-top)] overflow-auto pb-24 md:pb-4">
-          <StockMatcher
-            userProfile={userProfile!}
-            onReset={handleUpdateProfile}
-            onViewDetails={handleViewStockDetails}
-          />
-        </div>
+        <StockMatcher
+          userProfile={userProfile!}
+          onReset={handleUpdateProfile}
+          onViewDetails={handleViewStockDetails}
+        />
       </div>
 
       {/* Matches tab — hidden but mounted when not active */}
@@ -343,7 +341,7 @@ const IndexContent = () => {
         aria-hidden={currentStep !== 'matches'}
         style={{ display: currentStep === 'matches' ? 'block' : 'none' }}
       >
-        <div className={`min-h-screen w-full min-w-0 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 px-4 pt-[env(safe-area-inset-top)] overflow-auto ${isMobile ? 'pb-28' : 'pb-4'}`}>
+        <div className="min-h-[100dvh] w-full min-w-0 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 px-4 pt-[env(safe-area-inset-top)] overflow-auto pb-[max(env(safe-area-inset-bottom),6.5rem)]">
           <div className="w-full pt-4">
             <Matches onViewDetails={handleViewStockDetails} />
           </div>

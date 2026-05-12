@@ -349,7 +349,7 @@ export default function AIAssistantWidget() {
             }
           }}
           aria-label="Open AI Assistant"
-          className="fixed bottom-[7.5rem] right-4 md:bottom-8 md:right-6 z-[55] flex items-center gap-2 h-14 rounded-full shadow-2xl px-4
+          className="fixed bottom-[7.5rem] right-4 md:bottom-8 md:right-6 z-[75] flex items-center gap-2 h-14 rounded-full shadow-2xl px-4
             bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700
             text-white transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none"
           style={{ boxShadow: '0 8px 32px rgba(99,102,241,0.45)' }}
@@ -367,7 +367,7 @@ export default function AIAssistantWidget() {
 
       {/* Chat Widget — full height above nav on mobile, floating card on desktop */}
       {isOpen && (
-        <Card className="fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4rem)] bottom-[7.5rem] md:inset-x-auto md:top-auto md:left-auto md:bottom-8 md:right-6 md:w-[400px] md:h-[600px] md:max-h-[calc(100vh-5rem)] shadow-2xl z-[60] flex flex-col">
+        <Card className="fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4rem)] bottom-[7.5rem] md:inset-x-auto md:top-auto md:left-auto md:bottom-8 md:right-6 md:w-[400px] md:h-[600px] md:max-h-[calc(100vh-5rem)] shadow-2xl z-[76] flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-2">

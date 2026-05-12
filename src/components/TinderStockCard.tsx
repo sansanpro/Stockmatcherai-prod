@@ -294,8 +294,8 @@ const TinderStockCard = ({
   return (
     <>
       {/* Expanded fullscreen sheet */}
-      <Sheet open={isExpanded} onOpenChange={setIsExpanded}>
-        <SheetContent side="bottom" className="h-[95vh] p-0 rounded-t-3xl">
+      <Sheet open={isExpanded} onOpenChange={setIsExpanded} modal={false}>
+        <SheetContent side="bottom" className="h-[95vh] p-0 rounded-t-3xl z-[65]">
           <div className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-10">
             <h3 className="font-semibold text-lg">Stock Details</h3>
             <button
