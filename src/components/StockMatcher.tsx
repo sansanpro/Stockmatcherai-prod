@@ -396,7 +396,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
   const currentStock = allRecommendations[currentIndex];
 
   return (
-    <div className="w-full h-full flex flex-col pt-[env(safe-area-inset-top)] bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700">
+    <div className="w-full h-full flex flex-col bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto flex flex-col flex-1 min-h-0 px-4 lg:px-2">
         {/* Header with profile chips */}
         <div className="text-center mb-2 pt-3 flex-shrink-0 animate-fade-in">

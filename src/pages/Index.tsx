@@ -32,7 +32,7 @@ interface AppHeaderProps {
   onOpenSettings: () => void;
 }
 const AppHeader = ({ currentStep, onMatchTab, onLikesTab, onOpenSettings }: AppHeaderProps) => (
-  <div className="bg-background/80 backdrop-blur-md border-b border-border px-4 py-3 w-full pt-[env(safe-area-inset-top)] sticky top-0 z-40">
+  <div className="bg-background/80 backdrop-blur-md border-b border-border px-4 pb-3 w-full sticky top-0 z-40" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
     <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-4">
       <div className="flex items-center gap-1">
         <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mr-3">
@@ -341,7 +341,7 @@ const IndexContent = () => {
         aria-hidden={currentStep !== 'matches'}
         style={{ display: currentStep === 'matches' ? 'block' : 'none' }}
       >
-        <div className="min-h-[100dvh] w-full min-w-0 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 px-4 pt-[env(safe-area-inset-top)] overflow-auto pb-[max(env(safe-area-inset-bottom),6.5rem)]">
+        <div className="min-h-[100dvh] w-full min-w-0 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 px-4 overflow-auto pb-[max(env(safe-area-inset-bottom),6.5rem)]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="w-full pt-4">
             <Matches onViewDetails={handleViewStockDetails} />
           </div>

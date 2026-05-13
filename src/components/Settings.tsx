@@ -129,7 +129,7 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#0f0a1e] via-[#130d2a] to-[#0a0614] text-white overflow-x-hidden">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#130d2a]/80 backdrop-blur-md border-b border-white/10 px-4 py-3 pt-[env(safe-area-inset-top)]">
+      <div className="sticky top-0 z-10 bg-[#130d2a]/80 backdrop-blur-md border-b border-white/10 px-4 pb-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
         <div className="flex items-center gap-3 max-w-2xl mx-auto">
           <button onClick={onBack}
             className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
