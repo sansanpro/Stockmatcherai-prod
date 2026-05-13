@@ -510,7 +510,7 @@ export default function AIAssistantWidget() {
             </div>
             {!subscribed && (
               <p className="text-xs text-muted-foreground mt-2 text-center">
-                Free users: {2 - freeMessageCount} messages remaining
+                Free users: {Math.max(0, 5 - freeMessageCount)} messages remaining
               </p>
             )}
           </div>

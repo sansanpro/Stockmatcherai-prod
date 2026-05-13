@@ -33,7 +33,7 @@ export const SubscriptionProvider = ({ children }: { children: React.ReactNode }
   const [dailySwipesUsed, setDailySwipesUsed] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const dailySwipeLimit = subscriptionTier === 'premium' ? Infinity : 5;
+  const dailySwipeLimit = subscriptionTier === 'premium' ? Infinity : 7;
   const canSwipe = subscriptionTier === 'premium' || dailySwipesUsed < dailySwipeLimit;
 
   const checkSubscription = async () => {
