@@ -15,6 +15,7 @@
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
+		E75DE5AC2FA1401F00895FAC /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E75DE5AB2FA1401F00895FAC /* PrivacyInfo.xcprivacy */; };
 		E7F4D3962F7C9FD500E66662 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7F4D3952F7C9FD400E66662 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +33,7 @@
 		D8E28C9AE49EB299DD9D2C02 /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
 		DB475D896AC06A9F07B536C9 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
 		E75DE5AA2F95E4E100895FAC /* AppDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppDebug.entitlements; sourceTree = "<group>"; };
+		E75DE5AB2FA1401F00895FAC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = App/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E7D1A2972E397853004C99C7 /* App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "App-Bridging-Header.h"; sourceTree = "<group>"; };
 		E7F4D3952F7C9FD400E66662 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		E7F4D3982F8065BF00E66662 /* StoreKit.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKit.storekit; sourceTree = "<group>"; };
@@ -53,6 +55,7 @@
 		504EC2FB1FED79650016851F = {
 			isa = PBXGroup;
 			children = (
+				E75DE5AB2FA1401F00895FAC /* PrivacyInfo.xcprivacy */,
 				E7F4D3982F8065BF00E66662 /* StoreKit.storekit */,
 				504EC3061FED79650016851F /* App */,
 				504EC3051FED79650016851F /* Products */,
@@ -166,6 +169,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E75DE5AC2FA1401F00895FAC /* PrivacyInfo.xcprivacy in Resources */,
 				504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */,
 				50B271D11FEDC1A000F3C39B /* public in Resources */,
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,
@@ -372,7 +376,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = App/AppDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.1;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 5T6YBPQX48;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = App/Info.plist;
@@ -383,7 +387,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6;
+				MARKETING_VERSION = 1.7;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hassanomar.stockmatcherai;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -403,7 +407,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = App/AppDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2.1;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 5T6YBPQX48;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = App/Info.plist;
@@ -414,7 +418,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6;
+				MARKETING_VERSION = 1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hassanomar.stockmatcherai;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";

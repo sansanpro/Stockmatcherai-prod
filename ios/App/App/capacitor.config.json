@@ -13,9 +13,10 @@
 		}
 	},
 	"packageClassList": [
+		"SignInWithApple",
 		"StripePlugin",
 		"CAPBrowserPlugin",
-		"SubscriptionsPlugin",
-		"SignInWithApple"
+		"HapticsPlugin",
+		"SubscriptionsPlugin"
 	]
 }

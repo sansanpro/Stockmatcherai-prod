@@ -11,9 +11,9 @@ const fs = require('fs');
 
 // ── Fill these in ────────────────────────────────────────────────────────────
 const TEAM_ID    = '5T6YBPQX48';           // Your Apple Team ID
-const KEY_ID     = 'YOUR_KEY_ID';          // From Apple Developer → Keys (10-char string)
-const CLIENT_ID  = 'com.hassanomar.stockmatcherai'; // Your bundle / Service ID
-const KEY_FILE   = './AuthKey_XXXXXXXX.p8';// Path to your .p8 file from Apple Developer
+const KEY_ID     = 'H78GANXGU9';
+const CLIENT_ID  = 'com.hassanomar.stockmatcherai';
+const KEY_FILE   = `${require('os').homedir()}/Downloads/AuthKey_H78GANXGU9.p8`;
 // ─────────────────────────────────────────────────────────────────────────────
 
 const privateKey = fs.readFileSync(KEY_FILE, 'utf8');
