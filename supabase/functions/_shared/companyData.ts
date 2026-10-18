@@ -1,5 +1,6 @@
 // Company profile + news request handler, served by the company-data function
 // (and the legacy fmp-data alias for already-installed app builds).
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
 import { FinnhubClient, FinnhubNewsItem, FinnhubRateLimitError } from './finnhub.ts';
 
 const corsHeaders = {
@@ -7,13 +8,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Finnhub's free profile has no description, employee count or HQ city/state. If an FMP key
-// is still configured we fill those from FMP's profile (cached for a day, failures ignored).
-const FMP_BASE_URL = 'https://financialmodelingprep.com/stable';
-
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
-const FMP_CACHE_DURATION = 24 * 60 * 60 * 1000; // 1 day
 
 async function withCache<T>(cacheKey: string, ttl: number, fetcher: () => Promise<T>): Promise<T> {
   const cached = cache.get(cacheKey);
@@ -27,42 +23,54 @@ async function withCache<T>(cacheKey: string, ttl: number, fetcher: () => Promis
   return data;
 }
 
-async function getFmpProfileDetails(symbol: string): Promise<Record<string, any> | null> {
-  const fmpApiKey = Deno.env.get('FMP_API_KEY');
-  if (!fmpApiKey) return null;
-  try {
-    return await withCache(`fmp_profile_${symbol}`, FMP_CACHE_DURATION, async () => {
-      const response = await fetch(`${FMP_BASE_URL}/profile?symbol=${symbol}&apikey=${fmpApiKey}`);
-      if (!response.ok) return null;
-      const data = await response.json();
-      return Array.isArray(data) && data.length > 0 ? data[0] : null;
-    });
-  } catch (error) {
-    console.error(`[company-data] FMP profile fallback failed for ${symbol}:`, error);
+interface StoredCompanyProfile {
+  description: string;
+  full_time_employees: number | null;
+  city: string | null;
+  state: string | null;
+  country: string;
+}
+
+// Static facts Finnhub's free profile lacks (description, employees, HQ) live in the
+// company_profiles table, so no API call is needed for them.
+async function getStoredProfile(symbol: string): Promise<StoredCompanyProfile | null> {
+  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+  const { data, error } = await supabase
+    .from('company_profiles')
+    .select('description, full_time_employees, city, state, country')
+    .eq('ticker', symbol)
+    .maybeSingle();
+  if (error) {
+    console.error(`[company-data] company_profiles lookup failed for ${symbol}:`, error);
     return null;
   }
+  return data;
 }
 
 // Maps to the CompanyProfile shape in src/hooks/useCompanyProfile.ts
 async function getCompanyProfile(finnhub: FinnhubClient, symbol: string) {
-  const profile = await withCache(`profile_${symbol}`, CACHE_DURATION, () => finnhub.getProfile(symbol));
-  if (!profile) return null;
+  const [profile, stored] = await Promise.all([
+    withCache(`profile_${symbol}`, CACHE_DURATION, () => finnhub.getProfile(symbol)),
+    getStoredProfile(symbol),
+  ]);
+  if (!profile && !stored) return null;
 
-  const fmp = await getFmpProfileDetails(symbol);
+  // Outside the US there is no state, so show the country after the city instead
+  const region = stored?.state ?? (stored && stored.country !== 'US' ? stored.country : undefined);
   return {
-    symbol: profile.ticker,
-    companyName: profile.name ?? fmp?.companyName ?? symbol,
-    description: fmp?.description ?? '',
-    sector: fmp?.sector ?? profile.finnhubIndustry ?? '',
-    industry: profile.finnhubIndustry ?? fmp?.industry ?? '',
-    country: profile.country ?? fmp?.country ?? '',
-    fullTimeEmployees: fmp?.fullTimeEmployees ?? '',
-    website: profile.weburl ?? fmp?.website ?? '',
-    mktCap: (profile.marketCapitalization ?? 0) * 1_000_000,
-    ipoDate: profile.ipo ?? fmp?.ipoDate ?? '',
-    image: profile.logo || fmp?.image || `https://images.financialmodelingprep.com/symbol/${symbol}.png`,
-    city: fmp?.city,
-    state: fmp?.state,
+    symbol,
+    companyName: profile?.name ?? symbol,
+    description: stored?.description ?? '',
+    sector: profile?.finnhubIndustry ?? '',
+    industry: profile?.finnhubIndustry ?? '',
+    country: stored?.country ?? profile?.country ?? '',
+    fullTimeEmployees: stored?.full_time_employees?.toString() ?? '',
+    website: profile?.weburl ?? '',
+    mktCap: (profile?.marketCapitalization ?? 0) * 1_000_000,
+    ipoDate: profile?.ipo ?? '',
+    image: profile?.logo || `https://images.financialmodelingprep.com/symbol/${symbol}.png`,
+    city: stored?.city ?? undefined,
+    state: region,
   };
 }
 
