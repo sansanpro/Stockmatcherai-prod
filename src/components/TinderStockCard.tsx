@@ -6,7 +6,7 @@ import { StockRecommendation } from '@/types/stock-matcher';
 import { Heart, X, TrendingUp, DollarSign, Building, Eye, Minimize2, ThumbsUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import EducationalTooltip from '@/components/EducationalTooltip';
 import DataFreshnessIndicator from '@/components/DataFreshnessIndicator';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/sheet';
 import StockNewsPill from '@/components/StockNewsPill';
 import CompanySnapshot from '@/components/CompanySnapshot';
 
@@ -295,7 +295,7 @@ const TinderStockCard = ({
     <>
       {/* Expanded fullscreen sheet */}
       <Sheet open={isExpanded} onOpenChange={setIsExpanded} modal={false}>
-        <SheetContent side="bottom" className="h-[95vh] p-0 rounded-t-3xl z-[65]">
+        <SheetContent side="bottom" className="h-[95vh] p-0 rounded-t-3xl z-[65]" onInteractOutside={keepOpenForAIAssistant}>
           <div className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-10">
             <h3 className="font-semibold text-lg">Stock Details</h3>
             <button

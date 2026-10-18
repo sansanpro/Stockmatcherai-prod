@@ -129,3 +129,11 @@ export {
   SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetOverlay, SheetPortal, SheetTitle, SheetTrigger
 }
 
+
+// Pass as SheetContent's onInteractOutside so tapping the floating AI assistant
+// doesn't dismiss a non-modal sheet underneath it.
+export const keepOpenForAIAssistant = (event: { target: EventTarget | null; preventDefault: () => void }) => {
+  if (event.target instanceof Element && event.target.closest('[data-ai-assistant]')) {
+    event.preventDefault()
+  }
+}

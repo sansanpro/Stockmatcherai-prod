@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -130,9 +130,12 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
   const chartColor = isPositive ? '#10b981' : '#f43f5e';
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
+    // Non-modal so the AI assistant (drawn above this sheet) can still be tapped and typed in;
+    // a modal sheet traps focus and pulls it back out of the chat input.
+    <Sheet open={isOpen} onOpenChange={onClose} modal={false}>
       <SheetContent
         side="bottom"
+        onInteractOutside={keepOpenForAIAssistant}
         className="h-[92vh] p-0 rounded-t-3xl flex flex-col overflow-hidden"
       >
         {/* ── Gradient hero header ─────────────────────────────────────────── */}
