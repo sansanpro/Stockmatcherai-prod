@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -12,6 +11,10 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CHECK-SUBSCRIPTION] ${step}${detailsStr}`);
 };
 
+// Premium comes from two sources:
+//   'apple'  - App Store subscription, written by verify-apple-receipt
+//   'manual' - granted by hand (e.g. test accounts); optional subscription_end
+// Anything else (including legacy 'stripe' rows) is treated as free.
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -26,194 +29,58 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-    logStep("Stripe key verified");
-
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header provided");
-    logStep("Authorization header found");
 
     const token = authHeader.replace("Bearer ", "");
-    logStep("Authenticating user with token");
-    
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id });
 
-    const { data: existingSubscriber, error: subscriberLookupError } = await supabaseClient
+    const { data: subscriber, error: subscriberLookupError } = await supabaseClient
       .from("subscribers")
       .select("subscribed, subscription_tier, subscription_end, subscription_source")
       .eq("user_id", user.id)
       .maybeSingle();
 
     if (subscriberLookupError) {
-      logStep("Existing subscriber lookup failed", { message: subscriberLookupError.message });
+      logStep("Subscriber lookup failed", { message: subscriberLookupError.message });
     }
 
-    const hasActiveAppleSubscription = Boolean(
-      existingSubscriber?.subscription_source === 'apple' &&
-      existingSubscriber?.subscribed &&
-      existingSubscriber?.subscription_end &&
-      new Date(existingSubscriber.subscription_end).getTime() > Date.now()
-    );
+    const notExpired = !subscriber?.subscription_end ||
+      new Date(subscriber.subscription_end).getTime() > Date.now();
+    const isPremiumSource = subscriber?.subscription_source === 'apple' || subscriber?.subscription_source === 'manual';
+    const isActive = Boolean(subscriber?.subscribed && isPremiumSource && notExpired &&
+      // Apple subscriptions always carry an end date; a missing one means invalid data
+      (subscriber.subscription_source !== 'apple' || subscriber.subscription_end));
 
-    if (hasActiveAppleSubscription) {
-      logStep("Active Apple subscription found", existingSubscriber);
+    if (isActive) {
+      logStep("Active subscription", { source: subscriber!.subscription_source, end: subscriber!.subscription_end });
       return new Response(JSON.stringify({
         subscribed: true,
-        subscription_tier: existingSubscriber?.subscription_tier || 'premium',
-        subscription_end: existingSubscriber?.subscription_end || null,
+        subscription_tier: subscriber!.subscription_tier || 'premium',
+        subscription_end: subscriber!.subscription_end || null,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
-    
-    // Detect Stripe environment (test vs live)
-    const isTestMode = stripeKey.startsWith('sk_test_');
-    const isLiveMode = stripeKey.startsWith('sk_live_');
-    logStep("Stripe environment detected", { 
-      isTestMode, 
-      isLiveMode, 
-      keyPrefix: stripeKey.substring(0, 8) + '...' 
-    });
-    
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    
-    if (customers.data.length === 0) {
-      logStep("No customer found, updating unsubscribed state");
-      if (existingSubscriber?.subscription_source === 'apple') {
-        return new Response(JSON.stringify({
-          subscribed: false,
-          subscription_tier: existingSubscriber?.subscription_tier || 'free',
-          subscription_end: existingSubscriber?.subscription_end || null,
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 200,
-        });
-      }
-
-      await supabaseClient.from("subscribers").upsert({
-        email: user.email,
-        user_id: user.id,
-        stripe_customer_id: null,
-        subscribed: false,
-        subscription_tier: 'free',
-        subscription_end: null,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'email' });
-      return new Response(JSON.stringify({ subscribed: false, subscription_tier: 'free' }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
+    // Other functions (e.g. stock-assistant) read subscribers.subscribed directly, so clear stale flags
+    if (subscriber?.subscribed) {
+      logStep("Clearing expired or unsupported subscription", subscriber);
+      await supabaseClient
+        .from("subscribers")
+        .update({ subscribed: false, subscription_tier: 'free', updated_at: new Date().toISOString() })
+        .eq("user_id", user.id);
     }
 
-    const customerId = customers.data[0].id;
-    logStep("Found Stripe customer", { customerId });
-
-    // Get ALL subscriptions for this customer (including canceled ones to debug)
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      limit: 100, // Get all subscriptions
-      // Don't filter by status - get everything
-    });
-    
-    // Log detailed subscription information for debugging
-    logStep("Raw subscription data", { 
-      customer: customerId,
-      environment: isTestMode ? 'test' : (isLiveMode ? 'live' : 'unknown'),
-      totalSubscriptions: subscriptions.data.length,
-      subscriptions: subscriptions.data.map(s => ({
-        id: s.id,
-        status: s.status,
-        created: new Date(s.created * 1000).toISOString(),
-        current_period_start: new Date(s.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(s.current_period_end * 1000).toISOString(),
-        cancel_at_period_end: s.cancel_at_period_end,
-        canceled_at: s.canceled_at ? new Date(s.canceled_at * 1000).toISOString() : null,
-        items: s.items.data.map(item => ({
-          price_id: item.price.id,
-          product_id: item.price.product
-        }))
-      }))
-    });
-    
-    // If no subscriptions found at all, log this specifically
-    if (subscriptions.data.length === 0) {
-      logStep("CRITICAL: No subscriptions found for customer", { 
-        customerId,
-        customerEmail: user.email,
-        environment: isTestMode ? 'test' : (isLiveMode ? 'live' : 'unknown'),
-        suggestion: "Check if subscription was created in different Stripe environment"
-      });
-    }
-    
-    // Check ALL possible subscription statuses that could indicate an active subscription
-    const potentiallyActiveSubscriptions = subscriptions.data.filter(sub => 
-      sub.status === 'active' || 
-      sub.status === 'trialing' || 
-      sub.status === 'past_due' ||
-      sub.status === 'incomplete' ||
-      sub.status === 'unpaid'
-    );
-    
-    // Also check for recently canceled subscriptions that might still be valid
-    const recentlyCanceledButStillValid = subscriptions.data.filter(sub => 
-      sub.status === 'canceled' && 
-      sub.current_period_end > Math.floor(Date.now() / 1000) && // Still in current period
-      !sub.cancel_at_period_end // Was not set to cancel at period end
-    );
-    
-    logStep("Subscription analysis", { 
-      total: subscriptions.data.length,
-      potentiallyActive: potentiallyActiveSubscriptions.length,
-      recentlyCanceledButValid: recentlyCanceledButStillValid.length,
-      allStatuses: subscriptions.data.map(s => ({ id: s.id, status: s.status }))
-    });
-    
-    const activeSubscriptions = [...potentiallyActiveSubscriptions, ...recentlyCanceledButStillValid];
-    logStep("All subscriptions found", { 
-      total: subscriptions.data.length, 
-      statuses: subscriptions.data.map(s => ({ id: s.id, status: s.status }))
-    });
-    
-    const hasActiveSub = activeSubscriptions.length > 0;
-    let subscriptionTier = 'free';
-    let subscriptionEnd = null;
-
-    if (hasActiveSub) {
-      const subscription = activeSubscriptions[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      subscriptionTier = 'premium';
-      logStep("Active subscription found", { 
-        subscriptionId: subscription.id, 
-        status: subscription.status,
-        endDate: subscriptionEnd 
-      });
-    } else {
-      logStep("No active subscription found");
-    }
-
-    await supabaseClient.from("subscribers").upsert({
-      email: user.email,
-      user_id: user.id,
-      stripe_customer_id: customerId,
-      subscribed: hasActiveSub,
-      subscription_tier: subscriptionTier,
-      subscription_end: subscriptionEnd,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'email' });
-
-    logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionTier });
     return new Response(JSON.stringify({
-      subscribed: hasActiveSub,
-      subscription_tier: subscriptionTier,
-      subscription_end: subscriptionEnd
+      subscribed: false,
+      subscription_tier: 'free',
+      subscription_end: subscriber?.subscription_end || null,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

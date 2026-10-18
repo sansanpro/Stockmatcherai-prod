@@ -5,61 +5,19 @@ PODS:
     - Capacitor
   - CapacitorCommunityAppleSignIn (7.1.0):
     - Capacitor
-  - CapacitorCommunityStripe (7.2.0):
-    - Capacitor
-    - StripeApplePay (~> 24.15.0)
-    - StripePaymentSheet (~> 24.15.0)
   - CapacitorCordova (7.4.0)
   - CapacitorHaptics (8.0.2):
     - Capacitor
   - CapacitorSubscriptions (1.0.3-alpha):
     - Capacitor
-  - Stripe (24.15.0):
-    - StripeApplePay (= 24.15.0)
-    - StripeCore (= 24.15.0)
-    - StripePayments (= 24.15.0)
-    - StripePaymentsUI (= 24.15.0)
-    - StripeUICore (= 24.15.0)
-  - StripeApplePay (24.15.0):
-    - StripeCore (= 24.15.0)
-  - StripeCore (24.15.0)
-  - StripePayments (24.15.0):
-    - StripeCore (= 24.15.0)
-    - StripePayments/Stripe3DS2 (= 24.15.0)
-  - StripePayments/Stripe3DS2 (24.15.0):
-    - StripeCore (= 24.15.0)
-  - StripePaymentSheet (24.15.0):
-    - StripeApplePay (= 24.15.0)
-    - StripeCore (= 24.15.0)
-    - StripePayments (= 24.15.0)
-    - StripePaymentsUI (= 24.15.0)
-  - StripePaymentsUI (24.15.0):
-    - StripeCore (= 24.15.0)
-    - StripePayments (= 24.15.0)
-    - StripeUICore (= 24.15.0)
-  - StripeUICore (24.15.0):
-    - StripeCore (= 24.15.0)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorBrowser (from `../../node_modules/@capacitor/browser`)"
   - "CapacitorCommunityAppleSignIn (from `../../node_modules/@capacitor-community/apple-sign-in`)"
-  - "CapacitorCommunityStripe (from `../../node_modules/@capacitor-community/stripe`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorHaptics (from `../../node_modules/@capacitor/haptics`)"
   - CapacitorSubscriptions (from `../../node_modules/capacitor-subscriptions`)
-  - Stripe (~> 24.15.0)
-  - StripePaymentSheet (~> 24.15.0)
-
-SPEC REPOS:
-  trunk:
-    - Stripe
-    - StripeApplePay
-    - StripeCore
-    - StripePayments
-    - StripePaymentSheet
-    - StripePaymentsUI
-    - StripeUICore
 
 EXTERNAL SOURCES:
   Capacitor:
@@ -68,8 +26,6 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/browser"
   CapacitorCommunityAppleSignIn:
     :path: "../../node_modules/@capacitor-community/apple-sign-in"
-  CapacitorCommunityStripe:
-    :path: "../../node_modules/@capacitor-community/stripe"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
   CapacitorHaptics:
@@ -81,18 +37,10 @@ SPEC CHECKSUMS:
   Capacitor: 10feab36396883c55373328124a677f118cd4b5f
   CapacitorBrowser: 22541e48442de44dc629c214388290d6eecc6ae9
   CapacitorCommunityAppleSignIn: 271cb2860576fd2961508bbfa7a82117d93eadca
-  CapacitorCommunityStripe: 034985b6787b536683851b1afbc378544da5ceb3
   CapacitorCordova: 723e017d8a80ab2ede9959fbe37556c35ac860d5
   CapacitorHaptics: 296f771ecd89c7a1bd92a7b6826a7d268e2e70f5
   CapacitorSubscriptions: e6a4724df998bd02084c680646891e22964be897
-  Stripe: 6f0047bdd52bbeecc3c87a9c0d429bf5bb2b1b86
-  StripeApplePay: e7a2f5fa07cbdba9c56cb7586cbfd4e7e32ed895
-  StripeCore: 224f995bb108e3be3bdf6cfab918657edf325559
-  StripePayments: 07ad9e3c5f22e0b068874c47c2ec37663f1b7aa5
-  StripePaymentSheet: f576ebb935f7bf3ef956d302ade75b9148906a65
-  StripePaymentsUI: d0549558424d3884b3fb7b8f3905ea685e750600
-  StripeUICore: dbd893086aa4fe697517624af2f1f0cea3218ac8
 
-PODFILE CHECKSUM: aa7d75b80ec4f0d10133c7ab5daae60e3f3d5744
+PODFILE CHECKSUM: f3b5d5b8bc87cdecdf93938bfcc736f7f14fc878
 
 COCOAPODS: 1.16.2
