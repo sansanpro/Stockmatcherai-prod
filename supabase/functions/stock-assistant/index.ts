@@ -450,52 +450,26 @@ serve(async (req) => {
     ];
 
     // System prompt
-    const systemPrompt = `You are a Stock Education Assistant. Your role is to educate users about investing and markets.
+    const systemPrompt = `You are StockMatcher's AI assistant: a friendly stock education guide for a ${profile?.investment_experience || 'beginner'} investor.
 
-CRITICAL RULES:
-1. EDUCATIONAL FOCUS - Explain concepts, don't give financial advice. Never say "buy" or "sell".
-2. USE TOOLS - Always fetch real-time data when discussing specific stocks using the available tools.
-3. ANALYZE THE DATA - When you receive tool results, provide YOUR OWN analysis and insights.
-4. BE CONVERSATIONAL - Friendly, encouraging, use analogies for complex concepts.
-5. CITE SOURCES - Reference the data you fetch ("According to today's data...", "Currently trading at...").
-6. DISCLAIMERS - Remind users this is educational content, not investment advice.
-7. USER CONTEXT - Consider their experience level: ${profile?.investment_experience || 'beginner'}
-8. USE NEWS CONTEXT - When discussing stocks, use get_company_news to provide recent developments. Use get_market_news for market condition questions.
+STYLE
+- Lead with the direct answer in 1-2 sentences, then at most 4 short bullets. Keep it under 150 words unless the user asks for more detail.
+- No greetings, no restating the question, no filler.
+- Plain language. Use one quick analogy only when explaining a concept.
+- Use **bold** for key numbers and cite them naturally ("trading at **$214.13** today").
+- Educational only: never tell the user to buy or sell. End with this exact line: _Educational only, not investment advice._
 
-User Profile Summary:
-- Risk Tolerance: ${profile?.risk_tolerance || 'moderate'}
-- Investment Goals: ${profile?.investment_goals?.join(', ') || 'not specified'}
-- Experience: ${profile?.investment_experience || 'beginner'}
+DATA
+- Use tools only when the question needs current data about specific stocks or the market. Answer general concept questions (like "what is a P/E ratio") directly, without tools.
+- Request everything you need in ONE round of parallel tool calls. Only make a second round if the first results make it essential.
+- Only state numbers that come from tool results. If something isn't available (for example trading volume), say so in one short sentence and answer with what you have.
+- get_top_performers ranks only the stocks tracked in this app, by 1-year return.
+- For news, summarize the 2-3 most relevant headlines; don't list them all.
+
+USER PROFILE (relate answers to it when relevant)
+- Risk tolerance: ${profile?.risk_tolerance || 'moderate'}
+- Goals: ${profile?.investment_goals?.join(', ') || 'not specified'}
 - Interests: ${profile?.sectors_of_interest?.join(', ') || 'not specified'}
-
-RESPONSE GUIDELINES:
-- For PRICE questions ("What's the price of X?"): Give a direct answer with the current price, change, and volume.
-- For PERFORMANCE questions ("How is X performing?"): Analyze the data and explain what the numbers mean - is the stock up or down? By how much? What's the context?
-- For COMPANY questions ("Tell me about X"): Use get_company_profile for details AND get_company_news for recent developments.
-- For MARKET questions ("How's the market?"): Use get_market_news for general market conditions and get_top_performers for the strongest and weakest stocks in the app.
-- For COMPARISON questions: Fetch multiple stocks and compare their metrics side by side.
-- Always interpret the raw data - explain what the numbers tell us about the stock's movement.
-
-When users ask about stocks:
-- Use get_stock_quote for current prices and changes
-- Use get_company_profile for company details (sector, industry, CEO, description, employees)
-- Use get_company_news for recent news about a specific stock
-- Use get_market_news for general market conditions and sentiment
-- Use get_top_performers to find the best or worst 1-year performers among the app's stocks
-- Use get_price_performance for trends over time (5-day through 52-week returns, 52-week high/low)
-- Compare stocks using data from multiple calls
-
-NEWS HANDLING:
-- Summarize key headlines, don't list raw data
-- Explain how news might relate to the user's investment profile
-- Connect news to stock performance when relevant
-
-Format responses:
-- Start with the direct answer to their question
-- Use bullet points for additional details
-- Short paragraphs (2-3 sentences)
-- Use markdown for emphasis (**bold** for key numbers)
-- Include disclaimers
 
 Current date: ${new Date().toISOString().split('T')[0]}`;
 
@@ -556,290 +530,204 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
     const aiCallDuration = Date.now() - aiCallStart;
     console.log(`[stock-assistant] [${new Date().toISOString()}] AI response received in ${aiCallDuration}ms, starting stream`);
 
+    // Gemini often asks for more lookups after seeing the first results (e.g. quotes for the top
+    // performers it just found), so tool calls run in rounds until it answers in text.
+    const MAX_TOOL_ROUNDS = 2;
+
+    const runTool = async (toolName: string, toolArgs: any) => {
+      try {
+        if (toolName === 'get_stock_quote') return await stockData.getQuote(toolArgs.symbol);
+        if (toolName === 'get_company_profile') return await stockData.getProfile(toolArgs.symbol);
+        if (toolName === 'get_company_news') return await stockData.getCompanyNews(toolArgs.symbol, toolArgs.limit || 5);
+        if (toolName === 'get_market_news') return await stockData.getMarketNews(toolArgs.limit || 10);
+        if (toolName === 'get_top_performers') return await stockData.getTopPerformers(toolArgs.type, Math.min(toolArgs.limit || 5, 10));
+        if (toolName === 'get_price_performance') return await stockData.getPricePerformance(toolArgs.symbol);
+        return { error: `Unknown tool: ${toolName}` };
+      } catch (toolError) {
+        console.error(`[Tool Error] ${toolName}:`, toolError);
+        return { error: `Unable to fetch data: ${toolError instanceof Error ? toolError.message : String(toolError)}` };
+      }
+    };
+
+    type PendingToolCall = { id: string; name: string; arguments: string; extra_content?: unknown };
+    type ExecutedToolCall = { id: string; name: string; args: any; result: any; extra_content?: unknown };
+
     // Stream response back to client
     const stream = new ReadableStream({
       async start(controller) {
-        const reader = aiResponse.body!.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
-        let collectedToolCalls: any[] = [];
-        let toolCallsComplete = false;
-        let directContent = ''; // Capture text-only responses
-        
-        // Accumulate streaming tool calls by index
-        // extra_content carries Gemini's thought signature, which must be sent back with the tool results
-        const pendingToolCalls: Map<number, { id: string; name: string; arguments: string; extra_content?: unknown }> = new Map();
+        const encoder = new TextEncoder();
+        const send = (event: unknown) => controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
 
-        try {
-          // PHASE 1: Collect tool calls AND stream any direct content
+        // Reads one Gemini SSE response: forwards text deltas to the client and collects tool calls.
+        // extra_content carries Gemini's thought signature, which must be sent back with the tool results.
+        const readGeminiStream = async (response: Response) => {
+          const reader = response.body!.getReader();
+          const decoder = new TextDecoder();
+          const pending: Map<number, PendingToolCall> = new Map();
+          let buffer = '';
+          let content = '';
+          let raw = ''; // kept (truncated) to diagnose empty answers
+
           while (true) {
             const { done, value } = await reader.read();
-            if (done) {
-              toolCallsComplete = true;
-              break;
-            }
-
-            buffer += decoder.decode(value, { stream: true });
+            if (done) break;
+            const text = decoder.decode(value, { stream: true });
+            if (raw.length < 4000) raw += text;
+            buffer += text;
             const lines = buffer.split('\n');
             buffer = lines.pop() || '';
 
             for (const line of lines) {
-              if (!line.trim() || line.startsWith(':')) continue;
               if (!line.startsWith('data: ')) continue;
-
               const data = line.slice(6).trim();
-              if (data === '[DONE]') {
-                toolCallsComplete = true;
-                break;
-              }
-
+              if (data === '[DONE]') continue;
+              let choice;
               try {
-                const parsed = JSON.parse(data);
-                const choice = parsed.choices?.[0];
-
-                // Stream direct content immediately (text-only responses)
-                if (choice?.delta?.content) {
-                  directContent += choice.delta.content;
-                  controller.enqueue(
-                    new TextEncoder().encode(
-                      `data: ${JSON.stringify({ type: 'content_delta', delta: choice.delta.content })}\n\n`
-                    )
-                  );
-                }
-
-                // Accumulate tool calls across streaming chunks
-                if (choice?.delta?.tool_calls) {
-                  for (const toolCall of choice.delta.tool_calls) {
-                    // Gemini may send each complete call without an index; a new id means a new call
-                    let idx = toolCall.index ?? 0;
-                    const existing = pendingToolCalls.get(idx);
-                    if (toolCall.index === undefined && existing?.id && toolCall.id && existing.id !== toolCall.id) {
-                      idx = pendingToolCalls.size;
-                    }
-                    if (!pendingToolCalls.has(idx)) {
-                      pendingToolCalls.set(idx, { id: '', name: '', arguments: '' });
-                    }
-                    const pending = pendingToolCalls.get(idx)!;
-                    if (toolCall.id) pending.id = toolCall.id;
-                    if (toolCall.function?.name) pending.name += toolCall.function.name;
-                    if (toolCall.function?.arguments) pending.arguments += toolCall.function.arguments;
-                    if (toolCall.extra_content) pending.extra_content = toolCall.extra_content;
-                  }
-                }
-
-                // Check if streaming finished (finish_reason)
-                if (choice?.finish_reason === 'tool_calls' || choice?.finish_reason === 'stop') {
-                  toolCallsComplete = true;
-                  break;
-                }
+                choice = JSON.parse(data).choices?.[0];
               } catch (e) {
                 console.error('Error parsing SSE:', e);
+                continue;
+              }
+              if (choice?.delta?.content) {
+                content += choice.delta.content;
+                send({ type: 'content_delta', delta: choice.delta.content });
+              }
+              for (const toolCall of choice?.delta?.tool_calls ?? []) {
+                // Gemini may send each complete call without an index; a new id means a new call
+                let idx = toolCall.index ?? 0;
+                const existing = pending.get(idx);
+                if (toolCall.index === undefined && existing?.id && toolCall.id && existing.id !== toolCall.id) {
+                  idx = pending.size;
+                }
+                if (!pending.has(idx)) pending.set(idx, { id: '', name: '', arguments: '' });
+                const call = pending.get(idx)!;
+                if (toolCall.id) call.id = toolCall.id;
+                if (toolCall.function?.name) call.name += toolCall.function.name;
+                if (toolCall.function?.arguments) call.arguments += toolCall.function.arguments;
+                if (toolCall.extra_content) call.extra_content = toolCall.extra_content;
               }
             }
-
-            if (toolCallsComplete) break;
           }
+          return { content, toolCalls: [...pending.values()].filter(c => c.name), raw };
+        };
 
-          // Execute accumulated tool calls in parallel after the stream completes
-          const runTool = async (toolName: string, toolArgs: any) => {
-            try {
-              if (toolName === 'get_stock_quote') return await stockData.getQuote(toolArgs.symbol);
-              if (toolName === 'get_company_profile') return await stockData.getProfile(toolArgs.symbol);
-              if (toolName === 'get_company_news') return await stockData.getCompanyNews(toolArgs.symbol, toolArgs.limit || 5);
-              if (toolName === 'get_market_news') return await stockData.getMarketNews(toolArgs.limit || 10);
-              if (toolName === 'get_top_performers') return await stockData.getTopPerformers(toolArgs.type, Math.min(toolArgs.limit || 5, 10));
-              if (toolName === 'get_price_performance') return await stockData.getPricePerformance(toolArgs.symbol);
-              return { error: `Unknown tool: ${toolName}` };
-            } catch (toolError) {
-              console.error(`[Tool Error] ${toolName}:`, toolError);
-              return { error: `Unable to fetch data: ${toolError instanceof Error ? toolError.message : String(toolError)}` };
-            }
-          };
+        // Runs a round of tool calls in parallel, telling the client what's being looked up
+        const executeToolCalls = async (calls: PendingToolCall[], round: number): Promise<ExecutedToolCall[]> => {
+          const parsed = calls.map((call, i) => {
+            let args: any = {};
+            try { args = JSON.parse(call.arguments || '{}'); } catch { /* runTool reports bad args */ }
+            return { call, args, id: call.id || `call_${round}_${i}_${Date.now()}` };
+          });
+          for (const { call, args } of parsed) send({ type: 'tool_call', tool: { name: call.name, args } });
+          const started = Date.now();
+          const executed = await Promise.all(parsed.map(async ({ call, args, id }) => ({
+            id,
+            name: call.name,
+            args,
+            result: await runTool(call.name, args),
+            extra_content: call.extra_content,
+          })));
+          console.log(`[stock-assistant] round ${round}: ${executed.length} tool calls took ${Date.now() - started}ms`);
+          return executed;
+        };
 
-          const validToolCalls = [...pendingToolCalls.values()].filter(p => p.name);
-          // Tell the client what's being looked up (names and args only; it shows a status line)
-          for (const pending of validToolCalls) {
-            let args = {};
-            try { args = JSON.parse(pending.arguments || '{}'); } catch { /* malformed args; tool will error */ }
-            controller.enqueue(
-              new TextEncoder().encode(
-                `data: ${JSON.stringify({ type: 'tool_call', tool: { name: pending.name, args } })}\n\n`
-              )
-            );
-          }
+        const allToolCalls: ExecutedToolCall[] = [];
+        let conversation: any[] = [{ role: 'system', content: systemPrompt }, ...(messages || [])];
+        let model = firstModel;
+        let answer = '';
 
-          const toolsStart = Date.now();
-          collectedToolCalls = await Promise.all(validToolCalls.map(async (pending, i) => {
-            let toolArgs: any = {};
-            try { toolArgs = JSON.parse(pending.arguments || '{}'); } catch { /* handled by runTool */ }
-            return {
-              id: pending.id || `call_${Date.now()}_${i}`,
-              name: pending.name,
-              args: toolArgs,
-              result: await runTool(pending.name, toolArgs),
-              extra_content: pending.extra_content,
-            };
-          }));
-          if (collectedToolCalls.length > 0) {
-            console.log(`[stock-assistant] ${collectedToolCalls.length} tool calls took ${Date.now() - toolsStart}ms`);
-          }
+        try {
+          let { content, toolCalls, raw } = await readGeminiStream(aiResponse);
+          answer = content;
 
-          // PHASE 2: If we have tool calls, make follow-up request with results
-          if (collectedToolCalls.length > 0) {
-            console.log(`[${new Date().toISOString()}] [stock-assistant] Making follow-up call with tool results`);
-            
-            // Send analyzing status to client
-            controller.enqueue(
-              new TextEncoder().encode(
-                `data: ${JSON.stringify({ type: 'analyzing' })}\n\n`
-              )
-            );
-
-            // Build messages array with tool results
-            const followUpMessages = [
-              { role: 'system', content: systemPrompt },
-              ...(messages || []),
+          for (let round = 1; toolCalls.length > 0; round++) {
+            const executed = await executeToolCalls(toolCalls, round);
+            allToolCalls.push(...executed);
+            conversation = [
+              ...conversation,
               {
                 role: 'assistant',
                 content: null,
-                tool_calls: collectedToolCalls.map(tc => ({
+                tool_calls: executed.map(tc => ({
                   id: tc.id,
                   type: 'function',
-                  function: {
-                    name: tc.name,
-                    arguments: JSON.stringify(tc.args)
-                  },
-                  ...(tc.extra_content ? { extra_content: tc.extra_content } : {})
-                }))
+                  function: { name: tc.name, arguments: JSON.stringify(tc.args) },
+                  ...(tc.extra_content ? { extra_content: tc.extra_content } : {}),
+                })),
               },
-              ...collectedToolCalls.map(tc => ({
-                role: 'tool',
-                tool_call_id: tc.id,
-                content: JSON.stringify(tc.result)
-              }))
+              ...executed.map(tc => ({ role: 'tool', tool_call_id: tc.id, content: JSON.stringify(tc.result) })),
             ];
 
-            // Make follow-up API call for analysis with timeout. Thought signatures are tied to the
-            // model that produced them, so a different fallback model gets the data as plain text instead.
-            const followUpStart = Date.now();
-            const followUpTimeoutPromise = new Promise<never>((_, reject) => 
-              setTimeout(() => reject(new Error('Follow-up AI request timeout after 45 seconds')), 45000)
-            );
-
-            const inlinedMessages = [
+            send({ type: 'analyzing' });
+            // Same model keeps native tool messages (thought signatures are model-specific). A fallback
+            // model, or the last round, gets all fetched data inline with no tools so it must answer.
+            const allowMoreTools = round < MAX_TOOL_ROUNDS;
+            const inlined = [
               { role: 'system', content: systemPrompt },
               ...(messages || []),
               {
                 role: 'user',
-                content: `Data fetched for my last question:\n${JSON.stringify(collectedToolCalls.map(tc => ({ tool: tc.name, args: tc.args, result: tc.result })))}\n\nAnswer my last question using this data.`
-              }
+                content: `Data fetched for my last question:\n${JSON.stringify(allToolCalls.map(tc => ({ tool: tc.name, args: tc.args, result: tc.result })))}\n\nAnswer my last question using this data.`,
+              },
             ];
-
-            const followUpFetchPromise = fetchGeminiWithFallback(
-              () => GEMINI_OPENAI_CHAT_URL,
-              (model) => model === firstModel
-                ? geminiRequest(model, { messages: followUpMessages, tools, tool_choice: 'none' })
-                : geminiRequest(model, { messages: inlinedMessages }),
-              [firstModel, firstModel === GEMINI_MODEL ? GEMINI_FALLBACK_MODEL : GEMINI_MODEL],
+            const roundStart = Date.now();
+            const timeout = new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('AI request timeout after 45 seconds')), 45000)
             );
-
-            const { response: followUpResponse, model: followUpModel, failures: followUpFailures } = await Promise.race([followUpFetchPromise, followUpTimeoutPromise]);
-            if (followUpFailures.length > 0) {
-              await logError('follow_up_retries', followUpFailures.join(', '), { model: followUpModel, status: followUpResponse.status });
+            const { response, model: usedModel, failures } = await Promise.race([
+              fetchGeminiWithFallback(
+                () => GEMINI_OPENAI_CHAT_URL,
+                (m) => m === model && allowMoreTools
+                  ? geminiRequest(m, { messages: conversation, tools })
+                  : geminiRequest(m, { messages: inlined }),
+                [model, model === GEMINI_MODEL ? GEMINI_FALLBACK_MODEL : GEMINI_MODEL],
+              ),
+              timeout,
+            ]);
+            console.log(`[stock-assistant] round ${round} answer from ${usedModel} in ${Date.now() - roundStart}ms`);
+            if (failures.length > 0) {
+              await logError('follow_up_retries', failures.join(', '), { model: usedModel, status: response.status });
             }
-            const followUpDuration = Date.now() - followUpStart;
-            console.log(`[${new Date().toISOString()}] [stock-assistant] Follow-up response from ${followUpModel} in ${followUpDuration}ms`);
-
-            if (!followUpResponse.ok) {
-              const followUpErrorBody = await followUpResponse.text();
-              console.error('[stock-assistant] Follow-up error body:', followUpErrorBody);
-              await logError('follow_up', followUpErrorBody, { model: followUpModel, status: followUpResponse.status });
-              throw new Error(isRetryableGeminiStatus(followUpResponse.status)
+            if (!response.ok) {
+              const errorBody = await response.text();
+              await logError('follow_up', errorBody, { model: usedModel, status: response.status });
+              throw new Error(isRetryableGeminiStatus(response.status)
                 ? 'The AI service is busy right now. Please try again in a moment.'
-                : `Follow-up AI request failed: ${followUpResponse.status}`);
+                : `Follow-up AI request failed: ${response.status}`);
             }
-
-            // Stream the follow-up response
-            const followUpReader = followUpResponse.body!.getReader();
-            let followUpBuffer = '';
-            let assistantMessage = '';
-
-            while (true) {
-              const { done, value } = await followUpReader.read();
-              if (done) break;
-
-              followUpBuffer += decoder.decode(value, { stream: true });
-              const followUpLines = followUpBuffer.split('\n');
-              followUpBuffer = followUpLines.pop() || '';
-
-              for (const line of followUpLines) {
-                if (!line.trim() || line.startsWith(':')) continue;
-                if (!line.startsWith('data: ')) continue;
-
-                const data = line.slice(6).trim();
-                if (data === '[DONE]') continue;
-
-                try {
-                  const parsed = JSON.parse(data);
-                  const choice = parsed.choices?.[0];
-
-                  // Stream content delta
-                  if (choice?.delta?.content) {
-                    assistantMessage += choice.delta.content;
-                    controller.enqueue(
-                      new TextEncoder().encode(
-                        `data: ${JSON.stringify({ type: 'content_delta', delta: choice.delta.content })}\n\n`
-                      )
-                    );
-                  }
-                } catch (e) {
-                  console.error('Error parsing follow-up SSE:', e);
-                }
-              }
-            }
-
-            // Save assistant message with tool calls
-            if (assistantMessage) {
-              await supabaseAuth.from('ai_chat_messages').insert({
-                conversation_id: convId,
-                role: 'assistant',
-                content: assistantMessage,
-                tool_calls: collectedToolCalls.length > 0
-                  ? collectedToolCalls.map(({ extra_content: _sig, ...tc }) => tc)
-                  : null
-              });
-            }
-          } else if (directContent) {
-            // No tool calls, but we have direct content - save it
-            console.log('[stock-assistant] Text-only response, saving to DB');
-            await supabaseAuth.from('ai_chat_messages').insert({
-              conversation_id: convId,
-              role: 'assistant',
-              content: directContent
-            });
+            const usedInline = usedModel !== model || !allowMoreTools;
+            model = usedModel;
+            ({ content, toolCalls, raw } = await readGeminiStream(response));
+            answer += content;
+            if (usedInline) toolCalls = []; // inline requests have no tools to call
           }
 
-          controller.enqueue(new TextEncoder().encode('data: [DONE]\n\n'));
-          console.log(`[${new Date().toISOString()}] [stock-assistant] Stream completed successfully`);
+          if (!answer.trim()) {
+            await logError('empty_answer', raw || '(empty body)', { model });
+            throw new Error("I couldn't put together an answer. Please try rephrasing your question.");
+          }
+
+          await supabaseAuth.from('ai_chat_messages').insert({
+            conversation_id: convId,
+            role: 'assistant',
+            content: answer,
+            // The opaque thought signatures aren't useful to store
+            tool_calls: allToolCalls.length > 0
+              ? allToolCalls.map(({ extra_content: _sig, ...tc }) => tc)
+              : null,
+          });
+
+          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+          console.log(`[stock-assistant] Stream completed in ${Date.now() - aiCallStart}ms`);
           controller.close();
         } catch (e) {
           console.error(`[${new Date().toISOString()}] [stock-assistant] Stream error:`, e);
-          await logError('stream', e instanceof Error ? `${e.message}\n${e.stack ?? ''}` : String(e));
-          
-          // Send error to client
+          await logError('stream', e instanceof Error ? `${e.message}\n${e.stack ?? ''}` : String(e), { model });
           try {
-            controller.enqueue(
-              new TextEncoder().encode(
-                `data: ${JSON.stringify({ 
-                  type: 'error', 
-                  message: e instanceof Error ? e.message : 'Unknown error occurred' 
-                })}\n\n`
-              )
-            );
+            send({ type: 'error', message: e instanceof Error ? e.message : 'Unknown error occurred' });
           } catch (encodeError) {
             console.error('Failed to send error to client:', encodeError);
           }
-          
           // Close normally so the client reads the error event instead of a dropped connection
           controller.close();
         }

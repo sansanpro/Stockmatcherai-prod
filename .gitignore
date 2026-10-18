@@ -29,3 +29,8 @@ gen-apple-secret.js
 
 # Supabase CLI local state
 supabase/.temp/
+
+# Playwright
+e2e/.auth/
+test-results/
+playwright-report/

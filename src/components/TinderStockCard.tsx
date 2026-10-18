@@ -413,6 +413,7 @@ className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[
                   {onViewDetails && (
                     <button
                       onClick={handleViewDetails}
+                      aria-label="View stock details"
                       className="bg-white/20 hover:bg-white/30 text-white p-1 sm:p-2 rounded-full transition-colors"
                     >
                       <Eye className="w-4 h-4" />

@@ -497,6 +497,7 @@ export default function AIAssistantWidget() {
               <Button
                 onClick={handleSend}
                 disabled={!inputValue.trim() || isStreaming}
+                aria-label="Send message"
                 size="icon"
               >
                 <Send className="h-4 w-4" />

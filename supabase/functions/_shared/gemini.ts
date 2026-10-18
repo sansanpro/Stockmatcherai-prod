@@ -22,7 +22,7 @@ export function getGeminiApiKey(): string | undefined {
 export const isRetryableGeminiStatus = (status: number) => status === 429 || status >= 500;
 
 // POSTs to Gemini, trying each model in order until one doesn't return a retryable error.
-// Each model gets a second attempt after a short pause, since 503 "high demand" spikes are brief.
+// Each model gets a second attempt after a short pause on 5xx, since 503 "high demand" spikes are brief.
 // url/init receive the model name so callers can adapt the request per model.
 export async function fetchGeminiWithFallback(
   url: (model: string) => string,
@@ -43,6 +43,8 @@ export async function fetchGeminiWithFallback(
       console.warn(`[gemini] ${model} attempt ${attempt} returned ${response.status}: ${body.slice(0, 200)}`);
       // Body was consumed for logging; hand back an equivalent unread response
       last = { response: new Response(body, { status: response.status, headers: response.headers }), model };
+      // A rate limit (429) won't clear in a second, so move straight to the next model
+      if (response.status === 429) break;
       if (attempt < attemptsPerModel) await new Promise(resolve => setTimeout(resolve, 600 * attempt));
     }
   }
