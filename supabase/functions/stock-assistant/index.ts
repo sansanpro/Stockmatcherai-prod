@@ -1,77 +1,169 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { FinnhubClient, FinnhubNewsItem } from '../_shared/finnhub.ts';
+import { GEMINI_MODEL, GEMINI_OPENAI_CHAT_URL, getGeminiApiKey } from '../_shared/gemini.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// FMP Service for real-time stock data (300 calls/min)
-class FMPService {
-  private apiKey: string;
+const SECTOR_TABLES = [
+  'technology_stocks',
+  'healthcare_stocks',
+  'finance_stocks',
+  'energy_stocks',
+  'consumer_stocks',
+  'utilities_stocks',
+];
+
+const round = (n: unknown, digits = 2) =>
+  typeof n === 'number' && Number.isFinite(n) ? Number(n.toFixed(digits)) : null;
+
+// Data for the assistant's tools: live quotes/news/metrics from Finnhub, plus the app's own
+// stock tables and company_profiles for CEO, description, employees and HQ.
+class StockDataService {
   private cache: Map<string, { data: any; timestamp: number }> = new Map();
   private cacheTimeout = 5 * 60 * 1000; // 5 minutes
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-  }
+  constructor(private finnhub: FinnhubClient, private db: SupabaseClient) {}
 
-  private async fetchWithCache(url: string, cacheKey: string) {
-    const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
-      console.log(`[FMP] Cache hit for ${cacheKey}`);
-      return cached.data;
-    }
-
-    console.log(`[FMP] Fetching ${url}`);
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`FMP API error: ${response.statusText}`);
-    
-    const data = await response.json();
-    this.cache.set(cacheKey, { data, timestamp: Date.now() });
+  private async cached<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+    const hit = this.cache.get(key);
+    if (hit && Date.now() - hit.timestamp < this.cacheTimeout) return hit.data;
+    const data = await fetcher();
+    this.cache.set(key, { data, timestamp: Date.now() });
     return data;
   }
 
   async getQuote(symbol: string) {
-    const url = `https://financialmodelingprep.com/stable/quote-short?symbol=${symbol}&apikey=${this.apiKey}`;
-    return this.fetchWithCache(url, `quote_${symbol}`);
+    const sym = symbol.toUpperCase();
+    const quote = await this.cached(`quote_${sym}`, () => this.finnhub.getQuote(sym));
+    if (!quote) return { error: `No quote found for ${sym}. It may be delisted or not a US-listed ticker.` };
+    return {
+      symbol: sym,
+      price: quote.c,
+      change: round(quote.d),
+      changePercent: round(quote.dp),
+      open: quote.o,
+      dayHigh: quote.h,
+      dayLow: quote.l,
+      previousClose: quote.pc,
+      asOf: new Date(quote.t * 1000).toISOString(),
+    };
+  }
+
+  private async getStoredStock(sym: string) {
+    const results = await Promise.all(SECTOR_TABLES.map(table =>
+      this.db.from(table)
+        .select('company_name, ceo_name, ceo_highlights, pe_ratio, market_cap, one_year_return, price_per_share, dividend_yield, risk_level, esg_score')
+        .eq('ticker', sym)
+        .maybeSingle()
+    ));
+    return results.find(r => r.data)?.data ?? null;
   }
 
   async getProfile(symbol: string) {
-    const url = `https://financialmodelingprep.com/stable/profile?symbol=${symbol}&apikey=${this.apiKey}`;
-    return this.fetchWithCache(url, `profile_${symbol}`);
+    const sym = symbol.toUpperCase();
+    return this.cached(`profile_${sym}`, async () => {
+      const [profile, stored, facts] = await Promise.all([
+        this.finnhub.getProfile(sym),
+        this.getStoredStock(sym),
+        this.db.from('company_profiles')
+          .select('description, full_time_employees, city, state, country')
+          .eq('ticker', sym)
+          .maybeSingle()
+          .then(r => r.data),
+      ]);
+      if (!profile && !stored && !facts) return { error: `No company found for ${sym}.` };
+      return {
+        symbol: sym,
+        name: profile?.name ?? stored?.company_name ?? sym,
+        industry: profile?.finnhubIndustry,
+        description: facts?.description,
+        employees: facts?.full_time_employees,
+        headquarters: [facts?.city, facts?.state, facts?.country].filter(Boolean).join(', ') || undefined,
+        ceo: stored?.ceo_name,
+        ceoHighlights: stored?.ceo_highlights,
+        marketCapUsdMillions: profile?.marketCapitalization,
+        ipoDate: profile?.ipo,
+        website: profile?.weburl,
+        peRatio: stored?.pe_ratio,
+        dividendYieldPercent: stored?.dividend_yield,
+        oneYearReturnPercent: stored?.one_year_return,
+        riskLevel: stored?.risk_level,
+        esgScore: stored?.esg_score,
+      };
+    });
   }
 
-  async getMarketMovers(type: 'gainers' | 'losers') {
-    const endpoint = type === 'gainers' ? 'biggest-gainers' : 'biggest-losers';
-    const url = `https://financialmodelingprep.com/stable/${endpoint}?apikey=${this.apiKey}`;
-    return this.fetchWithCache(url, `movers_${type}`);
+  async getPricePerformance(symbol: string) {
+    const sym = symbol.toUpperCase();
+    const m = await this.cached(`metrics_${sym}`, () => this.finnhub.getMetrics(sym));
+    if (!m) return { error: `No performance data found for ${sym}.` };
+    return {
+      symbol: sym,
+      returnPercent: {
+        fiveDay: round(m['5DayPriceReturnDaily']),
+        monthToDate: round(m['monthToDatePriceReturnDaily']),
+        thirteenWeek: round(m['13WeekPriceReturnDaily']),
+        twentySixWeek: round(m['26WeekPriceReturnDaily']),
+        yearToDate: round(m['yearToDatePriceReturnDaily']),
+        fiftyTwoWeek: round(m['52WeekPriceReturnDaily']),
+      },
+      fiftyTwoWeekHigh: m['52WeekHigh'],
+      fiftyTwoWeekHighDate: m['52WeekHighDate'],
+      fiftyTwoWeekLow: m['52WeekLow'],
+      fiftyTwoWeekLowDate: m['52WeekLowDate'],
+      beta: round(m['beta']),
+      peTTM: round(m.peTTM),
+      dividendYieldPercent: round(m.currentDividendYieldTTM),
+    };
   }
 
-  async getHistoricalPrices(symbol: string, days: number = 30) {
-    // Use correct endpoint: /stable/historical-price-eod/full with from/to dates
-    const toDate = new Date();
-    const fromDate = new Date();
-    fromDate.setDate(fromDate.getDate() - days);
-    const fromStr = fromDate.toISOString().split('T')[0];
-    const toStr = toDate.toISOString().split('T')[0];
-    const url = `https://financialmodelingprep.com/stable/historical-price-eod/full?symbol=${symbol}&from=${fromStr}&to=${toStr}&apikey=${this.apiKey}`;
-    return this.fetchWithCache(url, `historical_${symbol}_${days}d`);
+  private toNews(item: FinnhubNewsItem) {
+    return {
+      headline: item.headline,
+      source: item.source,
+      publishedAt: new Date(item.datetime * 1000).toISOString(),
+      summary: item.summary,
+      url: item.url,
+    };
   }
 
-  // Get company news for a specific stock
-  async getCompanyNews(symbol: string, limit: number = 5) {
-    // Use correct endpoint: /stable/news with tickers parameter
-    const url = `https://financialmodelingprep.com/stable/news?tickers=${symbol}&limit=${limit}&apikey=${this.apiKey}`;
-    return this.fetchWithCache(url, `news_${symbol}_${limit}`);
+  async getCompanyNews(symbol: string, limit = 5) {
+    const sym = symbol.toUpperCase();
+    const news = await this.cached(`news_${sym}`, () => this.finnhub.getCompanyNews(sym));
+    return news.slice(0, Math.min(limit, 20)).map(item => this.toNews(item));
   }
 
-  // Get general market news
-  async getMarketNews(limit: number = 10) {
-    // Use correct endpoint: /stable/news without tickers for general news
-    const url = `https://financialmodelingprep.com/stable/news?limit=${limit}&apikey=${this.apiKey}`;
-    return this.fetchWithCache(url, `market_news_${limit}`);
+  async getMarketNews(limit = 10) {
+    const news = await this.cached('market_news', () => this.finnhub.getMarketNews());
+    return news.slice(0, Math.min(limit, 20)).map(item => this.toNews(item));
+  }
+
+  // Ranks the app's tracked stocks by 1-year return (Finnhub's free tier has no market-wide movers)
+  async getTopPerformers(type: 'best' | 'worst', limit = 5) {
+    const ascending = type === 'worst';
+    const results = await Promise.all(SECTOR_TABLES.map(table =>
+      this.db.from(table)
+        .select('ticker, company_name, one_year_return, price_per_share')
+        .order('one_year_return', { ascending })
+        .limit(limit)
+    ));
+    const seen = new Set<string>();
+    return results
+      .flatMap(r => r.data ?? [])
+      .filter(row => !seen.has(row.ticker) && seen.add(row.ticker))
+      .sort((a, b) => ascending ? a.one_year_return - b.one_year_return : b.one_year_return - a.one_year_return)
+      .slice(0, limit)
+      .map(row => ({
+        symbol: row.ticker,
+        name: row.company_name,
+        oneYearReturnPercent: row.one_year_return,
+        price: row.price_per_share,
+      }));
   }
 }
 
@@ -86,8 +178,8 @@ serve(async (req) => {
     // Check environment variables first
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseKey = Deno.env.get('SUPABASE_PUBLISHABLE_KEY') || Deno.env.get('SUPABASE_ANON_KEY');
-    const fmpApiKey = Deno.env.get('FMP_API_KEY');
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    const finnhubApiKey = Deno.env.get('FINNHUB_API_KEY');
+    const geminiApiKey = getGeminiApiKey();
 
     if (!supabaseUrl || !supabaseKey) {
       console.error('[stock-assistant] Missing Supabase credentials');
@@ -97,17 +189,17 @@ serve(async (req) => {
       });
     }
 
-    if (!fmpApiKey) {
-      console.error('[stock-assistant] Missing FMP_API_KEY');
-      return new Response(JSON.stringify({ error: 'Server configuration error: FMP API key missing' }), {
+    if (!finnhubApiKey) {
+      console.error('[stock-assistant] Missing FINNHUB_API_KEY');
+      return new Response(JSON.stringify({ error: 'Server configuration error: Finnhub API key missing' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    if (!lovableApiKey) {
-      console.error('[stock-assistant] Missing LOVABLE_API_KEY');
-      return new Response(JSON.stringify({ error: 'Server configuration error: Lovable API key missing' }), {
+    if (!geminiApiKey) {
+      console.error('[stock-assistant] Missing GEMINI_API_KEY');
+      return new Response(JSON.stringify({ error: 'Server configuration error: Gemini API key missing' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -261,9 +353,7 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .single();
 
-    // Initialize FMP service
-    console.log('[stock-assistant] Initializing FMP service');
-    const fmpService = new FMPService(fmpApiKey);
+    const stockData = new StockDataService(new FinnhubClient(finnhubApiKey), supabaseServiceRole);
 
     // Define tools for AI
     const tools = [
@@ -327,16 +417,17 @@ serve(async (req) => {
       {
         type: "function",
         function: {
-          name: "get_market_movers",
-          description: "Get top gaining or losing stocks in the market today",
+          name: "get_top_performers",
+          description: "Get the best or worst performing stocks by 1-year return among the stocks tracked in this app",
           parameters: {
             type: "object",
             properties: {
-              type: { 
+              type: {
                 type: "string",
-                enum: ["gainers", "losers"],
-                description: "Type of movers to fetch"
-              }
+                enum: ["best", "worst"],
+                description: "Whether to return the best or worst performers"
+              },
+              limit: { type: "number", description: "Number of stocks to return (default: 5, max: 10)", default: 5 }
             },
             required: ["type"]
           }
@@ -345,17 +436,12 @@ serve(async (req) => {
       {
         type: "function",
         function: {
-          name: "get_historical_prices",
-          description: "Get historical daily price data for a stock to analyze trends, trajectory, and performance over time",
+          name: "get_price_performance",
+          description: "Get a stock's price returns over 5 days, month-to-date, 13 weeks, 26 weeks, year-to-date and 52 weeks, plus its 52-week high/low, beta, P/E and dividend yield. Use this to analyze trends and performance over time",
           parameters: {
             type: "object",
             properties: {
-              symbol: { type: "string", description: "Stock ticker symbol" },
-              days: { 
-                type: "number", 
-                description: "Number of days of historical data (default: 30, max: 365)",
-                default: 30
-              }
+              symbol: { type: "string", description: "Stock ticker symbol" }
             },
             required: ["symbol"]
           }
@@ -386,7 +472,7 @@ RESPONSE GUIDELINES:
 - For PRICE questions ("What's the price of X?"): Give a direct answer with the current price, change, and volume.
 - For PERFORMANCE questions ("How is X performing?"): Analyze the data and explain what the numbers mean - is the stock up or down? By how much? What's the context?
 - For COMPANY questions ("Tell me about X"): Use get_company_profile for details AND get_company_news for recent developments.
-- For MARKET questions ("How's the market?"): Use get_market_news for general market conditions and get_market_movers for top performers.
+- For MARKET questions ("How's the market?"): Use get_market_news for general market conditions and get_top_performers for the strongest and weakest stocks in the app.
 - For COMPARISON questions: Fetch multiple stocks and compare their metrics side by side.
 - Always interpret the raw data - explain what the numbers tell us about the stock's movement.
 
@@ -395,7 +481,8 @@ When users ask about stocks:
 - Use get_company_profile for company details (sector, industry, CEO, description, employees)
 - Use get_company_news for recent news about a specific stock
 - Use get_market_news for general market conditions and sentiment
-- Use get_market_movers for market trends
+- Use get_top_performers to find the best or worst 1-year performers among the app's stocks
+- Use get_price_performance for trends over time (5-day through 52-week returns, 52-week high/low)
 - Compare stocks using data from multiple calls
 
 NEWS HANDLING:
@@ -412,8 +499,8 @@ Format responses:
 
 Current date: ${new Date().toISOString().split('T')[0]}`;
 
-    // Call Lovable AI with streaming and timeout
-    console.log(`[stock-assistant] [${new Date().toISOString()}] Calling Lovable AI`);
+    // Call Gemini (OpenAI-compatible endpoint) with streaming and timeout
+    console.log(`[stock-assistant] [${new Date().toISOString()}] Calling Gemini ${GEMINI_MODEL}`);
     const aiCallStart = Date.now();
     
     // Create timeout promise (45 seconds)
@@ -421,14 +508,15 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
       setTimeout(() => reject(new Error('AI request timeout after 45 seconds')), 45000)
     );
     
-    const fetchPromise = fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const fetchPromise = fetch(GEMINI_OPENAI_CHAT_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
+        'Authorization': `Bearer ${geminiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: GEMINI_MODEL,
+        reasoning_effort: 'low',
         messages: [
           { role: 'system', content: systemPrompt },
           ...(messages || [])
@@ -447,12 +535,6 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
       if (aiResponse.status === 429) {
         return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }), {
           status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: 'AI credits exhausted. Please contact support.' }), {
-          status: 402,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
@@ -476,7 +558,8 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
         let directContent = ''; // Capture text-only responses
         
         // Accumulate streaming tool calls by index
-        const pendingToolCalls: Map<number, { id: string; name: string; arguments: string }> = new Map();
+        // extra_content carries Gemini's thought signature, which must be sent back with the tool results
+        const pendingToolCalls: Map<number, { id: string; name: string; arguments: string; extra_content?: unknown }> = new Map();
 
         try {
           // PHASE 1: Collect tool calls AND stream any direct content
@@ -518,7 +601,12 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                 // Accumulate tool calls across streaming chunks
                 if (choice?.delta?.tool_calls) {
                   for (const toolCall of choice.delta.tool_calls) {
-                    const idx = toolCall.index ?? 0;
+                    // Gemini may send each complete call without an index; a new id means a new call
+                    let idx = toolCall.index ?? 0;
+                    const existing = pendingToolCalls.get(idx);
+                    if (toolCall.index === undefined && existing?.id && toolCall.id && existing.id !== toolCall.id) {
+                      idx = pendingToolCalls.size;
+                    }
                     if (!pendingToolCalls.has(idx)) {
                       pendingToolCalls.set(idx, { id: '', name: '', arguments: '' });
                     }
@@ -526,6 +614,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                     if (toolCall.id) pending.id = toolCall.id;
                     if (toolCall.function?.name) pending.name += toolCall.function.name;
                     if (toolCall.function?.arguments) pending.arguments += toolCall.function.arguments;
+                    if (toolCall.extra_content) pending.extra_content = toolCall.extra_content;
                   }
                 }
 
@@ -556,21 +645,23 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
             let toolResult;
             try {
               if (toolName === 'get_stock_quote') {
-                toolResult = await fmpService.getQuote(toolArgs.symbol);
+                toolResult = await stockData.getQuote(toolArgs.symbol);
               } else if (toolName === 'get_company_profile') {
-                toolResult = await fmpService.getProfile(toolArgs.symbol);
+                toolResult = await stockData.getProfile(toolArgs.symbol);
               } else if (toolName === 'get_company_news') {
-                toolResult = await fmpService.getCompanyNews(toolArgs.symbol, toolArgs.limit || 5);
+                toolResult = await stockData.getCompanyNews(toolArgs.symbol, toolArgs.limit || 5);
               } else if (toolName === 'get_market_news') {
-                toolResult = await fmpService.getMarketNews(toolArgs.limit || 10);
-              } else if (toolName === 'get_market_movers') {
-                toolResult = await fmpService.getMarketMovers(toolArgs.type);
-              } else if (toolName === 'get_historical_prices') {
-                toolResult = await fmpService.getHistoricalPrices(toolArgs.symbol, toolArgs.days || 30);
+                toolResult = await stockData.getMarketNews(toolArgs.limit || 10);
+              } else if (toolName === 'get_top_performers') {
+                toolResult = await stockData.getTopPerformers(toolArgs.type, Math.min(toolArgs.limit || 5, 10));
+              } else if (toolName === 'get_price_performance') {
+                toolResult = await stockData.getPricePerformance(toolArgs.symbol);
+              } else {
+                toolResult = { error: `Unknown tool: ${toolName}` };
               }
             } catch (toolError) {
               console.error(`[Tool Error] ${toolName}:`, toolError);
-              toolResult = { error: `Unable to fetch data: ${toolError.message}` };
+              toolResult = { error: `Unable to fetch data: ${toolError instanceof Error ? toolError.message : String(toolError)}` };
             }
             
             const toolCallDuration = Date.now() - toolCallStart;
@@ -580,7 +671,8 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
               id: toolId,
               name: toolName, 
               args: toolArgs, 
-              result: toolResult 
+              result: toolResult,
+              extra_content: pending.extra_content,
             });
 
             // Send tool call to client for visibility
@@ -611,14 +703,15 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
               ...(messages || []),
               {
                 role: 'assistant',
-                content: '',
+                content: null,
                 tool_calls: collectedToolCalls.map(tc => ({
                   id: tc.id,
                   type: 'function',
                   function: {
                     name: tc.name,
                     arguments: JSON.stringify(tc.args)
-                  }
+                  },
+                  ...(tc.extra_content ? { extra_content: tc.extra_content } : {})
                 }))
               },
               ...collectedToolCalls.map(tc => ({
@@ -634,15 +727,18 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
               setTimeout(() => reject(new Error('Follow-up AI request timeout after 45 seconds')), 45000)
             );
             
-            const followUpFetchPromise = fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+            const followUpFetchPromise = fetch(GEMINI_OPENAI_CHAT_URL, {
               method: 'POST',
               headers: {
-                'Authorization': `Bearer ${lovableApiKey}`,
+                'Authorization': `Bearer ${geminiApiKey}`,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                model: 'google/gemini-2.5-flash',
+                model: GEMINI_MODEL,
+                reasoning_effort: 'low',
                 messages: followUpMessages,
+                tools,
+                tool_choice: 'none',
                 stream: true,
               }),
             });
@@ -652,6 +748,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
             console.log(`[${new Date().toISOString()}] [stock-assistant] Follow-up response received in ${followUpDuration}ms`);
 
             if (!followUpResponse.ok) {
+              console.error('[stock-assistant] Follow-up error body:', await followUpResponse.text());
               throw new Error(`Follow-up AI request failed: ${followUpResponse.status}`);
             }
 
@@ -700,7 +797,9 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                 conversation_id: convId,
                 role: 'assistant',
                 content: assistantMessage,
-                tool_calls: collectedToolCalls.length > 0 ? collectedToolCalls : null
+                tool_calls: collectedToolCalls.length > 0
+                  ? collectedToolCalls.map(({ extra_content: _sig, ...tc }) => tc)
+                  : null
               });
             }
           } else if (directContent) {

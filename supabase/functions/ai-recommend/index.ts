@@ -2,13 +2,14 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+import { GEMINI_MODEL, geminiGenerateContentUrl, getGeminiApiKey } from '../_shared/gemini.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+const geminiApiKey = getGeminiApiKey();
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
@@ -177,25 +178,25 @@ serve(async (req) => {
         session_type: sessionType
       });
 
-    // Prepare prompt for Gemini 2.5
+    // Prepare prompt for Gemini
     const stocksToAnalyze = availableStocks.slice(0, 100);
     const prompt = createAIPrompt(userProfile, dbProfile, stocksToAnalyze);
     
     logInfo(`Calling Gemini API`, {
-      model: 'gemini-1.5-flash',
+      model: GEMINI_MODEL,
       stockCount: stocksToAnalyze.length,
       promptLength: prompt.length
     });
 
     const geminiStartTime = Date.now();
 
-    // Call Google Gemini 1.5 Flash API
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+      geminiGenerateContentUrl(),
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-goog-api-key': geminiApiKey,
         },
         body: JSON.stringify({
           contents: [
@@ -208,10 +209,11 @@ serve(async (req) => {
             }
           ],
           generationConfig: {
-            temperature: 1.0, // Maximum creativity for unique explanations
-            maxOutputTokens: 4000,
-            topP: 0.95, // Increase diversity
-            topK: 40
+            temperature: 1.0, // Gemini 3's recommended default; also keeps explanations varied
+            // Thinking tokens count toward this limit, so leave room beyond the ~4K-token JSON answer
+            maxOutputTokens: 16000,
+            responseMimeType: 'application/json',
+            thinkingConfig: { thinkingLevel: 'low' },
           }
         }),
       }
