@@ -26,3 +26,6 @@ dist-ssr
 # Apple Sign-In key generation (never commit)
 *.p8
 gen-apple-secret.js
+
+# Supabase CLI local state
+supabase/.temp/
