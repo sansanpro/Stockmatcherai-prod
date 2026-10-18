@@ -22,22 +22,42 @@ export function getGeminiApiKey(): string | undefined {
 export const isRetryableGeminiStatus = (status: number) => status === 429 || status >= 500;
 
 // POSTs to Gemini, trying each model in order until one doesn't return a retryable error.
+// Each model gets a second attempt after a short pause, since 503 "high demand" spikes are brief.
 // url/init receive the model name so callers can adapt the request per model.
 export async function fetchGeminiWithFallback(
   url: (model: string) => string,
   init: (model: string) => RequestInit,
   models: string[] = [GEMINI_MODEL, GEMINI_FALLBACK_MODEL],
-): Promise<{ response: Response; model: string }> {
+  attemptsPerModel = 2,
+): Promise<{ response: Response; model: string; failures: string[] }> {
   let last: { response: Response; model: string } | null = null;
+  const failures: string[] = [];
   for (const model of [...new Set(models)]) {
-    const response = await fetch(url(model), init(model));
-    if (response.ok || !isRetryableGeminiStatus(response.status)) {
-      return { response, model };
+    for (let attempt = 1; attempt <= attemptsPerModel; attempt++) {
+      const response = await fetch(url(model), init(model));
+      if (response.ok || !isRetryableGeminiStatus(response.status)) {
+        return { response, model, failures };
+      }
+      const body = await response.text();
+      failures.push(`${model}#${attempt}: ${response.status}`);
+      console.warn(`[gemini] ${model} attempt ${attempt} returned ${response.status}: ${body.slice(0, 200)}`);
+      // Body was consumed for logging; hand back an equivalent unread response
+      last = { response: new Response(body, { status: response.status, headers: response.headers }), model };
+      if (attempt < attemptsPerModel) await new Promise(resolve => setTimeout(resolve, 600 * attempt));
     }
-    const body = await response.text();
-    console.warn(`[gemini] ${model} returned ${response.status}: ${body.slice(0, 200)}`);
-    // Body was consumed for logging; hand back an equivalent unread response
-    last = { response: new Response(body, { status: response.status, headers: response.headers }), model };
   }
-  return last!;
+  return { ...last!, failures };
+}
+
+// Records an AI failure in public.ai_error_logs (never throws)
+export async function logAiError(
+  db: { from: (table: string) => any },
+  entry: { function_name: string; stage: string; user_id?: string | null; model?: string | null; status?: number | null; message: string },
+) {
+  try {
+    const { error } = await db.from('ai_error_logs').insert({ ...entry, message: entry.message.slice(0, 2000) });
+    if (error) console.error('[ai_error_logs] insert failed:', error);
+  } catch (e) {
+    console.error('[ai_error_logs] insert threw:', e);
+  }
 }

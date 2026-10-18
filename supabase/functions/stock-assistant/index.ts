@@ -2,7 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { FinnhubClient, FinnhubNewsItem } from '../_shared/finnhub.ts';
-import { GEMINI_FALLBACK_MODEL, GEMINI_MODEL, GEMINI_OPENAI_CHAT_URL, fetchGeminiWithFallback, getGeminiApiKey, isRetryableGeminiStatus } from '../_shared/gemini.ts';
+import { GEMINI_FALLBACK_MODEL, GEMINI_MODEL, GEMINI_OPENAI_CHAT_URL, fetchGeminiWithFallback, getGeminiApiKey, isRetryableGeminiStatus, logAiError } from '../_shared/gemini.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -528,12 +528,18 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
       }),
     );
     
-    const { response: aiResponse, model: firstModel } = await Promise.race([fetchPromise, timeoutPromise]);
+    const { response: aiResponse, model: firstModel, failures: firstFailures } = await Promise.race([fetchPromise, timeoutPromise]);
     console.log(`[stock-assistant] First response from ${firstModel}`);
+    const logError = (stage: string, message: string, extra: { model?: string; status?: number } = {}) =>
+      logAiError(supabaseServiceRole, { function_name: 'stock-assistant', stage, user_id: user.id, ...extra, message });
+    if (firstFailures.length > 0) {
+      await logError('first_call_retries', firstFailures.join(', '), { model: firstModel, status: aiResponse.status });
+    }
 
     if (!aiResponse.ok) {
       const errorBody = await aiResponse.text();
       console.error('[stock-assistant] AI gateway error:', aiResponse.status, errorBody);
+      await logError('first_call', errorBody, { model: firstModel, status: aiResponse.status });
       
       if (isRetryableGeminiStatus(aiResponse.status)) {
         return new Response(JSON.stringify({ error: 'The AI service is busy right now. Please try again in a moment.' }), {
@@ -737,12 +743,17 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
               [firstModel, firstModel === GEMINI_MODEL ? GEMINI_FALLBACK_MODEL : GEMINI_MODEL],
             );
 
-            const { response: followUpResponse, model: followUpModel } = await Promise.race([followUpFetchPromise, followUpTimeoutPromise]);
+            const { response: followUpResponse, model: followUpModel, failures: followUpFailures } = await Promise.race([followUpFetchPromise, followUpTimeoutPromise]);
+            if (followUpFailures.length > 0) {
+              await logError('follow_up_retries', followUpFailures.join(', '), { model: followUpModel, status: followUpResponse.status });
+            }
             const followUpDuration = Date.now() - followUpStart;
             console.log(`[${new Date().toISOString()}] [stock-assistant] Follow-up response from ${followUpModel} in ${followUpDuration}ms`);
 
             if (!followUpResponse.ok) {
-              console.error('[stock-assistant] Follow-up error body:', await followUpResponse.text());
+              const followUpErrorBody = await followUpResponse.text();
+              console.error('[stock-assistant] Follow-up error body:', followUpErrorBody);
+              await logError('follow_up', followUpErrorBody, { model: followUpModel, status: followUpResponse.status });
               throw new Error(isRetryableGeminiStatus(followUpResponse.status)
                 ? 'The AI service is busy right now. Please try again in a moment.'
                 : `Follow-up AI request failed: ${followUpResponse.status}`);
@@ -813,6 +824,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
           controller.close();
         } catch (e) {
           console.error(`[${new Date().toISOString()}] [stock-assistant] Stream error:`, e);
+          await logError('stream', e instanceof Error ? `${e.message}\n${e.stack ?? ''}` : String(e));
           
           // Send error to client
           try {

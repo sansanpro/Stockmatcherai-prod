@@ -2,7 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-import { GEMINI_MODEL, fetchGeminiWithFallback, geminiGenerateContentUrl, getGeminiApiKey } from '../_shared/gemini.ts';
+import { GEMINI_MODEL, fetchGeminiWithFallback, geminiGenerateContentUrl, getGeminiApiKey, logAiError } from '../_shared/gemini.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -223,6 +223,7 @@ serve(async (req) => {
     
     if (!response.ok) {
       const errorText = await response.text();
+      await logAiError(supabase, { function_name: 'ai-recommend', stage: 'generate', user_id: user.id, model: usedModel, status: response.status, message: errorText });
       logError(`Gemini API error: ${response.status}`, {
         status: response.status,
         statusText: response.statusText,
