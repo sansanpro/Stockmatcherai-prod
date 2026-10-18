@@ -61,7 +61,7 @@ async function getCompanyProfile(finnhub: FinnhubClient, symbol: string) {
     website: profile.weburl ?? fmp?.website ?? '',
     mktCap: (profile.marketCapitalization ?? 0) * 1_000_000,
     ipoDate: profile.ipo ?? fmp?.ipoDate ?? '',
-    image: profile.logo || fmp?.image || '',
+    image: profile.logo || fmp?.image || `https://images.financialmodelingprep.com/symbol/${symbol}.png`,
     city: fmp?.city,
     state: fmp?.state,
   };

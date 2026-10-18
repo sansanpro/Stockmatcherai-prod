@@ -16,8 +16,9 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  // Reset image error when profile changes
-  const currentImageUrl = profile?.image;
+  // Reset image error when profile changes. FMP's logo CDN needs no API key or quota,
+  // so it still shows a logo when the profile request fails.
+  const currentImageUrl = profile?.image || `https://images.financialmodelingprep.com/symbol/${ticker.toUpperCase()}.png`;
   const [lastImageUrl, setLastImageUrl] = useState<string | undefined>(undefined);
   
   if (currentImageUrl !== lastImageUrl) {
@@ -36,13 +37,13 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
       ? 'w-20 h-20 text-2xl' 
       : 'w-14 h-14 sm:w-16 sm:h-16 text-lg sm:text-xl';
 
-    const hasValidImage = profile?.image && !imageError;
+    const hasValidImage = !imageError;
 
     if (hasValidImage) {
       return (
         <div className={`${sizeClasses} rounded-xl overflow-hidden bg-white shadow-lg border-2 border-white ring-2 ring-blue-500/20 flex-shrink-0`}>
           <img 
-            src={profile.image} 
+            src={currentImageUrl} 
             alt={`${companyName} logo`}
             className="w-full h-full object-contain p-1"
             onError={() => setImageError(true)}
