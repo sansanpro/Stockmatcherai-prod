@@ -47,7 +47,7 @@ export function useCompanyProfile(ticker: string) {
         setIsLoading(true);
         setError(null);
 
-        const { data, error: fnError } = await supabase.functions.invoke('fmp-data', {
+        const { data, error: fnError } = await supabase.functions.invoke('company-data', {
           body: { action: 'company_profile', symbol: ticker }
         });
 

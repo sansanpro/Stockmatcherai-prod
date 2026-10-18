@@ -71,3 +71,6 @@ verify_jwt = true
 
 [functions.fmp-data]
 verify_jwt = false
+
+[functions.company-data]
+verify_jwt = false

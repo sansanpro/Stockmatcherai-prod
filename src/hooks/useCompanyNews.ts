@@ -37,7 +37,7 @@ export function useCompanyNews(ticker: string | null) {
     setError(null);
 
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('fmp-data', {
+      const { data, error: fnError } = await supabase.functions.invoke('company-data', {
         body: { action: 'company_news', symbol: ticker, limit: 5 }
       });
 

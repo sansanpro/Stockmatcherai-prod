@@ -5,6 +5,7 @@ SELECT cron.unschedule(jobname)
 FROM cron.job
 WHERE jobname IN (
   'update-stock-data-every-2-minutes',
+  'update-stock-data-every-4-hours',
   'smart-stock-update',
   'smart-stock-updates-morning',
   'smart-stock-updates-afternoon',
