@@ -1,19 +1,36 @@
 -- Switch stock price updates to Finnhub's free-tier rate limit (~60 calls/min).
 -- Remove every previous update-stock-data schedule (only the ones that still exist),
 -- then refresh every 15 minutes during US market hours (13:00-21:59 UTC covers 9:30-4:00 ET year-round).
-SELECT cron.unschedule(jobname)
-FROM cron.job
-WHERE jobname IN (
-  'update-stock-data-every-2-minutes',
-  'update-stock-data-every-4-hours',
-  'smart-stock-update',
-  'smart-stock-updates-morning',
-  'smart-stock-updates-afternoon',
-  'priority-stock-updates',
-  'stale-stock-cleanup-4hours',
-  'stock-update-every-6h',
-  'daily-stock-update'
-);
+-- Unschedule by id, one at a time: pg_cron only lets a role remove jobs it owns, and some of these
+-- were created by other roles (e.g. via the dashboard). Those log a warning instead of failing
+-- the whole migration and need deleting from Integrations > Cron in the Supabase dashboard.
+DO $$
+DECLARE
+  j record;
+BEGIN
+  FOR j IN
+    SELECT jobid, jobname, username
+    FROM cron.job
+    WHERE jobname IN (
+      'update-stock-data-every-2-minutes',
+      'update-stock-data-every-4-hours',
+      'smart-stock-update',
+      'smart-stock-updates-morning',
+      'smart-stock-updates-afternoon',
+      'priority-stock-updates',
+      'stale-stock-cleanup-4hours',
+      'stock-update-every-6h',
+      'daily-stock-update'
+    )
+  LOOP
+    BEGIN
+      PERFORM cron.unschedule(j.jobid);
+      RAISE NOTICE 'Unscheduled %', j.jobname;
+    EXCEPTION WHEN OTHERS THEN
+      RAISE WARNING 'Could not unschedule % (owned by %): %', j.jobname, j.username, SQLERRM;
+    END;
+  END LOOP;
+END $$;
 
 SELECT cron.schedule(
   'update-stock-data-market-hours',
