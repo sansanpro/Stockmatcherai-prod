@@ -2,7 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
-import { GEMINI_MODEL, geminiGenerateContentUrl, getGeminiApiKey } from '../_shared/gemini.ts';
+import { GEMINI_MODEL, fetchGeminiWithFallback, geminiGenerateContentUrl, getGeminiApiKey } from '../_shared/gemini.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -190,9 +190,9 @@ serve(async (req) => {
 
     const geminiStartTime = Date.now();
 
-    const response = await fetch(
-      geminiGenerateContentUrl(),
-      {
+    const { response, model: usedModel } = await fetchGeminiWithFallback(
+      (model) => geminiGenerateContentUrl(model),
+      () => ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ serve(async (req) => {
             thinkingConfig: { thinkingLevel: 'low' },
           }
         }),
-      }
+      })
     );
 
     const geminiLatency = Date.now() - geminiStartTime;
@@ -234,6 +234,7 @@ serve(async (req) => {
 
     const geminiResponse = await response.json();
     logInfo(`Gemini API response received`, {
+      model: usedModel,
       latencyMs: geminiLatency,
       hasContent: !!geminiResponse.candidates?.[0]?.content
     });

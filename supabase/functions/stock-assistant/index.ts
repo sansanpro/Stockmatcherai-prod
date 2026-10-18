@@ -2,7 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { FinnhubClient, FinnhubNewsItem } from '../_shared/finnhub.ts';
-import { GEMINI_MODEL, GEMINI_OPENAI_CHAT_URL, getGeminiApiKey } from '../_shared/gemini.ts';
+import { GEMINI_FALLBACK_MODEL, GEMINI_MODEL, GEMINI_OPENAI_CHAT_URL, fetchGeminiWithFallback, getGeminiApiKey, isRetryableGeminiStatus } from '../_shared/gemini.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -508,32 +508,35 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
       setTimeout(() => reject(new Error('AI request timeout after 45 seconds')), 45000)
     );
     
-    const fetchPromise = fetch(GEMINI_OPENAI_CHAT_URL, {
+    const geminiRequest = (model: string, body: Record<string, unknown>): RequestInit => ({
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${geminiApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: GEMINI_MODEL,
-        reasoning_effort: 'low',
+      body: JSON.stringify({ model, reasoning_effort: 'low', stream: true, ...body }),
+    });
+
+    const fetchPromise = fetchGeminiWithFallback(
+      () => GEMINI_OPENAI_CHAT_URL,
+      (model) => geminiRequest(model, {
         messages: [
           { role: 'system', content: systemPrompt },
           ...(messages || [])
         ],
         tools,
-        stream: true,
       }),
-    });
+    );
     
-    const aiResponse = await Promise.race([fetchPromise, timeoutPromise]);
+    const { response: aiResponse, model: firstModel } = await Promise.race([fetchPromise, timeoutPromise]);
+    console.log(`[stock-assistant] First response from ${firstModel}`);
 
     if (!aiResponse.ok) {
       const errorBody = await aiResponse.text();
       console.error('[stock-assistant] AI gateway error:', aiResponse.status, errorBody);
       
-      if (aiResponse.status === 429) {
-        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }), {
+      if (isRetryableGeminiStatus(aiResponse.status)) {
+        return new Response(JSON.stringify({ error: 'The AI service is busy right now. Please try again in a moment.' }), {
           status: 429,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -631,59 +634,48 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
             if (toolCallsComplete) break;
           }
 
-          // Execute accumulated tool calls after stream completes
-          for (const [, pending] of pendingToolCalls) {
-            if (!pending.name) continue;
-            const toolName = pending.name;
-            const toolArgs = JSON.parse(pending.arguments || '{}');
-            const toolId = pending.id || `call_${Date.now()}_${Math.random()}`;
-
-            const toolCallStart = Date.now();
-            console.log(`[${new Date().toISOString()}] [Tool Call] ${toolName}`, toolArgs);
-
-            // Execute tool with error handling
-            let toolResult;
+          // Execute accumulated tool calls in parallel after the stream completes
+          const runTool = async (toolName: string, toolArgs: any) => {
             try {
-              if (toolName === 'get_stock_quote') {
-                toolResult = await stockData.getQuote(toolArgs.symbol);
-              } else if (toolName === 'get_company_profile') {
-                toolResult = await stockData.getProfile(toolArgs.symbol);
-              } else if (toolName === 'get_company_news') {
-                toolResult = await stockData.getCompanyNews(toolArgs.symbol, toolArgs.limit || 5);
-              } else if (toolName === 'get_market_news') {
-                toolResult = await stockData.getMarketNews(toolArgs.limit || 10);
-              } else if (toolName === 'get_top_performers') {
-                toolResult = await stockData.getTopPerformers(toolArgs.type, Math.min(toolArgs.limit || 5, 10));
-              } else if (toolName === 'get_price_performance') {
-                toolResult = await stockData.getPricePerformance(toolArgs.symbol);
-              } else {
-                toolResult = { error: `Unknown tool: ${toolName}` };
-              }
+              if (toolName === 'get_stock_quote') return await stockData.getQuote(toolArgs.symbol);
+              if (toolName === 'get_company_profile') return await stockData.getProfile(toolArgs.symbol);
+              if (toolName === 'get_company_news') return await stockData.getCompanyNews(toolArgs.symbol, toolArgs.limit || 5);
+              if (toolName === 'get_market_news') return await stockData.getMarketNews(toolArgs.limit || 10);
+              if (toolName === 'get_top_performers') return await stockData.getTopPerformers(toolArgs.type, Math.min(toolArgs.limit || 5, 10));
+              if (toolName === 'get_price_performance') return await stockData.getPricePerformance(toolArgs.symbol);
+              return { error: `Unknown tool: ${toolName}` };
             } catch (toolError) {
               console.error(`[Tool Error] ${toolName}:`, toolError);
-              toolResult = { error: `Unable to fetch data: ${toolError instanceof Error ? toolError.message : String(toolError)}` };
+              return { error: `Unable to fetch data: ${toolError instanceof Error ? toolError.message : String(toolError)}` };
             }
-            
-            const toolCallDuration = Date.now() - toolCallStart;
-            console.log(`[${new Date().toISOString()}] [Tool Call Complete] ${toolName} took ${toolCallDuration}ms`);
+          };
 
-            collectedToolCalls.push({ 
-              id: toolId,
-              name: toolName, 
-              args: toolArgs, 
-              result: toolResult,
-              extra_content: pending.extra_content,
-            });
-
-            // Send tool call to client for visibility
+          const validToolCalls = [...pendingToolCalls.values()].filter(p => p.name);
+          // Tell the client what's being looked up (names and args only; it shows a status line)
+          for (const pending of validToolCalls) {
+            let args = {};
+            try { args = JSON.parse(pending.arguments || '{}'); } catch { /* malformed args; tool will error */ }
             controller.enqueue(
               new TextEncoder().encode(
-                `data: ${JSON.stringify({ 
-                  type: 'tool_call', 
-                  tool: { name: toolName, args: toolArgs, result: toolResult }
-                })}\n\n`
+                `data: ${JSON.stringify({ type: 'tool_call', tool: { name: pending.name, args } })}\n\n`
               )
             );
+          }
+
+          const toolsStart = Date.now();
+          collectedToolCalls = await Promise.all(validToolCalls.map(async (pending, i) => {
+            let toolArgs: any = {};
+            try { toolArgs = JSON.parse(pending.arguments || '{}'); } catch { /* handled by runTool */ }
+            return {
+              id: pending.id || `call_${Date.now()}_${i}`,
+              name: pending.name,
+              args: toolArgs,
+              result: await runTool(pending.name, toolArgs),
+              extra_content: pending.extra_content,
+            };
+          }));
+          if (collectedToolCalls.length > 0) {
+            console.log(`[stock-assistant] ${collectedToolCalls.length} tool calls took ${Date.now() - toolsStart}ms`);
           }
 
           // PHASE 2: If we have tool calls, make follow-up request with results
@@ -721,35 +713,39 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
               }))
             ];
 
-            // Make follow-up API call for analysis with timeout
+            // Make follow-up API call for analysis with timeout. Thought signatures are tied to the
+            // model that produced them, so a different fallback model gets the data as plain text instead.
             const followUpStart = Date.now();
             const followUpTimeoutPromise = new Promise<never>((_, reject) => 
               setTimeout(() => reject(new Error('Follow-up AI request timeout after 45 seconds')), 45000)
             );
-            
-            const followUpFetchPromise = fetch(GEMINI_OPENAI_CHAT_URL, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${geminiApiKey}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                model: GEMINI_MODEL,
-                reasoning_effort: 'low',
-                messages: followUpMessages,
-                tools,
-                tool_choice: 'none',
-                stream: true,
-              }),
-            });
 
-            const followUpResponse = await Promise.race([followUpFetchPromise, followUpTimeoutPromise]);
+            const inlinedMessages = [
+              { role: 'system', content: systemPrompt },
+              ...(messages || []),
+              {
+                role: 'user',
+                content: `Data fetched for my last question:\n${JSON.stringify(collectedToolCalls.map(tc => ({ tool: tc.name, args: tc.args, result: tc.result })))}\n\nAnswer my last question using this data.`
+              }
+            ];
+
+            const followUpFetchPromise = fetchGeminiWithFallback(
+              () => GEMINI_OPENAI_CHAT_URL,
+              (model) => model === firstModel
+                ? geminiRequest(model, { messages: followUpMessages, tools, tool_choice: 'none' })
+                : geminiRequest(model, { messages: inlinedMessages }),
+              [firstModel, firstModel === GEMINI_MODEL ? GEMINI_FALLBACK_MODEL : GEMINI_MODEL],
+            );
+
+            const { response: followUpResponse, model: followUpModel } = await Promise.race([followUpFetchPromise, followUpTimeoutPromise]);
             const followUpDuration = Date.now() - followUpStart;
-            console.log(`[${new Date().toISOString()}] [stock-assistant] Follow-up response received in ${followUpDuration}ms`);
+            console.log(`[${new Date().toISOString()}] [stock-assistant] Follow-up response from ${followUpModel} in ${followUpDuration}ms`);
 
             if (!followUpResponse.ok) {
               console.error('[stock-assistant] Follow-up error body:', await followUpResponse.text());
-              throw new Error(`Follow-up AI request failed: ${followUpResponse.status}`);
+              throw new Error(isRetryableGeminiStatus(followUpResponse.status)
+                ? 'The AI service is busy right now. Please try again in a moment.'
+                : `Follow-up AI request failed: ${followUpResponse.status}`);
             }
 
             // Stream the follow-up response
@@ -832,7 +828,8 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
             console.error('Failed to send error to client:', encodeError);
           }
           
-          controller.error(e);
+          // Close normally so the client reads the error event instead of a dropped connection
+          controller.close();
         }
       }
     });

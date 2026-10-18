@@ -17,8 +17,21 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
-  toolCalls?: Array<{ name: string; args: any; result: any }>;
   status?: 'fetching' | 'analyzing' | 'generating' | 'complete' | 'error';
+}
+
+// Short status shown while the assistant looks something up (the raw data isn't displayed)
+function describeToolCall(tool: { name: string; args?: Record<string, unknown> }): string {
+  const symbol = typeof tool.args?.symbol === 'string' ? tool.args.symbol.toUpperCase() : '';
+  switch (tool.name) {
+    case 'get_stock_quote': return `Checking ${symbol || 'the'} price...`;
+    case 'get_company_profile': return `Looking up ${symbol || 'the company'}...`;
+    case 'get_company_news': return `Reading ${symbol ? `${symbol} ` : ''}news...`;
+    case 'get_market_news': return 'Reading market news...';
+    case 'get_top_performers': return 'Ranking stocks...';
+    case 'get_price_performance': return `Checking ${symbol || 'its'} performance...`;
+    default: return 'Looking that up...';
+  }
 }
 
 export default function AIAssistantWidget() {
@@ -107,7 +120,6 @@ export default function AIAssistantWidget() {
       role: 'assistant',
       content: '',
       timestamp: new Date(),
-      toolCalls: [],
       status: 'fetching'
     };
     setMessages(prev => [...prev, assistantMsg]);
@@ -202,6 +214,8 @@ export default function AIAssistantWidget() {
       const reader = response.body!.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      let receivedContent = '';
+      let streamError: string | null = null;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -222,31 +236,24 @@ export default function AIAssistantWidget() {
             const chunk = JSON.parse(jsonStr);
 
             if (chunk.type === 'content_delta') {
-              setCurrentStatus('Generating response...');
+              receivedContent += chunk.delta;
+              setCurrentStatus('');
               setMessages(prev => prev.map(msg =>
                 msg.id === assistantMsgId
                   ? { ...msg, content: msg.content + chunk.delta, status: 'generating' }
                   : msg
               ));
             } else if (chunk.type === 'tool_call') {
-              const toolName = chunk.tool.name.replace('get_', '').replace('_', ' ');
-              setCurrentStatus(`Fetching ${toolName}...`);
-              setMessages(prev => prev.map(msg =>
-                msg.id === assistantMsgId
-                  ? { 
-                      ...msg, 
-                      toolCalls: [...(msg.toolCalls || []), chunk.tool],
-                      status: 'fetching'
-                    }
-                  : msg
-              ));
+              setCurrentStatus(describeToolCall(chunk.tool));
             } else if (chunk.type === 'analyzing') {
-              setCurrentStatus('Analyzing data...');
+              setCurrentStatus('Writing answer...');
               setMessages(prev => prev.map(msg =>
                 msg.id === assistantMsgId
                   ? { ...msg, status: 'analyzing' }
                   : msg
               ));
+            } else if (chunk.type === 'error') {
+              streamError = chunk.message || 'Something went wrong. Please try again.';
             }
           } catch (e) {
             console.error('Failed to parse SSE chunk:', e);
@@ -254,23 +261,20 @@ export default function AIAssistantWidget() {
         }
       }
       
-      // Mark as complete
-      setMessages(prev => prev.map(msg =>
-        msg.id === assistantMsgId
-          ? { ...msg, status: 'complete' }
-          : msg
-      ));
-
-      // Handle empty response
-      const finalMessage = messages.find(m => m.id === assistantMsgId);
-      if (finalMessage && !finalMessage.content.trim()) {
-        setMessages(prev => prev.map(m => 
-          m.id === assistantMsgId 
-            ? { ...m, content: "I couldn't generate a response. Please try rephrasing your question.", status: 'error' }
+      if (streamError || !receivedContent.trim()) {
+        const errorText = streamError ?? "I couldn't generate a response. Please try rephrasing your question.";
+        setMessages(prev => prev.map(m =>
+          m.id === assistantMsgId
+            ? { ...m, content: receivedContent || errorText, status: 'error' }
             : m
         ));
-        toast.error('Received empty response. Please try again.');
+        toast.error(errorText);
       } else {
+        setMessages(prev => prev.map(msg =>
+          msg.id === assistantMsgId
+            ? { ...msg, status: 'complete' }
+            : msg
+        ));
         // Increment free message count on successful response
         if (!subscribed) {
           setFreeMessageCount(prev => prev + 1);
@@ -433,7 +437,7 @@ export default function AIAssistantWidget() {
               </div>
             ) : (
               <div className="space-y-4">
-                {messages.map((msg) => (
+                {messages.filter(msg => msg.role === 'user' || msg.content).map((msg) => (
                   <div
                     key={msg.id}
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -446,27 +450,16 @@ export default function AIAssistantWidget() {
                       }`}
                     >
                       {msg.role === 'assistant' ? (
-                        <>
-                          <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
-                            <ReactMarkdown>{msg.content}</ReactMarkdown>
-                          </div>
-                          {msg.toolCalls && msg.toolCalls.length > 0 && (
-                            <div className="mt-2 pt-2 border-t border-border/50 text-xs text-muted-foreground">
-                              {msg.toolCalls.map((tool, idx) => (
-                                <div key={idx} className="flex items-center gap-1">
-                                  📊 Fetched {tool.name.replace('get_', '')} for {JSON.stringify(tool.args)}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </>
+                        <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
                       ) : (
                         <p className="text-sm">{msg.content}</p>
                       )}
                     </div>
                   </div>
                 ))}
-                {isStreaming && (
+                {isStreaming && !(messages[messages.length - 1]?.role === 'assistant' && messages[messages.length - 1]?.content) && (
                   <div className="flex justify-start">
                     <div className="bg-muted rounded-lg p-3">
                       <div className="flex items-center gap-2">
