@@ -1,34 +1,90 @@
+// Company profile + news for the app. Backed by Finnhub; the function keeps its original
+// name and response shape so already-installed app builds keep working.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { FinnhubClient, FinnhubNewsItem, FinnhubRateLimitError } from '../_shared/finnhub.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Finnhub's free profile has no description, employee count or HQ city/state. If an FMP key
+// is still configured we fill those from FMP's profile (cached for a day, failures ignored).
 const FMP_BASE_URL = 'https://financialmodelingprep.com/stable';
 
-// Cache for company data
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+const FMP_CACHE_DURATION = 24 * 60 * 60 * 1000; // 1 day
 
-async function fetchWithCache(url: string, cacheKey: string, apiKey: string) {
+async function withCache<T>(cacheKey: string, ttl: number, fetcher: () => Promise<T>): Promise<T> {
   const cached = cache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    console.log(`[fmp-data] Cache hit: ${cacheKey}`);
+  if (cached && Date.now() - cached.timestamp < ttl) {
     return cached.data;
   }
+  const data = await fetcher();
+  if (data !== null && data !== undefined) {
+    cache.set(cacheKey, { data, timestamp: Date.now() });
+  }
+  return data;
+}
 
-  console.log(`[fmp-data] Fetching: ${url}`);
-  const response = await fetch(`${url}&apikey=${apiKey}`);
-  
-  if (!response.ok) {
-    console.error(`[fmp-data] API error: ${response.status}`);
+async function getFmpProfileDetails(symbol: string): Promise<Record<string, any> | null> {
+  const fmpApiKey = Deno.env.get('FMP_API_KEY');
+  if (!fmpApiKey) return null;
+  try {
+    return await withCache(`fmp_profile_${symbol}`, FMP_CACHE_DURATION, async () => {
+      const response = await fetch(`${FMP_BASE_URL}/profile?symbol=${symbol}&apikey=${fmpApiKey}`);
+      if (!response.ok) return null;
+      const data = await response.json();
+      return Array.isArray(data) && data.length > 0 ? data[0] : null;
+    });
+  } catch (error) {
+    console.error(`[fmp-data] FMP profile fallback failed for ${symbol}:`, error);
     return null;
   }
-  
-  const data = await response.json();
-  cache.set(cacheKey, { data, timestamp: Date.now() });
-  return data;
+}
+
+// Maps to the CompanyProfile shape in src/hooks/useCompanyProfile.ts
+async function getCompanyProfile(finnhub: FinnhubClient, symbol: string) {
+  const profile = await withCache(`profile_${symbol}`, CACHE_DURATION, () => finnhub.getProfile(symbol));
+  if (!profile) return null;
+
+  const fmp = await getFmpProfileDetails(symbol);
+  return {
+    symbol: profile.ticker,
+    companyName: profile.name ?? fmp?.companyName ?? symbol,
+    description: fmp?.description ?? '',
+    sector: fmp?.sector ?? profile.finnhubIndustry ?? '',
+    industry: profile.finnhubIndustry ?? fmp?.industry ?? '',
+    country: profile.country ?? fmp?.country ?? '',
+    fullTimeEmployees: fmp?.fullTimeEmployees ?? '',
+    website: profile.weburl ?? fmp?.website ?? '',
+    mktCap: (profile.marketCapitalization ?? 0) * 1_000_000,
+    ipoDate: profile.ipo ?? fmp?.ipoDate ?? '',
+    image: profile.logo || fmp?.image || '',
+    city: fmp?.city,
+    state: fmp?.state,
+  };
+}
+
+// Maps to the NewsItem shape in src/hooks/useCompanyNews.ts
+function toNewsItem(item: FinnhubNewsItem, symbol?: string) {
+  return {
+    title: item.headline,
+    url: item.url,
+    publishedDate: new Date(item.datetime * 1000).toISOString(),
+    site: item.source,
+    text: item.summary,
+    image: item.image,
+    symbol: symbol ?? item.related,
+  };
+}
+
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
 }
 
 serve(async (req) => {
@@ -37,13 +93,11 @@ serve(async (req) => {
   }
 
   try {
-    const fmpApiKey = Deno.env.get('FMP_API_KEY');
-    if (!fmpApiKey) {
-      return new Response(JSON.stringify({ error: 'FMP API key not configured' }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+    const finnhubApiKey = Deno.env.get('FINNHUB_API_KEY');
+    if (!finnhubApiKey) {
+      return jsonResponse({ error: 'FINNHUB_API_KEY not configured' }, 500);
     }
+    const finnhub = new FinnhubClient(finnhubApiKey);
 
     const { action, symbol, limit = 5 } = await req.json();
     console.log(`[fmp-data] Action: ${action}, Symbol: ${symbol}`);
@@ -52,87 +106,50 @@ serve(async (req) => {
 
     switch (action) {
       case 'company_profile':
-        if (!symbol) {
-          return new Response(JSON.stringify({ error: 'Symbol required' }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
-        result = await fetchWithCache(
-          `${FMP_BASE_URL}/profile?symbol=${symbol}`,
-          `profile_${symbol}`,
-          fmpApiKey
-        );
-        // Return first item if array
-        if (Array.isArray(result) && result.length > 0) {
-          result = result[0];
-        }
+        if (!symbol) return jsonResponse({ error: 'Symbol required' }, 400);
+        result = await getCompanyProfile(finnhub, symbol.trim().toUpperCase());
         break;
 
-      case 'company_news':
-        if (!symbol) {
-          return new Response(JSON.stringify({ error: 'Symbol required' }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
-        // Use correct endpoint: /stable/news with tickers parameter
-        result = await fetchWithCache(
-          `${FMP_BASE_URL}/news?tickers=${symbol}&limit=${limit}`,
-          `news_${symbol}_${limit}`,
-          fmpApiKey
-        );
+      case 'company_news': {
+        if (!symbol) return jsonResponse({ error: 'Symbol required' }, 400);
+        const sym = symbol.trim().toUpperCase();
+        const news = await withCache(`news_${sym}`, CACHE_DURATION, () => finnhub.getCompanyNews(sym));
+        // Finnhub returns newest first
+        result = news.slice(0, limit).map(item => toNewsItem(item, sym));
         break;
+      }
 
-      case 'market_news':
-        // Use correct endpoint: /stable/news without tickers for general news
-        result = await fetchWithCache(
-          `${FMP_BASE_URL}/news?limit=${limit}`,
-          `market_news_${limit}`,
-          fmpApiKey
-        );
+      case 'market_news': {
+        const news = await withCache('market_news', CACHE_DURATION, () => finnhub.getMarketNews());
+        result = news.slice(0, limit).map(item => toNewsItem(item));
         break;
+      }
 
-      case 'batch_profiles':
+      case 'batch_profiles': {
         // Fetch multiple company profiles at once (max 5 to respect rate limits)
-        const symbols = symbol?.split(',').slice(0, 5) || [];
-        if (symbols.length === 0) {
-          return new Response(JSON.stringify({ error: 'Symbols required' }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
-        
+        const symbols: string[] = symbol?.split(',').map((s: string) => s.trim().toUpperCase()).filter(Boolean).slice(0, 5) || [];
+        if (symbols.length === 0) return jsonResponse({ error: 'Symbols required' }, 400);
+
         const profiles: Record<string, any> = {};
         for (const sym of symbols) {
-          const profile = await fetchWithCache(
-            `${FMP_BASE_URL}/profile?symbol=${sym.trim()}`,
-            `profile_${sym.trim()}`,
-            fmpApiKey
-          );
-          if (profile && Array.isArray(profile) && profile.length > 0) {
-            profiles[sym.trim()] = profile[0];
-          }
+          const profile = await getCompanyProfile(finnhub, sym);
+          if (profile) profiles[sym] = profile;
         }
         result = profiles;
         break;
+      }
 
       default:
-        return new Response(JSON.stringify({ error: 'Invalid action' }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return jsonResponse({ error: 'Invalid action' }, 400);
     }
 
-    return new Response(JSON.stringify({ data: result }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return jsonResponse({ data: result });
 
   } catch (error) {
+    if (error instanceof FinnhubRateLimitError) {
+      return jsonResponse({ error: 'Rate limit exceeded, try again shortly' }, 429);
+    }
     console.error('[fmp-data] Error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return jsonResponse({ error: error instanceof Error ? error.message : String(error) }, 500);
   }
 });

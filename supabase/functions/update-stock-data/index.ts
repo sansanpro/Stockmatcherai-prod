@@ -1,6 +1,6 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
-import { createFMPService } from './fmpService.ts';
+import { FinnhubClient, FinnhubRateLimitError, formatMarketCap } from '../_shared/finnhub.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,6 +22,7 @@ interface DatabaseStock {
   ceo_highlights: string;
   created_at: string;
   updated_at: string;
+  table: string;
 }
 
 Deno.serve(async (req) => {
@@ -55,15 +56,12 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get FMP API key
-    const fmpApiKey = Deno.env.get('FMP_API_KEY');
-    console.log('📊 FMP API Key status:', fmpApiKey ? `Present (${fmpApiKey.substring(0, 8)}...)` : 'MISSING');
-    
-    if (!fmpApiKey) {
-      console.error('❌ FMP_API_KEY is not set in environment variables');
+    const finnhubApiKey = Deno.env.get('FINNHUB_API_KEY');
+    if (!finnhubApiKey) {
+      console.error('❌ FINNHUB_API_KEY is not set in environment variables');
       return new Response(
         JSON.stringify({ 
-          error: 'FMP_API_KEY is not configured',
+          error: 'FINNHUB_API_KEY is not configured',
           success: false,
           updated: 0,
           failed: 0
@@ -75,8 +73,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Initialize FMP service
-    const fmpService = createFMPService(fmpApiKey);
+    const finnhub = new FinnhubClient(finnhubApiKey);
 
     // Define all sector tables
     const sectorTables = [
@@ -195,103 +192,78 @@ Deno.serve(async (req) => {
 
     const lockId = lockEntry?.id;
 
-    // Optimize for FMP premium plan (300 calls/min = 5 calls/sec)
+    // Finnhub free tier allows ~60 calls/min. Each ticker costs 2 calls (quote + metrics);
+    // 1250ms spacing keeps us at ~48 calls/min, leaving headroom for the fmp-data function's user-facing calls.
     let successCount = 0;
     let failCount = 0;
-    const batchSize = 50; // Larger batches for premium tier
     let processedCount = 0;
-    const delayBetweenCalls = 200; // 200ms between calls (5 calls/sec)
+    let apiCalls = 0;
+    const delayBetweenCalls = 1250;
 
-    console.log(`⚡ Optimized for FMP premium - processing up to 150 stocks with rate limiting (5 calls/sec)`);
+    const pause = () => new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
+    const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 
-    for (let i = 0; i < sortedTickers.length && processedCount < 150; i += batchSize) {
-      const currentTime = Date.now();
-      const elapsedTime = currentTime - startTime;
-      
-      if (elapsedTime > maxProcessingTime) {
-        console.log(`⏰ Approaching time limit (${elapsedTime}ms), stopping processing`);
+    for (const ticker of sortedTickers) {
+      if (Date.now() - startTime > maxProcessingTime) {
+        console.log(`⏰ Approaching time limit, stopping after ${processedCount} tickers`);
         break;
       }
 
-      const batchTickers = sortedTickers.slice(i, i + batchSize);
-      console.log(`🔄 Processing batch ${Math.floor(i / batchSize) + 1}: ${batchTickers.join(', ')}`);
+      try {
+        if (apiCalls > 0) await pause();
+        const quote = await finnhub.getQuote(ticker);
+        apiCalls++;
 
-      // Process tickers with optimized rate limiting
-      for (let tickerIndex = 0; tickerIndex < batchTickers.length; tickerIndex++) {
-        const ticker = batchTickers[tickerIndex];
-        
-        // Add delay between API calls (200ms for premium tier - 5 calls/sec)
-        if (i > 0 || tickerIndex > 0) {
-          await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
-        }
-        
-        try {
-          console.log(`📊 Fetching data for ${ticker}...`);
-          
-          // Get fresh quote data
-          const quote = await fmpService.getQuote(ticker);
-          
-          if (!quote) {
-            console.log(`⚠️ No quote data received for ${ticker}`);
-            failCount++;
-            processedCount++;
-            continue;
-          }
-
-          // Parse quote data
-          const currentPrice = parseFloat(quote['05. price'] || '0');
-          const changePercent = parseFloat((quote['10. change percent'] || '0%').replace('%', ''));
-          
-          if (currentPrice <= 0) {
-            console.log(`⚠️ Invalid price data for ${ticker}: ${currentPrice}`);
-            failCount++;
-            processedCount++;
-            continue;
-          }
-
-          console.log(`💰 ${ticker}: $${currentPrice} (${changePercent > 0 ? '+' : ''}${changePercent}%)`);
-
-          // Update all instances of this ticker across all tables
-          const stocksToUpdate = allStaleStocks.filter(stock => stock.ticker === ticker);
-          let updateCount = 0;
-          let updateErrors = 0;
-          
-          for (const stock of stocksToUpdate) {
-            try {
-              const { error: updateError } = await supabase
-                .from(stock.table)
-                .update({
-                  price_per_share: currentPrice,
-                  one_year_return: changePercent,
-                  updated_at: new Date().toISOString()
-                })
-                .eq('ticker', ticker);
-
-              if (updateError) {
-                console.error(`❌ Error updating ${ticker} in ${stock.table}:`, updateError);
-                updateErrors++;
-              } else {
-                console.log(`✅ Updated ${ticker} in ${stock.table}`);
-                updateCount++;
-              }
-            } catch (updateErr) {
-              console.error(`❌ Exception updating ${ticker} in ${stock.table}:`, updateErr);
-              updateErrors++;
-            }
-          }
-
-          if (updateCount > 0) {
-            successCount += updateCount;
-          } else {
-            failCount++;
-          }
-          processedCount++;
-
-        } catch (error) {
-          console.error(`❌ Error processing ${ticker}:`, error);
+        if (!quote) {
+          console.log(`⚠️ No quote data received for ${ticker}`);
           failCount++;
           processedCount++;
+          continue;
         }
+
+        await pause();
+        const metrics = await finnhub.getMetrics(ticker);
+        apiCalls++;
+
+        const updates: Record<string, unknown> = {
+          price_per_share: quote.c,
+          updated_at: new Date().toISOString(),
+        };
+        // Only overwrite fields Finnhub actually returned, so missing metrics keep their last known value
+        if (isNum(metrics?.['52WeekPriceReturnDaily'])) updates.one_year_return = Number(metrics!['52WeekPriceReturnDaily'].toFixed(2));
+        const pe = metrics?.peTTM ?? metrics?.peBasicExclExtraTTM;
+        if (isNum(pe) && pe > 0) updates.pe_ratio = Number(pe.toFixed(2));
+        if (isNum(metrics?.currentDividendYieldTTM)) updates.dividend_yield = Number(metrics!.currentDividendYieldTTM!.toFixed(2));
+        if (isNum(metrics?.marketCapitalization) && metrics!.marketCapitalization! > 0) updates.market_cap = formatMarketCap(metrics!.marketCapitalization!);
+
+        console.log(`💰 ${ticker}: $${quote.c} (today ${quote.dp ?? 0}%, 1Y ${updates.one_year_return ?? 'n/a'}%)`);
+
+        // Update every sector table this ticker appears in
+        const tables = [...new Set(allStaleStocks.filter(stock => stock.ticker === ticker).map(stock => stock.table))];
+        let updateCount = 0;
+        for (const table of tables) {
+          const { error: updateError } = await supabase.from(table).update(updates).eq('ticker', ticker);
+          if (updateError) {
+            console.error(`❌ Error updating ${ticker} in ${table}:`, updateError);
+          } else {
+            updateCount++;
+          }
+        }
+
+        if (updateCount > 0) {
+          successCount += updateCount;
+        } else {
+          failCount++;
+        }
+        processedCount++;
+      } catch (error) {
+        if (error instanceof FinnhubRateLimitError) {
+          console.log('⚠️ Finnhub rate limit hit, stopping this run');
+          break;
+        }
+        console.error(`❌ Error processing ${ticker}:`, error);
+        failCount++;
+        processedCount++;
       }
     }
 
@@ -304,7 +276,7 @@ Deno.serve(async (req) => {
           completed_at: new Date().toISOString(),
           stocks_updated: successCount,
           stocks_failed: failCount,
-          api_calls_used: processedCount
+          api_calls_used: apiCalls
         })
         .eq('id', lockId);
     }
@@ -330,7 +302,7 @@ Deno.serve(async (req) => {
     console.error('❌ Fatal error in update-stock-data function:', error);
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         success: false,
         updated: 0,
         failed: 0
