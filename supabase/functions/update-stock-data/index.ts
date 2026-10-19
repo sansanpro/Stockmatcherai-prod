@@ -1,316 +1,146 @@
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
-import { FinnhubClient, FinnhubRateLimitError, formatMarketCap } from '../_shared/finnhub.ts';
+import { FinnhubClient, FinnhubRateLimitError } from '../_shared/finnhub.ts';
+import { METRICS_TTL_MS, fetchAndApplyQuote, getMetricsFreshness, getTickerFreshness } from '../_shared/stockQuotes.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface DatabaseStock {
-  id: string;
-  ticker: string;
-  company_name: string;
-  pe_ratio: number;
-  market_cap: string;
-  one_year_return: number;
-  price_per_share: number;
-  dividend_yield: number;
-  risk_level: string;
-  esg_score: number;
-  ceo_name: string;
-  ceo_highlights: string;
-  created_at: string;
-  updated_at: string;
-  table: string;
-}
+// Runs every 10 minutes in market hours. A stock is refreshed when its price is older than
+// STALE_AFTER_MS; stalest first across all sectors. With metrics only refreshed daily most
+// stocks cost one Finnhub call, so ~90 fit in a run and every stock stays within ~20 minutes.
+const STALE_AFTER_MS = 9 * 60 * 1000;
+const MAX_RUN_MS = 115 * 1000; // edge functions are stopped at 150s
+// Finnhub free tier is 60 calls/min, shared with on-demand refreshes, news and the chatbot
+const CALL_SPACING_MS = 1200;
+const MAX_METRICS_PER_RUN = 15;
+
+const json = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let body: { updateType?: string; source?: string } = {};
   try {
-    // Parse request body to get parameters from cron jobs
-    let requestBody: any = {};
-    try {
-      if (req.method === 'POST') {
-        const text = await req.text();
-        if (text) {
-          requestBody = JSON.parse(text);
-        }
-      }
-    } catch (e) {
-      console.log('📝 No request body or invalid JSON, proceeding with default parameters');
+    const text = req.method === 'POST' ? await req.text() : '';
+    if (text) body = JSON.parse(text);
+  } catch {
+    // No or invalid body: use defaults
+  }
+  const updateType = body.updateType || 'default';
+
+  const finnhubApiKey = Deno.env.get('FINNHUB_API_KEY');
+  if (!finnhubApiKey) {
+    console.error('FINNHUB_API_KEY is not set');
+    return json({ error: 'FINNHUB_API_KEY is not configured', success: false, updated: 0, failed: 0 }, 500);
+  }
+  const finnhub = new FinnhubClient(finnhubApiKey);
+  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+  const startTime = Date.now();
+
+  try {
+    const freshness = await getTickerFreshness(supabase);
+    const staleTickers = [...freshness.entries()]
+      .filter(([, updatedAt]) => startTime - updatedAt > STALE_AFTER_MS)
+      .sort(([, a], [, b]) => a - b)
+      .map(([ticker]) => ticker);
+
+    if (staleTickers.length === 0) {
+      return json({ message: 'All stock data is up to date', success: true, updated: 0, failed: 0, staleCount: 0 });
     }
 
-    const updateType = requestBody.updateType || 'default';
-    const source = requestBody.source || 'manual';
-    const skipMarketCheck = requestBody.skipMarketCheck || false;
-    
-    console.log(`🚀 Stock data update function started - Type: ${updateType}, Source: ${source}`);
-    
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    const finnhubApiKey = Deno.env.get('FINNHUB_API_KEY');
-    if (!finnhubApiKey) {
-      console.error('❌ FINNHUB_API_KEY is not set in environment variables');
-      return new Response(
-        JSON.stringify({ 
-          error: 'FINNHUB_API_KEY is not configured',
-          success: false,
-          updated: 0,
-          failed: 0
-        }), 
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
-
-    const finnhub = new FinnhubClient(finnhubApiKey);
-
-    // Define all sector tables
-    const sectorTables = [
-      'technology_stocks',
-      'healthcare_stocks', 
-      'finance_stocks',
-      'energy_stocks',
-      'consumer_stocks',
-      'utilities_stocks'
-    ];
-
-    // Get all stocks older than 15 minutes
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
-    console.log(`⏰ Looking for stocks updated before: ${fifteenMinutesAgo}`);
-
-    let allStaleStocks: DatabaseStock[] = [];
-    
-    for (const table of sectorTables) {
-      try {
-        const { data: staleStocks, error } = await supabase
-          .from(table)
-          .select('*')
-          .lt('updated_at', fifteenMinutesAgo);
-
-        if (error) {
-          console.error(`❌ Error fetching stale stocks from ${table}:`, error);
-          continue;
-        }
-
-        if (staleStocks && staleStocks.length > 0) {
-          console.log(`📋 Found ${staleStocks.length} stale stocks in ${table}`);
-          allStaleStocks = [...allStaleStocks, ...staleStocks.map(stock => ({ ...stock, table }))];
-        }
-      } catch (err) {
-        console.error(`❌ Exception fetching from ${table}:`, err);
-      }
-    }
-
-    console.log(`🔍 Total stale stocks found: ${allStaleStocks.length}`);
-
-    if (allStaleStocks.length === 0) {
-      console.log('✅ All stock data is up to date (less than 15 minutes old)');
-      return new Response(
-        JSON.stringify({ 
-          message: 'All stock data is up to date',
-          success: true,
-          updated: 0,
-          failed: 0,
-          staleCount: 0
-        }), 
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Extract unique tickers and limit for wall-clock time constraints
-    const uniqueTickers = [...new Set(allStaleStocks.map(stock => stock.ticker))];
-    console.log(`📈 Unique tickers to update: ${uniqueTickers.length}`, uniqueTickers.slice(0, 10));
-
-    // Calculate time constraints (leave 30 seconds buffer for processing)
-    const startTime = Date.now();
-    const maxProcessingTime = 120 * 1000; // 120 seconds, leaving 30s buffer
-    
-    // Ensure balanced sector representation by grouping by sector and taking oldest from each
-    const tickersBySector = sectorTables.reduce((acc, table) => {
-      const sectorStocks = allStaleStocks.filter(s => s.table === table);
-      const sectorTickers = [...new Set(sectorStocks.map(s => s.ticker))];
-      acc[table] = sectorTickers.sort((a, b) => {
-        const aOldest = Math.min(...sectorStocks.filter(s => s.ticker === a).map(s => new Date(s.updated_at).getTime()));
-        const bOldest = Math.min(...sectorStocks.filter(s => s.ticker === b).map(s => new Date(s.updated_at).getTime()));
-        return aOldest - bOldest;
-      });
-      return acc;
-    }, {} as Record<string, string[]>);
-
-    // Create balanced selection: take ~8 from each sector to ensure all sectors get updates
-    const tickersPerSector = Math.floor(50 / sectorTables.length);
-    const sortedTickers: string[] = [];
-    sectorTables.forEach(table => {
-      const sectorTickers = tickersBySector[table] || [];
-      sortedTickers.push(...sectorTickers.slice(0, tickersPerSector + 2)); // +2 for rounding
-    });
-    
-    console.log(`⚖️ Balanced sector selection - ${sortedTickers.length} tickers distributed across all sectors`);
-
-    // Check if another update is already running (lock mechanism)
-    const { data: runningUpdates } = await supabase
+    // Lock so overlapping cron jobs don't double up on Finnhub's rate limit
+    const { data: running } = await supabase
       .from('stock_update_logs')
       .select('id')
       .eq('status', 'running')
-      .gte('started_at', new Date(Date.now() - 5 * 60 * 1000).toISOString()); // Check last 5 minutes
-    
-    if (runningUpdates && runningUpdates.length > 0) {
-      console.log('⚠️ Another update is already running, skipping to avoid rate limit conflicts');
-      return new Response(
-        JSON.stringify({ 
-          message: 'Another update is already running',
-          success: true,
-          updated: 0,
-          failed: 0
-        }), 
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      .gte('started_at', new Date(startTime - 5 * 60 * 1000).toISOString());
+    if (running && running.length > 0) {
+      return json({ message: 'Another update is already running', success: true, updated: 0, failed: 0 });
     }
-
-    // Create lock entry
-    const { data: lockEntry } = await supabase
+    const { data: lock } = await supabase
       .from('stock_update_logs')
-      .insert({
-        sector: 'all',
-        update_type: updateType,
-        status: 'running',
-        started_at: new Date().toISOString()
-      })
+      .insert({ sector: 'all', update_type: updateType, status: 'running', started_at: new Date().toISOString() })
       .select()
       .single();
 
-    const lockId = lockEntry?.id;
-
-    // Finnhub free tier allows ~60 calls/min. Each ticker costs 2 calls (quote + metrics);
-    // 1250ms spacing keeps us at ~48 calls/min, leaving headroom for the fmp-data function's user-facing calls.
-    let successCount = 0;
-    let failCount = 0;
-    let processedCount = 0;
+    const metricsFreshness = await getMetricsFreshness(supabase);
+    // Waits out the rest of the spacing since the last Finnhub call, so database writes
+    // happen inside the gap instead of adding to it
+    let lastCallAt = 0;
+    const pause = async (calls = 1) => {
+      const wait = lastCallAt + calls * CALL_SPACING_MS - Date.now();
+      if (wait > 0) await new Promise(resolve => setTimeout(resolve, wait));
+      lastCallAt = Date.now();
+    };
+    let updated = 0;
+    let failed = 0;
     let apiCalls = 0;
-    const delayBetweenCalls = 1250;
+    let metricsFetched = 0;
+    const failedTickers: string[] = [];
 
-    const pause = () => new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
-    const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
-
-    for (const ticker of sortedTickers) {
-      if (Date.now() - startTime > maxProcessingTime) {
-        console.log(`⏰ Approaching time limit, stopping after ${processedCount} tickers`);
-        break;
-      }
-
+    for (const ticker of staleTickers) {
+      if (Date.now() - startTime > MAX_RUN_MS) break;
+      const withMetrics = metricsFetched < MAX_METRICS_PER_RUN &&
+        startTime - (metricsFreshness.get(ticker) ?? 0) > METRICS_TTL_MS;
       try {
-        if (apiCalls > 0) await pause();
-        const quote = await finnhub.getQuote(ticker);
+        // Quote + metrics are two calls: budget a second interval to keep the average rate
+        await pause(withMetrics ? 2 : 1);
+        if (withMetrics) apiCalls++;
+        const result = await fetchAndApplyQuote(supabase, finnhub, ticker, withMetrics);
         apiCalls++;
-
-        if (!quote) {
-          console.log(`⚠️ No quote data received for ${ticker}`);
-          failCount++;
-          processedCount++;
-          continue;
-        }
-
-        await pause();
-        const metrics = await finnhub.getMetrics(ticker);
-        apiCalls++;
-
-        const updates: Record<string, unknown> = {
-          price_per_share: quote.c,
-          updated_at: new Date().toISOString(),
-        };
-        // Only overwrite fields Finnhub actually returned, so missing metrics keep their last known value
-        if (isNum(metrics?.['52WeekPriceReturnDaily'])) updates.one_year_return = Number(metrics!['52WeekPriceReturnDaily'].toFixed(2));
-        const pe = metrics?.peTTM ?? metrics?.peBasicExclExtraTTM;
-        if (isNum(pe) && pe > 0) updates.pe_ratio = Number(pe.toFixed(2));
-        if (isNum(metrics?.currentDividendYieldTTM)) updates.dividend_yield = Number(metrics!.currentDividendYieldTTM!.toFixed(2));
-        if (isNum(metrics?.marketCapitalization) && metrics!.marketCapitalization! > 0) updates.market_cap = formatMarketCap(metrics!.marketCapitalization!);
-
-        console.log(`💰 ${ticker}: $${quote.c} (today ${quote.dp ?? 0}%, 1Y ${updates.one_year_return ?? 'n/a'}%)`);
-
-        // Update every sector table this ticker appears in
-        const tables = [...new Set(allStaleStocks.filter(stock => stock.ticker === ticker).map(stock => stock.table))];
-        let updateCount = 0;
-        for (const table of tables) {
-          const { error: updateError } = await supabase.from(table).update(updates).eq('ticker', ticker);
-          if (updateError) {
-            console.error(`❌ Error updating ${ticker} in ${table}:`, updateError);
-          } else {
-            updateCount++;
-          }
-        }
-
-        if (updateCount > 0) {
-          successCount += updateCount;
+        if (withMetrics) metricsFetched++;
+        if (result && result.rowsUpdated > 0 && result.errors.length === 0) {
+          updated++;
         } else {
-          failCount++;
+          failed++;
+          failedTickers.push(ticker);
+          if (result?.errors.length) console.error(`Update errors for ${ticker}:`, result.errors);
         }
-        processedCount++;
       } catch (error) {
         if (error instanceof FinnhubRateLimitError) {
-          console.log('⚠️ Finnhub rate limit hit, stopping this run');
+          console.log('Finnhub rate limit hit, stopping this run');
           break;
         }
-        console.error(`❌ Error processing ${ticker}:`, error);
-        failCount++;
-        processedCount++;
+        console.error(`Error processing ${ticker}:`, error);
+        failed++;
+        failedTickers.push(ticker);
       }
     }
 
-    // Release lock
-    if (lockId) {
+    if (lock?.id) {
       await supabase
         .from('stock_update_logs')
         .update({
           status: 'completed',
           completed_at: new Date().toISOString(),
-          stocks_updated: successCount,
-          stocks_failed: failCount,
-          api_calls_used: apiCalls
+          stocks_updated: updated,
+          stocks_failed: failed,
+          api_calls_used: apiCalls,
+          error_message: failedTickers.length ? `Failed: ${failedTickers.join(', ')}` : null,
         })
-        .eq('id', lockId);
+        .eq('id', lock.id);
     }
 
     const summary = {
       message: 'Stock update process completed',
       success: true,
-      staleStocksFound: allStaleStocks.length,
-      uniqueTickersProcessed: uniqueTickers.length,
-      updated: successCount,
-      failed: failCount,
-      updateTime: new Date().toISOString()
+      staleStocksFound: staleTickers.length,
+      updated,
+      failed,
+      failedTickers,
+      metricsRefreshed: metricsFetched,
+      apiCalls,
+      seconds: Math.round((Date.now() - startTime) / 1000),
     };
-
-    console.log('📊 Update Summary:', summary);
-
-    return new Response(
-      JSON.stringify(summary), 
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-
+    console.log('Update summary:', summary);
+    return json(summary);
   } catch (error) {
-    console.error('❌ Fatal error in update-stock-data function:', error);
-    return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : String(error),
-        success: false,
-        updated: 0,
-        failed: 0
-      }), 
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    console.error('Fatal error in update-stock-data:', error);
+    return json({ error: error instanceof Error ? error.message : String(error), success: false, updated: 0, failed: 0 }, 500);
   }
 });

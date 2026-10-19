@@ -2,6 +2,7 @@
 // (and the legacy fmp-data alias for already-installed app builds).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
 import { FinnhubClient, FinnhubNewsItem, FinnhubRateLimitError } from './finnhub.ts';
+import { SECTOR_TABLES, fetchAndApplyQuote, getTickerFreshness } from './stockQuotes.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -171,6 +172,38 @@ function relevantNews<T extends { title: string; text?: string }>(items: T[], sy
   return matches.length >= 2 ? matches : items;
 }
 
+// On-demand price refresh for stocks a user is looking at: anything older than 20 minutes is
+// re-fetched from Finnhub and saved. The saved timestamp is shared, so each stock costs at most
+// one Finnhub call per 20 minutes however many people view it. Returns current stored prices.
+const ON_DEMAND_STALE_MS = 20 * 60 * 1000;
+const MAX_REFRESH_SYMBOLS = 3;
+
+async function refreshQuotes(finnhub: FinnhubClient, symbols: string[]) {
+  const freshness = await getTickerFreshness(db(), symbols);
+  const stale = symbols.filter(sym => freshness.has(sym) && Date.now() - freshness.get(sym)! > ON_DEMAND_STALE_MS);
+  await Promise.all(stale.map(async sym => {
+    try {
+      await fetchAndApplyQuote(db(), finnhub, sym, false);
+    } catch (error) {
+      // Rate limited or unavailable: return the stored price instead
+      console.warn(`[company-data] Quote refresh failed for ${sym}:`, error instanceof Error ? error.message : error);
+    }
+  }));
+
+  const results = await Promise.all(SECTOR_TABLES.map(table =>
+    db().from(table).select('ticker, price_per_share, updated_at').in('ticker', symbols)));
+  const prices: Record<string, { price: number; updatedAt: string }> = {};
+  for (const { data } of results) {
+    for (const row of data ?? []) {
+      const existing = prices[row.ticker];
+      if (!existing || row.updated_at > existing.updatedAt) {
+        prices[row.ticker] = { price: Number(row.price_per_share), updatedAt: row.updated_at };
+      }
+    }
+  }
+  return { prices, refreshed: stale };
+}
+
 // Maps to the NewsItem shape in src/hooks/useCompanyNews.ts
 function toNewsItem(item: FinnhubNewsItem, symbol?: string) {
   return {
@@ -228,6 +261,16 @@ export async function handleCompanyDataRequest(req: Request): Promise<Response> 
         const news = await withSharedCache('news:__market__', NEWS_TTL,
           async () => (await finnhub.getMarketNews()).slice(0, 20).map(item => toNewsItem(item)));
         result = news.slice(0, limit);
+        break;
+      }
+
+      case 'refresh_quotes': {
+        const symbols: string[] = (Array.isArray(symbol) ? symbol : String(symbol ?? '').split(','))
+          .map((s: string) => s.trim().toUpperCase())
+          .filter((s: string) => /^[A-Z.]{1,6}$/.test(s))
+          .slice(0, MAX_REFRESH_SYMBOLS);
+        if (symbols.length === 0) return jsonResponse({ error: 'Symbols required' }, 400);
+        result = await refreshQuotes(finnhub, symbols);
         break;
       }
 

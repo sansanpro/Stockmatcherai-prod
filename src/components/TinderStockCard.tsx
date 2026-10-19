@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLiveQuote } from '@/hooks/useLiveQuote';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +20,8 @@ interface TinderStockCardProps {
   zIndex?: number;
   scale?: number;
   isHighMatch?: boolean;
+  // Only the top card refreshes its price on demand
+  isActive?: boolean;
 }
 
 const TinderStockCard = ({ 
@@ -29,8 +32,10 @@ const TinderStockCard = ({
   isVisible = true, 
   zIndex = 1,
   scale = 1,
-  isHighMatch = false
+  isHighMatch = false,
+  isActive = false
 }: TinderStockCardProps) => {
+  const live = useLiveQuote(stock.ticker, stock.pricePerShare, stock.lastUpdated, isActive);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -226,7 +231,7 @@ const TinderStockCard = ({
           
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <DataFreshnessIndicator 
-              lastUpdated={(stock as any).lastUpdated} 
+              lastUpdated={live.lastUpdated} 
               variant="inline"
               className="bg-black/20 backdrop-blur-sm rounded-full px-3 py-1.5 text-sm"
             />
@@ -269,7 +274,7 @@ const TinderStockCard = ({
               <p className="text-sm text-green-600 dark:text-green-400 font-medium">Price/Share</p>
               <EducationalTooltip content="Current trading price per individual share of the company's stock." />
             </div>
-            <p className="text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
+            <p className="text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(live.price)}</p>
           </div>
           {stock.dividendYield > 0 && (
             <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-4 rounded-xl text-center">
@@ -432,7 +437,7 @@ className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[
               
               <div className="mt-2 flex flex-wrap items-center gap-2 animate-fade-in delay-300">
                 <DataFreshnessIndicator 
-                  lastUpdated={(stock as any).lastUpdated} 
+                  lastUpdated={live.lastUpdated} 
                   variant="inline"
                   className="bg-black/20 backdrop-blur-sm rounded-full px-2 py-1 text-xs"
                 />
@@ -501,7 +506,7 @@ className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[
                     content="Current trading price per individual share of the company's stock."
                   />
                 </div>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(stock.pricePerShare)}</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(live.price)}</p>
               </div>
               {stock.dividendYield > 0 && (
                 <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">

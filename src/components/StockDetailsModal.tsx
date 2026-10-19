@@ -12,6 +12,7 @@ import CompanySnapshot from '@/components/CompanySnapshot';
 import { useCompanyNews } from '@/hooks/useCompanyNews';
 import { usePricePerformance } from '@/hooks/usePricePerformance';
 import { getMomentum } from '@/utils/momentum';
+import { useLiveQuote } from '@/hooks/useLiveQuote';
 
 interface StockDetailsModalProps {
   stock: StockRecommendation | null;
@@ -67,6 +68,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
   const { news, isLoading: newsLoading, error: newsError } = useCompanyNews(isOpen && stock ? stock.ticker : null, stock?.companyName);
   const { performance, isLoading: performanceLoading, error: performanceError } =
     usePricePerformance(stock?.ticker ?? null, isOpen);
+  const live = useLiveQuote(stock?.ticker ?? '', stock?.pricePerShare ?? 0, stock?.lastUpdated, isOpen && !!stock);
 
   if (!stock) return null;
 
@@ -75,7 +77,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
   const rangeHigh = performance?.fiftyTwoWeekHigh;
   const rangeLow = performance?.fiftyTwoWeekLow;
   const rangePosition = rangeHigh && rangeLow && rangeHigh > rangeLow
-    ? Math.min(100, Math.max(0, ((stock.pricePerShare - rangeLow) / (rangeHigh - rangeLow)) * 100))
+    ? Math.min(100, Math.max(0, ((live.price - rangeLow) / (rangeHigh - rangeLow)) * 100))
     : null;
 
   return (
@@ -111,7 +113,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                 </div>
               </div>
               <div className="flex-shrink-0 text-right">
-                <p className="text-white text-xl font-bold">${stock.pricePerShare.toFixed(2)}</p>
+                <p className="text-white text-xl font-bold">${live.price.toFixed(2)}</p>
                 <div className={`flex items-center justify-end gap-1 mt-0.5 text-sm font-semibold ${
                   isPositive ? 'text-green-200' : 'text-red-200'
                 }`}>
@@ -246,7 +248,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <p className="text-xs text-muted-foreground">Current Price</p>
-                    <p className="text-2xl font-bold">${stock.pricePerShare.toFixed(2)}</p>
+                    <p className="text-2xl font-bold">${live.price.toFixed(2)}</p>
                   </div>
                   <div className={`px-3 py-1.5 rounded-xl text-sm font-semibold ${
                     isPositive

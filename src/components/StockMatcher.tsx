@@ -496,6 +496,7 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
                   zIndex={zIndex}
                   scale={scale}
                   isHighMatch={isActiveCard ? isHighCompatibilityMatch(stock, userProfile) : false}
+                  isActive={isActiveCard}
                 />
               );
             })}

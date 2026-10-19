@@ -24,4 +24,5 @@ export interface StockRecommendation {
   dividendYield: number;
   whyItFits: string;
   esgScore?: number;
+  lastUpdated?: string;
 }

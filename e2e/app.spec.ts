@@ -144,3 +144,36 @@ test('no ESG scores anywhere (they were unsourced placeholder values)', async ({
     await expect(details.getByText(/\bESG\b/)).toHaveCount(0);
   }
 });
+
+test('a card whose price is over 20 minutes old refreshes it on screen', async ({ page }) => {
+  // Make every stock look an hour old so the visible card must refresh its price
+  const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  await page.route(/\/rest\/v1\/\w+_stocks/, async (route) => {
+    const response = await route.fetch();
+    const rows = await response.json();
+    const aged = Array.isArray(rows)
+      ? rows.map((r: Record<string, unknown>) => ({ ...r, last_updated: hourAgo, updated_at: hourAgo }))
+      : rows;
+    // Build the reply by hand: fulfill({ response, json }) crashes WebKit's network process
+    await route.fulfill({
+      status: response.status(),
+      contentType: 'application/json',
+      headers: { 'access-control-allow-origin': '*', 'content-range': response.headers()['content-range'] ?? '*/*' },
+      body: JSON.stringify(aged),
+    });
+  });
+
+  const refresh = page.waitForRequest(req =>
+    req.url().includes('/functions/v1/company-data') && (req.postData() ?? '').includes('refresh_quotes'));
+  await openApp(page);
+  const request = await refresh;
+  const ticker = JSON.parse(request.postData()!).symbol as string;
+  const response = await (await request.response())!.json();
+  const fresh = response.data.prices[ticker];
+  expect(fresh.price).toBeGreaterThan(0);
+
+  // The top card's freshness badge shows the refreshed time (cards stacked behind it keep
+  // their age until they reach the top)
+  await expect(page.getByText(/^(Just now|[0-9]+m ago)$/).first()).toBeVisible({ timeout: 10_000 });
+  await page.screenshot({ path: 'e2e/screens/live-quote.png' });
+});
