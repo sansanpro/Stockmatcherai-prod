@@ -8,7 +8,6 @@ export interface FactorScores {
   incomeScore: number;        // 0-100: Dividend income potential
   affordabilityScore: number; // 0-100: Price accessibility for user
   sectorMatch: number;        // 0-100: Sector preference alignment
-  esgScore: number;           // 0-100: ESG rating quality
 }
 
 export interface FactorAnalysis {
@@ -58,7 +57,6 @@ const calculateFactorScores = (
     incomeScore: calculateIncomeScore(stock.dividendYield, profile.investmentGoal),
     affordabilityScore: calculateAffordability(stock.pricePerShare, profile.salary),
     sectorMatch: profile.sectorPreference === stock.sector || profile.sectorPreference === 'any' ? 100 : 40,
-    esgScore: stock.esgScore ? Math.min(100, stock.esgScore) : 50,
   };
 };
 
@@ -203,16 +201,6 @@ const identifyTopFactors = (
       score: scores.sectorMatch,
       dataPoint: stock.sector,
       context: 'preferred sector',
-    });
-  }
-  
-  // ESG factor - only if ESG score is valid
-  if (scores.esgScore >= 80 && stock.esgScore && stock.esgScore >= 70 && stock.esgScore <= 100) {
-    factors.push({
-      name: 'esg',
-      score: scores.esgScore,
-      dataPoint: `${stock.esgScore}`,
-      context: 'sustainability leader',
     });
   }
   

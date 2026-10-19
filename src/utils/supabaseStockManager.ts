@@ -228,7 +228,6 @@ export const getStocksFromSupabase = async (sector?: string): Promise<Omit<Stock
         riskLevel: stock.risk_level as 'low' | 'medium' | 'high',
         pricePerShare: stock.price_per_share,
         dividendYield: stock.dividend_yield,
-        esgScore: stock.esg_score || 75,
         lastUpdated: stock.last_updated
       }));
     

@@ -147,22 +147,6 @@ export const sortStocksByRelevance = (
     scoreA += getAffordabilityScore(a, profile.salary);
     scoreB += getAffordabilityScore(b, profile.salary);
 
-    // ESG and sustainability bonus
-    const getESGScore = (stock: any, age: number) => {
-      if (!stock.esgScore) return 0;
-      
-      // Younger investors care more about ESG
-      const ageFactor = age < 40 ? 1.5 : age < 55 ? 1.0 : 0.5;
-      
-      if (stock.esgScore > 80) return 6 * ageFactor;
-      if (stock.esgScore > 70) return 4 * ageFactor;
-      if (stock.esgScore > 60) return 2 * ageFactor;
-      return 0;
-    };
-
-    scoreA += getESGScore(a, profile.age);
-    scoreB += getESGScore(b, profile.age);
-
     // Financial health indicators
     const getFinancialHealthScore = (stock: any) => {
       let healthScore = 0;

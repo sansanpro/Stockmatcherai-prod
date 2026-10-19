@@ -6,7 +6,7 @@ export interface ExplanationTemplate {
   template: string;
   requiredFactors: string[];
   tone: 'confident' | 'analytical' | 'conversational' | 'urgent';
-  leadType: 'strength' | 'user' | 'comparison' | 'ceo' | 'esg' | 'affordability' | 'time-horizon' | 'personal' | 'trajectory';
+  leadType: 'strength' | 'user' | 'comparison' | 'ceo' | 'affordability' | 'time-horizon' | 'personal' | 'trajectory';
 }
 
 // Placeholders:
@@ -22,7 +22,6 @@ export interface ExplanationTemplate {
 // {goal} - User's investment goal
 // {ceoName} - CEO name
 // {ceoKeyword} - Extracted CEO highlight keyword
-// {esg} - ESG score
 // {comparison} - Performance comparison text
 // {yieldComparison} - Dividend comparison text
 // NEW PERSONAL PLACEHOLDERS:
@@ -135,14 +134,6 @@ export const ceoLeadTemplates: ExplanationTemplate[] = [
   { id: 'ceo-5', template: 'Trust the leadership: {ceoName} built {ticker} on {ceoKeyword}. {trajectoryContext}.', requiredFactors: [], tone: 'conversational', leadType: 'ceo' },
 ];
 
-export const esgLeadTemplates: ExplanationTemplate[] = [
-  { id: 'esg-1', template: 'ESG score of {esg} makes {ticker} a sustainability leader in {sector}. {sectorInterest}.', requiredFactors: ['esg', 'sector'], tone: 'confident', leadType: 'esg' },
-  { id: 'esg-2', template: '{company} combines {esg} ESG rating with {return} financial returns. {goalReason}.', requiredFactors: ['esg', 'performance', 'goal'], tone: 'analytical', leadType: 'esg' },
-  { id: 'esg-3', template: 'Responsible investing: {ticker} scores {esg} on ESG metrics. {riskProfile}.', requiredFactors: ['esg', 'risk'], tone: 'confident', leadType: 'esg' },
-  { id: 'esg-4', template: '{esg} ESG score at {company} signals long-term sustainability. {trajectoryContext}.', requiredFactors: ['esg'], tone: 'analytical', leadType: 'esg' },
-  { id: 'esg-5', template: 'Values-aligned: {ticker} ESG of {esg} exceeds industry standards. {goalReason}.', requiredFactors: ['esg', 'goal'], tone: 'confident', leadType: 'esg' },
-];
-
 export const affordabilityTemplates: ExplanationTemplate[] = [
   { id: 'aff-1', template: 'At {price}/share, {ticker} is {affordabilityContext}. {goalReason}.', requiredFactors: ['affordability', 'goal'], tone: 'conversational', leadType: 'affordability' },
   { id: 'aff-2', template: '{price} entry point on {company} lets you start without major commitment. {trajectoryContext}.', requiredFactors: ['affordability'], tone: 'conversational', leadType: 'affordability' },
@@ -185,7 +176,6 @@ export const getAllTemplates = (): ExplanationTemplate[] => [
   ...userLeadTemplates,
   ...comparisonTemplates,
   ...ceoLeadTemplates,
-  ...esgLeadTemplates,
   ...affordabilityTemplates,
   ...timeHorizonTemplates,
   ...combinationTemplates,

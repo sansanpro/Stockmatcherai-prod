@@ -325,7 +325,6 @@ serve(async (req) => {
         riskLevel: stock.risk_level,
         pricePerShare: stock.price_per_share,
         dividendYield: stock.dividend_yield,
-        esgScore: stock.esg_score,
         whyItFits: rec.explanation || rec.reason || 'AI-powered personalized recommendation',
         aiRecommendationId: aiRecommendation.id,
         confidenceScore: rec.confidence || confidenceScore

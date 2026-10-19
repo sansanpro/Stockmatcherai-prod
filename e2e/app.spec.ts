@@ -132,3 +132,15 @@ test('details panel shows real returns, real news and no buy/sell ratings', asyn
   await expect(details.getByText(/demonstrates strong commitment/)).toHaveCount(0);
   await page.screenshot({ path: 'e2e/screens/details-news.png' });
 });
+
+test('no ESG scores anywhere (they were unsourced placeholder values)', async ({ page }) => {
+  await openApp(page);
+  await expect(page.getByText('P/E Ratio').first()).toBeVisible();
+  await expect(page.getByText(/\bESG\b|sustainability leader/i)).toHaveCount(0);
+  await page.getByRole('button', { name: 'View stock details' }).first().click();
+  const details = page.getByRole('dialog');
+  for (const tab of [/Overview/, /Metrics/, /Returns/, /News/]) {
+    await details.getByRole('tab', { name: tab }).click();
+    await expect(details.getByText(/\bESG\b/)).toHaveCount(0);
+  }
+});

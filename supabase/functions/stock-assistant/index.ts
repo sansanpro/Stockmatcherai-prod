@@ -57,7 +57,7 @@ class StockDataService {
   private async getStoredStock(sym: string) {
     const results = await Promise.all(SECTOR_TABLES.map(table =>
       this.db.from(table)
-        .select('company_name, ceo_name, ceo_highlights, pe_ratio, market_cap, one_year_return, price_per_share, dividend_yield, risk_level, esg_score')
+        .select('company_name, ceo_name, ceo_highlights, pe_ratio, market_cap, one_year_return, price_per_share, dividend_yield, risk_level')
         .eq('ticker', sym)
         .maybeSingle()
     ));
@@ -94,7 +94,6 @@ class StockDataService {
         dividendYieldPercent: stored?.dividend_yield,
         oneYearReturnPercent: stored?.one_year_return,
         riskLevel: stored?.risk_level,
-        esgScore: stored?.esg_score,
       };
     });
   }

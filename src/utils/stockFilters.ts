@@ -111,12 +111,6 @@ export const filterStocksByProfile = (
       if (b.oneYearReturn > 0) scoreB += b.oneYearReturn * 0.5;
     }
 
-    // ESG preference (slight boost for better ESG scores)
-    if (a.esgScore && b.esgScore) {
-      scoreA += (a.esgScore - 50) * 0.1;
-      scoreB += (b.esgScore - 50) * 0.1;
-    }
-
     return scoreB - scoreA;
   });
 

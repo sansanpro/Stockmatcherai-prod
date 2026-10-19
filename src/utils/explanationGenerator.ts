@@ -12,7 +12,6 @@ import {
   userLeadTemplates,
   comparisonTemplates,
   ceoLeadTemplates,
-  esgLeadTemplates,
   affordabilityTemplates,
   timeHorizonTemplates,
   combinationTemplates,
@@ -140,11 +139,6 @@ const selectCandidateTemplates = (
     candidates.push(...shuffleArray(ceoLeadTemplates));
   }
   
-  // Ninth: Add ESG templates if score is good
-  if (analysis.scores.esgScore >= 75 && stock.esgScore) {
-    candidates.push(...shuffleArray(esgLeadTemplates));
-  }
-  
   // Tenth: Add affordability templates if price is accessible
   if (analysis.scores.affordabilityScore >= 70) {
     candidates.push(...shuffleArray(affordabilityTemplates));
@@ -182,8 +176,6 @@ const hasFactorData = (
       return !!stock.sector && (profile.sectorPreference === stock.sector || profile.sectorPreference === 'any');
     case 'affordability':
       return analysis.scores.affordabilityScore >= 50 && stock.pricePerShare > 0;
-    case 'esg':
-      return !!stock.esgScore && stock.esgScore >= 70 && stock.esgScore <= 100;
     default:
       return true;
   }
@@ -368,12 +360,6 @@ const fillTemplate = (
   result = result.replace(/{marketCap}/g, analysis.marketCapTier);
   result = result.replace(/{ceoName}/g, stock.ceoName || 'leadership');
   result = result.replace(/{ceoKeyword}/g, analysis.ceoKeyword || 'innovation');
-  
-  // Only show ESG if valid
-  const esgText = stock.esgScore && stock.esgScore >= 50 && stock.esgScore <= 100 
-    ? stock.esgScore.toString() 
-    : 'strong';
-  result = result.replace(/{esg}/g, esgText);
   
   // User data replacements
   result = result.replace(/{goal}/g, profile.investmentGoal || 'growth');

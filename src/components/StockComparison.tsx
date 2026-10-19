@@ -66,13 +66,6 @@ const StockComparison = ({ availableStocks }: StockComparisonProps) => {
         ...acc,
         [`stock${index}`]: stock.dividendYield
       }), {})
-    },
-    {
-      metric: 'ESG Score',
-      ...selectedStocks.reduce((acc, stock, index) => ({
-        ...acc,
-        [`stock${index}`]: stock.esgScore || 70
-      }), {})
     }
   ];
 

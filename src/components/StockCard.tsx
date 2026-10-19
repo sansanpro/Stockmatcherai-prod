@@ -3,7 +3,7 @@ import { getMomentum } from '@/utils/momentum';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { StockRecommendation } from '@/types/stock-matcher';
-import { Eye, Star, Leaf } from 'lucide-react';
+import { Eye, Star } from 'lucide-react';
 import StockNewsPill from '@/components/StockNewsPill';
 import CompanySnapshot from '@/components/CompanySnapshot';
 
@@ -41,16 +41,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
     return `$${num.toFixed(2)}`;
   };
 
-  const getESGRating = (score: number) => {
-    if (score >= 80) return { rating: 'A+', color: 'text-green-600 dark:text-green-400' };
-    if (score >= 70) return { rating: 'A', color: 'text-green-600 dark:text-green-400' };
-    if (score >= 60) return { rating: 'B+', color: 'text-blue-600 dark:text-blue-400' };
-    if (score >= 50) return { rating: 'B', color: 'text-yellow-600 dark:text-yellow-400' };
-    return { rating: 'C', color: 'text-red-600 dark:text-red-400' };
-  };
-
   const momentum = getMomentum(stock.oneYearReturn);
-  const esgRating = getESGRating(stock.esgScore || 70);
 
   return (
     <Card className="w-full max-w-md md:max-w-xl lg:max-w-3xl xl:max-w-4xl mx-auto shadow-xl border-0 bg-card overflow-hidden max-h-[85vh] lg:max-h-[calc(100vh-10rem)] overflow-y-auto">
@@ -97,11 +88,6 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
                 <Badge className={`${momentum.badgeClass} text-[10px] sm:text-xs px-2 py-1`}>
                   {momentum.label}
                 </Badge>
-              </div>
-              <div className="flex items-center gap-2">
-                <Leaf className="w-4 h-4 text-green-500 flex-shrink-0" />
-                <span className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">ESG:</span>
-                <span className={`font-bold text-xs sm:text-sm ${esgRating.color}`}>{esgRating.rating}</span>
               </div>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StockRecommendation } from '@/types/stock-matcher';
 import {
-  TrendingUp, TrendingDown, Globe, Leaf, Heart, X,
+  TrendingUp, TrendingDown, Globe, Heart, X,
   Building2, DollarSign, BarChart3, Newspaper, ExternalLink,
 } from 'lucide-react';
 import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
@@ -41,14 +41,6 @@ const getRiskEmoji = (risk: string) => {
   }
 };
 
-const esgInfo = (score: number) => {
-  if (score >= 80) return { rating: 'A+', color: 'text-emerald-600 dark:text-emerald-400', bar: 'bg-emerald-500' };
-  if (score >= 70) return { rating: 'A',  color: 'text-green-600 dark:text-green-400',    bar: 'bg-green-500'   };
-  if (score >= 60) return { rating: 'B+', color: 'text-blue-600 dark:text-blue-400',      bar: 'bg-blue-500'    };
-  if (score >= 50) return { rating: 'B',  color: 'text-yellow-600 dark:text-yellow-400',  bar: 'bg-yellow-500'  };
-  return                  { rating: 'C',  color: 'text-red-600 dark:text-red-400',        bar: 'bg-red-500'     };
-};
-
 const timeAgo = (dateString: string): string => {
   const diffHours = Math.floor((Date.now() - new Date(dateString).getTime()) / (1000 * 60 * 60));
   if (diffHours < 1) return 'Just now';
@@ -80,8 +72,6 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
 
   const isPositive = stock.oneYearReturn >= 0;
   const momentum = getMomentum(stock.oneYearReturn);
-  const esgScore = stock.esgScore || 70;
-  const esg      = esgInfo(esgScore);
   const rangeHigh = performance?.fiftyTwoWeekHigh;
   const rangeLow = performance?.fiftyTwoWeekLow;
   const rangePosition = rangeHigh && rangeLow && rangeHigh > rangeLow
@@ -326,7 +316,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
               </p>
             </TabsContent>
 
-            {/* ── News & ESG ───────────────────────────────────────────────── */}
+            {/* ── News ───────────────────────────────────────────────────── */}
             <TabsContent value="news" className="mt-0 px-4 pt-4 space-y-4">
               {/* News */}
               <div>
@@ -373,34 +363,6 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                 )}
               </div>
 
-              {/* ESG */}
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                  ESG Analysis
-                </p>
-                <div className="bg-muted/50 rounded-2xl p-4 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Leaf className="w-5 h-5 text-emerald-500" />
-                      <span className="font-semibold text-sm">ESG Rating</span>
-                    </div>
-                    <span className={`text-2xl font-bold ${esg.color}`}>{esg.rating}</span>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-xs mb-1.5">
-                      <span className="text-muted-foreground">Overall score</span>
-                      <span className="font-semibold">{esgScore}/100</span>
-                    </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className={`h-2 rounded-full ${esg.bar} transition-all duration-700`}
-                        style={{ width: `${esgScore}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
             </TabsContent>
           </div>
         </Tabs>
