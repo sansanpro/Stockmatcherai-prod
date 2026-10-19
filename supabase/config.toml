@@ -65,3 +65,6 @@ verify_jwt = false
 
 [functions.company-data]
 verify_jwt = false
+
+[functions.match-feed]
+verify_jwt = true
