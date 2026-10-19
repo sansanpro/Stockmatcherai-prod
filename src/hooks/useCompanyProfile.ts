@@ -106,8 +106,9 @@ export function formatIPODate(ipoDate: string): string {
     const now = new Date().getFullYear();
     const yearsAgo = now - year;
     
+    // This is the IPO date, not the founding date
     if (yearsAgo > 1) {
-      return `Est. ${year}`;
+      return `IPO ${year}`;
     }
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   } catch {

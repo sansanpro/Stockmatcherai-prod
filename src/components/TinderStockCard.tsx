@@ -3,7 +3,7 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { StockRecommendation } from '@/types/stock-matcher';
-import { Heart, X, TrendingUp, DollarSign, Building, Eye, Minimize2, ThumbsUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, X, TrendingUp, DollarSign, Building, Eye, Minimize2, ThumbsUp } from 'lucide-react';
 import EducationalTooltip from '@/components/EducationalTooltip';
 import DataFreshnessIndicator from '@/components/DataFreshnessIndicator';
 import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/sheet';
@@ -125,8 +125,14 @@ const TinderStockCard = ({
     }
   };
 
+  // Taps on buttons/links inside the card (details, tooltips, news, carousel) shouldn't also
+  // count as a tap on the card, which would expand it on top of whatever the button opens
+  const startsOnControl = (target: EventTarget) =>
+    target instanceof Element && !!target.closest('button, a, input, [role="button"]');
+
   // Mouse events
   const handleMouseDown = (e: React.MouseEvent) => {
+    if (startsOnControl(e.target)) return;
     e.preventDefault();
     handleStart(e.clientX, e.clientY);
   };
@@ -141,6 +147,7 @@ const TinderStockCard = ({
 
   // Touch events
   const handleTouchStart = (e: React.TouchEvent) => {
+    if (startsOnControl(e.target)) return;
     const touch = e.touches[0];
     handleStart(touch.clientX, touch.clientY);
   };
@@ -300,6 +307,7 @@ const TinderStockCard = ({
             <h3 className="font-semibold text-lg">Stock Details</h3>
             <button
               onClick={() => setIsExpanded(false)}
+              aria-label="Collapse stock details"
               className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-muted hover:bg-muted/80 active:scale-95 transition-all"
             >
               <Minimize2 className="w-5 h-5" />
@@ -377,17 +385,6 @@ className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Faint edge chevrons when idle */}
-        {!isDragging && !isExiting && (
-          <>
-            <div className="absolute left-1 top-1/2 -translate-y-1/2 z-10 opacity-15 pointer-events-none">
-              <ChevronLeft className="w-6 h-6 text-muted-foreground" />
-            </div>
-            <div className="absolute right-1 top-1/2 -translate-y-1/2 z-10 opacity-15 pointer-events-none">
-              <ChevronRight className="w-6 h-6 text-muted-foreground" />
-            </div>
-          </>
-        )}
         <CardContent className="p-0 flex flex-col h-full overflow-y-auto">
           {/* Header with gradient background */}
           <div 

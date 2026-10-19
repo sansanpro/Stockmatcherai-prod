@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 // End-to-end tests against the web build in WebKit at iPhone size (closest to the Capacitor iOS
 // WebView). They hit the real Supabase backend as the test account in .env.test.local.
-// Run: npx playwright test        Screenshots land in test-results/
+// Run: npx playwright test        Screenshots land in e2e/screens/ (failure artifacts in test-results/)
 export default defineConfig({
   testDir: './e2e',
   outputDir: 'test-results',

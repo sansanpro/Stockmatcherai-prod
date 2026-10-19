@@ -29,15 +29,22 @@ interface StoredCompanyProfile {
   city: string | null;
   state: string | null;
   country: string;
+  industry: string | null;
+  website: string | null;
+  ipo_date: string | null;
+  logo_url: string | null;
+  finnhub_synced_at: string | null;
 }
 
-// Static facts Finnhub's free profile lacks (description, employees, HQ) live in the
-// company_profiles table, so no API call is needed for them.
+const db = () => createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+
+// Company facts live in the company_profiles table so profile views don't spend Finnhub's
+// shared 60 calls/min. Finnhub is only called once per ticker to fill industry, website,
+// IPO date and logo, and the result is stored.
 async function getStoredProfile(symbol: string): Promise<StoredCompanyProfile | null> {
-  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-  const { data, error } = await supabase
+  const { data, error } = await db()
     .from('company_profiles')
-    .select('description, full_time_employees, city, state, country')
+    .select('description, full_time_employees, city, state, country, industry, website, ipo_date, logo_url, finnhub_synced_at')
     .eq('ticker', symbol)
     .maybeSingle();
   if (error) {
@@ -47,28 +54,54 @@ async function getStoredProfile(symbol: string): Promise<StoredCompanyProfile | 
   return data;
 }
 
+async function syncFromFinnhub(finnhub: FinnhubClient, symbol: string, stored: StoredCompanyProfile | null) {
+  let profile = null;
+  try {
+    profile = await finnhub.getProfile(symbol);
+  } catch (error) {
+    // Rate limited or down: serve what we have and try again on a later request
+    console.warn(`[company-data] Finnhub profile unavailable for ${symbol}:`, error instanceof Error ? error.message : error);
+    return null;
+  }
+  if (!profile) return null;
+
+  const fields = {
+    industry: profile.finnhubIndustry || null,
+    website: profile.weburl || null,
+    ipo_date: profile.ipo || null,
+    logo_url: profile.logo || null,
+    finnhub_synced_at: new Date().toISOString(),
+  };
+  // Only update existing rows; new tickers need a description written before they get a row
+  if (stored) {
+    const { error } = await db().from('company_profiles').update(fields).eq('ticker', symbol);
+    if (error) console.error(`[company-data] Failed to store Finnhub fields for ${symbol}:`, error);
+  }
+  return { ...fields, name: profile.name, country: profile.country };
+}
+
 // Maps to the CompanyProfile shape in src/hooks/useCompanyProfile.ts
 async function getCompanyProfile(finnhub: FinnhubClient, symbol: string) {
-  const [profile, stored] = await Promise.all([
-    withCache(`profile_${symbol}`, CACHE_DURATION, () => finnhub.getProfile(symbol)),
-    getStoredProfile(symbol),
-  ]);
-  if (!profile && !stored) return null;
+  const stored = await getStoredProfile(symbol);
+  const synced = stored?.finnhub_synced_at
+    ? null
+    : await withCache(`finnhub_profile_${symbol}`, CACHE_DURATION, () => syncFromFinnhub(finnhub, symbol, stored));
+  if (!stored && !synced) return null;
 
   // Outside the US there is no state, so show the country after the city instead
   const region = stored?.state ?? (stored && stored.country !== 'US' ? stored.country : undefined);
   return {
     symbol,
-    companyName: profile?.name ?? symbol,
+    companyName: synced?.name ?? symbol,
     description: stored?.description ?? '',
-    sector: profile?.finnhubIndustry ?? '',
-    industry: profile?.finnhubIndustry ?? '',
-    country: stored?.country ?? profile?.country ?? '',
+    sector: stored?.industry ?? synced?.industry ?? '',
+    industry: stored?.industry ?? synced?.industry ?? '',
+    country: stored?.country ?? synced?.country ?? '',
     fullTimeEmployees: stored?.full_time_employees?.toString() ?? '',
-    website: profile?.weburl ?? '',
-    mktCap: (profile?.marketCapitalization ?? 0) * 1_000_000,
-    ipoDate: profile?.ipo ?? '',
-    image: profile?.logo || `https://images.financialmodelingprep.com/symbol/${symbol}.png`,
+    website: stored?.website ?? synced?.website ?? '',
+    mktCap: 0, // not shown in the app
+    ipoDate: stored?.ipo_date ?? synced?.ipo_date ?? '',
+    image: stored?.logo_url || synced?.logo_url || `https://images.financialmodelingprep.com/symbol/${symbol}.png`,
     city: stored?.city ?? undefined,
     state: region,
   };

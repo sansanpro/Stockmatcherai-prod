@@ -67,28 +67,29 @@ class StockDataService {
   async getProfile(symbol: string) {
     const sym = symbol.toUpperCase();
     return this.cached(`profile_${sym}`, async () => {
-      const [profile, stored, facts] = await Promise.all([
-        this.finnhub.getProfile(sym),
+      const [stored, facts] = await Promise.all([
         this.getStoredStock(sym),
         this.db.from('company_profiles')
-          .select('description, full_time_employees, city, state, country')
+          .select('description, full_time_employees, city, state, country, industry, website, ipo_date, finnhub_synced_at')
           .eq('ticker', sym)
           .maybeSingle()
           .then(r => r.data),
       ]);
+      // company_profiles already holds Finnhub's static fields once synced; only call it otherwise
+      const profile = facts?.finnhub_synced_at ? null : await this.finnhub.getProfile(sym).catch(() => null);
       if (!profile && !stored && !facts) return { error: `No company found for ${sym}.` };
       return {
         symbol: sym,
-        name: profile?.name ?? stored?.company_name ?? sym,
-        industry: profile?.finnhubIndustry,
+        name: stored?.company_name ?? profile?.name ?? sym,
+        industry: facts?.industry ?? profile?.finnhubIndustry,
         description: facts?.description,
         employees: facts?.full_time_employees,
         headquarters: [facts?.city, facts?.state, facts?.country].filter(Boolean).join(', ') || undefined,
         ceo: stored?.ceo_name,
         ceoHighlights: stored?.ceo_highlights,
-        marketCapUsdMillions: profile?.marketCapitalization,
-        ipoDate: profile?.ipo,
-        website: profile?.weburl,
+        marketCap: stored?.market_cap,
+        ipoDate: facts?.ipo_date ?? profile?.ipo,
+        website: facts?.website ?? profile?.weburl,
         peRatio: stored?.pe_ratio,
         dividendYieldPercent: stored?.dividend_yield,
         oneYearReturnPercent: stored?.one_year_return,

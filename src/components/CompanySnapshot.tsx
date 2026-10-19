@@ -15,6 +15,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
   const { profile, isLoading, error } = useCompanyProfile(ticker);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   // Reset image error when profile changes. FMP's logo CDN needs no API key or quota,
   // so it still shows a logo when the profile request fails.
@@ -24,6 +25,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
   if (currentImageUrl !== lastImageUrl) {
     setLastImageUrl(currentImageUrl);
     setImageError(false);
+    setImageLoaded(false);
   }
 
   // Get ticker initials as fallback for logo
@@ -37,26 +39,30 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
       ? 'w-20 h-20 text-2xl' 
       : 'w-14 h-14 sm:w-16 sm:h-16 text-lg sm:text-xl';
 
-    const hasValidImage = !imageError;
-
-    if (hasValidImage) {
-      return (
-        <div className={`${sizeClasses} rounded-xl overflow-hidden bg-white shadow-lg border-2 border-white ring-2 ring-blue-500/20 flex-shrink-0`}>
-          <img 
-            src={currentImageUrl} 
-            alt={`${companyName} logo`}
-            className="w-full h-full object-contain p-1"
-            onError={() => setImageError(true)}
-          />
-        </div>
-      );
-    }
-
-    return (
+    const initials = (
       <div className={`${sizeClasses} bg-gradient-to-br from-blue-600 to-indigo-800 rounded-xl flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-blue-500/20 flex-shrink-0`}>
         <span className="text-white font-bold tracking-wide">
           {getTickerInitials(ticker)}
         </span>
+      </div>
+    );
+
+    if (imageError) return initials;
+
+    // Show initials until the logo has loaded (Finnhub logos redirect and can take a moment),
+    // instead of an empty white tile
+    return (
+      <div className="relative flex-shrink-0">
+        {!imageLoaded && initials}
+        <div className={`${sizeClasses} rounded-xl overflow-hidden bg-white shadow-lg border-2 border-white ring-2 ring-blue-500/20 ${imageLoaded ? '' : 'absolute inset-0 opacity-0'}`}>
+          <img
+            src={currentImageUrl}
+            alt={`${companyName} logo`}
+            className="w-full h-full object-contain p-1"
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
+          />
+        </div>
       </div>
     );
   };
@@ -89,7 +95,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
           {renderLogo('sm')}
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-gray-900 dark:text-white text-base sm:text-lg lg:text-xl truncate">
-              {profile?.companyName || companyName}
+              {companyName || profile?.companyName}
             </h3>
             <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-300">
               {displayIndustry} {ipoYear && `• ${ipoYear}`}
@@ -143,7 +149,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
         {renderLogo('lg')}
         <div>
           <h3 className="font-bold text-gray-900 dark:text-white text-xl">
-            {profile?.companyName || companyName}
+            {companyName || profile?.companyName}
           </h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             {profile?.industry || sector || 'Company'}
@@ -159,7 +165,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
       {/* About Section */}
       <div className="mb-4">
         <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm uppercase tracking-wide">
-          About {profile?.companyName || companyName}
+          About {companyName || profile?.companyName}
         </h4>
         <p className={`text-base text-gray-700 dark:text-gray-300 leading-relaxed ${
           !isDescriptionExpanded && showExpandButton ? 'line-clamp-4' : ''
@@ -188,9 +194,9 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
         {profile?.ipoDate && (
           <div className="bg-white/60 dark:bg-gray-800/60 rounded-xl p-3 text-center">
             <Calendar className="w-5 h-5 mx-auto mb-1 text-blue-600 dark:text-blue-400" />
-            <p className="text-xs text-gray-500 dark:text-gray-400">Founded</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Went Public</p>
             <p className="font-semibold text-gray-900 dark:text-white text-sm">
-              {formatIPODate(profile.ipoDate)}
+              {new Date(profile.ipoDate).getUTCFullYear() || 'N/A'}
             </p>
           </div>
         )}
@@ -210,7 +216,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
             <Building2 className="w-5 h-5 mx-auto mb-1 text-purple-600 dark:text-purple-400" />
             <p className="text-xs text-gray-500 dark:text-gray-400">Headquarters</p>
             <p className="font-semibold text-gray-900 dark:text-white text-sm truncate">
-              {profile.state || profile.country || 'N/A'}
+              {profile.city || profile.state || profile.country || 'N/A'}
             </p>
           </div>
         )}
