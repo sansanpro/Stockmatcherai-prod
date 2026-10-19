@@ -2,7 +2,7 @@
 // (and the legacy fmp-data alias for already-installed app builds).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
 import { FinnhubClient, FinnhubNewsItem, FinnhubRateLimitError } from './finnhub.ts';
-import { SECTOR_TABLES, fetchAndApplyQuote, getTickerFreshness } from './stockQuotes.ts';
+import { fetchAndApplyQuote, getTickerFreshness } from './stockQuotes.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,7 +25,8 @@ async function withCache<T>(cacheKey: string, ttl: number, fetcher: () => Promis
 }
 
 interface StoredCompanyProfile {
-  description: string;
+  company_name: string;
+  description: string | null;
   full_time_employees: number | null;
   city: string | null;
   state: string | null;
@@ -39,17 +40,17 @@ interface StoredCompanyProfile {
 
 const db = () => createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
-// Company facts live in the company_profiles table so profile views don't spend Finnhub's
-// shared 60 calls/min. Finnhub is only called once per ticker to fill industry, website,
-// IPO date and logo, and the result is stored.
+// Company facts live in the stocks table so profile views don't spend Finnhub's shared
+// 60 calls/min. Finnhub is only called once per ticker to fill industry, website, IPO date,
+// logo and exchange, and the result is stored.
 async function getStoredProfile(symbol: string): Promise<StoredCompanyProfile | null> {
   const { data, error } = await db()
-    .from('company_profiles')
-    .select('description, full_time_employees, city, state, country, industry, website, ipo_date, logo_url, finnhub_synced_at')
+    .from('stocks')
+    .select('company_name, description, full_time_employees, city, state, country, industry, website, ipo_date, logo_url, finnhub_synced_at')
     .eq('ticker', symbol)
     .maybeSingle();
   if (error) {
-    console.error(`[company-data] company_profiles lookup failed for ${symbol}:`, error);
+    console.error(`[company-data] stocks profile lookup failed for ${symbol}:`, error);
     return null;
   }
   return data;
@@ -71,11 +72,12 @@ async function syncFromFinnhub(finnhub: FinnhubClient, symbol: string, stored: S
     website: profile.weburl || null,
     ipo_date: profile.ipo || null,
     logo_url: profile.logo || null,
+    exchange: profile.exchange || null,
     finnhub_synced_at: new Date().toISOString(),
   };
-  // Only update existing rows; new tickers need a description written before they get a row
+  // Only update tracked companies; this never adds a ticker
   if (stored) {
-    const { error } = await db().from('company_profiles').update(fields).eq('ticker', symbol);
+    const { error } = await db().from('stocks').update(fields).eq('ticker', symbol);
     if (error) console.error(`[company-data] Failed to store Finnhub fields for ${symbol}:`, error);
   }
   return { ...fields, name: profile.name, country: profile.country };
@@ -93,7 +95,7 @@ async function getCompanyProfile(finnhub: FinnhubClient, symbol: string) {
   const region = stored?.state ?? (stored && stored.country !== 'US' ? stored.country : undefined);
   return {
     symbol,
-    companyName: synced?.name ?? symbol,
+    companyName: stored?.company_name ?? synced?.name ?? symbol,
     description: stored?.description ?? '',
     sector: stored?.industry ?? synced?.industry ?? '',
     industry: stored?.industry ?? synced?.industry ?? '',
@@ -190,15 +192,11 @@ async function refreshQuotes(finnhub: FinnhubClient, symbols: string[]) {
     }
   }));
 
-  const results = await Promise.all(SECTOR_TABLES.map(table =>
-    db().from(table).select('ticker, price_per_share, updated_at').in('ticker', symbols)));
+  const { data } = await db().from('stocks').select('ticker, price_per_share, updated_at').in('ticker', symbols);
   const prices: Record<string, { price: number; updatedAt: string }> = {};
-  for (const { data } of results) {
-    for (const row of data ?? []) {
-      const existing = prices[row.ticker];
-      if (!existing || row.updated_at > existing.updatedAt) {
-        prices[row.ticker] = { price: Number(row.price_per_share), updatedAt: row.updated_at };
-      }
+  for (const row of data ?? []) {
+    if (row.price_per_share !== null) {
+      prices[row.ticker] = { price: Number(row.price_per_share), updatedAt: row.updated_at };
     }
   }
   return { prices, refreshed: stale };

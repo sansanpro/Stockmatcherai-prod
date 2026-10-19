@@ -9,20 +9,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const SECTOR_TABLES = [
-  'technology_stocks',
-  'healthcare_stocks',
-  'finance_stocks',
-  'energy_stocks',
-  'consumer_stocks',
-  'utilities_stocks',
-];
-
 const round = (n: unknown, digits = 2) =>
   typeof n === 'number' && Number.isFinite(n) ? Number(n.toFixed(digits)) : null;
 
 // Data for the assistant's tools: live quotes/news/metrics from Finnhub, plus the app's own
-// stock tables and company_profiles for CEO, description, employees and HQ.
+// stocks table for CEO, ratios, description, employees and HQ.
 class StockDataService {
   private cache: Map<string, { data: any; timestamp: number }> = new Map();
   private cacheTimeout = 5 * 60 * 1000; // 5 minutes
@@ -55,41 +46,32 @@ class StockDataService {
   }
 
   private async getStoredStock(sym: string) {
-    const results = await Promise.all(SECTOR_TABLES.map(table =>
-      this.db.from(table)
-        .select('company_name, ceo_name, ceo_highlights, pe_ratio, market_cap, one_year_return, price_per_share, dividend_yield, risk_level')
-        .eq('ticker', sym)
-        .maybeSingle()
-    ));
-    return results.find(r => r.data)?.data ?? null;
+    const { data } = await this.db.from('stocks')
+      .select('company_name, ceo_name, ceo_highlights, pe_ratio, market_cap, one_year_return, price_per_share, dividend_yield, risk_level, description, full_time_employees, city, state, country, industry, website, ipo_date, finnhub_synced_at')
+      .eq('ticker', sym)
+      .maybeSingle();
+    return data;
   }
 
   async getProfile(symbol: string) {
     const sym = symbol.toUpperCase();
     return this.cached(`profile_${sym}`, async () => {
-      const [stored, facts] = await Promise.all([
-        this.getStoredStock(sym),
-        this.db.from('company_profiles')
-          .select('description, full_time_employees, city, state, country, industry, website, ipo_date, finnhub_synced_at')
-          .eq('ticker', sym)
-          .maybeSingle()
-          .then(r => r.data),
-      ]);
-      // company_profiles already holds Finnhub's static fields once synced; only call it otherwise
-      const profile = facts?.finnhub_synced_at ? null : await this.finnhub.getProfile(sym).catch(() => null);
-      if (!profile && !stored && !facts) return { error: `No company found for ${sym}.` };
+      const stored = await this.getStoredStock(sym);
+      // stocks already holds Finnhub's static fields once synced; only call it otherwise
+      const profile = stored?.finnhub_synced_at ? null : await this.finnhub.getProfile(sym).catch(() => null);
+      if (!profile && !stored) return { error: `No company found for ${sym}.` };
       return {
         symbol: sym,
         name: stored?.company_name ?? profile?.name ?? sym,
-        industry: facts?.industry ?? profile?.finnhubIndustry,
-        description: facts?.description,
-        employees: facts?.full_time_employees,
-        headquarters: [facts?.city, facts?.state, facts?.country].filter(Boolean).join(', ') || undefined,
+        industry: stored?.industry ?? profile?.finnhubIndustry,
+        description: stored?.description,
+        employees: stored?.full_time_employees,
+        headquarters: [stored?.city, stored?.state, stored?.country].filter(Boolean).join(', ') || undefined,
         ceo: stored?.ceo_name,
         ceoHighlights: stored?.ceo_highlights,
         marketCap: stored?.market_cap,
-        ipoDate: facts?.ipo_date ?? profile?.ipo,
-        website: facts?.website ?? profile?.weburl,
+        ipoDate: stored?.ipo_date ?? profile?.ipo,
+        website: stored?.website ?? profile?.weburl,
         peRatio: stored?.pe_ratio,
         dividendYieldPercent: stored?.dividend_yield,
         oneYearReturnPercent: stored?.one_year_return,
@@ -146,18 +128,12 @@ class StockDataService {
   // Ranks the app's tracked stocks by 1-year return (Finnhub's free tier has no market-wide movers)
   async getTopPerformers(type: 'best' | 'worst', limit = 5) {
     const ascending = type === 'worst';
-    const results = await Promise.all(SECTOR_TABLES.map(table =>
-      this.db.from(table)
-        .select('ticker, company_name, one_year_return, price_per_share')
-        .order('one_year_return', { ascending })
-        .limit(limit)
-    ));
-    const seen = new Set<string>();
-    return results
-      .flatMap(r => r.data ?? [])
-      .filter(row => !seen.has(row.ticker) && seen.add(row.ticker))
-      .sort((a, b) => ascending ? a.one_year_return - b.one_year_return : b.one_year_return - a.one_year_return)
-      .slice(0, limit)
+    const { data } = await this.db.from('stocks')
+      .select('ticker, company_name, one_year_return, price_per_share')
+      .not('one_year_return', 'is', null)
+      .order('one_year_return', { ascending })
+      .limit(limit);
+    return (data ?? [])
       .map(row => ({
         symbol: row.ticker,
         name: row.company_name,
