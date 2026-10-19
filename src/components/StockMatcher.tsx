@@ -17,6 +17,7 @@ import { Json } from '@/integrations/supabase/types';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { track, trackLike } from '@/lib/analytics';
 
 interface StockMatcherProps {
   userProfile: UserProfile;
@@ -79,6 +80,8 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       
       console.log(`Filtered ${stocks.length} stocks to ${validStocks.length} valid stocks`);
       
+      track('deck_loaded', { cards: validStocks.length });
+
       // Add staggered entrance animation
       setTimeout(() => {
         setAllRecommendations(validStocks);
@@ -123,6 +126,8 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       await recordSwipe(user.id, currentStock.ticker, currentStock.companyName, true, stockData, currentStock.whyItFits);
     }
     
+    trackLike({ ticker: currentStock.ticker, sector: currentStock.sector, position: currentIndex });
+
     // Add to seen stocks
     setSeenStockTickers(prev => new Set(prev).add(currentStock.ticker));
     setMatches(prev => [...prev, currentStock]);
@@ -192,6 +197,8 @@ const StockMatcher = ({ userProfile, onReset, onViewDetails }: StockMatcherProps
       await recordSwipe(user.id, currentStock.ticker, currentStock.companyName, false, stockData);
     }
     
+    track('swipe', { ticker: currentStock.ticker, sector: currentStock.sector, position: currentIndex, liked: false });
+
     // Add to seen stocks
     setSeenStockTickers(prev => new Set(prev).add(currentStock.ticker));
     setPasses(prev => [...prev, currentStock]);

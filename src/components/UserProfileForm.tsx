@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { track } from '@/lib/analytics';
 
 interface UserProfileFormProps {
   onComplete: (profile: UserProfile) => void;
@@ -100,6 +101,11 @@ const UserProfileForm = ({ onComplete, existingProfile, isUpdate = false }: User
       }
 
       localStorage.removeItem('onboarding_answers');
+      if (!isUpdate) {
+        // In the current (v1) flow the profile form is the last onboarding step
+        track('profile_complete', { version: 1 });
+        track('onboarding_complete', { version: 1 });
+      }
       toast.success(isUpdate ? 'Profile updated!' : 'Profile saved!');
       onComplete(profile as UserProfile);
     } catch (error) {

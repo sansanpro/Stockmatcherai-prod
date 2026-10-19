@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "12.2.3"
   }
   public: {
     Tables: {
@@ -73,6 +73,39 @@ export type Database = {
           },
         ]
       }
+      ai_error_logs: {
+        Row: {
+          created_at: string
+          function_name: string
+          id: number
+          message: string | null
+          model: string | null
+          stage: string
+          status: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          function_name: string
+          id?: never
+          message?: string | null
+          model?: string | null
+          stage: string
+          status?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          function_name?: string
+          id?: never
+          message?: string | null
+          model?: string | null
+          stage?: string
+          status?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       ai_recommendations: {
         Row: {
           confidence_score: number | null
@@ -115,57 +148,87 @@ export type Database = {
         }
         Relationships: []
       }
-      consumer_stocks: {
+      analytics_events: {
         Row: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at: string | null
-          dividend_yield: number
-          esg_score: number | null
-          id: string
-          last_updated: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
-          ticker: string
-          updated_at: string | null
+          anonymous_id: string
+          app_version: string | null
+          created_at: string
+          event: string
+          id: number
+          platform: string | null
+          props: Json
+          session_id: string | null
+          user_id: string | null
         }
         Insert: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at?: string | null
-          dividend_yield: number
-          esg_score?: number | null
-          id: string
-          last_updated?: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
-          ticker: string
-          updated_at?: string | null
+          anonymous_id: string
+          app_version?: string | null
+          created_at?: string
+          event: string
+          id?: never
+          platform?: string | null
+          props?: Json
+          session_id?: string | null
+          user_id?: string | null
         }
         Update: {
-          ceo_highlights?: string
-          ceo_name?: string
-          company_name?: string
-          created_at?: string | null
-          dividend_yield?: number
-          esg_score?: number | null
+          anonymous_id?: string
+          app_version?: string | null
+          created_at?: string
+          event?: string
+          id?: never
+          platform?: string | null
+          props?: Json
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      causes: {
+        Row: {
+          icon: string
+          id: string
+          is_live: boolean
+          label: string
+          sort_order: number
+          tagline: string
+        }
+        Insert: {
+          icon: string
+          id: string
+          is_live?: boolean
+          label: string
+          sort_order: number
+          tagline: string
+        }
+        Update: {
+          icon?: string
           id?: string
-          last_updated?: string | null
-          market_cap?: string
-          one_year_return?: number
-          pe_ratio?: number
-          price_per_share?: number
-          risk_level?: string
-          ticker?: string
-          updated_at?: string | null
+          is_live?: boolean
+          label?: string
+          sort_order?: number
+          tagline?: string
+        }
+        Relationships: []
+      }
+      daily_decks: {
+        Row: {
+          cards: Json
+          created_at: string
+          deck_date: string
+          user_id: string
+        }
+        Insert: {
+          cards: Json
+          created_at?: string
+          deck_date: string
+          user_id: string
+        }
+        Update: {
+          cards?: Json
+          created_at?: string
+          deck_date?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -196,165 +259,21 @@ export type Database = {
         }
         Relationships: []
       }
-      energy_stocks: {
+      market_data_cache: {
         Row: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at: string | null
-          dividend_yield: number
-          esg_score: number | null
-          id: string
-          last_updated: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
-          ticker: string
-          updated_at: string | null
+          cache_key: string
+          data: Json
+          fetched_at: string
         }
         Insert: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at?: string | null
-          dividend_yield: number
-          esg_score?: number | null
-          id: string
-          last_updated?: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
-          ticker: string
-          updated_at?: string | null
+          cache_key: string
+          data: Json
+          fetched_at?: string
         }
         Update: {
-          ceo_highlights?: string
-          ceo_name?: string
-          company_name?: string
-          created_at?: string | null
-          dividend_yield?: number
-          esg_score?: number | null
-          id?: string
-          last_updated?: string | null
-          market_cap?: string
-          one_year_return?: number
-          pe_ratio?: number
-          price_per_share?: number
-          risk_level?: string
-          ticker?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      finance_stocks: {
-        Row: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at: string | null
-          dividend_yield: number
-          esg_score: number | null
-          id: string
-          last_updated: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
-          ticker: string
-          updated_at: string | null
-        }
-        Insert: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at?: string | null
-          dividend_yield: number
-          esg_score?: number | null
-          id: string
-          last_updated?: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
-          ticker: string
-          updated_at?: string | null
-        }
-        Update: {
-          ceo_highlights?: string
-          ceo_name?: string
-          company_name?: string
-          created_at?: string | null
-          dividend_yield?: number
-          esg_score?: number | null
-          id?: string
-          last_updated?: string | null
-          market_cap?: string
-          one_year_return?: number
-          pe_ratio?: number
-          price_per_share?: number
-          risk_level?: string
-          ticker?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      healthcare_stocks: {
-        Row: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at: string | null
-          dividend_yield: number
-          esg_score: number | null
-          id: string
-          last_updated: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
-          ticker: string
-          updated_at: string | null
-        }
-        Insert: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at?: string | null
-          dividend_yield: number
-          esg_score?: number | null
-          id: string
-          last_updated?: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
-          ticker: string
-          updated_at?: string | null
-        }
-        Update: {
-          ceo_highlights?: string
-          ceo_name?: string
-          company_name?: string
-          created_at?: string | null
-          dividend_yield?: number
-          esg_score?: number | null
-          id?: string
-          last_updated?: string | null
-          market_cap?: string
-          one_year_return?: number
-          pe_ratio?: number
-          price_per_share?: number
-          risk_level?: string
-          ticker?: string
-          updated_at?: string | null
+          cache_key?: string
+          data?: Json
+          fetched_at?: string
         }
         Relationships: []
       }
@@ -424,6 +343,290 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_flags: {
+        Row: {
+          created_at: string
+          dealbreaker: string
+          evidence: string
+          source_url: string
+          ticker: string
+        }
+        Insert: {
+          created_at?: string
+          dealbreaker: string
+          evidence: string
+          source_url: string
+          ticker: string
+        }
+        Update: {
+          created_at?: string
+          dealbreaker?: string
+          evidence?: string
+          source_url?: string
+          ticker?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "company_profiles"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "consumer_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "consumer_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "energy_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "energy_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "finance_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "finance_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "healthcare_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "healthcare_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "technology_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "technology_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "utilities_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_flags_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "utilities_stocks"
+            referencedColumns: ["ticker"]
+          },
+        ]
+      }
+      stock_missions: {
+        Row: {
+          cause: string
+          created_at: string
+          evidence: string
+          exposure: string
+          id: number
+          reviewed_at: string | null
+          source_url: string
+          status: string
+          tagged_by: string
+          ticker: string
+          updated_at: string
+          version: number
+          why_line: string | null
+        }
+        Insert: {
+          cause: string
+          created_at?: string
+          evidence: string
+          exposure: string
+          id?: never
+          reviewed_at?: string | null
+          source_url: string
+          status?: string
+          tagged_by: string
+          ticker: string
+          updated_at?: string
+          version?: number
+          why_line?: string | null
+        }
+        Update: {
+          cause?: string
+          created_at?: string
+          evidence?: string
+          exposure?: string
+          id?: never
+          reviewed_at?: string | null
+          source_url?: string
+          status?: string
+          tagged_by?: string
+          ticker?: string
+          updated_at?: string
+          version?: number
+          why_line?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_missions_cause_fkey"
+            columns: ["cause"]
+            isOneToOne: false
+            referencedRelation: "cause_company_counts"
+            referencedColumns: ["cause"]
+          },
+          {
+            foreignKeyName: "stock_missions_cause_fkey"
+            columns: ["cause"]
+            isOneToOne: false
+            referencedRelation: "causes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "company_profiles"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "consumer_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "consumer_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "energy_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "energy_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "finance_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "finance_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "healthcare_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "healthcare_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "technology_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "technology_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "utilities_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_missions_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "utilities_stocks"
+            referencedColumns: ["ticker"]
+          },
+        ]
+      }
       stock_update_logs: {
         Row: {
           api_calls_used: number | null
@@ -466,6 +669,120 @@ export type Database = {
         }
         Relationships: []
       }
+      stocks: {
+        Row: {
+          beta: number | null
+          ceo_highlights: string | null
+          ceo_name: string | null
+          city: string | null
+          company_name: string
+          country: string
+          created_at: string
+          description: string | null
+          dividend_yield: number | null
+          esg_score: number | null
+          exchange: string | null
+          finnhub_synced_at: string | null
+          full_time_employees: number | null
+          in_feed: boolean
+          industry: string | null
+          ipo_date: string | null
+          is_fund: boolean
+          last_updated: string
+          logo_url: string | null
+          market_cap: string | null
+          market_cap_usd: number | null
+          mission_story: string | null
+          one_year_return: number | null
+          pe_ratio: number | null
+          price_per_share: number | null
+          profile_updated_at: string
+          proof: string | null
+          proof_source_url: string | null
+          risk_level: string | null
+          sector: string
+          state: string | null
+          things_to_know: string[] | null
+          ticker: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          beta?: number | null
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          city?: string | null
+          company_name: string
+          country?: string
+          created_at?: string
+          description?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          exchange?: string | null
+          finnhub_synced_at?: string | null
+          full_time_employees?: number | null
+          in_feed?: boolean
+          industry?: string | null
+          ipo_date?: string | null
+          is_fund?: boolean
+          last_updated?: string
+          logo_url?: string | null
+          market_cap?: string | null
+          market_cap_usd?: number | null
+          mission_story?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          profile_updated_at?: string
+          proof?: string | null
+          proof_source_url?: string | null
+          risk_level?: string | null
+          sector: string
+          state?: string | null
+          things_to_know?: string[] | null
+          ticker: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          beta?: number | null
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          city?: string | null
+          company_name?: string
+          country?: string
+          created_at?: string
+          description?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          exchange?: string | null
+          finnhub_synced_at?: string | null
+          full_time_employees?: number | null
+          in_feed?: boolean
+          industry?: string | null
+          ipo_date?: string | null
+          is_fund?: boolean
+          last_updated?: string
+          logo_url?: string | null
+          market_cap?: string | null
+          market_cap_usd?: number | null
+          mission_story?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          profile_updated_at?: string
+          proof?: string | null
+          proof_source_url?: string | null
+          risk_level?: string | null
+          sector?: string
+          state?: string | null
+          things_to_know?: string[] | null
+          ticker?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           created_at: string
@@ -505,59 +822,53 @@ export type Database = {
         }
         Relationships: []
       }
-      technology_stocks: {
+      swipes: {
         Row: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at: string | null
-          dividend_yield: number
-          esg_score: number | null
-          id: string
-          last_updated: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
+          card_type: string
+          cause: string | null
+          created_at: string
+          deck_date: string
+          id: number
+          liked: boolean
           ticker: string
-          updated_at: string | null
+          user_id: string
         }
         Insert: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at?: string | null
-          dividend_yield: number
-          esg_score?: number | null
-          id: string
-          last_updated?: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
+          card_type?: string
+          cause?: string | null
+          created_at?: string
+          deck_date?: string
+          id?: never
+          liked: boolean
           ticker: string
-          updated_at?: string | null
+          user_id: string
         }
         Update: {
-          ceo_highlights?: string
-          ceo_name?: string
-          company_name?: string
-          created_at?: string | null
-          dividend_yield?: number
-          esg_score?: number | null
-          id?: string
-          last_updated?: string | null
-          market_cap?: string
-          one_year_return?: number
-          pe_ratio?: number
-          price_per_share?: number
-          risk_level?: string
+          card_type?: string
+          cause?: string | null
+          created_at?: string
+          deck_date?: string
+          id?: never
+          liked?: boolean
           ticker?: string
-          updated_at?: string | null
+          user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "swipes_cause_fkey"
+            columns: ["cause"]
+            isOneToOne: false
+            referencedRelation: "cause_company_counts"
+            referencedColumns: ["cause"]
+          },
+          {
+            foreignKeyName: "swipes_cause_fkey"
+            columns: ["cause"]
+            isOneToOne: false
+            referencedRelation: "causes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_feedback: {
         Row: {
@@ -639,16 +950,22 @@ export type Database = {
           age_range: string | null
           ai_learned_preferences: Json | null
           behavior_patterns: Json | null
+          causes: string[] | null
           created_at: string
+          dealbreakers: string[] | null
           gender: string | null
+          horizon: string | null
           id: string
           income_level: string | null
           investment_experience: string | null
           investment_goals: string[] | null
           last_ai_analysis: string | null
+          motivation: string | null
+          onboarding_version: number
           risk_tolerance: string | null
           salary: number | null
           sectors_of_interest: string[] | null
+          starting_amount: string | null
           time_horizon: string | null
           updated_at: string
           user_id: string
@@ -658,16 +975,22 @@ export type Database = {
           age_range?: string | null
           ai_learned_preferences?: Json | null
           behavior_patterns?: Json | null
+          causes?: string[] | null
           created_at?: string
+          dealbreakers?: string[] | null
           gender?: string | null
+          horizon?: string | null
           id?: string
           income_level?: string | null
           investment_experience?: string | null
           investment_goals?: string[] | null
           last_ai_analysis?: string | null
+          motivation?: string | null
+          onboarding_version?: number
           risk_tolerance?: string | null
           salary?: number | null
           sectors_of_interest?: string[] | null
+          starting_amount?: string | null
           time_horizon?: string | null
           updated_at?: string
           user_id: string
@@ -677,16 +1000,22 @@ export type Database = {
           age_range?: string | null
           ai_learned_preferences?: Json | null
           behavior_patterns?: Json | null
+          causes?: string[] | null
           created_at?: string
+          dealbreakers?: string[] | null
           gender?: string | null
+          horizon?: string | null
           id?: string
           income_level?: string | null
           investment_experience?: string | null
           investment_goals?: string[] | null
           last_ai_analysis?: string | null
+          motivation?: string | null
+          onboarding_version?: number
           risk_tolerance?: string | null
           salary?: number | null
           sectors_of_interest?: string[] | null
+          starting_amount?: string | null
           time_horizon?: string | null
           updated_at?: string
           user_id?: string
@@ -720,60 +1049,6 @@ export type Database = {
         }
         Relationships: []
       }
-      utilities_stocks: {
-        Row: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at: string | null
-          dividend_yield: number
-          esg_score: number | null
-          id: string
-          last_updated: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
-          ticker: string
-          updated_at: string | null
-        }
-        Insert: {
-          ceo_highlights: string
-          ceo_name: string
-          company_name: string
-          created_at?: string | null
-          dividend_yield: number
-          esg_score?: number | null
-          id: string
-          last_updated?: string | null
-          market_cap: string
-          one_year_return: number
-          pe_ratio: number
-          price_per_share: number
-          risk_level: string
-          ticker: string
-          updated_at?: string | null
-        }
-        Update: {
-          ceo_highlights?: string
-          ceo_name?: string
-          company_name?: string
-          created_at?: string | null
-          dividend_yield?: number
-          esg_score?: number | null
-          id?: string
-          last_updated?: string | null
-          market_cap?: string
-          one_year_return?: number
-          pe_ratio?: number
-          price_per_share?: number
-          risk_level?: string
-          ticker?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       waitlist: {
         Row: {
           created_at: string
@@ -803,7 +1078,384 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      cause_company_counts: {
+        Row: {
+          cause: string | null
+          companies: number | null
+          is_live: boolean | null
+          label: string | null
+        }
+        Relationships: []
+      }
+      company_profiles: {
+        Row: {
+          city: string | null
+          country: string | null
+          description: string | null
+          finnhub_synced_at: string | null
+          full_time_employees: number | null
+          industry: string | null
+          ipo_date: string | null
+          logo_url: string | null
+          state: string | null
+          ticker: string | null
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          description?: string | null
+          finnhub_synced_at?: string | null
+          full_time_employees?: number | null
+          industry?: string | null
+          ipo_date?: string | null
+          logo_url?: string | null
+          state?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          description?: string | null
+          finnhub_synced_at?: string | null
+          full_time_employees?: number | null
+          industry?: string | null
+          ipo_date?: string | null
+          logo_url?: string | null
+          state?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      consumer_stocks: {
+        Row: {
+          ceo_highlights: string | null
+          ceo_name: string | null
+          company_name: string | null
+          created_at: string | null
+          dividend_yield: number | null
+          esg_score: number | null
+          id: string | null
+          last_updated: string | null
+          market_cap: string | null
+          one_year_return: number | null
+          pe_ratio: number | null
+          price_per_share: number | null
+          risk_level: string | null
+          ticker: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      energy_stocks: {
+        Row: {
+          ceo_highlights: string | null
+          ceo_name: string | null
+          company_name: string | null
+          created_at: string | null
+          dividend_yield: number | null
+          esg_score: number | null
+          id: string | null
+          last_updated: string | null
+          market_cap: string | null
+          one_year_return: number | null
+          pe_ratio: number | null
+          price_per_share: number | null
+          risk_level: string | null
+          ticker: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      finance_stocks: {
+        Row: {
+          ceo_highlights: string | null
+          ceo_name: string | null
+          company_name: string | null
+          created_at: string | null
+          dividend_yield: number | null
+          esg_score: number | null
+          id: string | null
+          last_updated: string | null
+          market_cap: string | null
+          one_year_return: number | null
+          pe_ratio: number | null
+          price_per_share: number | null
+          risk_level: string | null
+          ticker: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      healthcare_stocks: {
+        Row: {
+          ceo_highlights: string | null
+          ceo_name: string | null
+          company_name: string | null
+          created_at: string | null
+          dividend_yield: number | null
+          esg_score: number | null
+          id: string | null
+          last_updated: string | null
+          market_cap: string | null
+          one_year_return: number | null
+          pe_ratio: number | null
+          price_per_share: number | null
+          risk_level: string | null
+          ticker: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      technology_stocks: {
+        Row: {
+          ceo_highlights: string | null
+          ceo_name: string | null
+          company_name: string | null
+          created_at: string | null
+          dividend_yield: number | null
+          esg_score: number | null
+          id: string | null
+          last_updated: string | null
+          market_cap: string | null
+          one_year_return: number | null
+          pe_ratio: number | null
+          price_per_share: number | null
+          risk_level: string | null
+          ticker: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      utilities_stocks: {
+        Row: {
+          ceo_highlights: string | null
+          ceo_name: string | null
+          company_name: string | null
+          created_at: string | null
+          dividend_yield: number | null
+          esg_score: number | null
+          id: string | null
+          last_updated: string | null
+          market_cap: string | null
+          one_year_return: number | null
+          pe_ratio: number | null
+          price_per_share: number | null
+          risk_level: string | null
+          ticker: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          ceo_highlights?: string | null
+          ceo_name?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          dividend_yield?: number | null
+          esg_score?: number | null
+          id?: string | null
+          last_updated?: string | null
+          market_cap?: string | null
+          one_year_return?: number | null
+          pe_ratio?: number | null
+          price_per_share?: number | null
+          risk_level?: string | null
+          ticker?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
@@ -825,12 +1477,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -854,11 +1506,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -879,11 +1531,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -904,11 +1556,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -921,11 +1573,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

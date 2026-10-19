@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
 import { getAppleProducts, purchaseAppleSubscription } from '@/services/appleIAPService';
+import { track } from '@/lib/analytics';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
   const [appleProductAvailable, setAppleProductAvailable] = useState(true);
 
   useEffect(() => {
+    if (isOpen) track('paywall_shown');
     if (isOpen && Capacitor.isNativePlatform()) {
       loadAppleProduct();
     }
@@ -46,6 +48,7 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
 
   const handleApplePurchase = async () => {
     setIsProcessing(true);
+    track('purchase_started');
     try {
       const result = await purchaseAppleSubscription(user?.id);
 
@@ -64,6 +67,7 @@ const UpgradeModal = ({ isOpen, onClose }: UpgradeModalProps) => {
       if (error) throw error;
 
       toast.success('Subscription activated!');
+      track('purchase_completed');
       await checkSubscription();
       onClose();
     } catch (error: any) {

@@ -7,6 +7,7 @@ import { Navigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
+import { track } from '@/lib/analytics';
 
 // Onboarding step types
 type OnboardingStep = 'welcome' | 'style' | 'interests' | 'goal' | 'account' | 'signin';
@@ -115,7 +116,12 @@ const Auth = () => {
 
   const advance = () => {
     const idx = STEP_ORDER.indexOf(step);
-    if (idx < STEP_ORDER.length - 1) setStep(STEP_ORDER[idx + 1]);
+    if (idx < STEP_ORDER.length - 1) {
+      const next = STEP_ORDER[idx + 1];
+      if (step === 'welcome') track('onboarding_started', { version: 1 });
+      track('onboarding_step', { version: 1, step: next });
+      setStep(next);
+    }
   };
 
   const back = () => {

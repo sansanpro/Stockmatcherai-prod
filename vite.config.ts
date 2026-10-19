@@ -32,5 +32,7 @@ export default defineConfig(({ mode }) => ({
   },
   define: {
     global: 'globalThis',
+    // Identifies the web bundle in analytics events (UTC build time, e.g. 2026-10-19T17:05)
+    __APP_BUILD__: JSON.stringify(new Date().toISOString().slice(0, 16)),
   }
 }));

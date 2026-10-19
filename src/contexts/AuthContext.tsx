@@ -4,6 +4,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { signInWithApple as appleSignIn } from '@/services/appleAuthService';
 import { toast } from 'sonner';
+import { track } from '@/lib/analytics';
 
 interface AuthContextType {
   user: User | null;
@@ -70,6 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.error(error.message);
     } else {
       toast.success('Check your email to confirm your account!');
+      track('sign_up', { method: 'email' });
     }
 
     return { error };
@@ -85,6 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.error(error.message);
     } else {
       toast.success('Welcome back!');
+      track('sign_in', { method: 'email' });
     }
 
     return { error };
@@ -94,6 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await appleSignIn();
       toast.success('Welcome!');
+      track('sign_in', { method: 'apple' });
     } catch (error: any) {
       // User cancelled — no toast. Any other error is shown.
       const isCancelled =

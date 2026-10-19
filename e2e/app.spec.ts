@@ -177,3 +177,21 @@ test('a card whose price is over 20 minutes old refreshes it on screen', async (
   await expect(page.getByText(/^(Just now|[0-9]+m ago)$/).first()).toBeVisible({ timeout: 10_000 });
   await page.screenshot({ path: 'e2e/screens/live-quote.png' });
 });
+
+test('analytics events are recorded (app_open, deck_loaded, swipe, details_opened)', async ({ page }) => {
+  const recorded: { event: string; status: number }[] = [];
+  page.on('response', async (response) => {
+    if (response.url().includes('/rest/v1/analytics_events') && response.request().method() === 'POST') {
+      const body = JSON.parse(response.request().postData() ?? '{}');
+      recorded.push({ event: body.event, status: response.status() });
+    }
+  });
+  await openApp(page);
+  await expect(page.getByText('P/E Ratio').first()).toBeVisible();
+  await page.getByRole('button', { name: 'View stock details' }).first().click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await expect.poll(() => recorded.map(r => r.event), { timeout: 10_000 })
+    .toEqual(expect.arrayContaining(['app_open', 'deck_loaded', 'details_opened']));
+  // Every insert was accepted by the database (RLS allows inserts, 201 Created)
+  expect(recorded.every(r => r.status === 201)).toBe(true);
+});

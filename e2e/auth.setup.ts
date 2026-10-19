@@ -4,6 +4,12 @@ import { testUser } from './helpers';
 // Signs in once through the real sign-in screen and saves the session for the other tests
 setup('sign in as test user', async ({ page }) => {
   const { email, password } = testUser();
+  // Marks test traffic so analytics metrics exclude it
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('analytics_install_id')) {
+      localStorage.setItem('analytics_install_id', `e2e-${Math.random().toString(36).slice(2, 12)}`);
+    }
+  });
   await page.goto('/auth');
   await page.getByText('Already have an account?').click();
   await page.locator('#signin-email').fill(email);

@@ -11,6 +11,7 @@ import UpgradeModal from '@/components/UpgradeModal';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/integrations/supabase/client';
+import { track } from '@/lib/analytics';
 
 interface Message {
   id: string;
@@ -100,6 +101,7 @@ export default function AIAssistantWidget() {
   }, [user, subscribed, isOpen]);
 
   const streamMessage = async (userMessage: string) => {
+    track('ai_message_sent', { subscribed });
     setIsStreaming(true);
     setCurrentStatus('Connecting...');
 

@@ -20,6 +20,7 @@ import { Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { User as UserIcon, Heart as HeartIcon, Home } from 'lucide-react';
+import { track } from '@/lib/analytics';
 
 type MainStep = 'matching' | 'matches' | 'settings';
 
@@ -239,6 +240,7 @@ const IndexContent = () => {
   };
 
   const handleViewStockDetails = (stock: StockRecommendation, advance?: (liked: boolean) => void) => {
+    track('details_opened', { ticker: stock.ticker });
     setSelectedStockForDetails(stock);
     advanceCardRef.current = advance ?? null;
     setIsDetailsModalOpen(true);

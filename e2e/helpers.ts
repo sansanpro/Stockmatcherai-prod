@@ -16,6 +16,10 @@ export function testUser() {
 // Opens the main app with first-run overlays dismissed. Pass { aiConsent: false } to test the consent dialog.
 export async function openApp(page: Page, { aiConsent = true } = {}) {
   await page.addInitScript((consent) => {
+    // Marks test traffic so analytics metrics exclude it
+    if (!localStorage.getItem('analytics_install_id')) {
+      localStorage.setItem('analytics_install_id', `e2e-${Math.random().toString(36).slice(2, 12)}`);
+    }
     localStorage.setItem('stockmatch_onboarding_v2', 'true');
     localStorage.setItem('att_status', 'authorized');
     localStorage.setItem('ai_widget_opened', 'true');

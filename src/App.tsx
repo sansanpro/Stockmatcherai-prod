@@ -15,12 +15,17 @@ import Waitlist from "./pages/Waitlist";
 import Support from "./pages/Support";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+import { track } from '@/lib/analytics';
 
 const queryClient = new QueryClient();
 
 const App = () => {
   // Detect if running on native mobile platform (iOS/Android)
   const isNativeMobile = Capacitor.isNativePlatform();
+
+  useEffect(() => {
+    track('app_open');
+  }, []);
 
   // Request ATT permission on first user interaction (iOS only)
   useEffect(() => {
