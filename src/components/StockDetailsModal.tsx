@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
 import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StockRecommendation } from '@/types/stock-matcher';
 import {
-  TrendingUp, TrendingDown, Star, Globe, Leaf, Heart, X,
-  Building2, DollarSign, BarChart3, Newspaper,
+  TrendingUp, TrendingDown, Globe, Leaf, Heart, X,
+  Building2, DollarSign, BarChart3, Newspaper, ExternalLink,
 } from 'lucide-react';
-import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, defs, linearGradient,
-} from 'recharts';
+import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import CompanySnapshot from '@/components/CompanySnapshot';
+import { useCompanyNews } from '@/hooks/useCompanyNews';
+import { usePricePerformance } from '@/hooks/usePricePerformance';
+import { getMomentum } from '@/utils/momentum';
 
 interface StockDetailsModalProps {
   stock: StockRecommendation | null;
@@ -41,13 +41,6 @@ const getRiskEmoji = (risk: string) => {
   }
 };
 
-const analystLabel = (ret: number) => {
-  if (ret > 15) return { label: 'Strong Buy', color: 'bg-emerald-500', text: 'text-emerald-600', width: '90%' };
-  if (ret > 5)  return { label: 'Buy',         color: 'bg-green-400',  text: 'text-green-600',  width: '70%' };
-  if (ret > -5) return { label: 'Hold',        color: 'bg-yellow-400', text: 'text-yellow-600', width: '50%' };
-  return              { label: 'Sell',         color: 'bg-red-500',    text: 'text-red-600',    width: '20%' };
-};
-
 const esgInfo = (score: number) => {
   if (score >= 80) return { rating: 'A+', color: 'text-emerald-600 dark:text-emerald-400', bar: 'bg-emerald-500' };
   if (score >= 70) return { rating: 'A',  color: 'text-green-600 dark:text-green-400',    bar: 'bg-green-500'   };
@@ -56,13 +49,21 @@ const esgInfo = (score: number) => {
   return                  { rating: 'C',  color: 'text-red-600 dark:text-red-400',        bar: 'bg-red-500'     };
 };
 
-// Custom chart tooltip
-const ChartTooltip = ({ active, payload, label }: any) => {
+const timeAgo = (dateString: string): string => {
+  const diffHours = Math.floor((Date.now() - new Date(dateString).getTime()) / (1000 * 60 * 60));
+  if (diffHours < 1) return 'Just now';
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffHours < 24 * 7) return `${Math.floor(diffHours / 24)}d ago`;
+  return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+
+const ReturnTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
+  const value = Number(payload[0]?.value);
   return (
     <div className="bg-background/95 backdrop-blur-sm border border-border rounded-xl px-3 py-2 shadow-xl text-xs">
       <p className="text-muted-foreground mb-0.5">{label}</p>
-      <p className="font-bold text-foreground">${Number(payload[0]?.value).toFixed(2)}</p>
+      <p className="font-bold text-foreground">{value > 0 ? '+' : ''}{value.toFixed(2)}%</p>
     </div>
   );
 };
@@ -70,64 +71,22 @@ const ChartTooltip = ({ active, payload, label }: any) => {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDetailsModalProps) => {
-  const [performanceData, setPerformanceData] = useState<any[]>([]);
-  const [news, setNews]                       = useState<any[]>([]);
-  const [isPositive, setIsPositive]           = useState(true);
-
-  useEffect(() => {
-    if (!stock || !isOpen) return;
-
-    const pos = stock.oneYearReturn >= 0;
-    setIsPositive(pos);
-
-    // Build 12-month simulated price series
-    const data = [];
-    let price = stock.pricePerShare / (1 + stock.oneYearReturn / 100);
-    for (let i = 11; i >= 0; i--) {
-      const noise = (Math.random() - 0.45) * (stock.pricePerShare * 0.06);
-      price = Math.max(price + noise, 1);
-      data.push({
-        month: new Date(Date.now() - i * 30 * 24 * 60 * 60 * 1000)
-          .toLocaleDateString('en-US', { month: 'short' }),
-        price: parseFloat(price.toFixed(2)),
-      });
-    }
-    // Ensure last point matches current price
-    data[data.length - 1].price = stock.pricePerShare;
-    setPerformanceData(data);
-
-    setNews([
-      {
-        title: `${stock.companyName} Reports Strong Q4 Earnings`,
-        summary: `${stock.companyName} exceeded analyst expectations with robust growth across key segments.`,
-        source: 'Financial Times',
-        time: '2h ago',
-        sentiment: 'positive',
-      },
-      {
-        title: `Analysts Upgrade ${stock.ticker} Price Target`,
-        summary: 'Multiple firms raise price targets following strong performance indicators.',
-        source: 'Reuters',
-        time: '5h ago',
-        sentiment: 'positive',
-      },
-      {
-        title: `${stock.sector} Sector Outlook Remains Positive`,
-        summary: `Industry trends continue to favour companies like ${stock.companyName}.`,
-        source: 'MarketWatch',
-        time: '1d ago',
-        sentiment: 'neutral',
-      },
-    ]);
-  }, [stock, isOpen]);
+  // Real data only: news and returns come from Finnhub via company-data (cached server-side)
+  const { news, isLoading: newsLoading, error: newsError } = useCompanyNews(isOpen && stock ? stock.ticker : null, stock?.companyName);
+  const { performance, isLoading: performanceLoading, error: performanceError } =
+    usePricePerformance(stock?.ticker ?? null, isOpen);
 
   if (!stock) return null;
 
-  const analyst  = analystLabel(stock.oneYearReturn);
-  const esg      = esgInfo(stock.esgScore || 70);
+  const isPositive = stock.oneYearReturn >= 0;
+  const momentum = getMomentum(stock.oneYearReturn);
   const esgScore = stock.esgScore || 70;
-  const stars    = stock.oneYearReturn > 10 ? 5 : stock.oneYearReturn > 0 ? 4 : 3;
-  const chartColor = isPositive ? '#10b981' : '#f43f5e';
+  const esg      = esgInfo(esgScore);
+  const rangeHigh = performance?.fiftyTwoWeekHigh;
+  const rangeLow = performance?.fiftyTwoWeekLow;
+  const rangePosition = rangeHigh && rangeLow && rangeHigh > rangeLow
+    ? Math.min(100, Math.max(0, ((stock.pricePerShare - rangeLow) / (rangeHigh - rangeLow)) * 100))
+    : null;
 
   return (
     // Non-modal so the AI assistant (drawn above this sheet) can still be tapped and typed in;
@@ -174,13 +133,13 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
               </div>
             </div>
 
-            {/* Risk + analyst badges */}
+            {/* Risk + momentum badges */}
             <div className="flex gap-2 mt-3 flex-wrap">
               <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm text-xs font-semibold px-3 py-1">
                 {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()} RISK
               </Badge>
               <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm text-xs font-semibold px-3 py-1">
-                {analyst.label}
+                {momentum.label}
               </Badge>
             </div>
           </div>
@@ -196,7 +155,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
               <DollarSign className="w-3 h-3" />Metrics
             </TabsTrigger>
             <TabsTrigger value="performance" className="rounded-lg text-xs data-[state=active]:shadow-sm gap-1">
-              <BarChart3 className="w-3 h-3" />Chart
+              <BarChart3 className="w-3 h-3" />Returns
             </TabsTrigger>
             <TabsTrigger value="news"        className="rounded-lg text-xs data-[state=active]:shadow-sm gap-1">
               <Newspaper className="w-3 h-3" />News
@@ -273,42 +232,27 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                 />
               </div>
 
-              {/* Analyst confidence bar */}
+              {/* 1-year momentum (computed from price change, not analyst ratings) */}
               <div className="bg-muted/50 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold">Analyst Rating</span>
-                  <span className={`text-sm font-bold ${analyst.text}`}>{analyst.label}</span>
+                  <span className="text-sm font-semibold">1-Year Momentum</span>
+                  <span className={`text-sm font-bold ${momentum.textColor}`}>{momentum.label}</span>
                 </div>
                 <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                   <div
-                    className={`h-2 rounded-full ${analyst.color} transition-all duration-700`}
-                    style={{ width: analyst.width }}
+                    className={`h-2 rounded-full ${momentum.barColor} transition-all duration-700`}
+                    style={{ width: momentum.width }}
                   />
                 </div>
-                <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-                  <span>Sell</span><span>Hold</span><span>Buy</span><span>Strong Buy</span>
-                </div>
-              </div>
-
-              {/* Star rating */}
-              <div className="bg-muted/50 rounded-2xl p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold">Match Recommendation</span>
-                  <div className="flex gap-0.5">
-                    {[1,2,3,4,5].map(i => (
-                      <Star
-                        key={i}
-                        className={`w-5 h-5 ${i <= stars ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground/30'}`}
-                      />
-                    ))}
-                  </div>
-                </div>
+                <p className="text-[11px] text-muted-foreground mt-2">
+                  Based on the past year's price change. Not a recommendation.
+                </p>
               </div>
             </TabsContent>
 
-            {/* ── Performance ──────────────────────────────────────────────── */}
-            <TabsContent value="performance" className="mt-0 px-4 pt-4">
-              <div className="bg-muted/40 rounded-2xl p-4 mb-4">
+            {/* ── Returns ──────────────────────────────────────────────────── */}
+            <TabsContent value="performance" className="mt-0 px-4 pt-4 space-y-4">
+              <div className="bg-muted/40 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <p className="text-xs text-muted-foreground">Current Price</p>
@@ -319,45 +263,66 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                       ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
                       : 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
                   }`}>
-                    {isPositive ? '▲' : '▼'} {Math.abs(stock.oneYearReturn).toFixed(1)}% this year
+                    {isPositive ? '▲' : '▼'} {Math.abs(stock.oneYearReturn).toFixed(1)}% past year
                   </div>
                 </div>
 
-                {/* Area chart */}
-                <div className="h-52">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={performanceData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%"  stopColor={chartColor} stopOpacity={0.35} />
-                          <stop offset="95%" stopColor={chartColor} stopOpacity={0.02} />
-                        </linearGradient>
-                      </defs>
-                      <XAxis
-                        dataKey="month"
-                        tick={{ fontSize: 10, fill: 'currentColor' }}
-                        axisLine={false}
-                        tickLine={false}
-                        className="text-muted-foreground"
-                      />
-                      <YAxis hide />
-                      <Tooltip content={<ChartTooltip />} />
-                      <Area
-                        type="monotone"
-                        dataKey="price"
-                        stroke={chartColor}
-                        strokeWidth={2.5}
-                        fill="url(#priceGrad)"
-                        dot={false}
-                        activeDot={{ r: 5, fill: chartColor, strokeWidth: 0 }}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
+                {performanceLoading && <div className="h-48 rounded-xl bg-muted animate-pulse" />}
+                {!performanceLoading && (performanceError || !performance?.returns.length) && (
+                  <p className="text-sm text-muted-foreground text-center py-12">
+                    {performanceError ?? 'No return data available for this stock.'}
+                  </p>
+                )}
+                {!performanceLoading && performance && performance.returns.length > 0 && (
+                  <div className="h-48" aria-label="Price returns by period">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={performance.returns} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                        <XAxis
+                          dataKey="period"
+                          tick={{ fontSize: 11, fill: 'currentColor' }}
+                          axisLine={false}
+                          tickLine={false}
+                          className="text-muted-foreground"
+                        />
+                        <YAxis
+                          tick={{ fontSize: 10, fill: 'currentColor' }}
+                          axisLine={false}
+                          tickLine={false}
+                          tickFormatter={(v: number) => `${v}%`}
+                          className="text-muted-foreground"
+                        />
+                        <ReferenceLine y={0} stroke="currentColor" strokeOpacity={0.25} />
+                        <Tooltip content={<ReturnTooltip />} cursor={{ fill: 'currentColor', fillOpacity: 0.05 }} />
+                        <Bar dataKey="percent" radius={[6, 6, 6, 6]} isAnimationActive={false}>
+                          {performance.returns.map((r) => (
+                            <Cell key={r.period} fill={r.percent >= 0 ? '#10b981' : '#f43f5e'} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
               </div>
 
+              {/* 52-week range */}
+              {rangePosition !== null && (
+                <div className="bg-muted/40 rounded-2xl p-4">
+                  <p className="text-sm font-semibold mb-3">52-Week Range</p>
+                  <div className="relative h-2 bg-gradient-to-r from-rose-400 via-yellow-400 to-emerald-500 rounded-full">
+                    <div
+                      className="absolute -top-1 w-4 h-4 rounded-full bg-background border-2 border-foreground shadow"
+                      style={{ left: `calc(${rangePosition}% - 8px)` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                    <span>Low ${rangeLow!.toFixed(2)}</span>
+                    <span>High ${rangeHigh!.toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+
               <p className="text-xs text-muted-foreground text-center">
-                Simulated 12-month price trend based on available return data
+                Price returns from market data. Past performance doesn't predict future results.
               </p>
             </TabsContent>
 
@@ -368,30 +333,44 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                   Recent News
                 </p>
-                <div className="space-y-2">
-                  {news.map((item, i) => (
-                    <div
-                      key={i}
-                      className="bg-muted/50 rounded-2xl p-4"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 ${
-                          item.sentiment === 'positive' ? 'bg-emerald-500' :
-                          item.sentiment === 'negative' ? 'bg-rose-500' : 'bg-yellow-500'
-                        }`} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold leading-snug">{item.title}</p>
-                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{item.summary}</p>
-                          <div className="flex gap-2 mt-2 text-[11px] text-muted-foreground">
-                            <span>{item.source}</span>
-                            <span>·</span>
-                            <span>{item.time}</span>
+                {newsLoading && (
+                  <div className="space-y-2">
+                    {[0, 1, 2].map(i => <div key={i} className="h-20 rounded-2xl bg-muted/50 animate-pulse" />)}
+                  </div>
+                )}
+                {!newsLoading && (newsError || news.length === 0) && (
+                  <p className="text-sm text-muted-foreground bg-muted/50 rounded-2xl p-4">
+                    {newsError ? 'News is unavailable right now.' : 'No recent news for this company.'}
+                  </p>
+                )}
+                {!newsLoading && news.length > 0 && (
+                  <div className="space-y-2">
+                    {news.map((item) => (
+                      <a
+                        key={item.url}
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block bg-muted/50 rounded-2xl p-4 hover:bg-muted/80 transition-colors"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold leading-snug line-clamp-2">{item.title}</p>
+                            {item.text && (
+                              <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-2">{item.text}</p>
+                            )}
+                            <div className="flex gap-2 mt-2 text-[11px] text-muted-foreground">
+                              <span>{item.site}</span>
+                              <span>·</span>
+                              <span>{timeAgo(item.publishedDate)}</span>
+                            </div>
                           </div>
+                          <ExternalLink className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                         </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* ESG */}
@@ -408,28 +387,18 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                     <span className={`text-2xl font-bold ${esg.color}`}>{esg.rating}</span>
                   </div>
 
-                  {[
-                    { label: 'Environmental', value: Math.min(100, esgScore + 10), color: 'bg-emerald-500' },
-                    { label: 'Social',         value: Math.min(100, esgScore - 5),  color: 'bg-blue-500'    },
-                    { label: 'Governance',     value: Math.min(100, esgScore + 5),  color: 'bg-purple-500'  },
-                  ].map(({ label, value, color }) => (
-                    <div key={label}>
-                      <div className="flex justify-between text-xs mb-1.5">
-                        <span className="text-muted-foreground">{label}</span>
-                        <span className="font-semibold">{value}/100</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className={`h-2 rounded-full ${color} transition-all duration-700`}
-                          style={{ width: `${value}%` }}
-                        />
-                      </div>
+                  <div>
+                    <div className="flex justify-between text-xs mb-1.5">
+                      <span className="text-muted-foreground">Overall score</span>
+                      <span className="font-semibold">{esgScore}/100</span>
                     </div>
-                  ))}
-
-                  <p className="text-xs text-muted-foreground leading-relaxed pt-1 border-t border-border/50">
-                    {stock.companyName} demonstrates strong commitment to sustainable practices and ethical governance.
-                  </p>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className={`h-2 rounded-full ${esg.bar} transition-all duration-700`}
+                        style={{ width: `${esgScore}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </TabsContent>

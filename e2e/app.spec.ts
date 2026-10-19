@@ -108,3 +108,27 @@ test('company logo loads instead of a blank tile', async ({ page }) => {
   await page.waitForTimeout(300);
   await page.screenshot({ path: 'e2e/screens/logo.png' });
 });
+
+test('details panel shows real returns, real news and no buy/sell ratings', async ({ page }) => {
+  await openApp(page);
+  await page.getByRole('button', { name: 'View stock details' }).first().click();
+  const details = page.getByRole('dialog');
+
+  // No analyst-style ratings (they were derived from 1Y return, not analysts)
+  await expect(details.getByText(/Strong Buy|Analyst Rating|\bSell\b/)).toHaveCount(0);
+  await expect(details.getByText(/momentum|^Flat$/i).first()).toBeVisible();
+
+  // Returns tab: real periods from market data, no simulated chart
+  await details.getByRole('tab', { name: /Returns/ }).click();
+  await expect(details.getByText('52-Week Range')).toBeVisible();
+  await expect(details.getByText(/Simulated/)).toHaveCount(0);
+  await expect(details.getByText('1Y', { exact: true })).toBeVisible();
+  await page.screenshot({ path: 'e2e/screens/details-returns.png' });
+
+  // News tab: real headlines link out; none of the old template headlines
+  await details.getByRole('tab', { name: /News/ }).click();
+  await expect(details.getByText(/Reports Strong Q4 Earnings|Analysts Upgrade/)).toHaveCount(0);
+  await expect(details.locator('a[href^="http"]').first().or(details.getByText(/No recent news|unavailable/))).toBeVisible();
+  await expect(details.getByText(/demonstrates strong commitment/)).toHaveCount(0);
+  await page.screenshot({ path: 'e2e/screens/details-news.png' });
+});

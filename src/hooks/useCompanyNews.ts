@@ -18,7 +18,7 @@ interface NewsCache {
 const newsCache = new Map<string, NewsCache>();
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
-export function useCompanyNews(ticker: string | null) {
+export function useCompanyNews(ticker: string | null, companyName?: string) {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export function useCompanyNews(ticker: string | null) {
 
     try {
       const { data, error: fnError } = await supabase.functions.invoke('company-data', {
-        body: { action: 'company_news', symbol: ticker, limit: 5 }
+        body: { action: 'company_news', symbol: ticker, limit: 5, companyName }
       });
 
       if (fnError) throw fnError;
@@ -55,7 +55,7 @@ export function useCompanyNews(ticker: string | null) {
     } finally {
       setIsLoading(false);
     }
-  }, [ticker]);
+  }, [ticker, companyName]);
 
   useEffect(() => {
     fetchNews();

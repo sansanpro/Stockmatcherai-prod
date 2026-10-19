@@ -38,7 +38,7 @@ const getSentiment = (title: string): { emoji: string; color: string } => {
 
 const StockNewsPill = ({ ticker, companyName }: StockNewsPillProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { news, isLoading, error } = useCompanyNews(ticker);
+  const { news, isLoading, error } = useCompanyNews(ticker, companyName);
 
   // Don't render if no news or error
   if (error || (!isLoading && news.length === 0)) {

@@ -1,4 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { getMomentum } from '@/utils/momentum';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { StockRecommendation } from '@/types/stock-matcher';
@@ -48,7 +49,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
     return { rating: 'C', color: 'text-red-600 dark:text-red-400' };
   };
 
-  const analystRating = stock.oneYearReturn > 15 ? 'Strong Buy' : stock.oneYearReturn > 5 ? 'Buy' : stock.oneYearReturn > -5 ? 'Hold' : 'Sell';
+  const momentum = getMomentum(stock.oneYearReturn);
   const esgRating = getESGRating(stock.esgScore || 70);
 
   return (
@@ -92,10 +93,9 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
               <div className="flex items-center gap-2">
                 <Star className="w-4 h-4 text-yellow-500 flex-shrink-0" />
-                <span className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Analyst:</span>
-                <Badge className={`${analystRating.includes('Buy') ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 
-                  analystRating === 'Hold' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'} text-[10px] sm:text-xs px-2 py-1`}>
-                  {analystRating}
+                <span className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">1Y momentum:</span>
+                <Badge className={`${momentum.badgeClass} text-[10px] sm:text-xs px-2 py-1`}>
+                  {momentum.label}
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
