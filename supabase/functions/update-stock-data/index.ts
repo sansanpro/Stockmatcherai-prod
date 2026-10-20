@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  let body: { updateType?: string; source?: string } = {};
+  let body: { updateType?: string; source?: string; tickers?: string[] } = {};
   try {
     const text = req.method === 'POST' ? await req.text() : '';
     if (text) body = JSON.parse(text);
@@ -42,12 +42,21 @@ Deno.serve(async (req) => {
   const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
   const startTime = Date.now();
 
+  // Admin backfill: refresh prices and metrics for specific tickers now (e.g. newly added
+  // companies). Requires the service role key, since it bypasses the staleness and metrics limits.
+  const backfill = Array.isArray(body.tickers) && body.tickers.length > 0;
+  if (backfill && req.headers.get('Authorization') !== `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`) {
+    return json({ error: 'Unauthorized' }, 401);
+  }
+
   try {
     const freshness = await getTickerFreshness(supabase);
-    const staleTickers = [...freshness.entries()]
-      .filter(([, updatedAt]) => startTime - updatedAt > STALE_AFTER_MS)
-      .sort(([, a], [, b]) => a - b)
-      .map(([ticker]) => ticker);
+    const staleTickers = backfill
+      ? body.tickers!.map(t => String(t).toUpperCase()).filter(t => freshness.has(t))
+      : [...freshness.entries()]
+        .filter(([, updatedAt]) => startTime - updatedAt > STALE_AFTER_MS)
+        .sort(([, a], [, b]) => a - b)
+        .map(([ticker]) => ticker);
 
     if (staleTickers.length === 0) {
       return json({ message: 'All stock data is up to date', success: true, updated: 0, failed: 0, staleCount: 0 });
@@ -85,8 +94,8 @@ Deno.serve(async (req) => {
 
     for (const ticker of staleTickers) {
       if (Date.now() - startTime > MAX_RUN_MS) break;
-      const withMetrics = metricsFetched < MAX_METRICS_PER_RUN &&
-        startTime - (metricsFreshness.get(ticker) ?? 0) > METRICS_TTL_MS;
+      const withMetrics = backfill || (metricsFetched < MAX_METRICS_PER_RUN &&
+        startTime - (metricsFreshness.get(ticker) ?? 0) > METRICS_TTL_MS);
       try {
         // Quote + metrics are two calls: budget a second interval to keep the average rate
         await pause(withMetrics ? 2 : 1);

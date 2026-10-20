@@ -1,0 +1,2184 @@
+{
+  "_about": "Release 1 launch universe: the source of truth for stock_missions, stock_flags and the mission fields on stocks. Edit here, then run: node scripts/build-launch-seed.mjs",
+  "companies": [
+    {
+      "ticker": "MRK",
+      "company_name": "Merck & Co., Inc.",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Develops medicines and vaccines, led by Keytruda, an immunotherapy that helps the immune system find and attack cancer.",
+      "proof": "Keytruda was the world's best-selling medicine in 2024, with about $29 billion in sales.",
+      "things_to_know": [
+        "Keytruda's main U.S. patents begin expiring in 2028, a known challenge for Merck's growth."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "Oncology, led by Keytruda, is Merck's largest business.",
+          "why_line": "Its biggest medicine trains the immune system to fight cancer."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "BMY",
+      "company_name": "Bristol-Myers Squibb Company",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Develops medicines for cancer, blood disorders, immune diseases and heart disease, including the cancer immunotherapy Opdivo.",
+      "proof": "Opdivo is approved for many cancers, including lung, skin, kidney and bladder cancer.",
+      "things_to_know": [
+        "Several top drugs, including Eliquis and Opdivo, face patent expirations later this decade."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "Oncology and blood cancers are among Bristol Myers Squibb's largest therapeutic areas.",
+          "why_line": "A large share of its medicines treat cancer."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "PFE",
+      "company_name": "Pfizer Inc.",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "One of the world's largest drugmakers, with medicines and vaccines for cancer, infections, heart disease and more.",
+      "proof": "Pfizer bought cancer-drug developer Seagen in 2023 for about $43 billion to expand its cancer medicines.",
+      "things_to_know": [
+        "Sales of its COVID-19 products have fallen sharply since 2022."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "partial",
+          "evidence": "Oncology is one of Pfizer's main areas, expanded by the Seagen acquisition.",
+          "why_line": "Cancer is one of its biggest research areas, alongside vaccines."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "ABBV",
+      "company_name": "AbbVie Inc.",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Develops medicines for immune diseases, cancer and brain conditions, plus Botox through its Allergan business.",
+      "proof": "Its cancer drugs include Imbruvica and Venclexta, used to treat blood cancers such as leukemia.",
+      "things_to_know": [
+        "Its former top seller, Humira, now faces lower-cost biosimilar competition."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "partial",
+          "evidence": "Oncology, including the blood-cancer drugs Imbruvica and Venclexta, is one of AbbVie's core areas.",
+          "why_line": "Part of its business develops treatments for blood cancers."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "AMGN",
+      "company_name": "Amgen Inc",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "A biotechnology pioneer making medicines for cancer, bone loss, heart disease and inflammation.",
+      "proof": "Its cancer medicines include Kyprolis for multiple myeloma and Blincyto for leukemia.",
+      "things_to_know": [
+        "Its 2023 purchase of Horizon Therapeutics added significant debt."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "partial",
+          "evidence": "Oncology and hematology are major therapeutic areas for Amgen.",
+          "why_line": "Several of its medicines treat blood cancers."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "REGN",
+      "company_name": "Regeneron Pharmaceuticals Inc",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Discovers antibody medicines for eye disease, allergies, asthma and cancer, using its own genetic research tools.",
+      "proof": "Its Libtayo is an approved immunotherapy for certain skin and lung cancers.",
+      "things_to_know": [
+        "Much of its income still depends on the eye drug Eylea, which faces new competition."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "partial",
+          "evidence": "Regeneron develops cancer immunotherapies, including Libtayo and several bispecific antibodies.",
+          "why_line": "It's building a growing set of cancer treatments."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "GILD",
+      "company_name": "Gilead Sciences Inc",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Develops medicines for HIV, liver disease and cancer, including cell therapies that reprogram immune cells to fight cancer.",
+      "proof": "Its Kite unit makes the CAR T-cell therapies Yescarta and Tecartus for blood cancers.",
+      "things_to_know": [
+        "Most of its sales still come from HIV medicines rather than cancer."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "Gilead's business is medicines for HIV, liver disease and cancer, including Kite's cell therapies.",
+          "why_line": "Its medicines treat HIV, and its Kite unit engineers immune cells to attack cancer."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "MRNA",
+      "company_name": "Moderna Inc",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Develops mRNA medicines and vaccines, including its COVID-19 vaccine, an RSV vaccine and experimental personalized cancer vaccines.",
+      "proof": "Its mRNA COVID-19 vaccine was one of the first two COVID-19 vaccines authorized in the U.S., in December 2020.",
+      "things_to_know": [
+        "Not profitable since COVID-19 vaccine demand fell, and the stock is very volatile."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "Moderna's business is mRNA vaccines and therapies for infectious disease and cancer.",
+          "why_line": "Its whole platform is built on vaccines and treatments for disease."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "BNTX",
+      "company_name": "BioNTech SE",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "20-F",
+      "mission_story": "A German biotech developing cancer immunotherapies and vaccines, best known for co-developing the Pfizer-BioNTech COVID-19 vaccine.",
+      "proof": "It co-developed the first COVID-19 vaccine authorized in the U.S., in December 2020.",
+      "things_to_know": [
+        "Results swing with vaccine demand, and it reports as a foreign company (Form 20-F)."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "BioNTech's pipeline focuses on cancer immunotherapies and infectious-disease vaccines.",
+          "why_line": "It's betting its future on new ways to treat cancer."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "VRTX",
+      "company_name": "Vertex Pharmaceuticals Inc",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Develops medicines that treat the root causes of serious diseases like cystic fibrosis and sickle cell disease.",
+      "proof": "Its Casgevy, approved in 2023, was the first approved CRISPR gene-editing therapy.",
+      "things_to_know": [
+        "Most of its revenue still comes from cystic fibrosis medicines."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "Vertex develops medicines for cystic fibrosis, sickle cell disease and other serious diseases.",
+          "why_line": "It focuses on treating the genetic causes of serious diseases."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "BIIB",
+      "company_name": "Biogen Inc",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Develops therapies for neurological diseases such as multiple sclerosis, spinal muscular atrophy and Alzheimer's disease.",
+      "proof": "It co-developed Leqembi, approved in 2023 as a treatment that slows early Alzheimer's disease.",
+      "things_to_know": [
+        "Its older multiple sclerosis drugs face falling sales from generic competition."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "Biogen's business is medicines for neurological and neurodegenerative diseases.",
+          "why_line": "It works on hard-to-treat brain diseases like Alzheimer's."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "DHR",
+      "company_name": "Danaher Corporation",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Makes tools used to research diseases, manufacture biologic medicines and diagnose patients, through brands like Cytiva, Beckman Coulter and Cepheid.",
+      "proof": "Its Cepheid GeneXpert systems are used worldwide to diagnose tuberculosis and other infections.",
+      "things_to_know": [
+        "Demand for its tools slowed after the COVID-19 testing boom ended."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "partial",
+          "evidence": "Danaher's diagnostics and life-science tools support disease testing and drug development.",
+          "why_line": "Its tests and lab tools help diagnose disease and develop new treatments."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "GH",
+      "company_name": "Guardant Health",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Develops blood tests that find cancer and help doctors choose treatments, without needing a tissue biopsy.",
+      "proof": "Its Shield test became the first FDA-approved blood test for primary colorectal cancer screening, in 2024.",
+      "things_to_know": [
+        "Not yet profitable; growth depends on doctors and insurers adopting its tests."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "Guardant Health's business is blood-based cancer detection and monitoring tests.",
+          "why_line": "Its blood tests aim to catch cancer earlier and guide treatment."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Guardant Health develops blood tests that detect cancer and guide treatment, including Guardant360 for advanced cancer and the Shield colorectal cancer screening test.",
+        "city": "Palo Alto",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "NTRA",
+      "company_name": "Natera",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Develops genetic blood tests that check whether cancer has returned, screen pregnancies and monitor transplanted organs.",
+      "proof": "Its Signatera test is personalized to each patient's tumor to detect cancer recurrence from a blood draw.",
+      "things_to_know": [
+        "Has a history of losses while investing heavily in growth."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "Natera's cell-free DNA tests are used to detect cancer recurrence and screen for genetic conditions.",
+          "why_line": "Its blood tests help catch cancer coming back earlier."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Natera develops cell-free DNA tests for cancer monitoring, prenatal screening and organ transplant health.",
+        "city": "Austin",
+        "state": "TX",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "ILMN",
+      "company_name": "Illumina",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes the DNA sequencing machines labs use to read genes, study cancer and diagnose genetic disease.",
+      "proof": "Its technology helped cut the cost of sequencing a human genome from millions of dollars to a few hundred.",
+      "things_to_know": [
+        "Spun off the cancer-test maker Grail in 2024 after regulators challenged the acquisition."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "partial",
+          "evidence": "Illumina's sequencing is used in cancer research and genetic disease diagnosis.",
+          "why_line": "Its machines power much of the genetic research behind new cancer tests."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Illumina makes DNA sequencing machines and chemistry used in genetic research, cancer testing and disease diagnosis.",
+        "city": "San Diego",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "INCY",
+      "company_name": "Incyte",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Develops medicines for blood cancers, other cancers and inflammatory skin conditions.",
+      "proof": "Its drug Jakafi treats myelofibrosis and polycythemia vera, two rare blood cancers.",
+      "things_to_know": [
+        "Jakafi, its main drug, loses U.S. patent protection later this decade."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "Incyte's main medicines treat blood cancers and other cancers.",
+          "why_line": "Most of its work goes into new cancer medicines."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Incyte discovers and develops medicines for cancer and inflammatory diseases, led by Jakafi for rare blood cancers.",
+        "city": "Wilmington",
+        "state": "DE",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "EXEL",
+      "company_name": "Exelixis",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "A focused cancer-drug company whose main medicine treats kidney, liver and thyroid cancers.",
+      "proof": "Its drug Cabometyx is approved for advanced kidney cancer, liver cancer and certain thyroid cancers.",
+      "things_to_know": [
+        "Depends heavily on a single drug, Cabometyx."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "Exelixis's business is discovering and selling cancer medicines.",
+          "why_line": "Cancer is the entire focus of the company."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Exelixis develops cancer medicines, led by Cabometyx for kidney, liver and thyroid cancers.",
+        "city": "Alameda",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "ALNY",
+      "company_name": "Alnylam Pharmaceuticals",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Pioneered medicines that switch off disease-causing genes, starting with rare inherited diseases and expanding into heart disease.",
+      "proof": "Its Onpattro, approved in 2018, was the first FDA-approved RNAi medicine.",
+      "things_to_know": [
+        "Has spent heavily on research, and its profits depend on a few key medicines."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "Alnylam develops RNAi medicines for genetic and cardiometabolic diseases.",
+          "why_line": "It treats diseases by silencing the genes that cause them."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Alnylam develops RNA interference (RNAi) medicines that silence disease-causing genes, for rare and common diseases.",
+        "city": "Cambridge",
+        "state": "MA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "BMRN",
+      "company_name": "BioMarin Pharmaceutical",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Develops medicines for rare genetic diseases that often have few or no other treatments.",
+      "proof": "Its Voxzogo was the first approved medicine to increase growth in children with achondroplasia, the most common form of dwarfism.",
+      "things_to_know": [
+        "Rare-disease medicines serve small patient groups, so each launch matters a lot."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "core",
+          "evidence": "BioMarin focuses on medicines for rare genetic diseases.",
+          "why_line": "It focuses on rare diseases that often have no other treatment."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "BioMarin develops medicines for rare genetic diseases, including enzyme therapies and a treatment for achondroplasia.",
+        "city": "San Rafael",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "QGEN",
+      "company_name": "Qiagen",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "",
+      "mission_story": "Makes the kits and tests labs use to extract and analyze DNA, including tests for tuberculosis, infections and cancer markers.",
+      "proof": "Its QuantiFERON test is widely used to screen for latent tuberculosis infection.",
+      "things_to_know": [
+        "Incorporated in the Netherlands, so results are sensitive to currency moves."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "partial",
+          "evidence": "Qiagen's molecular diagnostics are used to detect infectious diseases and cancer biomarkers.",
+          "why_line": "Its tests help labs detect disease and guide cancer treatment."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Qiagen makes sample-preparation kits and molecular tests used by labs to detect infections, cancer markers and genetic conditions.",
+        "city": "Venlo",
+        "state": null,
+        "country": "Netherlands"
+      }
+    },
+    {
+      "ticker": "ABT",
+      "company_name": "Abbott Laboratories",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Makes medical devices, diagnostic tests, nutrition products and medicines, including the FreeStyle Libre glucose monitor.",
+      "proof": "Its FreeStyle Libre glucose monitors are used by millions of people with diabetes worldwide.",
+      "things_to_know": [
+        "Faces lawsuits over formula products for premature infants."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Abbott's medical devices, including diabetes care and heart devices, are its fastest-growing business.",
+          "why_line": "Its glucose monitors help people manage diabetes day to day."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "DXCM",
+      "company_name": "DexCom Inc",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes continuous glucose monitors that let people with diabetes track their blood sugar in real time without finger pricks.",
+      "proof": "In 2024 it launched Stelo, the first over-the-counter glucose biosensor cleared by the FDA.",
+      "things_to_know": [
+        "Faces strong competition from Abbott's FreeStyle Libre."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Dexcom's entire business is continuous glucose monitoring.",
+          "why_line": "Its sensors help people with diabetes avoid dangerous blood-sugar swings."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "PODD",
+      "company_name": "Insulet",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes the Omnipod, a small tubeless insulin pump worn on the body, for people with diabetes.",
+      "proof": "Omnipod 5 works with continuous glucose monitors to adjust insulin delivery automatically.",
+      "things_to_know": [
+        "Competes with larger device makers and newer diabetes medicines."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Insulet's business is the Omnipod insulin delivery system.",
+          "why_line": "Its pump makes managing insulin simpler for people with diabetes."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Insulet makes the Omnipod, a tubeless, wearable insulin pump for people with diabetes.",
+        "city": "Acton",
+        "state": "MA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "ISRG",
+      "company_name": "Intuitive Surgical Inc",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Makes the da Vinci robotic surgery system, which helps surgeons perform minimally invasive operations.",
+      "proof": "Surgeons have performed millions of procedures with da Vinci systems since its first FDA clearance in 2000.",
+      "things_to_know": [
+        "The stock is valued at a high multiple of earnings."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Intuitive's da Vinci systems enable minimally invasive surgery, which typically means smaller incisions and faster recovery.",
+          "why_line": "Its robots help patients recover faster from surgery."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "EW",
+      "company_name": "Edwards Lifesciences Corp",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes heart valves and devices that let doctors replace or repair heart valves without open-heart surgery.",
+      "proof": "It pioneered transcatheter aortic valve replacement (TAVR), which replaces a heart valve through a catheter.",
+      "things_to_know": [
+        "Sold its critical care business in 2024 to focus on structural heart devices."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Edwards focuses on devices for structural heart disease.",
+          "why_line": "Its valves give heart patients an option without open-heart surgery."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "BSX",
+      "company_name": "Boston Scientific Corp",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Makes devices for heart, vascular, digestive and urological conditions, including treatments for irregular heartbeat.",
+      "proof": "Its Farapulse system uses pulsed electric fields to treat atrial fibrillation, a common irregular heartbeat.",
+      "things_to_know": [
+        "Has grown through many acquisitions, which carry integration risk."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Boston Scientific makes medical devices for cardiology, vascular and other conditions.",
+          "why_line": "Its devices treat heart conditions with less invasive procedures."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "MDT",
+      "company_name": "Medtronic PLC",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "One of the largest medical device companies, making pacemakers, insulin pumps, spine and surgical tools.",
+      "proof": "Its Micra is a leadless pacemaker small enough to be placed directly in the heart through a vein.",
+      "things_to_know": [
+        "Growth has been slower than at smaller device makers."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Medtronic's devices treat heart rhythm, diabetes, spine and neurological conditions.",
+          "why_line": "Its devices keep hearts beating in rhythm and help manage chronic disease."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "SYK",
+      "company_name": "Stryker Corporation",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Makes orthopedic implants, surgical equipment and robotic systems for joint replacement.",
+      "proof": "Its Mako robotic-arm system assists surgeons with knee and hip replacements.",
+      "things_to_know": [
+        "Hospital spending cycles can affect equipment sales."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Stryker makes medical technology for orthopedics, surgery and neurotechnology.",
+          "why_line": "Its implants and robots help people stay mobile after joint damage."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "ZBH",
+      "company_name": "Zimmer Biomet Holdings Inc",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Makes knee and hip replacement implants and related surgical technology.",
+      "proof": "It is one of the largest makers of knee and hip replacement implants.",
+      "things_to_know": [
+        "Its growth has lagged rivals, and it has faced product recalls."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Zimmer Biomet focuses on joint reconstruction implants.",
+          "why_line": "Its replacement joints help people walk without pain."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "RMD",
+      "company_name": "ResMed",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Makes CPAP machines and masks that treat sleep apnea, plus cloud software that tracks patients' therapy.",
+      "proof": "Its AirSense devices connect to the cloud so care teams can see how patients are using their therapy.",
+      "things_to_know": [
+        "Weight-loss drugs could reduce sleep apnea cases over time, a debated risk to its sales."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "ResMed's business is devices and software for sleep apnea and respiratory care.",
+          "why_line": "Treating sleep apnea lowers the risk of heart disease and constant fatigue."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "ResMed makes CPAP machines, masks and software for sleep apnea and other breathing disorders.",
+        "city": "San Diego",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "INSP",
+      "company_name": "Inspire Medical Systems",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Makes a small implant that treats sleep apnea by keeping the airway open during sleep, for people who can't tolerate CPAP.",
+      "proof": "Its therapy works by stimulating the nerve that moves the tongue, keeping the airway open during sleep.",
+      "things_to_know": [
+        "Weight-loss drugs and competing devices are watched closely as risks to growth."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Inspire's business is its implanted sleep apnea therapy.",
+          "why_line": "It offers sleep apnea relief for people who can't use a mask."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Inspire Medical Systems makes an implanted device that treats obstructive sleep apnea for people who can't use CPAP.",
+        "city": "Golden Valley",
+        "state": "MN",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "IRTC",
+      "company_name": "iRhythm Technologies",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Makes Zio, a wearable patch that records heart rhythms for up to two weeks to help detect conditions like atrial fibrillation.",
+      "proof": "Its Zio patch is worn for up to 14 days, and the recordings are analyzed with AI-assisted software.",
+      "things_to_know": [
+        "Not yet consistently profitable and depends on insurance reimbursement rates."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "iRhythm's business is wearable heart-rhythm monitoring.",
+          "why_line": "Catching irregular heartbeats early can help prevent strokes."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "iRhythm Technologies makes the Zio wearable heart monitor and analysis service to detect irregular heart rhythms.",
+        "city": "San Francisco",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "PEN",
+      "company_name": "Penumbra",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes devices that remove blood clots from arteries and veins, used to treat strokes and blood clots in the lungs.",
+      "proof": "Its computer-assisted vacuum devices pull clots out through a thin catheter.",
+      "things_to_know": [
+        "Competition in clot-removal devices is increasing."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Penumbra's devices treat strokes and vascular blockages.",
+          "why_line": "Its devices help stroke and clot patients recover with less damage."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Penumbra makes devices that remove blood clots, used to treat strokes, pulmonary embolisms and other vascular conditions.",
+        "city": "Alameda",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "GKOS",
+      "company_name": "Glaukos",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Develops tiny implants and drug-delivery treatments for glaucoma and other chronic eye diseases.",
+      "proof": "Its iStent is among the smallest medical devices ever approved by the FDA.",
+      "things_to_know": [
+        "Not consistently profitable, and new products depend on insurance coverage decisions."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Glaukos focuses on glaucoma and corneal disease treatments.",
+          "why_line": "Its implants help protect people's eyesight from glaucoma."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Glaukos develops treatments for glaucoma and other eye diseases, including tiny stents implanted during eye surgery.",
+        "city": "Aliso Viejo",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "TMDX",
+      "company_name": "TransMedics",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Keeps donor hearts, lungs and livers warm and functioning outside the body, and flies them to transplant centers.",
+      "proof": "Its Organ Care System keeps donor organs perfused and working during transport instead of packing them on ice.",
+      "things_to_know": [
+        "A volatile stock; growth depends on transplant volumes and its aviation logistics."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "TransMedics' business is organ preservation and transplant logistics.",
+          "why_line": "It helps more donor organs reach the patients who need them."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "TransMedics makes the Organ Care System, which keeps donor organs functioning outside the body, and runs an aviation network to transport them.",
+        "city": "Andover",
+        "state": "MA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "STE",
+      "company_name": "Steris",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Helps hospitals and device makers prevent infections with sterilization equipment, services and supplies.",
+      "proof": "It sterilizes medical devices for manufacturers and surgical instruments for hospitals.",
+      "things_to_know": [
+        "A steady but slower-growing business tied to hospital procedure volumes."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "partial",
+          "evidence": "Steris's products and services reduce infection risk in healthcare.",
+          "why_line": "Its sterilization keeps surgeries and hospitals safer."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Steris provides sterilization equipment, services and products that help hospitals and medical device makers prevent infections.",
+        "city": "Dublin",
+        "state": null,
+        "country": "Ireland"
+      }
+    },
+    {
+      "ticker": "DGX",
+      "company_name": "Quest Diagnostics",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Runs one of the largest networks of medical testing labs, used for checkups, disease screening and diagnosis.",
+      "proof": "Quest says it serves about one in three U.S. adults each year.",
+      "things_to_know": [
+        "Lab testing prices are pressured by insurers and government reimbursement rules."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "partial",
+          "evidence": "Quest's diagnostic testing supports disease screening and preventive care.",
+          "why_line": "Routine lab tests help catch health problems early."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Quest Diagnostics runs clinical laboratories that perform medical tests for doctors, hospitals, employers and consumers.",
+        "city": "Secaucus",
+        "state": "NJ",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "LH",
+      "company_name": "Labcorp",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Runs medical testing labs used by doctors and patients, and supports the development of new medicines.",
+      "proof": "Labcorp processes hundreds of millions of lab tests each year.",
+      "things_to_know": [
+        "Spun off its clinical-trials business, Fortrea, in 2023."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "partial",
+          "evidence": "Labcorp's diagnostics support disease detection and prevention.",
+          "why_line": "Its lab tests help doctors catch problems early."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Labcorp runs clinical laboratories for medical testing and provides lab services for drug development.",
+        "city": "Burlington",
+        "state": "NC",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "LLY",
+      "company_name": "Eli Lilly and Company",
+      "new": false,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Develops medicines for diabetes, obesity, cancer, immune diseases and Alzheimer's disease.",
+      "proof": "Its tirzepatide is sold as Mounjaro for diabetes and Zepbound for weight loss.",
+      "things_to_know": [
+        "Its stock price assumes strong long-term growth from obesity medicines."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Diabetes and obesity medicines are Lilly's largest and fastest-growing business.",
+          "why_line": "Its medicines help people manage diabetes and lose weight."
+        },
+        {
+          "cause": "beat_cancer",
+          "exposure": "partial",
+          "evidence": "Lilly's oncology medicines include Verzenio for breast cancer.",
+          "why_line": "It also develops cancer medicines, such as Verzenio for breast cancer."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "NVO",
+      "company_name": "Novo Nordisk",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "medium",
+      "filing_type": "20-F",
+      "mission_story": "A Danish drugmaker focused on diabetes and obesity, the maker of insulin, Ozempic and Wegovy.",
+      "proof": "Novo Nordisk has made insulin since the 1920s.",
+      "things_to_know": [
+        "Faces intense competition from Eli Lilly in obesity medicines, and reports as a foreign company (Form 20-F)."
+      ],
+      "missions": [
+        {
+          "cause": "live_healthier",
+          "exposure": "core",
+          "evidence": "Novo Nordisk's business centers on diabetes and obesity care.",
+          "why_line": "Its medicines help millions of people manage diabetes and weight."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Novo Nordisk develops diabetes and obesity medicines, including Ozempic and Wegovy, and treatments for rare blood disorders.",
+        "city": "Bagsvaerd",
+        "state": null,
+        "country": "Denmark"
+      }
+    },
+    {
+      "ticker": "NEE",
+      "company_name": "NextEra Energy, Inc.",
+      "new": false,
+      "sector": "utilities",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Owns Florida's largest electric utility and one of the world's largest developers of wind and solar power.",
+      "proof": "Its NextEra Energy Resources unit is one of the world's largest generators of power from wind and sun.",
+      "things_to_know": [
+        "Its Florida utility still generates much of its power from natural gas."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "NextEra develops and operates large wind, solar and battery storage projects.",
+          "why_line": "It builds more wind and solar power than almost anyone."
+        }
+      ],
+      "flags": [
+        {
+          "dealbreaker": "fossil_fuels",
+          "evidence": "Florida Power & Light generates a large share of its electricity from natural gas."
+        }
+      ],
+      "reviewed": false
+    },
+    {
+      "ticker": "FSLR",
+      "company_name": "First Solar",
+      "new": true,
+      "sector": "energy",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes thin-film solar panels using a different technology from most rivals, with large factories in the United States.",
+      "proof": "It is the largest U.S.-based solar panel manufacturer.",
+      "things_to_know": [
+        "Its profits depend partly on U.S. clean-energy tax credits."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "First Solar's business is manufacturing solar modules.",
+          "why_line": "Every panel it makes adds clean power to the grid."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "First Solar makes thin-film solar panels, with factories in the United States and Asia.",
+        "city": "Tempe",
+        "state": "AZ",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "ENPH",
+      "company_name": "Enphase Energy",
+      "new": true,
+      "sector": "energy",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Makes microinverters and home batteries that turn rooftop solar into usable electricity and store it.",
+      "proof": "It pioneered microinverters, which convert power at each solar panel instead of at one central inverter.",
+      "things_to_know": [
+        "Home solar demand has fallen with higher interest rates, and the stock is volatile."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "Enphase's products are used in residential and commercial solar systems.",
+          "why_line": "It helps households generate and store their own clean power."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Enphase Energy makes microinverters, batteries and software for home solar systems.",
+        "city": "Fremont",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "NXT",
+      "company_name": "Nextpower",
+      "new": true,
+      "sector": "energy",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes solar trackers that tilt panels to follow the sun, helping large solar farms produce more power.",
+      "proof": "It has been one of the world's largest solar tracker suppliers by shipments for years.",
+      "things_to_know": [
+        "Renamed from Nextracker to Nextpower; demand depends on large solar project timelines."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "Nextpower's business is equipment for utility-scale solar plants.",
+          "why_line": "Its trackers get more clean electricity out of every solar farm."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Nextpower (formerly Nextracker) makes solar trackers, which tilt solar panels to follow the sun, plus other solar power-plant equipment.",
+        "city": "Fremont",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "ARRY",
+      "company_name": "Array Technologies",
+      "new": true,
+      "sector": "energy",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Makes trackers that move solar panels to follow the sun at large solar power plants.",
+      "proof": "It has been building solar tracking systems since 1989.",
+      "things_to_know": [
+        "Smaller and more volatile than its main rival, Nextpower."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "Array's business is solar tracking systems.",
+          "why_line": "It helps large solar farms produce more clean power."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Array Technologies makes solar trackers and related equipment for utility-scale solar projects.",
+        "city": "Albuquerque",
+        "state": "NM",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "BE",
+      "company_name": "Bloom Energy",
+      "new": true,
+      "sector": "energy",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Makes fuel-cell power systems that generate electricity on-site with lower emissions than burning fuel.",
+      "proof": "Its fuel cells produce electricity through an electrochemical reaction rather than combustion.",
+      "things_to_know": [
+        "Most of its systems currently run on natural gas, though they can use hydrogen."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "partial",
+          "evidence": "Bloom's fuel cells provide lower-emission on-site power and can run on hydrogen.",
+          "why_line": "It offers cleaner on-site power than traditional generators."
+        }
+      ],
+      "flags": [
+        {
+          "dealbreaker": "fossil_fuels",
+          "evidence": "Most Bloom fuel cells currently run on natural gas."
+        }
+      ],
+      "reviewed": false,
+      "profile": {
+        "description": "Bloom Energy makes solid-oxide fuel cells that generate electricity on-site, including for data centers.",
+        "city": "San Jose",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "FLNC",
+      "company_name": "Fluence Energy",
+      "new": true,
+      "sector": "energy",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Builds large battery systems that store electricity for the grid, making wind and solar power more reliable.",
+      "proof": "It was formed in 2018 by Siemens and AES, two longtime energy companies.",
+      "things_to_know": [
+        "Margins are thin, and the stock is volatile."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "Fluence's business is grid-scale energy storage.",
+          "why_line": "Batteries let solar and wind power keep flowing after the sun sets."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Fluence Energy provides battery energy storage systems and software for power grids.",
+        "city": "Arlington",
+        "state": "VA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "CEG",
+      "company_name": "Constellation Energy",
+      "new": true,
+      "sector": "utilities",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Operates the largest fleet of nuclear power plants in the U.S., the country's biggest source of carbon-free electricity.",
+      "proof": "It is the largest producer of carbon-free energy in the United States.",
+      "things_to_know": [
+        "Also owns natural gas power plants, and nuclear power is controversial to some."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "Most of Constellation's power comes from nuclear plants, which emit no carbon.",
+          "why_line": "Its nuclear plants produce huge amounts of carbon-free power."
+        }
+      ],
+      "flags": [
+        {
+          "dealbreaker": "fossil_fuels",
+          "evidence": "Constellation also operates natural gas power plants."
+        }
+      ],
+      "reviewed": false,
+      "profile": {
+        "description": "Constellation Energy is the largest U.S. producer of nuclear power and sells electricity to businesses and homes.",
+        "city": "Baltimore",
+        "state": "MD",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "BEP",
+      "company_name": "Brookfield Renewable Partners",
+      "new": true,
+      "sector": "utilities",
+      "risk_level": "medium",
+      "filing_type": "20-F",
+      "mission_story": "Owns one of the world's largest portfolios of renewable power, from hydroelectric dams to wind and solar farms.",
+      "proof": "In 2024 it agreed to supply Microsoft with more than 10.5 gigawatts of new renewable power.",
+      "things_to_know": [
+        "A limited partnership that reports as a foreign company (Form 20-F); its distributions are taxed differently."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "Brookfield Renewable's business is owning and operating renewable power assets.",
+          "why_line": "Its dams, wind and solar farms run on renewable power."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Brookfield Renewable owns and operates hydroelectric, wind, solar and storage facilities around the world.",
+        "city": "Toronto",
+        "state": "Ontario",
+        "country": "Canada"
+      }
+    },
+    {
+      "ticker": "CWEN",
+      "company_name": "Clearway Energy",
+      "new": true,
+      "sector": "utilities",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Owns wind, solar and battery projects across the U.S. and pays out much of its cash flow as dividends.",
+      "proof": "It sells most of its power under long-term contracts with utilities and companies.",
+      "things_to_know": [
+        "Also owns some natural gas plants and carries significant debt."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "Most of Clearway's generating capacity is wind and solar.",
+          "why_line": "Its farms generate renewable power under long-term contracts."
+        }
+      ],
+      "flags": [
+        {
+          "dealbreaker": "fossil_fuels",
+          "evidence": "Clearway owns natural gas generating facilities alongside its renewables."
+        }
+      ],
+      "reviewed": false,
+      "profile": {
+        "description": "Clearway Energy owns wind, solar and battery storage projects across the U.S. and sells their power under long-term contracts.",
+        "city": "Princeton",
+        "state": "NJ",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "ORA",
+      "company_name": "Ormat Technologies",
+      "new": true,
+      "sector": "utilities",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Generates electricity from the Earth's heat, one of the few renewable sources that runs around the clock.",
+      "proof": "It has been developing geothermal power technology since the 1960s.",
+      "things_to_know": [
+        "Geothermal projects take years to develop and are capital-intensive."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "Ormat's main business is geothermal power generation.",
+          "why_line": "Its plants make clean power day and night from underground heat."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Ormat Technologies develops and operates geothermal power plants and makes geothermal and energy storage equipment.",
+        "city": "Reno",
+        "state": "NV",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "HASI",
+      "company_name": "HA Sustainable Infrastructure Capital",
+      "new": true,
+      "sector": "finance",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Invests in and lends to clean energy and climate projects, from solar and wind to energy efficiency.",
+      "proof": "It reports the carbon emissions its investments avoid each year, using a metric it calls CarbonCount.",
+      "things_to_know": [
+        "A financial company whose results are sensitive to interest rates."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "HASI's business is financing climate-positive infrastructure.",
+          "why_line": "It funds the projects that cut carbon emissions."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "HA Sustainable Infrastructure Capital invests in climate solutions such as renewable energy, energy efficiency and sustainable infrastructure.",
+        "city": "Annapolis",
+        "state": "MD",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "RUN",
+      "company_name": "Sunrun",
+      "new": true,
+      "sector": "energy",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "The largest U.S. home solar company, installing rooftop solar and batteries that households lease or buy.",
+      "proof": "It is the largest residential solar installer in the United States.",
+      "things_to_know": [
+        "Carries a lot of debt and depends on tax credits; the stock is very volatile."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "Sunrun's business is residential solar and battery systems.",
+          "why_line": "It puts solar panels and batteries on people's homes."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Sunrun installs and finances rooftop solar and home battery systems for households.",
+        "city": "San Francisco",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "TSLA",
+      "company_name": "Tesla, Inc.",
+      "new": false,
+      "sector": "technology",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Makes electric vehicles, home and grid batteries, and solar products, and is developing self-driving technology.",
+      "proof": "Its Megapack batteries store electricity at grid scale, and energy storage is one of its fastest-growing businesses.",
+      "things_to_know": [
+        "Valued like a tech company; the stock is very volatile and closely tied to its CEO."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "core",
+          "evidence": "Tesla's business is electric vehicles and energy storage.",
+          "why_line": "Its cars and batteries help move transport and power away from fossil fuels."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "GEV",
+      "company_name": "GE Vernova",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Builds wind turbines and the grid equipment that carries power, and services a large share of the world's power plants.",
+      "proof": "It was spun off from General Electric in 2024 as GE's energy business.",
+      "things_to_know": [
+        "A large part of its business is gas turbines for fossil-fuel power plants."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "partial",
+          "evidence": "GE Vernova's wind and electrification businesses support renewable power and grid upgrades.",
+          "why_line": "Its wind turbines and grid equipment help connect clean power."
+        }
+      ],
+      "flags": [
+        {
+          "dealbreaker": "fossil_fuels",
+          "evidence": "GE Vernova makes gas turbines for power plants."
+        }
+      ],
+      "reviewed": false,
+      "profile": {
+        "description": "GE Vernova makes wind turbines, grid equipment and gas turbines, and services power plants worldwide.",
+        "city": "Cambridge",
+        "state": "MA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "ETN",
+      "company_name": "Eaton",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Makes electrical equipment that manages power in buildings, data centers and grids, helping electrify the economy.",
+      "proof": "Its products include equipment that connects solar, batteries and EV chargers to buildings and the grid.",
+      "things_to_know": [
+        "Much of its demand comes from data centers and industry, not only clean energy."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "partial",
+          "evidence": "Eaton's electrical business supports electrification and energy efficiency.",
+          "why_line": "Its equipment helps buildings and grids use power more efficiently."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Eaton is a power management company making electrical equipment for buildings, utilities, data centers, vehicles and aircraft.",
+        "city": "Dublin",
+        "state": null,
+        "country": "Ireland"
+      }
+    },
+    {
+      "ticker": "AES",
+      "company_name": "AES",
+      "new": true,
+      "sector": "utilities",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "A global power company shifting toward wind, solar and batteries, and a major supplier of clean power to tech companies.",
+      "proof": "It has signed long-term clean-power contracts with large tech companies, including Google and Microsoft.",
+      "things_to_know": [
+        "Still operates coal and gas plants and carries significant debt."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "partial",
+          "evidence": "AES is building large amounts of renewable generation and battery storage.",
+          "why_line": "It's moving its power business toward wind, solar and batteries."
+        }
+      ],
+      "flags": [
+        {
+          "dealbreaker": "fossil_fuels",
+          "evidence": "AES operates coal and natural gas power plants."
+        }
+      ],
+      "reviewed": false,
+      "profile": {
+        "description": "AES is a global power company developing renewable energy and battery storage and operating utilities.",
+        "city": "Arlington",
+        "state": "VA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "XEL",
+      "company_name": "Xcel Energy Inc",
+      "new": false,
+      "sector": "utilities",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "A utility serving eight states and one of the largest providers of wind power among U.S. utilities.",
+      "proof": "In 2018 it became the first major U.S. utility to commit to 100% carbon-free electricity by 2050.",
+      "things_to_know": [
+        "Still burns coal and natural gas for part of its power."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "partial",
+          "evidence": "Xcel generates a large share of its electricity from wind and plans to retire its coal plants.",
+          "why_line": "It's one of the utilities pushing hardest toward carbon-free power."
+        }
+      ],
+      "flags": [
+        {
+          "dealbreaker": "fossil_fuels",
+          "evidence": "Xcel still generates part of its electricity from coal and natural gas."
+        }
+      ],
+      "reviewed": false
+    },
+    {
+      "ticker": "AEP",
+      "company_name": "American Electric Power Co Inc",
+      "new": false,
+      "sector": "utilities",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "A large utility serving 11 states and the owner of one of the largest U.S. electricity transmission networks.",
+      "proof": "It operates the largest electricity transmission system in the United States.",
+      "things_to_know": [
+        "Coal and natural gas still make up a large share of its generation."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "partial",
+          "evidence": "AEP is investing in transmission and renewable generation to modernize the grid.",
+          "why_line": "Its transmission lines move power, including renewables, across the grid."
+        }
+      ],
+      "flags": [
+        {
+          "dealbreaker": "fossil_fuels",
+          "evidence": "AEP generates a large share of its electricity from coal and natural gas."
+        }
+      ],
+      "reviewed": false
+    },
+    {
+      "ticker": "ALB",
+      "company_name": "Albemarle",
+      "new": true,
+      "sector": "energy",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "One of the world's largest lithium producers, supplying a key material for electric-vehicle and grid batteries.",
+      "proof": "It produces lithium from brine in Chile and from hard-rock mines in Australia.",
+      "things_to_know": [
+        "Lithium prices swing widely, making profits and the stock volatile."
+      ],
+      "missions": [
+        {
+          "cause": "clean_energy",
+          "exposure": "partial",
+          "evidence": "Albemarle's lithium is used in batteries for EVs and energy storage.",
+          "why_line": "Its lithium goes into the batteries behind EVs and clean power."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Albemarle is one of the world's largest lithium producers, supplying battery materials, plus bromine and refining catalysts.",
+        "city": "Charlotte",
+        "state": "NC",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "CRWD",
+      "company_name": "Crowdstrike Holdings Inc",
+      "new": false,
+      "sector": "technology",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Protects computers, cloud systems and user identities from cyberattacks with its Falcon platform.",
+      "proof": "Its Falcon platform uses a single lightweight agent on each device to detect and stop attacks.",
+      "things_to_know": [
+        "A faulty software update in July 2024 crashed millions of Windows computers worldwide."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "CrowdStrike's business is cybersecurity.",
+          "why_line": "It stops hackers before they can break in."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "PANW",
+      "company_name": "Palo Alto Networks Inc",
+      "new": false,
+      "sector": "technology",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "One of the largest cybersecurity companies, protecting networks, cloud systems and security operations.",
+      "proof": "Its customers include most of the Fortune 100.",
+      "things_to_know": [
+        "Agreed in 2025 to buy CyberArk, its largest acquisition."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Palo Alto Networks' business is cybersecurity.",
+          "why_line": "It defends companies and governments against cyberattacks."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "FTNT",
+      "company_name": "Fortinet Inc",
+      "new": false,
+      "sector": "technology",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes firewalls and network security systems that protect businesses from cyberattacks.",
+      "proof": "It designs its own security chips to speed up its firewalls.",
+      "things_to_know": [
+        "Sales depend partly on hardware upgrade cycles."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Fortinet's business is network security.",
+          "why_line": "Its firewalls keep attackers out of business networks."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "ZS",
+      "company_name": "Zscaler Inc",
+      "new": false,
+      "sector": "technology",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Provides cloud-based security that connects employees to apps safely without a traditional company network.",
+      "proof": "Its cloud processes hundreds of billions of transactions a day.",
+      "things_to_know": [
+        "Not consistently profitable under standard accounting."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Zscaler's business is cloud-delivered security.",
+          "why_line": "It protects people working from anywhere."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "NET",
+      "company_name": "Cloudflare Inc",
+      "new": false,
+      "sector": "technology",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Runs a global network that protects websites and apps from attacks and makes them faster.",
+      "proof": "Its network runs in more than 300 cities worldwide.",
+      "things_to_know": [
+        "Highly valued relative to its current profits."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Cloudflare's network provides security services such as DDoS protection and zero-trust access.",
+          "why_line": "It shields websites from attacks that would knock them offline."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "OKTA",
+      "company_name": "Okta Inc",
+      "new": false,
+      "sector": "technology",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Provides identity software that controls who can sign in to apps and systems.",
+      "proof": "It offers identity tools for both employees and customers, including the Auth0 platform.",
+      "things_to_know": [
+        "Suffered a security breach of its customer support system in 2023."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Okta's business is identity and access security.",
+          "why_line": "It makes sure only the right people can get into accounts."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "S",
+      "company_name": "SentinelOne",
+      "new": true,
+      "sector": "technology",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Uses AI to detect and stop cyberattacks on computers, cloud systems and identities automatically.",
+      "proof": "Its platform can roll a Windows device back to its state before a ransomware attack.",
+      "things_to_know": [
+        "Not yet profitable, and it competes with much larger rivals."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "SentinelOne's business is cybersecurity.",
+          "why_line": "Its AI stops attacks automatically, even before people notice."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "SentinelOne provides AI-powered cybersecurity that protects devices, cloud workloads and identities.",
+        "city": "Mountain View",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "CHKP",
+      "company_name": "Check Point Software",
+      "new": true,
+      "sector": "technology",
+      "risk_level": "low",
+      "filing_type": "20-F",
+      "mission_story": "One of the original cybersecurity companies, protecting networks, cloud systems and email from attacks.",
+      "proof": "It helped pioneer the commercial firewall in the 1990s.",
+      "things_to_know": [
+        "Grows more slowly than newer rivals, and reports as a foreign company (Form 20-F)."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Check Point's business is cybersecurity.",
+          "why_line": "It has been protecting networks from attacks for decades."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Check Point Software provides firewalls, cloud security and threat prevention to businesses and governments.",
+        "city": "Tel Aviv",
+        "state": null,
+        "country": "Israel"
+      }
+    },
+    {
+      "ticker": "TENB",
+      "company_name": "Tenable",
+      "new": true,
+      "sector": "technology",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Finds security weaknesses in computer systems before attackers can exploit them.",
+      "proof": "It created Nessus, one of the most widely used vulnerability scanners.",
+      "things_to_know": [
+        "Competes in a crowded security market."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Tenable's business is vulnerability and exposure management.",
+          "why_line": "It finds the holes before hackers do."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Tenable makes exposure-management software that finds security weaknesses across IT systems.",
+        "city": "Columbia",
+        "state": "MD",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "RPD",
+      "company_name": "Rapid7",
+      "new": true,
+      "sector": "technology",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Helps security teams find weak spots and detect attacks across their systems.",
+      "proof": "It maintains Metasploit, a widely used open-source tool for testing security.",
+      "things_to_know": [
+        "Faces tough competition and slowing growth."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Rapid7's business is security operations and vulnerability management.",
+          "why_line": "It helps security teams spot attacks early."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Rapid7 provides security operations and vulnerability management software for businesses.",
+        "city": "Boston",
+        "state": "MA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "QLYS",
+      "company_name": "Qualys",
+      "new": true,
+      "sector": "technology",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Scans companies' computers and cloud systems for security weaknesses and compliance gaps.",
+      "proof": "It was one of the first companies to deliver security scanning as a cloud service.",
+      "things_to_know": [
+        "A smaller company facing larger, faster-growing competitors."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Qualys's business is cloud-based security and compliance.",
+          "why_line": "It continuously checks systems for weaknesses attackers could use."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Qualys provides cloud-based IT security and compliance software.",
+        "city": "Foster City",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "VRNS",
+      "company_name": "Varonis Systems",
+      "new": true,
+      "sector": "technology",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Protects sensitive data by finding where it lives, who can access it, and spotting suspicious activity.",
+      "proof": "It focuses on protecting data itself, such as files and email, rather than the network around it.",
+      "things_to_know": [
+        "It is moving customers to a cloud subscription model, which affects reported results."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Varonis's business is data security.",
+          "why_line": "It keeps sensitive files and emails out of the wrong hands."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Varonis makes data security software that finds sensitive data and detects threats to it.",
+        "city": "New York",
+        "state": "NY",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "RBRK",
+      "company_name": "Rubrik",
+      "new": true,
+      "sector": "technology",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Protects companies' data with backups that attackers can't change, helping them recover from ransomware.",
+      "proof": "Its backups are designed to be immutable, so ransomware can't alter or delete them.",
+      "things_to_know": [
+        "Not yet profitable."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Rubrik's business is data security and cyber recovery.",
+          "why_line": "It helps organizations bounce back after ransomware."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Rubrik provides data security and backup software that helps organizations recover from ransomware attacks.",
+        "city": "Palo Alto",
+        "state": "CA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "GEN",
+      "company_name": "Gen Digital",
+      "new": true,
+      "sector": "technology",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes Norton, Avast and LifeLock, protecting everyday people from viruses, scams and identity theft.",
+      "proof": "It says its products protect around 500 million users worldwide.",
+      "things_to_know": [
+        "Carries significant debt from its Avast acquisition."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Gen Digital's business is consumer cyber safety.",
+          "why_line": "It protects regular people from scams and identity theft."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Gen Digital makes consumer cybersecurity and privacy products, including Norton, Avast and LifeLock.",
+        "city": "Tempe",
+        "state": "AZ",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "AKAM",
+      "company_name": "Akamai Technologies",
+      "new": true,
+      "sector": "technology",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Runs one of the world's largest networks for delivering websites and protecting them from attacks.",
+      "proof": "Security has become its largest business, ahead of content delivery.",
+      "things_to_know": [
+        "Its original content-delivery business is shrinking."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "partial",
+          "evidence": "Akamai's security services protect websites, apps and APIs from attacks.",
+          "why_line": "It shields major websites from attacks that would take them down."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Akamai runs a large content delivery and cloud network and sells cybersecurity services that protect websites and apps.",
+        "city": "Cambridge",
+        "state": "MA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "CSCO",
+      "company_name": "Cisco Systems Inc",
+      "new": false,
+      "sector": "technology",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "The largest maker of networking equipment, with a growing security business that includes Splunk.",
+      "proof": "It bought Splunk in 2024 for about $28 billion, expanding its security business.",
+      "things_to_know": [
+        "Security is still a minority of Cisco's revenue."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "partial",
+          "evidence": "Cisco's security products, including Splunk, protect networks and detect threats.",
+          "why_line": "Part of its business protects the networks it builds."
+        }
+      ],
+      "flags": [],
+      "reviewed": false
+    },
+    {
+      "ticker": "MSA",
+      "company_name": "MSA Safety",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Makes safety gear that protects firefighters and workers, from breathing equipment to gas detectors and hard hats.",
+      "proof": "It was founded in 1914 to make safety equipment for coal miners.",
+      "things_to_know": [
+        "Sales depend on industrial and fire-department budgets."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "MSA's business is safety equipment for workers and first responders.",
+          "why_line": "Its gear helps firefighters and workers come home safe."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "MSA Safety makes safety equipment such as gas detectors, firefighter breathing gear and hard hats.",
+        "city": "Cranberry Township",
+        "state": "PA",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "ADT",
+      "company_name": "ADT",
+      "new": true,
+      "sector": "consumer",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Provides home security systems and 24/7 alarm monitoring for homes and businesses.",
+      "proof": "It has provided security services for more than 150 years.",
+      "things_to_know": [
+        "Carries a lot of debt."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "ADT's business is security monitoring for homes and businesses.",
+          "why_line": "It watches over homes around the clock."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "ADT provides home security and monitoring services, including alarms, cameras and smart-home devices.",
+        "city": "Boca Raton",
+        "state": "FL",
+        "country": "US"
+      }
+    },
+    {
+      "ticker": "ALLE",
+      "company_name": "Allegion",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Makes locks and access systems, including Schlage, that secure homes, schools and businesses.",
+      "proof": "It owns Schlage, a lock brand founded in 1920.",
+      "things_to_know": [
+        "Tied to construction and renovation activity."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "partial",
+          "evidence": "Allegion's locks and access systems secure buildings.",
+          "why_line": "Its locks keep homes, schools and businesses secure."
+        }
+      ],
+      "flags": [],
+      "reviewed": false,
+      "profile": {
+        "description": "Allegion makes locks, door hardware and access-control systems, including the Schlage brand.",
+        "city": "Dublin",
+        "state": null,
+        "country": "Ireland"
+      }
+    },
+    {
+      "ticker": "AXON",
+      "company_name": "Axon Enterprise",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Makes body cameras, evidence software and TASER devices for police, with a stated goal of making the bullet obsolete.",
+      "proof": "Its body cameras and evidence software are used by many U.S. police departments.",
+      "things_to_know": [
+        "TASER devices are weapons, and police technology raises civil-liberties debates."
+      ],
+      "missions": [
+        {
+          "cause": "keeping_safe",
+          "exposure": "core",
+          "evidence": "Axon's business is public safety technology.",
+          "why_line": "Its cameras and software aim to make policing safer and more accountable."
+        }
+      ],
+      "flags": [
+        {
+          "dealbreaker": "weapons",
+          "evidence": "Axon makes TASER energy weapons."
+        }
+      ],
+      "reviewed": false,
+      "profile": {
+        "description": "Axon makes TASER devices, body cameras and cloud software used by police and public safety agencies.",
+        "city": "Scottsdale",
+        "state": "AZ",
+        "country": "US"
+      }
+    }
+  ]
+}

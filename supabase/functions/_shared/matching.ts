@@ -156,10 +156,11 @@ function causeQuotas(causes: string[], companyCards: number): Map<string, number
 }
 
 // Orders cards so no two in a row share a cause or a sector. Searches for a clash-free order
-// (decks are small: 7 cards is at most 5,040 orders), keeping the score order where it can;
-// falls back to the order with the fewest clashes.
+// (decks are small: 7 cards is at most 5,040 orders), keeping the score order where it can.
+// When clashes are unavoidable (e.g. most cards are healthcare), back-to-back causes cost more
+// than back-to-back sectors, so causes still alternate.
 function spreadOut<T extends { cause?: string; sector?: string }>(cards: T[]): T[] {
-  const clash = (a: T, b: T) => a.cause === b.cause || a.sector === b.sector;
+  const clash = (a: T, b: T) => (a.cause === b.cause ? 2 : 0) + (a.sector === b.sector ? 1 : 0);
   if (cards.length > 9) return cards; // larger decks: keep score order (not used today)
 
   let best: T[] = cards;
@@ -178,7 +179,7 @@ function spreadOut<T extends { cause?: string; sector?: string }>(cards: T[]): T
       const prev = path[path.length - 1];
       used[i] = true;
       path.push(cards[i]);
-      const done = search(clashes + (prev && clash(prev, cards[i]) ? 1 : 0));
+      const done = search(clashes + (prev ? clash(prev, cards[i]) : 0));
       path.pop();
       used[i] = false;
       if (done) return true;

@@ -68,6 +68,16 @@ const adjacentClashes = deck => {
   check('3 causes: no duplicate companies', new Set(cards.map(c => c.ticker)).size === cards.length);
 }
 
+// 1b. Mostly one sector (health causes): sector clashes are unavoidable, causes must still alternate
+{
+  const prefs = { causes: ['beat_cancer', 'live_healthier', 'keeping_safe'], dealbreakers: [], risk: 'medium', goal: 'growth' };
+  const healthOnly = candidates.map(c => c.missions.some(m => m.cause === 'beat_cancer' || m.cause === 'live_healthier') ? { ...c, sector: 'healthcare' } : c);
+  const deck = buildDeck(healthOnly, prefs, emptyHistory(), [], OPTS);
+  const cards = companyCards(deck);
+  const causeRepeats = cards.slice(1).filter((c, i) => c.cause === cards[i].cause).length;
+  check('mostly one sector: no two cards in a row share a cause', causeRepeats === 0, cards.map(c => c.cause).join(' > '));
+}
+
 // 2. Dealbreakers and low risk
 {
   const prefs = { causes: ['beat_cancer', 'keeping_safe'], dealbreakers: ['animal_testing', 'weapons'], risk: 'low', goal: 'income' };
