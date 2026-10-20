@@ -56,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, fullName?: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -69,9 +69,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (error) {
       toast.error(error.message);
+    } else if (data.session) {
+      // Email confirmation is off for this project, so the account is ready right away
+      toast.success('Account created!');
+      track('sign_up', { method: 'email' });
     } else {
       toast.success('Check your email to confirm your account!');
-      track('sign_up', { method: 'email' });
+      track('sign_up', { method: 'email', needs_confirmation: true });
     }
 
     return { error };

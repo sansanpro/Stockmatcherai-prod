@@ -17,7 +17,7 @@ const FREE_DECK_SIZE = 7;
 const PREMIUM_DECK_SIZE = 12;
 const UPDATE_CARDS = 2;
 const UPDATE_MAX_AGE_DAYS = 3;
-const DEALBREAKERS = ['tobacco', 'weapons', 'fossil_fuels', 'gambling', 'animal_testing', 'factory_farming'];
+const DEALBREAKERS = ['tobacco', 'weapons', 'fossil_fuels', 'gambling', 'factory_farming'];
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
