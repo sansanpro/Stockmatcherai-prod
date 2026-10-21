@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Capacitor } from "@capacitor/core";
-import { requestTrackingPermission } from "@/lib/att";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -26,26 +25,7 @@ const App = () => {
   useEffect(() => {
     track('app_open');
   }, []);
-
-  // Request ATT permission on first user interaction (iOS only)
-  useEffect(() => {
-    if (localStorage.getItem('att_status')) return;
-    
-    const handleFirstInteraction = async () => {
-      const status = await requestTrackingPermission();
-      localStorage.setItem('att_status', status);
-      document.removeEventListener('click', handleFirstInteraction);
-      document.removeEventListener('touchstart', handleFirstInteraction);
-    };
-
-    document.addEventListener('click', handleFirstInteraction, { once: true });
-    document.addEventListener('touchstart', handleFirstInteraction, { once: true });
-    
-    return () => {
-      document.removeEventListener('click', handleFirstInteraction);
-      document.removeEventListener('touchstart', handleFirstInteraction);
-    };
-  }, []);
+  // App Tracking Transparency is requested after onboarding (see requestTrackingOnce), not here
 
   return (
   <ErrorBoundary>

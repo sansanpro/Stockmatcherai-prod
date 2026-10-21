@@ -20,7 +20,8 @@ export async function openApp(page: Page, { aiConsent = true } = {}) {
     if (!localStorage.getItem('analytics_install_id')) {
       localStorage.setItem('analytics_install_id', `e2e-${Math.random().toString(36).slice(2, 12)}`);
     }
-    localStorage.setItem('stockmatch_onboarding_v2', 'true');
+    localStorage.setItem('coach_first_card', 'seen');
+    localStorage.setItem('coach_first_details', 'seen');
     localStorage.setItem('att_status', 'authorized');
     localStorage.setItem('ai_widget_opened', 'true');
     if (consent) localStorage.setItem('ai_data_consent', 'true');

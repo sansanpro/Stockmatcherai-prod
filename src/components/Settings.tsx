@@ -2,15 +2,18 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import UpgradeModal from '@/components/UpgradeModal';
+import CausePicker from '@/components/onboarding/CausePicker';
+import { ChipGroup, ChoiceList } from '@/components/onboarding/Choices';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
-import { UserProfile } from '@/types/stock-matcher';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { User, Save, ArrowLeft, Trash2, AlertTriangle, RotateCcw, Crown, Zap } from 'lucide-react';
-import { saveUserProfile, getUserProfile } from '@/utils/profileManager';
+import { User, Save, ArrowLeft, Trash2, AlertTriangle, RotateCcw, Crown, Heart } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
+import { fetchCauses, type CauseInfo } from '@/lib/matchFeed';
+import { DEALBREAKERS, GOAL_OPTIONS, RISK_OPTIONS, toProfileRow, type OnboardingAnswers } from '@/lib/onboarding';
+import { track } from '@/lib/analytics';
 import { restoreApplePurchases } from '@/services/appleIAPService';
 import {
   AlertDialog,
@@ -26,35 +29,17 @@ import {
 
 interface SettingsProps {
   onBack: () => void;
-  userProfile: UserProfile | null;
-  onProfileUpdate: (profile: UserProfile) => void;
+  answers: OnboardingAnswers;
+  onCausesSaved: (answers: OnboardingAnswers) => void;
 }
 
 const isIOSNative = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
 
-const incomeRangeMap: { [key: string]: number } = {
-  '0-50000': 25000,
-  '50000-85000': 67500,
-  '85000-100000': 92500,
-  '100000-150000': 125000,
-  '150000-200000': 175000,
-  '200000+': 250000,
-};
-
-const getIncomeRangeFromSalary = (salary: number | null | undefined): string => {
-  if (!salary) return '';
-  if (salary < 50000) return '0-50000';
-  if (salary < 85000) return '50000-85000';
-  if (salary < 100000) return '85000-100000';
-  if (salary < 150000) return '100000-150000';
-  if (salary < 200000) return '150000-200000';
-  return '200000+';
-};
-
-const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
+const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
   const { user, deleteAccount } = useAuth();
   const { checkSubscription, subscribed } = useSubscription();
-  const [profile, setProfile] = useState<UserProfile | null>(userProfile);
+  const [values, setValues] = useState<OnboardingAnswers>(answers);
+  const [causes, setCauses] = useState<CauseInfo[]>([]);
   const [fullName, setFullName] = useState(user?.user_metadata?.full_name || '');
   const [loading, setLoading] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -85,46 +70,31 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
   };
 
   useEffect(() => {
-    if (userProfile) {
-      setProfile(userProfile);
-    } else if (user?.id) {
-      loadUserProfile();
-    }
-  }, [userProfile, user?.id]);
+    fetchCauses().then(setCauses).catch(() => {});
+  }, []);
 
-  const loadUserProfile = async () => {
-    if (!user?.id) return;
-    try {
-      const loaded = await getUserProfile(user.id);
-      if (loaded) {
-        setProfile(loaded);
-        onProfileUpdate(loaded);
-      }
-    } catch {}
-  };
+  const changed = JSON.stringify(values) !== JSON.stringify(answers);
 
-  const handleProfileSave = async () => {
-    if (!profile || !user?.id) return;
+  const handleValuesSave = async () => {
+    if (!user?.id || values.causes.length === 0) return;
     setLoading(true);
     try {
-      const success = await saveUserProfile(profile, user.id);
-      if (success) {
-        onProfileUpdate(profile);
-        toast.success('Profile updated!');
-      } else {
-        toast.error('Failed to update profile');
-      }
+      const { error } = await supabase.from('user_profiles').upsert(toProfileRow(values, user.id), { onConflict: 'user_id' });
+      if (error) throw error;
+      track('causes_updated', { source: 'settings', causes: values.causes });
+      onCausesSaved(values);
+      toast.success('Saved. Your matches will follow these from now on.');
     } catch {
-      toast.error('Failed to update profile');
+      toast.error("Couldn't save. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const set = (field: keyof UserProfile, value: string | number) => {
-    if (!profile) return;
-    setProfile(prev => ({ ...prev!, [field]: value }));
-  };
+  const toggleDealbreaker = (id: string) => setValues(v => ({
+    ...v,
+    dealbreakers: v.dealbreakers.includes(id) ? v.dealbreakers.filter(d => d !== id) : [...v.dealbreakers, id],
+  }));
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#0f0a1e] via-[#130d2a] to-[#0a0614] text-white overflow-x-hidden">
@@ -154,7 +124,7 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white">Upgrade to Premium</p>
-                <p className="text-xs text-white/60">Unlimited swipes, AI assistant & more</p>
+                <p className="text-xs text-white/60">More matches every day, AI assistant & more</p>
               </div>
               <Button
                 size="sm"
@@ -200,125 +170,45 @@ const Settings = ({ onBack, userProfile, onProfileUpdate }: SettingsProps) => {
           </div>
         </section>
 
-        {/* Investment Profile */}
-        {profile && (
-          <section className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm">
-            <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-primary flex items-center justify-center">
-                <Zap className="w-3.5 h-3.5 text-white" />
-              </div>
-              <h2 className="font-semibold text-sm">Investment Profile</h2>
+        {/* What you care about (drives matching) */}
+        <section className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm">
+          <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-pink-500 to-primary flex items-center justify-center">
+              <Heart className="w-3.5 h-3.5 text-white" />
             </div>
-            <div className="p-4 space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-white/60 uppercase tracking-wide">Age</Label>
-                  <Input type="number" min="18" max="100" value={profile.age}
-                    inputMode="numeric"
-                    onChange={e => set('age', parseInt(e.target.value))}
-                    className="bg-white/8 border-white/15 text-white rounded-xl h-11 text-base" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs text-white/60 uppercase tracking-wide">Gender</Label>
-                  <Select value={profile.gender} onValueChange={v => set('gender', v)}>
-                    <SelectTrigger className="bg-white/8 border-white/15 text-white rounded-xl h-11">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                      <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {[
-                {
-                  label: 'Annual Income', key: 'salary' as keyof UserProfile, type: 'select',
-                  value: getIncomeRangeFromSalary(profile.salary),
-                  onChange: (v: string) => set('salary', incomeRangeMap[v]),
-                  options: [
-                    { value: '0-50000', label: '$0 – $50,000' },
-                    { value: '50000-85000', label: '$50,000 – $85,000' },
-                    { value: '85000-100000', label: '$85,000 – $100,000' },
-                    { value: '100000-150000', label: '$100,000 – $150,000' },
-                    { value: '150000-200000', label: '$150,000 – $200,000' },
-                    { value: '200000+', label: '$200,000+' },
-                  ]
-                },
-                {
-                  label: 'Experience', key: 'experience' as keyof UserProfile, type: 'select',
-                  value: profile.experience,
-                  onChange: (v: string) => set('experience', v),
-                  options: [
-                    { value: 'none', label: 'Never invested before' },
-                    { value: 'beginner', label: 'Less than 1 year' },
-                    { value: 'intermediate', label: '1–5 years' },
-                    { value: 'advanced', label: '5+ years' },
-                  ]
-                },
-                {
-                  label: 'Risk Tolerance', key: 'riskTolerance' as keyof UserProfile, type: 'select',
-                  value: profile.riskTolerance,
-                  onChange: (v: string) => set('riskTolerance', v),
-                  options: [
-                    { value: 'low', label: 'Low — Stable returns' },
-                    { value: 'medium', label: 'Medium — Some volatility ok' },
-                    { value: 'high', label: 'High — Max growth' },
-                  ]
-                },
-                {
-                  label: 'Preferred Sector', key: 'sectorPreference' as keyof UserProfile, type: 'select',
-                  value: profile.sectorPreference,
-                  onChange: (v: string) => set('sectorPreference', v),
-                  options: [
-                    { value: 'technology', label: 'Technology' },
-                    { value: 'healthcare', label: 'Healthcare' },
-                    { value: 'finance', label: 'Finance' },
-                    { value: 'energy', label: 'Energy' },
-                    { value: 'consumer', label: 'Consumer Goods' },
-                    { value: 'utilities', label: 'Utilities' },
-                    { value: 'any', label: 'No preference' },
-                  ]
-                },
-                {
-                  label: 'Investment Goal', key: 'investmentGoal' as keyof UserProfile, type: 'select',
-                  value: profile.investmentGoal,
-                  onChange: (v: string) => set('investmentGoal', v),
-                  options: [
-                    { value: 'growth', label: 'Long-term growth' },
-                    { value: 'income', label: 'Regular income (dividends)' },
-                    { value: 'balance', label: 'Balanced' },
-                    { value: 'retirement', label: 'Retirement planning' },
-                    { value: 'short-term', label: 'Short-term gains' },
-                  ]
-                },
-              ].map(field => (
-                <div key={field.label} className="space-y-1.5">
-                  <Label className="text-xs text-white/60 uppercase tracking-wide">{field.label}</Label>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="bg-white/8 border-white/15 text-white rounded-xl h-11">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {field.options.map(opt => (
-                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              ))}
-
-              <Button onClick={handleProfileSave} disabled={loading}
-                className="w-full h-12 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 rounded-xl font-semibold flex items-center justify-center gap-2 mt-2">
-                <Save className="w-4 h-4" />
-                {loading ? 'Saving...' : 'Save Changes'}
-              </Button>
+            <h2 className="font-semibold text-sm">What you care about</h2>
+          </div>
+          <div className="p-4 space-y-6">
+            <div>
+              <Label className="text-xs text-white/60 uppercase tracking-wide">Your causes</Label>
+              <p className="text-xs text-white/40 mt-1 mb-3">Pick up to 3. Your first pick matters most.</p>
+              <CausePicker causes={causes} selected={values.causes} onChange={c => setValues(v => ({ ...v, causes: c }))} />
             </div>
-          </section>
-        )}
+            <div>
+              <Label className="text-xs text-white/60 uppercase tracking-wide">Never show me companies tied to</Label>
+              <div className="mt-3">
+                <ChipGroup name="Dealbreakers" multiple options={DEALBREAKERS} selected={values.dealbreakers} onToggle={toggleDealbreaker} />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs text-white/60 uppercase tracking-wide">If a company you own drops 20% in a month</Label>
+              <div className="mt-3">
+                <ChoiceList name="If a stock drops 20%" options={RISK_OPTIONS} value={values.risk} onSelect={id => setValues(v => ({ ...v, risk: id }))} />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs text-white/60 uppercase tracking-wide">What this money is for</Label>
+              <div className="mt-3">
+                <ChoiceList name="Goal" options={GOAL_OPTIONS} value={values.goal} onSelect={id => setValues(v => ({ ...v, goal: id }))} />
+              </div>
+            </div>
+            <Button onClick={handleValuesSave} disabled={loading || !changed || values.causes.length === 0}
+              className="w-full h-12 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 rounded-xl font-semibold flex items-center justify-center gap-2">
+              <Save className="w-4 h-4" />
+              {loading ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </section>
 
         {/* Danger Zone */}
         <section className="rounded-2xl overflow-hidden border border-red-500/20 bg-red-500/5">

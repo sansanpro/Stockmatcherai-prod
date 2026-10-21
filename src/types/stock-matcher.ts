@@ -1,12 +1,11 @@
 
-export interface UserProfile {
-  age: number;
-  gender: string;
-  salary: number;
-  experience: string;
-  riskTolerance: string;
-  sectorPreference: string;
-  investmentGoal: string;
+// One of the user's causes that a company matches (from match-feed)
+export interface MatchedCause {
+  cause: string;
+  label: string;
+  icon: string;
+  exposure: 'core' | 'partial' | 'peripheral';
+  whyLine?: string | null;
 }
 
 export interface StockRecommendation {
@@ -25,4 +24,15 @@ export interface StockRecommendation {
   whyItFits: string;
   esgScore?: number;
   lastUpdated?: string;
+  // Values-first fields (cards from match-feed)
+  logoUrl?: string;
+  cardType?: 'company' | 'update';
+  cause?: string;
+  matchedCauses?: MatchedCause[];
+  missionStory?: string;
+  proof?: string;
+  proofSourceUrl?: string;
+  thingsToKnow?: string[];
+  // Update cards: news about a company the user already liked
+  update?: { headline: string; source?: string; url?: string; publishedAt?: string };
 }

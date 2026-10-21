@@ -1,7 +1,9 @@
 // Today's values-matched deck, built on the server, and the swipes against it.
-//   { action: 'deck' }                                   signed in: today's deck (built once per day)
+//   { action: 'deck', rebuild? }                         signed in: today's deck (built once per day;
+//                                                        rebuild: true rebuilds it if nothing was swiped yet)
 //   { action: 'deck', prefs, seen?, liked? }             signed out: a deck from onboarding answers
 //   { action: 'swipe', ticker, liked }                   signed in: record a swipe on today's deck
+//   { action: 'import', liked, passed }                  signed in: swipes made on this device before signing in
 // Only cards in today's deck can be swiped, which is what enforces the daily limit.
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.50.2';
 import {
@@ -17,6 +19,7 @@ const FREE_DECK_SIZE = 7;
 const PREMIUM_DECK_SIZE = 12;
 const UPDATE_CARDS = 2;
 const UPDATE_MAX_AGE_DAYS = 3;
+const MAX_IMPORT = 200;
 const DEALBREAKERS = ['tobacco', 'weapons', 'fossil_fuels', 'gambling', 'factory_farming'];
 
 const json = (body: unknown, status = 200) =>
@@ -145,6 +148,28 @@ async function loadUpdates(db: SupabaseClient, liked: Set<string>, names: Map<st
   return updates.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }
 
+// The Likes list (user_matches) gets one row per liked company
+async function saveLikes(db: SupabaseClient, userId: string, tickers: string[], reasons: Map<string, string | null> = new Map()) {
+  if (tickers.length === 0) return;
+  const [{ data: existing }, { data: stocks }] = await Promise.all([
+    db.from('user_matches').select('ticker').eq('user_id', userId).eq('is_match', true).in('ticker', tickers),
+    db.from('stocks').select('ticker, company_name, sector, price_per_share, one_year_return').in('ticker', tickers),
+  ]);
+  const have = new Set((existing ?? []).map(r => r.ticker));
+  const rows = (stocks ?? []).filter(s => !have.has(s.ticker)).map(s => ({
+    user_id: userId,
+    ticker: s.ticker,
+    company_name: s.company_name ?? s.ticker,
+    is_match: true,
+    match_reason: reasons.get(s.ticker) ?? null,
+    stock_data: { ticker: s.ticker, companyName: s.company_name, sector: s.sector, pricePerShare: s.price_per_share, oneYearReturn: s.one_year_return },
+  }));
+  if (rows.length) {
+    const { error } = await db.from('user_matches').insert(rows);
+    if (error) throw error;
+  }
+}
+
 // Adds what the app needs to render each card
 async function enrichCards(db: SupabaseClient, cards: DeckCard[], stocks: Map<string, Record<string, unknown>>) {
   const missing = cards.map(c => c.ticker).filter(t => !stocks.has(t));
@@ -217,20 +242,35 @@ Deno.serve(async (req) => {
       if (error?.code === '23505') return json({ error: 'Already swiped' }, 409);
       if (error) throw error;
 
-      // Keep the existing Likes list working
       if (body.liked === true && card.type === 'company') {
-        const { data: s } = await db.from('stocks').select('company_name, sector, price_per_share, one_year_return').eq('ticker', ticker).maybeSingle();
-        await db.from('user_matches').insert({
-          user_id: user.id,
-          ticker,
-          company_name: s?.company_name ?? ticker,
-          is_match: true,
-          match_reason: card.matchedCauses[0]?.whyLine ?? null,
-          stock_data: { ticker, companyName: s?.company_name, sector: s?.sector, pricePerShare: s?.price_per_share, oneYearReturn: s?.one_year_return },
-        });
+        await saveLikes(db, user.id, [ticker], new Map([[ticker, card.matchedCauses[0]?.whyLine ?? null]]));
       }
-      const { count } = await db.from('swipes').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('deck_date', today);
-      return json({ ok: true, remaining: Math.max(0, (deck!.cards as DeckCard[]).length - (count ?? 0)) });
+      const { data: swipedToday } = await db.from('swipes').select('ticker').eq('user_id', user.id).eq('deck_date', today);
+      const swipedTickers = new Set((swipedToday ?? []).map(s => s.ticker));
+      return json({ ok: true, remaining: (deck!.cards as DeckCard[]).filter(c => !swipedTickers.has(c.ticker)).length });
+    }
+
+    // Swipes from onboarding (made before the account existed): they keep those companies out of
+    // future decks, and the likes go to the Likes list. They don't count against today's deck.
+    if (body.action === 'import') {
+      if (!user) return json({ error: 'Sign in first' }, 401);
+      const clean = (v: unknown) => [...new Set((Array.isArray(v) ? v : []).map(t => String(t).toUpperCase()))]
+        .filter(t => /^[A-Z.]{1,6}$/.test(t)).slice(0, MAX_IMPORT);
+      const liked = clean(body.liked);
+      const passed = clean(body.passed).filter(t => !liked.includes(t));
+      const all = [...liked, ...passed];
+      if (all.length === 0) return json({ ok: true, imported: 0 });
+      const { data: known } = await db.from('stocks').select('ticker').in('ticker', all);
+      const knownTickers = new Set((known ?? []).map(s => s.ticker));
+      const rows = all.filter(t => knownTickers.has(t)).map(t => ({
+        user_id: user.id, ticker: t, liked: liked.includes(t), card_type: 'company', deck_date: today,
+      }));
+      if (rows.length) {
+        const { error } = await db.from('swipes').upsert(rows, { onConflict: 'user_id,ticker,deck_date', ignoreDuplicates: true });
+        if (error) throw error;
+      }
+      await saveLikes(db, user.id, liked.filter(t => knownTickers.has(t)));
+      return json({ ok: true, imported: rows.length });
     }
 
     if (body.action !== 'deck') return json({ error: 'Unknown action' }, 400);
@@ -253,6 +293,15 @@ Deno.serve(async (req) => {
     const { data: swipedToday } = await db.from('swipes').select('ticker, liked').eq('user_id', user.id).eq('deck_date', today);
     const { data: existing } = await db.from('daily_decks').select('cards').eq('user_id', user.id).eq('deck_date', today).maybeSingle();
     let cards = existing?.cards as DeckCard[] | undefined;
+    // After the user changes their causes: today's deck is rebuilt only if none of it was swiped
+    // yet, so a rebuild can never add swipes to the day
+    if (cards && body.rebuild === true) {
+      const deckTickers = new Set(cards.map(c => c.ticker));
+      if (!(swipedToday ?? []).some(s => deckTickers.has(s.ticker))) {
+        await db.from('daily_decks').delete().eq('user_id', user.id).eq('deck_date', today);
+        cards = undefined;
+      }
+    }
     let stocks = new Map<string, Record<string, unknown>>();
 
     if (!cards) {

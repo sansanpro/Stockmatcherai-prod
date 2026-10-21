@@ -44,6 +44,8 @@ const call = async (body, token = anonKey) => {
   check('signed out: no causes -> 400', s2 === 400);
   const { status: s3 } = await call({ action: 'swipe', ticker: 'MRK', liked: true });
   check('signed out: swipes need an account', s3 === 401);
+  const { status: s4 } = await call({ action: 'import', liked: ['MRK'], passed: [] });
+  check('signed out: importing device swipes needs an account', s4 === 401);
 }
 
 // Signed in as the test account
@@ -73,6 +75,19 @@ const token = auth.access_token;
     check("signed in: a card outside today's deck can't be swiped", outside.status === 403, `${outside.status}`);
     const after = await call({ action: 'deck' }, token);
     check('signed in: deck reports swiped cards', after.body.swiped?.length >= 1);
+
+    const rebuilt = await call({ action: 'deck', rebuild: true }, token);
+    check("signed in: no rebuild once today's deck has swipes",
+      JSON.stringify(rebuilt.body.cards?.map(c => c.ticker)) === JSON.stringify(after.body.cards?.map(c => c.ticker)));
+
+    // Swipes made on the device before sign-in. ZS is already liked and PFE is out of the feed,
+    // so this doesn't change what the test account sees.
+    const imported = await call({ action: 'import', liked: ['ZS'], passed: ['PFE', 'not a ticker!'] }, token);
+    check('signed in: device swipes import', imported.status === 200 && imported.body.ok && imported.body.imported === 2, JSON.stringify(imported.body));
+    const likes = await fetch(`${base}/rest/v1/user_matches?select=ticker&ticker=eq.ZS&is_match=eq.true`, {
+      headers: { Authorization: `Bearer ${token}`, apikey: anonKey },
+    }).then(r => r.json());
+    check('signed in: imported likes reach the Likes list', Array.isArray(likes) && likes.length >= 1, JSON.stringify(likes));
   }
 }
 

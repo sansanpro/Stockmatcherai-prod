@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Navigate } from 'react-router-dom';
-import UserProfileForm from '@/components/UserProfileForm';
 import StockMatcher from '@/components/StockMatcher';
 import Matches from '@/components/Matches';
 import AIAssistantWidget from '@/components/AIAssistantWidget';
@@ -10,29 +9,39 @@ import NotificationSystem from '@/components/NotificationSystem';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UserMenu from '@/components/UserMenu';
 import StockDetailsModal from '@/components/StockDetailsModal';
-import OnboardingTutorial from '@/components/OnboardingTutorial';
-import { AppProvider, useApp } from '@/contexts/AppContext';
+import OnboardingFlow, { type OnboardingMode } from '@/components/onboarding/OnboardingFlow';
+import SavePrompt, { FREE_LIKES_WITHOUT_ACCOUNT } from '@/components/SavePrompt';
+import { AppProvider, DEVICE_WATCHLIST_KEY, useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
-import { UserProfile, StockRecommendation } from '@/types/stock-matcher';
+import { StockRecommendation } from '@/types/stock-matcher';
 import { Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { User as UserIcon, Heart as HeartIcon, Home } from 'lucide-react';
 import { track } from '@/lib/analytics';
+import { requestTrackingOnce } from '@/lib/att';
+import {
+  clearAnswers, isComplete, loadAnswers, profileToAnswers, toProfileRow, type OnboardingAnswers,
+} from '@/lib/onboarding';
+import { clearDeviceFeed, importDeviceSwipes, loadDeviceFeed } from '@/lib/matchFeed';
 
 type MainStep = 'matching' | 'matches' | 'settings';
+// What the screen shows: deciding, onboarding questions, or the app itself
+type Gate = 'loading' | 'onboarding' | 'app';
 
 // Defined outside IndexContent so React sees a stable component type — prevents
 // the nav bar from remounting (and flickering) on every parent re-render.
 interface AppHeaderProps {
   currentStep: MainStep;
+  signedIn: boolean;
   onMatchTab: () => void;
   onLikesTab: () => void;
   onOpenSettings: () => void;
+  onSaveMatches: () => void;
 }
-const AppHeader = ({ currentStep, onMatchTab, onLikesTab, onOpenSettings }: AppHeaderProps) => (
+const AppHeader = ({ currentStep, signedIn, onMatchTab, onLikesTab, onOpenSettings, onSaveMatches }: AppHeaderProps) => (
   <div className="bg-background/80 backdrop-blur-md border-b border-border px-4 pb-3 w-full sticky top-0 z-40" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
     <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-4">
       <div className="flex items-center gap-1">
@@ -57,8 +66,14 @@ const AppHeader = ({ currentStep, onMatchTab, onLikesTab, onOpenSettings }: AppH
         </Button>
       </div>
       <div className="flex items-center gap-3">
-        <NotificationSystem />
-        <UserMenu onOpenSettings={onOpenSettings} />
+        {signedIn ? (
+          <>
+            <NotificationSystem />
+            <UserMenu onOpenSettings={onOpenSettings} />
+          </>
+        ) : (
+          <Button onClick={onSaveMatches} className="min-h-[44px] rounded-xl">Save my matches</Button>
+        )}
       </div>
     </div>
   </div>
@@ -108,135 +123,159 @@ const BottomNavBar = ({ currentStep, onStepChange, watchlistLength }: BottomNavB
   );
 };
 
+// Device swipes made before sign-in: keep those companies out of the account's next decks and
+// move the likes to the account. The device copy is cleared only once the server has them.
+async function syncDeviceSwipes(): Promise<boolean> {
+  const device = loadDeviceFeed();
+  if (device.liked.length === 0 && device.passed.length === 0) {
+    clearDeviceFeed();
+    return true;
+  }
+  try {
+    await importDeviceSwipes(device.liked, device.passed);
+    clearDeviceFeed();
+    try { localStorage.removeItem(DEVICE_WATCHLIST_KEY); } catch { /* storage blocked */ }
+    return true;
+  } catch (error) {
+    console.error('[Index] could not move device swipes to the account:', error);
+    return false;
+  }
+}
+
 const IndexContent = () => {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [currentStep, setCurrentStep] = useState<'welcome' | 'profile' | MainStep>('welcome');
-  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const { user, loading } = useAuth();
+  const { watchlist, reloadWatchlist } = useApp();
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
+
+  const [gate, setGate] = useState<Gate>('loading');
+  const [onboardingMode, setOnboardingMode] = useState<OnboardingMode>('new');
+  const [answers, setAnswers] = useState<OnboardingAnswers | null>(null);
+  const [currentStep, setCurrentStep] = useState<MainStep>('matching');
+  const [causesVersion, setCausesVersion] = useState(0);
+  const [savePromptOpen, setSavePromptOpen] = useState(false);
+  const [deviceLikes, setDeviceLikes] = useState(() => loadDeviceFeed().liked.length);
   const [selectedStockForDetails, setSelectedStockForDetails] = useState<StockRecommendation | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   // Stores the advance callback provided by StockMatcher when a card's
   // "View Details" is tapped — used to advance the card from the modal.
   const advanceCardRef = useRef<((liked: boolean) => void) | null>(null);
-  const { addToWatchlist, passStock, watchlist } = useApp();
-  const { user, loading } = useAuth();
-  const isMobile = useIsMobile();
 
-  // Check for existing user profile when user logs in
+  const saveProfile = async (next: OnboardingAnswers) => {
+    if (!user) return false;
+    const { error } = await supabase.from('user_profiles').upsert(toProfileRow(next, user.id), { onConflict: 'user_id' });
+    if (error) {
+      console.error('Error saving profile:', error);
+      toast.error("We couldn't save your answers. Please try again.");
+      return false;
+    }
+    return true;
+  };
+
+  // Decide what to show whenever sign-in state settles
   useEffect(() => {
-    const checkExistingProfile = async () => {
+    if (loading) return;
+    let cancelled = false;
+    (async () => {
+      const local = loadAnswers();
       if (!user) {
-        setIsLoadingProfile(false);
-        setCurrentStep('welcome');
-        setUserProfile(null);
+        setAnswers(local);
+        setDeviceLikes(loadDeviceFeed().liked.length);
+        if (isComplete(local)) {
+          setGate('app');
+        } else {
+          setOnboardingMode('new');
+          setGate('onboarding');
+        }
         return;
       }
 
-      setIsLoadingProfile(true);
+      setGate('loading');
+      const { data: profile, error } = await supabase.from('user_profiles').select('*').eq('user_id', user.id).maybeSingle();
+      if (cancelled) return;
+      if (error) console.error('Unexpected error fetching user profile:', error);
 
-      try {
-        const { data: profileData, error } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-
-        if (error && error.code !== 'PGRST116') {
-          console.error('Unexpected error fetching user profile:', error);
-          setCurrentStep('profile');
-          setIsLoadingProfile(false);
-          return;
+      // Just signed in after onboarding on this device: the answers and swipes move to the account
+      if (isComplete(local)) {
+        if (await saveProfile(local)) {
+          clearAnswers();
+          track('profile_complete', { version: 2, source: 'device_onboarding' });
         }
-
-        if (profileData) {
-          const profile: UserProfile = {
-            age: profileData.age || (profileData.age_range ? parseInt(profileData.age_range.split('-')[0]) : 25),
-            gender: profileData.gender || 'prefer-not-to-say',
-            salary: profileData.salary || (profileData.income_level ? parseInt(profileData.income_level.replace(/[^\d]/g, '')) : null),
-            experience: profileData.investment_experience || 'beginner',
-            riskTolerance: profileData.risk_tolerance || 'medium',
-            sectorPreference: profileData.sectors_of_interest?.[0] || 'any',
-            investmentGoal: profileData.investment_goals?.[0] || 'growth'
-          };
-          setUserProfile(profile);
-          setCurrentStep('matching');
-        } else {
-          setCurrentStep('profile');
-        }
-      } catch (error) {
-        console.error('Error checking user profile:', error);
-        if (user) setCurrentStep('profile');
-      } finally {
-        setIsLoadingProfile(false);
+        await syncDeviceSwipes();
+        await reloadWatchlist();
+        if (cancelled) return;
+        setAnswers(local);
+        setGate('app');
+        return;
       }
-    };
 
-    if (!loading) {
-      checkExistingProfile();
+      await syncDeviceSwipes(); // retries a sync that failed last time, if any
+      const fromProfile = profile ? profileToAnswers(profile) : null;
+      if (fromProfile && fromProfile.causes.length > 0) {
+        setAnswers(fromProfile);
+        setGate('app');
+      } else if (profile) {
+        // An account from before values matching: ask for causes once
+        setAnswers(fromProfile);
+        setOnboardingMode('causes_only');
+        setGate('onboarding');
+      } else {
+        setAnswers(null);
+        setOnboardingMode('new_signed_in');
+        setGate('onboarding');
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id, loading]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Tracking permission comes after onboarding (a no-op once asked)
+  useEffect(() => {
+    if (gate === 'app') requestTrackingOnce();
+  }, [gate]);
+
+  // Back to the deck when someone signs out from any tab
+  useEffect(() => {
+    if (!user && !loading) {
+      setCurrentStep('matching');
+      setIsDetailsModalOpen(false);
+      setSelectedStockForDetails(null);
     }
   }, [user, loading]);
 
-  const handleProfileComplete = async (profile: UserProfile) => {
-    if (!user) {
-      toast.error('Please log in to save your profile');
+  const handleOnboardingComplete = async (final: OnboardingAnswers) => {
+    if (onboardingMode === 'new') {
+      setAnswers(final); // already on the device; saved to the account at sign-in
+      setCurrentStep('matching');
+      setGate('app');
       return;
     }
-
-    try {
-      const profileData = {
-        user_id: user.id,
-        age: profile.age,
-        gender: profile.gender,
-        salary: profile.salary,
-        investment_experience: profile.experience,
-        risk_tolerance: profile.riskTolerance,
-        sectors_of_interest: [profile.sectorPreference],
-        investment_goals: [profile.investmentGoal],
-        age_range: `${profile.age}-${profile.age + 10}`,
-        income_level: profile.salary?.toString() || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-
-      const { error } = await supabase
-        .from('user_profiles')
-        .upsert(profileData, { onConflict: 'user_id' })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error saving user profile:', error);
-        toast.error('Failed to save profile. Please try again.');
-        return;
-      }
-
-      toast.success('Profile saved successfully!');
-      setUserProfile(profile);
-      setCurrentStep('matching');
-      setIsUpdatingProfile(false);
-    } catch (error) {
-      console.error('Error saving profile:', error);
-      toast.error('Failed to save profile. Please try again.');
+    const merged = onboardingMode === 'causes_only' && answers
+      ? { ...answers, causes: final.causes, dealbreakers: final.dealbreakers }
+      : final;
+    if (!(await saveProfile(merged))) return;
+    if (onboardingMode === 'causes_only') {
+      track('causes_updated', { source: 'existing_user', causes: merged.causes });
+    } else {
+      track('profile_complete', { version: 2, source: 'signed_in_onboarding' });
     }
+    setAnswers(merged);
+    setCurrentStep('matching');
+    setGate('app');
   };
 
-  const resetApp = () => {
-    setUserProfile(null);
-    setCurrentStep('welcome');
-    setIsUpdatingProfile(false);
-    setSelectedStockForDetails(null);
-    setIsDetailsModalOpen(false);
+  const handleCausesSaved = (next: OnboardingAnswers) => {
+    setAnswers(next);
+    setCausesVersion(v => v + 1);
   };
 
-  const handleUpdateProfile = () => {
-    setCurrentStep('profile');
-    setIsUpdatingProfile(true);
-  };
+  const openSavePrompt = () => setSavePromptOpen(true);
 
-  const handleOpenSettings = () => setCurrentStep('settings');
-
-  const handleBackFromSettings = () => {
-    setCurrentStep(userProfile ? 'matching' : 'welcome');
+  // Signed out: offer to save after the first like, and again (required to keep them) at the third
+  const handleLikedOnDevice = (likes: number) => {
+    setDeviceLikes(likes);
+    const prompt = likes === 1 || likes === FREE_LIKES_WITHOUT_ACCOUNT;
+    if (prompt) setSavePromptOpen(true);
+    return prompt;
   };
 
   const handleViewStockDetails = (stock: StockRecommendation, advance?: (liked: boolean) => void) => {
@@ -257,55 +296,44 @@ const IndexContent = () => {
     advanceCardRef.current = null;
   };
 
-  // Clear state when user signs out
-  useEffect(() => {
-    if (!user && !loading) resetApp();
-  }, [user, loading]);
+  const goToStep = (step: MainStep) => {
+    // Signed out, the Profile tab is where you save your matches
+    if (step === 'settings' && !user) {
+      openSavePrompt();
+      return;
+    }
+    setCurrentStep(step);
+  };
 
-  if (loading || isLoadingProfile) {
+  if (loading || gate === 'loading') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500" />
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-950 to-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary" />
       </div>
     );
   }
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  // Profile setup (welcome / profile step)
-  if (currentStep === 'welcome' || currentStep === 'profile') {
+  if (gate === 'onboarding') {
     return (
-      <ProtectedRoute>
-        <div className={`min-h-screen w-full bg-gradient-to-br from-[#0f0a1e] via-[#130d2a] to-[#0a0614] overflow-auto ${currentStep === 'welcome' ? 'pt-[env(safe-area-inset-top)]' : ''}`}>
-          {currentStep === 'profile' && (
-            <AppHeader
-              currentStep="matching"
-              onMatchTab={() => setCurrentStep('matching')}
-              onLikesTab={() => setCurrentStep('matches')}
-              onOpenSettings={handleOpenSettings}
-            />
-          )}
-          <UserProfileForm
-            onComplete={handleProfileComplete}
-            existingProfile={userProfile || undefined}
-            isUpdate={isUpdatingProfile}
-          />
-        </div>
-      </ProtectedRoute>
+      <OnboardingFlow
+        key={onboardingMode}
+        mode={onboardingMode}
+        initial={onboardingMode === 'new' ? loadAnswers() : answers}
+        onComplete={handleOnboardingComplete}
+        onSignIn={() => navigate('/auth?mode=signin')}
+      />
     );
   }
 
-  // Settings — separate full-page render (matches/matching stay unmounted here,
-  // which is fine: settings is visited infrequently)
+  const myAnswers = answers!;
+
   if (currentStep === 'settings') {
     return (
       <ProtectedRoute>
         <Settings
-          onBack={handleBackFromSettings}
-          userProfile={userProfile}
-          onProfileUpdate={handleProfileComplete}
+          onBack={() => setCurrentStep('matching')}
+          answers={myAnswers}
+          onCausesSaved={handleCausesSaved}
         />
       </ProtectedRoute>
     );
@@ -313,16 +341,17 @@ const IndexContent = () => {
 
   // Main app — both tabs are ALWAYS mounted so switching tabs never resets
   // StockMatcher's card position or triggers a fresh data fetch.
-  const mainStep = currentStep as MainStep;
-
+  const signedIn = !!user;
   return (
-    <ProtectedRoute>
+    <>
       {!isMobile && (
         <AppHeader
-          currentStep={mainStep}
+          currentStep={currentStep}
+          signedIn={signedIn}
           onMatchTab={() => setCurrentStep('matching')}
           onLikesTab={() => setCurrentStep('matches')}
-          onOpenSettings={handleOpenSettings}
+          onOpenSettings={() => setCurrentStep('settings')}
+          onSaveMatches={openSavePrompt}
         />
       )}
 
@@ -332,8 +361,13 @@ const IndexContent = () => {
         style={{ display: currentStep === 'matching' ? 'flex' : 'none', flexDirection: 'column', height: '100dvh', overflow: 'hidden' }}
       >
         <StockMatcher
-          userProfile={userProfile!}
-          onReset={handleUpdateProfile}
+          answers={myAnswers}
+          signedIn={signedIn}
+          causesVersion={causesVersion}
+          onEditCauses={() => (signedIn ? setCurrentStep('settings') : openSavePrompt())}
+          onNeedsCauses={() => { setOnboardingMode('causes_only'); setGate('onboarding'); }}
+          onLikedOnDevice={handleLikedOnDevice}
+          onSaveMatches={openSavePrompt}
           onViewDetails={handleViewStockDetails}
         />
       </div>
@@ -345,7 +379,7 @@ const IndexContent = () => {
       >
         <div className="min-h-[100dvh] w-full min-w-0 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 px-4 overflow-auto pb-[max(env(safe-area-inset-bottom),6.5rem)]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="w-full pt-4">
-            <Matches onViewDetails={handleViewStockDetails} />
+            <Matches onViewDetails={handleViewStockDetails} signedIn={signedIn} onSaveMatches={openSavePrompt} />
           </div>
         </div>
       </div>
@@ -357,16 +391,16 @@ const IndexContent = () => {
         onMatch={handleMatchFromModal}
         onPass={handlePassFromModal}
       />
-      {isMobile && user && (
+      {isMobile && (
         <BottomNavBar
-          currentStep={mainStep}
-          onStepChange={(step) => setCurrentStep(step)}
+          currentStep={currentStep}
+          onStepChange={goToStep}
           watchlistLength={watchlist.length}
         />
       )}
-      <AIAssistantWidget />
-      <OnboardingTutorial />
-    </ProtectedRoute>
+      {signedIn && <AIAssistantWidget />}
+      {!signedIn && <SavePrompt open={savePromptOpen} likes={deviceLikes} onClose={() => setSavePromptOpen(false)} />}
+    </>
   );
 };
 

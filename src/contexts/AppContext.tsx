@@ -1,6 +1,8 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
 import { StockRecommendation } from '@/types/stock-matcher';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SwipeStats {
   totalSwipes: number;
@@ -14,6 +16,7 @@ interface AppContextType {
   addToWatchlist: (stock: StockRecommendation) => void;
   removeFromWatchlist: (ticker: string) => void;
   isInWatchlist: (ticker: string) => boolean;
+  reloadWatchlist: () => Promise<void>;
   passStock: (stock: StockRecommendation) => void;
   swipeStats: SwipeStats;
   updateSwipeStats: (isMatch: boolean) => void;
@@ -31,7 +34,67 @@ export const useApp = () => {
   return context;
 };
 
+export const DEVICE_WATCHLIST_KEY = 'stockMatcher_watchlist';
+
+const readDeviceWatchlist = (): StockRecommendation[] => {
+  try {
+    const saved = localStorage.getItem(DEVICE_WATCHLIST_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeDeviceWatchlist = (list: StockRecommendation[]) => {
+  try { localStorage.setItem(DEVICE_WATCHLIST_KEY, JSON.stringify(list)); } catch { /* storage blocked */ }
+};
+
+const num = (v: unknown) => (typeof v === 'number' ? v : Number(v) || 0);
+
+// Liked companies saved to the account (user_matches), newest first, with current stock data
+async function loadAccountWatchlist(userId: string): Promise<StockRecommendation[]> {
+  const { data: matches, error } = await supabase
+    .from('user_matches')
+    .select('ticker, match_reason, matched_at')
+    .eq('user_id', userId)
+    .eq('is_match', true)
+    .order('matched_at', { ascending: false });
+  if (error) throw error;
+  const tickers = [...new Set((matches ?? []).map(m => m.ticker))];
+  if (tickers.length === 0) return [];
+  const { data: stocks } = await supabase
+    .from('stocks')
+    .select('ticker, company_name, sector, price_per_share, one_year_return, pe_ratio, market_cap, dividend_yield, risk_level, updated_at, logo_url, mission_story, ceo_name')
+    .in('ticker', tickers);
+  const byTicker = new Map((stocks ?? []).map(s => [s.ticker, s]));
+  const reasons = new Map<string, string | null>();
+  for (const m of matches ?? []) if (!reasons.has(m.ticker)) reasons.set(m.ticker, m.match_reason);
+  return tickers.filter(t => byTicker.has(t)).map(t => {
+    const s = byTicker.get(t)!;
+    const risk = s.risk_level === 'low' || s.risk_level === 'high' ? s.risk_level : 'medium';
+    return {
+      id: t,
+      ticker: t,
+      companyName: s.company_name ?? t,
+      sector: s.sector ?? '',
+      ceoName: s.ceo_name ?? '',
+      ceoHighlights: '',
+      peRatio: num(s.pe_ratio),
+      marketCap: s.market_cap ?? '',
+      oneYearReturn: num(s.one_year_return),
+      riskLevel: risk,
+      pricePerShare: num(s.price_per_share),
+      dividendYield: num(s.dividend_yield),
+      whyItFits: reasons.get(t) || s.mission_story || '',
+      lastUpdated: s.updated_at ?? undefined,
+      logoUrl: s.logo_url ?? undefined,
+      missionStory: s.mission_story ?? undefined,
+    };
+  });
+}
+
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
   const [watchlist, setWatchlist] = useState<StockRecommendation[]>([]);
   const [swipeStats, setSwipeStats] = useState<SwipeStats>({
     totalSwipes: 0,
@@ -41,15 +104,24 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   });
   const [isDarkMode, setIsDarkMode] = useState(true);
 
-  // Load data from localStorage on mount
+  // Likes follow the account when signed in; before sign-in they live on this device
+  const reloadWatchlist = useCallback(async () => {
+    if (!user) {
+      setWatchlist(readDeviceWatchlist());
+      return;
+    }
+    try {
+      setWatchlist(await loadAccountWatchlist(user.id));
+    } catch (error) {
+      console.error('[AppContext] could not load likes:', error);
+    }
+  }, [user]);
+
+  useEffect(() => { reloadWatchlist(); }, [reloadWatchlist]);
+
   useEffect(() => {
-    const savedWatchlist = localStorage.getItem('stockMatcher_watchlist');
     const savedStats = localStorage.getItem('stockMatcher_swipeStats');
     const savedDarkMode = localStorage.getItem('stockMatcher_darkMode');
-
-    if (savedWatchlist) {
-      setWatchlist(JSON.parse(savedWatchlist));
-    }
     if (savedStats) {
       setSwipeStats(JSON.parse(savedStats));
     }
@@ -69,16 +141,22 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isDarkMode]);
 
+  // Signed in, match-feed saves the like to the account; this only updates what's on screen
   const addToWatchlist = (stock: StockRecommendation) => {
-    const newWatchlist = [...watchlist, stock];
-    setWatchlist(newWatchlist);
-    localStorage.setItem('stockMatcher_watchlist', JSON.stringify(newWatchlist));
+    setWatchlist(prev => {
+      if (prev.some(s => s.ticker === stock.ticker)) return prev;
+      const next = [stock, ...prev];
+      if (!user) writeDeviceWatchlist(next);
+      return next;
+    });
   };
 
   const removeFromWatchlist = (ticker: string) => {
-    const newWatchlist = watchlist.filter(stock => stock.ticker !== ticker);
-    setWatchlist(newWatchlist);
-    localStorage.setItem('stockMatcher_watchlist', JSON.stringify(newWatchlist));
+    setWatchlist(prev => {
+      const next = prev.filter(stock => stock.ticker !== ticker);
+      if (!user) writeDeviceWatchlist(next);
+      return next;
+    });
   };
 
   const isInWatchlist = (ticker: string) => {
@@ -98,7 +176,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       matchRate: 0
     };
     newStats.matchRate = newStats.totalSwipes > 0 ? (newStats.matches / newStats.totalSwipes) * 100 : 0;
-    
+
     setSwipeStats(newStats);
     localStorage.setItem('stockMatcher_swipeStats', JSON.stringify(newStats));
   };
@@ -115,6 +193,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       addToWatchlist,
       removeFromWatchlist,
       isInWatchlist,
+      reloadWatchlist,
       passStock,
       swipeStats,
       updateSwipeStats,

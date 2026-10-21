@@ -193,6 +193,21 @@ const TinderStockCard = ({
     };
   }, [isDragging, startPos]);
 
+  // Update cards carry news about a company the user already liked instead of a match reason
+  const isUpdate = stock.cardType === 'update' && !!stock.update;
+  const whyHeading = isUpdate ? 'News on a company you liked' : 'Why this matches you';
+  const whyIcon = isUpdate ? '📰' : '💡';
+  const whyBody = isUpdate ? (
+    <>
+      {stock.update!.headline}
+      {stock.update!.url && (
+        <a href={stock.update!.url} target="_blank" rel="noopener noreferrer" className="block mt-2 text-sm font-semibold text-primary underline">
+          Read it{stock.update!.source ? ` on ${stock.update!.source}` : ''}
+        </a>
+      )}
+    </>
+  ) : stock.whyItFits;
+
   const rotation = dragOffset.x * 0.1;
   const opacity = isExiting ? 0 : Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300);
   const cardScale = isExiting ? 0.8 : scale;
@@ -291,13 +306,13 @@ const TinderStockCard = ({
       {/* Why it fits section */}
       <div className="p-5 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 flex-1">
         <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-xl">
-          <span className="text-xl">💡</span>
-          Why this matches you
+          <span className="text-xl">{whyIcon}</span>
+          {whyHeading}
         </h4>
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-5 rounded-xl border border-white/50 dark:border-gray-600/50 shadow-lg">
-          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-            {stock.whyItFits}
-          </p>
+          <div className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+            {whyBody}
+          </div>
         </div>
       </div>
     </div>
@@ -457,13 +472,13 @@ className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[
           {/* Why it fits section - More prominent */}
           <div className="p-4 sm:p-6 lg:p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-400 flex-shrink-0">
             <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-base sm:text-lg lg:text-xl">
-              <span className="text-lg lg:text-xl">💡</span>
-              Why this matches you
+              <span className="text-lg lg:text-xl">{whyIcon}</span>
+              {whyHeading}
             </h4>
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-5 lg:p-4 rounded-xl border border-white/50 dark:border-gray-600/50 shadow-lg">
-              <p className="text-sm sm:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                {stock.whyItFits}
-              </p>
+              <div className="text-sm sm:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                {whyBody}
+              </div>
             </div>
 
             {/* Tap to expand hint */}

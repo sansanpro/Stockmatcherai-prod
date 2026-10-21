@@ -24,6 +24,15 @@ export async function requestTrackingPermission(): Promise<ATTStatus> {
   }
 }
 
+// Asks once per install. Called after onboarding (never before the reveal screen).
+export async function requestTrackingOnce(): Promise<void> {
+  try {
+    if (localStorage.getItem('att_status')) return;
+    const status = await requestTrackingPermission();
+    localStorage.setItem('att_status', status);
+  } catch { /* storage blocked */ }
+}
+
 export async function getTrackingStatus(): Promise<ATTStatus> {
   if (!Capacitor.isNativePlatform()) return 'authorized';
 

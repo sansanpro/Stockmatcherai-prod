@@ -7,21 +7,27 @@ const openChat = async (page: Page) => {
 };
 
 const chatInput = (page: Page) => page.getByPlaceholder(/Ask about stocks|Try asking about a stock/);
+// The chat panel (the deck has its own "not investment advice" footer, so answers are matched in here)
+const chatPanel = (page: Page) => page.locator('div[data-ai-assistant].fixed');
 
-test('swipe deck loads a stock card', async ({ page }) => {
+test('swipe deck loads a values-matched card', async ({ page }) => {
   await openApp(page);
   await expect(page.getByText('P/E Ratio').first()).toBeVisible();
+  await expect(page.getByText('Why this matches you').first()).toBeVisible();
+  await expect(page.getByText(/matches left today/)).toBeVisible();
+  // Profile chips are the user's causes now, not age or sector
+  await expect(page.getByText(/^\d+yo$/)).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'View stock details' }).first()).toBeVisible();
   await page.screenshot({ path: 'e2e/screens/deck.png' });
 });
 
-test('stock details show company description, employees and HQ', async ({ page }) => {
+test('stock details show company description, HQ and IPO year', async ({ page }) => {
   await openApp(page);
   await page.getByRole('button', { name: 'View stock details' }).first().click();
   const details = page.getByRole('dialog');
   // These come from the company_profiles table, not a live API
   await expect(details.getByText(/^About /)).toBeVisible();
-  await expect(details.getByText('Employees')).toBeVisible();
+  // (Employee counts exist for the original companies only, so that tile isn't checked here)
   await expect(details.getByText('Headquarters')).toBeVisible();
   await expect(details.getByText('Went Public')).toBeVisible();
   await expect(details.getByText(/is a company in the .* sector\./)).toHaveCount(0); // generic fallback text
@@ -37,7 +43,7 @@ test('first message shows the AI consent dialog above the chat, then sends', asy
   const agree = page.getByRole('button', { name: 'I Agree' });
   await expect(agree).toBeVisible();
   await agree.click(); // fails if the dialog is hidden behind the chat panel
-  await expect(page.getByText(/not investment advice/i).last()).toBeVisible({ timeout: 60_000 });
+  await expect(chatPanel(page).getByText(/not investment advice/i).last()).toBeVisible({ timeout: 60_000 });
   await page.screenshot({ path: 'e2e/screens/chat-consent.png' });
 });
 
@@ -47,9 +53,9 @@ test('chat answers a data question without showing raw tool output', async ({ pa
   await chatInput(page).fill('How is NVIDIA doing?');
   await page.getByRole('button', { name: 'Send message' }).click();
 
-  await expect(page.getByText(/not investment advice/i).last()).toBeVisible({ timeout: 60_000 });
+  await expect(chatPanel(page).getByText(/not investment advice/i).last()).toBeVisible({ timeout: 60_000 });
   await expect(page.getByText(/Fetched/)).toHaveCount(0);
-  await expect(page.getByText(/NVDA|NVIDIA/).last()).toBeVisible();
+  await expect(chatPanel(page).getByText(/NVDA|NVIDIA/).last()).toBeVisible();
   await page.screenshot({ path: 'e2e/screens/chat-answer.png' });
 });
 
@@ -83,7 +89,8 @@ test('tapping a tooltip on the card does not expand the card', async ({ page }) 
 
 test('expanded card can be collapsed (AI button does not cover it)', async ({ page }) => {
   await openApp(page);
-  await page.getByText('P/E Ratio').first().click(); // tap the card body to expand it
+  await page.getByRole('button', { name: 'View stock details' }).first().waitFor(); // deck loaded
+  await page.locator('h2').first().click(); // tap the card (its company name) to expand it
   const collapse = page.getByRole('button', { name: 'Collapse stock details' });
   await expect(collapse).toBeVisible();
   await page.waitForTimeout(600); // sheet slide-in animation
@@ -148,17 +155,18 @@ test('no ESG scores anywhere (they were unsourced placeholder values)', async ({
 test('a card whose price is over 20 minutes old refreshes it on screen', async ({ page }) => {
   // Make every stock look an hour old so the visible card must refresh its price
   const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  await page.route(/\/rest\/v1\/\w+_stocks/, async (route) => {
+  await page.route(/\/functions\/v1\/match-feed/, async (route) => {
+    if (route.request().method() !== 'POST') return route.continue();
     const response = await route.fetch();
-    const rows = await response.json();
-    const aged = Array.isArray(rows)
-      ? rows.map((r: Record<string, unknown>) => ({ ...r, last_updated: hourAgo, updated_at: hourAgo }))
-      : rows;
+    const body = await response.json();
+    const aged = Array.isArray(body.cards)
+      ? { ...body, cards: body.cards.map((c: Record<string, unknown>) => ({ ...c, lastUpdated: hourAgo })) }
+      : body;
     // Build the reply by hand: fulfill({ response, json }) crashes WebKit's network process
     await route.fulfill({
       status: response.status(),
       contentType: 'application/json',
-      headers: { 'access-control-allow-origin': '*', 'content-range': response.headers()['content-range'] ?? '*/*' },
+      headers: { 'access-control-allow-origin': '*' },
       body: JSON.stringify(aged),
     });
   });
@@ -194,4 +202,40 @@ test('analytics events are recorded (app_open, deck_loaded, swipe, details_opene
     .toEqual(expect.arrayContaining(['app_open', 'deck_loaded', 'details_opened']));
   // Every insert was accepted by the database (RLS allows inserts, 201 Created)
   expect(recorded.every(r => r.status === 201)).toBe(true);
+});
+
+test('profile settings edit causes and no longer ask for age, gender or income', async ({ page }) => {
+  await openApp(page);
+  await expect(page.getByText('P/E Ratio').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Profile' }).click();
+  await expect(page.getByText('What you care about')).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Causes' }).getByRole('button')).toHaveCount(4);
+  await expect(page.getByRole('button', { name: /, pick 1$/ })).toBeVisible(); // the account's #1 cause
+  await expect(page.getByText(/^(Age|Gender|Annual Income)$/)).toHaveCount(0);
+  await page.screenshot({ path: 'e2e/screens/settings-causes.png', fullPage: true });
+});
+
+test('an account from before values matching is asked for causes once', async ({ page }) => {
+  // Pretend the profile predates causes; the upsert is answered locally so the real profile stays as it is
+  await page.route(/\/rest\/v1\/user_profiles/, async (route) => {
+    const request = route.request();
+    if (request.method() === 'GET') {
+      const response = await route.fetch();
+      const row = await response.json();
+      // maybeSingle() reads a list and takes the first row
+      const toLegacy = (r: Record<string, unknown>) => ({ ...r, causes: null, dealbreakers: null, onboarding_version: 1 });
+      const legacy = Array.isArray(row) ? row.map(toLegacy) : row && typeof row === 'object' ? toLegacy(row) : row;
+      return route.fulfill({ status: response.status(), contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(legacy) });
+    }
+    return route.fulfill({ status: 201, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '[]' });
+  });
+  await openApp(page);
+  await expect(page.getByText('New: match by what you care about.')).toBeVisible();
+  await page.screenshot({ path: 'e2e/screens/existing-user-causes-intro.png' });
+  await page.getByRole('button', { name: 'Pick my causes' }).click();
+  await page.getByRole('button', { name: /^Keeping people safe/ }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByText("Anything you'd never want your money to fund?")).toBeVisible();
+  await page.getByRole('button', { name: 'Show my matches' }).click();
+  await expect(page.getByText('P/E Ratio').first()).toBeVisible();
 });

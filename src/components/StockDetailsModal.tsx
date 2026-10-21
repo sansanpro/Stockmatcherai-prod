@@ -1,4 +1,5 @@
 import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/sheet';
+import CoachMark from '@/components/CoachMark';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -136,6 +137,12 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
             </div>
           </div>
         </div>
+
+        <CoachMark
+          id="first_details"
+          text="Here's the full picture: what the company does, how its stock has moved, and recent news. Take your time. You decide."
+          className="mx-4 mt-3 max-w-none"
+        />
 
         {/* ── Tabs ─────────────────────────────────────────────────────────── */}
         <Tabs defaultValue="overview" className="flex-1 flex flex-col overflow-hidden">
