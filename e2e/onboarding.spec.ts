@@ -126,3 +126,68 @@ test('"I already have an account" goes to sign in', async ({ page }) => {
   await expect(page.getByText('Welcome back')).toBeVisible();
   await expect(page.locator('#signin-email')).toBeVisible();
 });
+
+test('saving from the prompt creates an account that keeps the answers and likes', async ({ page }) => {
+  await freshInstall(page);
+  await page.goto('/app');
+
+  // Onboarding with one cause, no dealbreakers
+  await page.getByRole('button', { name: 'Find my matches' }).click();
+  await page.getByRole('radio', { name: "I've been meaning to for years" }).click();
+  await page.getByRole('button', { name: /^Live longer & healthier/ }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Skip' }).click();
+  await page.getByRole('radio', { name: 'Wait it out.' }).click();
+  await page.getByRole('radio', { name: 'A few times' }).click();
+  await page.getByRole('radio', { name: 'A little extra income' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'See my first 7 matches' }).click();
+  await page.getByRole('button', { name: 'Got it' }).click();
+
+  // Like two companies on the device
+  const liked: string[] = [];
+  for (let i = 0; i < 2; i++) {
+    await page.getByRole('button', { name: 'View stock details' }).first().waitFor();
+    liked.push((await page.locator('h2').first().innerText()).trim());
+    await like(page);
+    if (i === 0) await page.getByRole('button', { name: 'Not now' }).click();
+    await expect(page.getByText(`${6 - i} of 7 matches left today`)).toBeVisible();
+  }
+
+  // Save them: Profile tab -> save prompt -> email sign-up
+  await page.getByRole('button', { name: 'Profile' }).click();
+  await page.getByRole('button', { name: 'Use email' }).click();
+  await expect(page.getByText('Save your matches')).toBeVisible();
+  const email = `e2e-${Date.now()}@example.com`;
+  await page.locator('#signup-name').fill('E2E');
+  await page.locator('#signup-email').fill(email);
+  await page.locator('#signup-password').fill(`Pw-${Math.random().toString(36).slice(2, 12)}!`);
+  await page.getByRole('button', { name: 'Save my matches' }).click();
+
+  // Signed in: the account's own (free) deck, without the companies liked before signing up
+  await expect(page.getByText(/of 7 matches left today/)).toBeVisible({ timeout: 30_000 });
+  const device = await page.evaluate(() => ({
+    answers: localStorage.getItem('onboarding_v2_answers'),
+    feed: localStorage.getItem('device_feed_v1'),
+  }));
+  expect(device).toEqual({ answers: null, feed: null }); // moved to the account, gone from the device
+  for (const name of liked) await expect(page.locator('h2').first()).not.toHaveText(name);
+
+  // The likes made before sign-up are in the account's Likes list
+  await page.getByRole('button', { name: 'Likes' }).click();
+  await expect(page.getByText('2 companies saved')).toBeVisible();
+  for (const name of liked) await expect(page.getByText(name).first()).toBeVisible();
+  await expect(page.getByText(/more likes? (is|are) waiting/)).toHaveCount(0);
+  await page.screenshot({ path: 'e2e/screens/signup-likes-carried-over.png' });
+
+  // The answers are on the account: Settings shows the cause and goal picked before sign-up
+  await page.getByRole('button', { name: 'Profile' }).click();
+  await expect(page.getByRole('button', { name: 'Live longer & healthier, pick 1' })).toBeVisible();
+  await expect(page.getByRole('radio', { name: 'A little extra income' })).toHaveAttribute('aria-checked', 'true');
+
+  // Clean up: delete the throwaway account through the app
+  await page.getByRole('button', { name: 'Delete Account' }).click();
+  await page.getByPlaceholder('Type DELETE to confirm').fill('DELETE');
+  await page.getByRole('button', { name: 'Delete My Account' }).click();
+  await expect(page.getByText('Your account has been deleted.')).toBeVisible();
+});

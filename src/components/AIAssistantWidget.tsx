@@ -245,6 +245,13 @@ export default function AIAssistantWidget() {
                   ? { ...msg, content: msg.content + chunk.delta, status: 'generating' }
                   : msg
               ));
+            } else if (chunk.type === 'restart') {
+              // The server is retrying a cut-off answer; replace what was shown so far
+              receivedContent = '';
+              setMessages(prev => prev.map(msg =>
+                msg.id === assistantMsgId ? { ...msg, content: '', status: 'analyzing' } : msg
+              ));
+              setCurrentStatus('Writing answer...');
             } else if (chunk.type === 'tool_call') {
               setCurrentStatus(describeToolCall(chunk.tool));
             } else if (chunk.type === 'analyzing') {

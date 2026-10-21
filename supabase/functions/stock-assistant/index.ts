@@ -529,10 +529,27 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
     type ExecutedToolCall = { id: string; name: string; args: any; result: any; extra_content?: unknown };
 
     // Stream response back to client
+    // Set when the user closes the chat mid-answer; nothing more is sent after that
+    let clientGone = false;
     const stream = new ReadableStream({
+      cancel() {
+        clientGone = true;
+      },
       async start(controller) {
         const encoder = new TextEncoder();
-        const send = (event: unknown) => controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+        const write = (text: string) => {
+          if (clientGone) return;
+          try {
+            controller.enqueue(encoder.encode(text));
+          } catch {
+            clientGone = true;
+          }
+        };
+        const send = (event: unknown) => write(`data: ${JSON.stringify(event)}\n\n`);
+        const finish = () => {
+          if (clientGone) return;
+          try { controller.close(); } catch { /* already closed */ }
+        };
 
         // Reads one Gemini SSE response: forwards text deltas to the client and collects tool calls.
         // extra_content carries Gemini's thought signature, which must be sent back with the tool results.
@@ -543,6 +560,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
           let buffer = '';
           let content = '';
           let raw = ''; // kept (truncated) to diagnose empty answers
+          let finishReason: string | null = null;
 
           while (true) {
             const { done, value } = await reader.read();
@@ -564,6 +582,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                 console.error('Error parsing SSE:', e);
                 continue;
               }
+              if (choice?.finish_reason) finishReason = choice.finish_reason;
               if (choice?.delta?.content) {
                 content += choice.delta.content;
                 send({ type: 'content_delta', delta: choice.delta.content });
@@ -584,7 +603,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
               }
             }
           }
-          return { content, toolCalls: [...pending.values()].filter(c => c.name), raw };
+          return { content, toolCalls: [...pending.values()].filter(c => c.name), raw, finishReason };
         };
 
         // Runs a round of tool calls in parallel, telling the client what's being looked up
@@ -613,7 +632,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
         let answer = '';
 
         try {
-          let { content, toolCalls, raw } = await readGeminiStream(aiResponse);
+          let { content, toolCalls, raw, finishReason } = await readGeminiStream(aiResponse);
           answer = content;
 
           for (let round = 1; toolCalls.length > 0; round++) {
@@ -673,9 +692,43 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
             }
             const usedInline = usedModel !== model || !allowMoreTools;
             model = usedModel;
-            ({ content, toolCalls, raw } = await readGeminiStream(response));
+            ({ content, toolCalls, raw, finishReason } = await readGeminiStream(response));
             answer += content;
             if (usedInline) toolCalls = []; // inline requests have no tools to call
+          }
+
+          // Gemini sometimes ends a stream mid-sentence (seen under rate limiting). Ask the other
+          // model once, with any fetched data inline, and have the client replace the partial text.
+          // Finished answers end with the disclaimer the prompt asks for, or at least a full sentence
+          const cutOff = (text: string, reason: string | null) =>
+            !!text.trim() && !/not investment advice/i.test(text) &&
+            (!/[.!?:)_*\]]\s*$/.test(text.trim()) || (!!reason && reason !== 'stop' && reason !== 'tool_calls'));
+          if (cutOff(answer, finishReason)) {
+            await logError('truncated_answer', `finish_reason=${finishReason}; ${answer.slice(-200)}`, { model });
+            const retryModel = model === GEMINI_MODEL ? GEMINI_FALLBACK_MODEL : GEMINI_MODEL;
+            const dataNote = allToolCalls.length
+              ? [{ role: 'user', content: `Data fetched for my last question:\n${JSON.stringify(allToolCalls.map(tc => ({ tool: tc.name, args: tc.args, result: tc.result })))}\n\nAnswer my last question using this data.` }]
+              : [];
+            const { response: retry, model: retryUsed } = await fetchGeminiWithFallback(
+              () => GEMINI_OPENAI_CHAT_URL,
+              (m) => geminiRequest(m, { messages: [{ role: 'system', content: systemPrompt }, ...(messages || []), ...dataNote] }),
+              [retryModel, model],
+            );
+            if (retry.ok) {
+              send({ type: 'restart' });
+              const retried = await readGeminiStream(retry);
+              if (retried.content.trim()) {
+                answer = retried.content;
+                model = retryUsed;
+              }
+            }
+          }
+
+          // Every answer ends with the disclaimer, even if the model leaves it out
+          if (answer.trim() && !/not investment advice/i.test(answer)) {
+            const footer = '\n\n_Educational only, not investment advice._';
+            send({ type: 'content_delta', delta: footer });
+            answer += footer;
           }
 
           if (!answer.trim()) {
@@ -693,19 +746,17 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
               : null,
           });
 
-          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+          write('data: [DONE]\n\n');
           console.log(`[stock-assistant] Stream completed in ${Date.now() - aiCallStart}ms`);
-          controller.close();
+          finish();
         } catch (e) {
           console.error(`[${new Date().toISOString()}] [stock-assistant] Stream error:`, e);
-          await logError('stream', e instanceof Error ? `${e.message}\n${e.stack ?? ''}` : String(e), { model });
-          try {
-            send({ type: 'error', message: e instanceof Error ? e.message : 'Unknown error occurred' });
-          } catch (encodeError) {
-            console.error('Failed to send error to client:', encodeError);
+          if (!clientGone) {
+            await logError('stream', e instanceof Error ? `${e.message}\n${e.stack ?? ''}` : String(e), { model });
           }
+          send({ type: 'error', message: e instanceof Error ? e.message : 'Unknown error occurred' });
           // Close normally so the client reads the error event instead of a dropped connection
-          controller.close();
+          finish();
         }
       }
     });

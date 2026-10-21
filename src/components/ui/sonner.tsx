@@ -12,8 +12,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
       visibleToasts={1}
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
-      position="bottom-center"
-      offset="calc(24px + env(safe-area-inset-bottom, 0px))"
+      // Top: the bottom of the screen holds the like/pass buttons and the tab bar
+      position="top-center"
+      offset="calc(12px + env(safe-area-inset-top, 0px))"
       toastOptions={{
         classNames: {
           toast:
