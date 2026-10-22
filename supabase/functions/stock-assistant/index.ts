@@ -2,7 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { FinnhubClient, FinnhubNewsItem } from '../_shared/finnhub.ts';
-import { GEMINI_FALLBACK_MODEL, GEMINI_MODEL, GEMINI_OPENAI_CHAT_URL, fetchGeminiWithFallback, getGeminiApiKey, isRetryableGeminiStatus, logAiError } from '../_shared/gemini.ts';
+import { GEMINI_MODEL, GEMINI_MODELS, GEMINI_OPENAI_CHAT_URL, fetchGeminiWithFallback, getGeminiApiKey, isRetryableGeminiStatus, logAiError } from '../_shared/gemini.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -47,7 +47,7 @@ class StockDataService {
 
   private async getStoredStock(sym: string) {
     const { data } = await this.db.from('stocks')
-      .select('company_name, ceo_name, ceo_highlights, pe_ratio, market_cap, one_year_return, price_per_share, dividend_yield, risk_level, description, full_time_employees, city, state, country, industry, website, ipo_date, finnhub_synced_at')
+      .select('company_name, ceo_name, ceo_highlights, pe_ratio, market_cap, one_year_return, price_per_share, dividend_yield, risk_level, description, full_time_employees, city, state, country, industry, website, ipo_date, finnhub_synced_at, mission_story, proof, proof_source_url, things_to_know')
       .eq('ticker', sym)
       .maybeSingle();
     return data;
@@ -56,11 +56,25 @@ class StockDataService {
   async getProfile(symbol: string) {
     const sym = symbol.toUpperCase();
     return this.cached(`profile_${sym}`, async () => {
-      const stored = await this.getStoredStock(sym);
+      const [stored, { data: missions }] = await Promise.all([
+        this.getStoredStock(sym),
+        // The causes it works on (reviewed tags), with how central each is to the business
+        this.db.from('stock_missions').select('exposure, why_line, causes(label)')
+          .eq('ticker', sym).eq('status', 'approved').neq('exposure', 'peripheral'),
+      ]);
       // stocks already holds Finnhub's static fields once synced; only call it otherwise
       const profile = stored?.finnhub_synced_at ? null : await this.finnhub.getProfile(sym).catch(() => null);
       if (!profile && !stored) return { error: `No company found for ${sym}.` };
       return {
+        // Reviewed, sourced facts from StockMatcher's company research (prefer these when relevant)
+        whatItWorksOn: stored?.mission_story ?? undefined,
+        causes: (missions ?? []).map((m: any) => ({
+          cause: m.causes?.label,
+          howCentral: m.exposure === 'core' ? 'core business' : 'part of the business',
+          why: m.why_line,
+        })),
+        proof: stored?.proof ? { fact: stored.proof, source: stored.proof_source_url } : undefined,
+        thingsToKnow: stored?.things_to_know ?? undefined,
         symbol: sym,
         name: stored?.company_name ?? profile?.name ?? sym,
         industry: stored?.industry ?? profile?.finnhubIndustry,
@@ -325,9 +339,9 @@ serve(async (req) => {
     // Get user profile for context
     const { data: profile } = await supabaseAuth
       .from('user_profiles')
-      .select('*')
+      .select('causes, dealbreakers, risk_tolerance, investment_goals, investment_experience')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     const stockData = new StockDataService(new FinnhubClient(finnhubApiKey), supabaseServiceRole);
 
@@ -351,7 +365,7 @@ serve(async (req) => {
         type: "function",
         function: {
           name: "get_company_profile",
-          description: "Get detailed company information including sector, industry, CEO, description, market cap, number of employees, business overview, and company history",
+          description: "Get company information: what it works on, the causes it relates to, a sourced proof fact, things to know, plus industry, CEO, description, market cap, employees and headquarters",
           parameters: {
             type: "object",
             properties: {
@@ -426,7 +440,16 @@ serve(async (req) => {
     ];
 
     // System prompt
-    const systemPrompt = `You are StockMatcher's AI assistant: a friendly stock education guide for a ${profile?.investment_experience || 'beginner'} investor.
+    // The user's causes (ranked) and onboarding answers, in words
+    const { data: causeRows } = await supabaseServiceRole.from('causes').select('id, label');
+    const causeLabel = new Map((causeRows ?? []).map(c => [c.id, c.label]));
+    const userCauses = (profile?.causes ?? []).map((c: string) => causeLabel.get(c) ?? c);
+    const experienceWords: Record<string, string> = {
+      never: 'first-time (has never bought a stock)', none: 'first-time (has never bought a stock)',
+      few: 'new (has bought a stock a few times)', beginner: 'new',
+      comfortable: 'somewhat experienced', intermediate: 'somewhat experienced', advanced: 'experienced',
+    };
+    const systemPrompt = `You are StockMatcher's AI assistant: a friendly stock education guide for a ${experienceWords[profile?.investment_experience ?? ''] ?? 'new'} investor.
 
 STYLE
 - Lead with the direct answer in 1-2 sentences, then at most 4 short bullets. Keep it under 150 words unless the user asks for more detail.
@@ -442,10 +465,17 @@ DATA
 - get_top_performers ranks only the stocks tracked in this app, by 1-year return.
 - For news, summarize the 2-3 most relevant headlines; don't list them all.
 
-USER PROFILE (relate answers to it when relevant)
-- Risk tolerance: ${profile?.risk_tolerance || 'moderate'}
-- Goals: ${profile?.investment_goals?.join(', ') || 'not specified'}
-- Interests: ${profile?.sectors_of_interest?.join(', ') || 'not specified'}
+VALUES
+- StockMatcher helps people find companies working on causes they care about; they decide for themselves.
+- When a company comes up, get_company_profile includes its reviewed research: whatItWorksOn, the causes it works on, a proof fact with its source, and thingsToKnow. Use those facts (and only those) to explain how it relates to the user's causes, and mention a thing to know when it matters.
+- A company matches a cause only if that cause is in its causes list. Never link it to any other cause, even one the user cares about; if asked, say StockMatcher hasn't matched it to that cause.
+- Never call a company a good or bad investment, and never recommend buying, selling or how much to put in.
+
+USER (relate answers to this when relevant)
+- Causes they care about, most important first: ${userCauses.length ? userCauses.join(', ') : 'not chosen yet'}
+- Never wants money going to: ${profile?.dealbreakers?.length ? profile.dealbreakers.join(', ').replace(/_/g, ' ') : 'nothing specified'}
+- If a stock they own dropped 20% in a month, they would: ${({ low: 'sell', medium: 'wait it out', high: 'buy a little more if they still believed in it' } as Record<string, string>)[profile?.risk_tolerance ?? ''] ?? 'not specified'}
+- What the money is for: ${profile?.investment_goals?.join(', ').replace(/_/g, ' ') || 'not specified'}
 
 Current date: ${new Date().toISOString().split('T')[0]}`;
 
@@ -476,6 +506,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
         ],
         tools,
       }),
+      { db: supabaseServiceRole },
     );
     
     const { response: aiResponse, model: firstModel, failures: firstFailures } = await Promise.race([fetchPromise, timeoutPromise]);
@@ -675,7 +706,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
                 (m) => m === model && allowMoreTools
                   ? geminiRequest(m, { messages: conversation, tools })
                   : geminiRequest(m, { messages: inlined }),
-                [model, model === GEMINI_MODEL ? GEMINI_FALLBACK_MODEL : GEMINI_MODEL],
+                { models: [model, ...GEMINI_MODELS.filter(m => m !== model)], db: supabaseServiceRole },
               ),
               timeout,
             ]);
@@ -705,14 +736,13 @@ Current date: ${new Date().toISOString().split('T')[0]}`;
             (!/[.!?:)_*\]]\s*$/.test(text.trim()) || (!!reason && reason !== 'stop' && reason !== 'tool_calls'));
           if (cutOff(answer, finishReason)) {
             await logError('truncated_answer', `finish_reason=${finishReason}; ${answer.slice(-200)}`, { model });
-            const retryModel = model === GEMINI_MODEL ? GEMINI_FALLBACK_MODEL : GEMINI_MODEL;
             const dataNote = allToolCalls.length
               ? [{ role: 'user', content: `Data fetched for my last question:\n${JSON.stringify(allToolCalls.map(tc => ({ tool: tc.name, args: tc.args, result: tc.result })))}\n\nAnswer my last question using this data.` }]
               : [];
             const { response: retry, model: retryUsed } = await fetchGeminiWithFallback(
               () => GEMINI_OPENAI_CHAT_URL,
               (m) => geminiRequest(m, { messages: [{ role: 'system', content: systemPrompt }, ...(messages || []), ...dataNote] }),
-              [retryModel, model],
+              { models: [...GEMINI_MODELS.filter(m => m !== model), model], db: supabaseServiceRole },
             );
             if (retry.ok) {
               send({ type: 'restart' });

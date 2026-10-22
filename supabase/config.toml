@@ -45,9 +45,6 @@ enabled = false
 port = 54327
 vector_port = 54328
 
-[functions.ai-recommend]
-verify_jwt = true
-
 [functions.check-subscription]
 verify_jwt = true
 
