@@ -193,7 +193,7 @@ async function enrichCards(db: SupabaseClient, cards: DeckCard[], stocks: Map<st
       dividendYield: num(s.dividend_yield),
       riskLevel: s.risk_level,
     };
-    if (card.type === 'update') return { ...card, ...company };
+    if (card.type === 'update') return { ...card, ...company, missionStory: s.mission_story };
     return {
       ...card,
       ...company,

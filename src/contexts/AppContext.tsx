@@ -1,8 +1,9 @@
 
 import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
-import { StockRecommendation } from '@/types/stock-matcher';
+import { MatchedCause, StockRecommendation } from '@/types/stock-matcher';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { fetchCauses, type CauseInfo } from '@/lib/matchFeed';
 
 interface SwipeStats {
   totalSwipes: number;
@@ -62,11 +63,25 @@ async function loadAccountWatchlist(userId: string): Promise<StockRecommendation
   if (error) throw error;
   const tickers = [...new Set((matches ?? []).map(m => m.ticker))];
   if (tickers.length === 0) return [];
-  const { data: stocks } = await supabase
-    .from('stocks')
-    .select('ticker, company_name, sector, price_per_share, one_year_return, pe_ratio, market_cap, dividend_yield, risk_level, updated_at, logo_url, mission_story, ceo_name')
-    .in('ticker', tickers);
+  const [{ data: stocks }, { data: missions }, causes] = await Promise.all([
+    supabase
+      .from('stocks')
+      .select('ticker, company_name, sector, price_per_share, one_year_return, pe_ratio, market_cap, dividend_yield, risk_level, updated_at, logo_url, mission_story, proof, proof_source_url, things_to_know, ceo_name')
+      .in('ticker', tickers),
+    supabase.from('stock_missions').select('ticker, cause, exposure, why_line').eq('status', 'approved').in('ticker', tickers).neq('exposure', 'peripheral'),
+    fetchCauses().catch(() => [] as CauseInfo[]),
+  ]);
   const byTicker = new Map((stocks ?? []).map(s => [s.ticker, s]));
+  const causeInfo = new Map(causes.map(c => [c.id, c]));
+  const causesOf = (ticker: string): MatchedCause[] => (missions ?? [])
+    .filter(m => m.ticker === ticker && causeInfo.has(m.cause))
+    .map(m => ({
+      cause: m.cause,
+      label: causeInfo.get(m.cause)!.label,
+      icon: causeInfo.get(m.cause)!.icon,
+      exposure: m.exposure as MatchedCause['exposure'],
+      whyLine: m.why_line,
+    }));
   const reasons = new Map<string, string | null>();
   for (const m of matches ?? []) if (!reasons.has(m.ticker)) reasons.set(m.ticker, m.match_reason);
   return tickers.filter(t => byTicker.has(t)).map(t => {
@@ -89,6 +104,10 @@ async function loadAccountWatchlist(userId: string): Promise<StockRecommendation
       lastUpdated: s.updated_at ?? undefined,
       logoUrl: s.logo_url ?? undefined,
       missionStory: s.mission_story ?? undefined,
+      proof: s.proof ?? undefined,
+      proofSourceUrl: s.proof_source_url ?? undefined,
+      thingsToKnow: s.things_to_know ?? [],
+      matchedCauses: causesOf(t),
     };
   });
 }

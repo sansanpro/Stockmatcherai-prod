@@ -1,5 +1,8 @@
 import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/sheet';
 import CoachMark from '@/components/CoachMark';
+import CauseChips, { causeGradient } from '@/components/values/CauseChips';
+import ValuesSummary from '@/components/values/ValuesSummary';
+import { RISK_WORDS } from '@/components/values/KeyNumbers';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,15 +34,6 @@ const getRiskGradient = (risk: string) => {
     case 'medium': return 'from-yellow-400 to-orange-500';
     case 'high':   return 'from-rose-500 to-pink-600';
     default:       return 'from-gray-500 to-gray-700';
-  }
-};
-
-const getRiskEmoji = (risk: string) => {
-  switch (risk) {
-    case 'low':    return '🟢';
-    case 'medium': return '🟡';
-    case 'high':   return '🔴';
-    default:       return '⚪';
   }
 };
 
@@ -91,7 +85,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
         className="h-[92vh] p-0 rounded-t-3xl flex flex-col overflow-hidden"
       >
         {/* ── Gradient hero header ─────────────────────────────────────────── */}
-        <div className={`bg-gradient-to-br ${getRiskGradient(stock.riskLevel)} flex-shrink-0 relative overflow-hidden`}>
+        <div className={`bg-gradient-to-br ${stock.cause || stock.matchedCauses?.length ? causeGradient(stock.cause ?? stock.matchedCauses?.[0]?.cause) : getRiskGradient(stock.riskLevel)} flex-shrink-0 relative overflow-hidden`}>
           {/* Decorative circles */}
           <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full" />
           <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-white/10 rounded-full" />
@@ -129,7 +123,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
             {/* Risk + momentum badges */}
             <div className="flex gap-2 mt-3 flex-wrap">
               <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm text-xs font-semibold px-3 py-1">
-                {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()} RISK
+                {(RISK_WORDS[stock.riskLevel] ?? RISK_WORDS.medium).emoji} {(RISK_WORDS[stock.riskLevel] ?? RISK_WORDS.medium).text}
               </Badge>
               <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm text-xs font-semibold px-3 py-1">
                 {momentum.label}
@@ -166,6 +160,29 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
 
             {/* ── Overview ─────────────────────────────────────────────────── */}
             <TabsContent value="overview" className="mt-0 space-y-0">
+              {/* What they work on, the causes it matches, proof and things to know */}
+              {(stock.matchedCauses?.length || stock.missionStory) ? (
+                <div className="px-4 pt-3 pb-1 space-y-4">
+                  <CauseChips causes={stock.matchedCauses} tone="muted" label={stock.cause ? 'Values match' : 'Works on'} />
+                  <ValuesSummary stock={stock} />
+                  {(stock.matchedCauses ?? []).some(c => c.whyLine) && (
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Why it matches you</p>
+                      <ul className="space-y-1 text-sm text-gray-800 dark:text-gray-200">
+                        {(stock.matchedCauses ?? []).filter(c => c.whyLine).map(c => (
+                          <li key={c.cause}><span aria-hidden>{c.icon}</span> {c.whyLine}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ) : stock.whyItFits ? (
+                <div className="mx-4 mt-3 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-4 border border-indigo-100 dark:border-indigo-800/30">
+                  <p className="text-xs font-semibold text-indigo-500 dark:text-indigo-400 uppercase tracking-wide mb-2">Why you liked it</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{stock.whyItFits}</p>
+                </div>
+              ) : null}
+
               {/* Company snapshot (logo, description, facts) */}
               <CompanySnapshot
                 ticker={stock.ticker}
@@ -173,16 +190,6 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                 sector={stock.sector}
                 variant="expanded"
               />
-
-              {/* Why it matches you */}
-              <div className="mx-4 mb-4 mt-2 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-4 border border-indigo-100 dark:border-indigo-800/30">
-                <p className="text-xs font-semibold text-indigo-500 dark:text-indigo-400 uppercase tracking-wide mb-2">
-                  💡 Why this matches you
-                </p>
-                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                  {stock.whyItFits}
-                </p>
-              </div>
 
               {/* CEO highlights */}
               {stock.ceoHighlights && (

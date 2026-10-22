@@ -2,14 +2,27 @@ import { useState, useRef, useEffect } from 'react';
 import { useLiveQuote } from '@/hooks/useLiveQuote';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { StockRecommendation } from '@/types/stock-matcher';
-import { Heart, X, TrendingUp, DollarSign, Building, Eye, Minimize2, ThumbsUp } from 'lucide-react';
-import EducationalTooltip from '@/components/EducationalTooltip';
+import { Heart, X, Eye, Minimize2, ThumbsUp } from 'lucide-react';
 import DataFreshnessIndicator from '@/components/DataFreshnessIndicator';
 import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/sheet';
 import StockNewsPill from '@/components/StockNewsPill';
 import CompanySnapshot from '@/components/CompanySnapshot';
+import CompanyLogo from '@/components/values/CompanyLogo';
+import CauseChips, { causeGradient } from '@/components/values/CauseChips';
+import ValuesSummary from '@/components/values/ValuesSummary';
+import KeyNumbers from '@/components/values/KeyNumbers';
+
+const capitalize = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+
+const timeAgo = (iso?: string) => {
+  if (!iso) return '';
+  const hours = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 3_600_000));
+  if (hours < 1) return 'just now';
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.round(hours / 24);
+  return `${days} day${days === 1 ? '' : 's'} ago`;
+};
 
 interface TinderStockCardProps {
   stock: StockRecommendation;
@@ -22,6 +35,8 @@ interface TinderStockCardProps {
   isHighMatch?: boolean;
   // Only the top card refreshes its price on demand
   isActive?: boolean;
+  // For people who have never bought a stock: a short meaning under each number
+  explain?: boolean;
 }
 
 const TinderStockCard = ({ 
@@ -33,7 +48,8 @@ const TinderStockCard = ({
   zIndex = 1,
   scale = 1,
   isHighMatch = false,
-  isActive = false
+  isActive = false,
+  explain = false,
 }: TinderStockCardProps) => {
   const live = useLiveQuote(stock.ticker, stock.pricePerShare, stock.lastUpdated, isActive);
   const [isDragging, setIsDragging] = useState(false);
@@ -44,34 +60,6 @@ const TinderStockCard = ({
   const [hasDragged, setHasDragged] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const tapThreshold = 10; // pixels - if drag is less than this, it's a tap
-
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case 'low': return 'from-green-400 to-green-600';
-      case 'medium': return 'from-yellow-400 to-orange-500';
-      case 'high': return 'from-red-400 to-pink-600';
-      default: return 'from-gray-400 to-gray-600';
-    }
-  };
-
-  const getRiskEmoji = (risk: string) => {
-    switch (risk) {
-      case 'low': return '🟢';
-      case 'medium': return '🟡';
-      case 'high': return '🔴';
-      default: return '⚪';
-    }
-  };
-
-  const formatNumber = (num: number) => {
-    if (num >= 1000000000) {
-      return `$${(num / 1000000000).toFixed(1)}B`;
-    }
-    if (num >= 1000000) {
-      return `$${(num / 1000000).toFixed(1)}M`;
-    }
-    return `$${num.toFixed(2)}`;
-  };
 
   const handleStart = (clientX: number, clientY: number) => {
     setIsDragging(true);
@@ -193,128 +181,95 @@ const TinderStockCard = ({
     };
   }, [isDragging, startPos]);
 
-  // Update cards carry news about a company the user already liked instead of a match reason
   const isUpdate = stock.cardType === 'update' && !!stock.update;
-  const whyHeading = isUpdate ? 'News on a company you liked' : 'Why this matches you';
-  const whyIcon = isUpdate ? '📰' : '💡';
-  const whyBody = isUpdate ? (
-    <>
-      {stock.update!.headline}
-      {stock.update!.url && (
-        <a href={stock.update!.url} target="_blank" rel="noopener noreferrer" className="block mt-2 text-sm font-semibold text-primary underline">
-          Read it{stock.update!.source ? ` on ${stock.update!.source}` : ''}
-        </a>
+  const primaryCause = stock.cause ?? stock.matchedCauses?.[0]?.cause;
+
+  // Logo, name and the causes it matches, on the cause's color
+  const header = (large = false) => (
+    <div className={`bg-gradient-to-br ${causeGradient(primaryCause)} text-white ${large ? 'p-5' : 'p-4'} flex-shrink-0`}>
+      <div className="flex items-start gap-3">
+        <CompanyLogo src={stock.logoUrl} name={stock.companyName} ticker={stock.ticker} className={large ? 'w-14 h-14' : 'w-12 h-12'} />
+        <div className="flex-1 min-w-0">
+          <h2 className={`${large ? 'text-2xl' : 'text-xl'} font-bold leading-tight truncate`}>{stock.companyName}</h2>
+          <p className="text-white/80 text-sm">{stock.ticker}{stock.sector ? ` · ${capitalize(stock.sector)}` : ''}</p>
+        </div>
+        {!large && onViewDetails && (
+          <button
+            onClick={handleViewDetails}
+            aria-label="View stock details"
+            className="bg-white/20 hover:bg-white/30 text-white w-10 h-10 flex items-center justify-center rounded-full transition-colors flex-shrink-0"
+          >
+            <Eye className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+      <div className="mt-3">
+        {isUpdate ? (
+          <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-white/20 border border-white/25">
+            📰 News on a company you liked
+          </span>
+        ) : (
+          <CauseChips causes={stock.matchedCauses} />
+        )}
+      </div>
+    </div>
+  );
+
+  // Update cards: the news, and why the user liked the company in the first place
+  const updateBody = isUpdate && (
+    <div className="space-y-3">
+      <div className="rounded-xl bg-blue-50 dark:bg-blue-900/25 border border-blue-200/70 dark:border-blue-700/40 p-3">
+        <p className="text-[15px] font-semibold leading-snug text-gray-900 dark:text-white">{stock.update!.headline}</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          {[stock.update!.source, timeAgo(stock.update!.publishedAt)].filter(Boolean).join(' · ')}
+        </p>
+        {stock.update!.url && (
+          <a href={stock.update!.url} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 text-sm font-semibold text-primary underline">
+            Read it{stock.update!.source ? ` on ${stock.update!.source}` : ''} ↗
+          </a>
+        )}
+      </div>
+      {stock.missionStory && (
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Why you liked it</p>
+          <p className="text-sm text-gray-800 dark:text-gray-200 mt-1 leading-snug">{stock.missionStory}</p>
+        </div>
       )}
-    </>
-  ) : stock.whyItFits;
+    </div>
+  );
+
+  // Each matched cause's one-line reason
+  const whyLines = !isUpdate && (stock.matchedCauses ?? []).some(c => c.whyLine) && (
+    <div>
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Why it matches you</p>
+      <ul className="space-y-1 text-sm text-gray-800 dark:text-gray-200">
+        {(stock.matchedCauses ?? []).filter(c => c.whyLine).map(c => (
+          <li key={c.cause}><span aria-hidden>{c.icon}</span> {c.whyLine}</li>
+        ))}
+      </ul>
+    </div>
+  );
 
   const rotation = dragOffset.x * 0.1;
   const opacity = isExiting ? 0 : Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300);
   const cardScale = isExiting ? 0.8 : scale;
 
-  // Render the expanded fullscreen content
+  // Tapping the card opens everything, with the meaning of every number spelled out
   const renderExpandedContent = () => (
     <div className="flex flex-col h-full overflow-y-auto">
-      {/* Header with gradient background */}
-      <div 
-        className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-5 relative overflow-hidden flex-shrink-0`}
-      >
-        <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12"></div>
-        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8"></div>
-        
-        <div className="relative z-10">
-          <div className="flex justify-between items-start mb-3 gap-2">
-            <div className="flex-1 min-w-0">
-              <h2 className="text-2xl font-bold leading-tight">{stock.companyName}</h2>
-              <p className="text-white/90 font-medium text-lg">({stock.ticker})</p>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <Badge className="bg-white/20 text-white border-white/30 font-semibold px-3 py-1.5 backdrop-blur-sm">
-                {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()}
-              </Badge>
-            </div>
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-2 text-white/90 text-sm">
-            <Building className="w-4 h-4" />
-            <span>{stock.sector}</span>
-            <TrendingUp className="w-4 h-4 ml-2" />
-            <span className={`font-semibold ${stock.oneYearReturn >= 0 ? 'text-green-200' : 'text-red-200'}`}>
-              {stock.oneYearReturn > 0 ? '+' : ''}{stock.oneYearReturn.toFixed(1)}%
-            </span>
-          </div>
-          
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <DataFreshnessIndicator 
-              lastUpdated={live.lastUpdated} 
-              variant="inline"
-              className="bg-black/20 backdrop-blur-sm rounded-full px-3 py-1.5 text-sm"
-            />
-            <StockNewsPill ticker={stock.ticker} companyName={stock.companyName} />
-          </div>
+      {header(true)}
+      <div className="p-5 space-y-5">
+        {updateBody}
+        <ValuesSummary stock={stock} />
+        {whyLines}
+        <KeyNumbers stock={stock} price={live.price} explain />
+        <div className="flex flex-wrap items-center gap-2">
+          <DataFreshnessIndicator lastUpdated={live.lastUpdated} variant="inline" className="bg-muted rounded-full px-3 py-1.5 text-sm" />
+          <StockNewsPill ticker={stock.ticker} companyName={stock.companyName} />
         </div>
       </div>
-
-      {/* Company Snapshot - Expanded */}
-      <CompanySnapshot 
-        ticker={stock.ticker} 
-        companyName={stock.companyName} 
-        sector={stock.sector}
-        variant="expanded" 
-      />
-
-      {/* Financials Grid */}
-      <div className="p-5 bg-white dark:bg-gray-800">
-        <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 text-xl">
-          <DollarSign className="w-6 h-6 text-green-600 dark:text-green-400" />
-          Key Metrics
-        </h4>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-xl text-center">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
-              <EducationalTooltip content="P/E Ratio compares a company's share price to its earnings per share. Lower values may indicate undervalued stocks." />
-            </div>
-            <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
-          </div>
-          <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-4 rounded-xl text-center">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
-              <EducationalTooltip content="Market Capitalization is the total value of all company shares. Larger caps are typically more stable." />
-            </div>
-            <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
-          </div>
-          <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-xl text-center">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <p className="text-sm text-green-600 dark:text-green-400 font-medium">Price/Share</p>
-              <EducationalTooltip content="Current trading price per individual share of the company's stock." />
-            </div>
-            <p className="text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(live.price)}</p>
-          </div>
-          {stock.dividendYield > 0 && (
-            <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-4 rounded-xl text-center">
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
-                <EducationalTooltip content="Dividend Yield shows the annual dividend payments as a percentage of the stock price. Higher yields provide more regular income." />
-              </div>
-              <p className="text-2xl font-bold text-orange-700 dark:text-orange-300">{stock.dividendYield.toFixed(2)}%</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Why it fits section */}
-      <div className="p-5 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 flex-1">
-        <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-xl">
-          <span className="text-xl">{whyIcon}</span>
-          {whyHeading}
-        </h4>
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-5 rounded-xl border border-white/50 dark:border-gray-600/50 shadow-lg">
-          <div className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-            {whyBody}
-          </div>
-        </div>
-      </div>
+      <CompanySnapshot ticker={stock.ticker} companyName={stock.companyName} sector={stock.sector} variant="expanded" />
+      <p className="text-center text-xs text-muted-foreground py-4">Educational only, not investment advice.</p>
     </div>
   );
 
@@ -406,135 +361,19 @@ className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[
         onTouchEnd={handleTouchEnd}
       >
         <CardContent className="p-0 flex flex-col h-full overflow-y-auto">
-          {/* Header with gradient background */}
-          <div 
-            className={`bg-gradient-to-r ${getRiskColor(stock.riskLevel)} text-white p-4 sm:p-5 lg:p-4 relative overflow-hidden rounded-t-2xl flex-shrink-0`}
-          >
-            <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 bg-white/10 rounded-full -translate-y-6 sm:-translate-y-12 translate-x-6 sm:translate-x-12 animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-12 h-12 sm:w-16 sm:h-16 bg-white/10 rounded-full translate-y-4 sm:translate-y-8 -translate-x-4 sm:-translate-x-8 animate-pulse delay-75"></div>
-            
-            <div className="relative z-10">
-              <div className="flex justify-between items-start mb-3 gap-2">
-              <div className="flex-1 min-w-0 animate-fade-in">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight truncate">{stock.companyName}</h2>
-                  <p className="text-white/90 font-medium text-sm sm:text-base lg:text-lg">({stock.ticker})</p>
-                </div>
-                <div className="flex items-center gap-2 animate-fade-in delay-100 flex-shrink-0">
-                  <Badge className="bg-white/20 text-white border-white/30 font-semibold px-2 py-1 backdrop-blur-sm text-xs whitespace-nowrap">
-                    {getRiskEmoji(stock.riskLevel)} {stock.riskLevel.toUpperCase()}
-                  </Badge>
-                  <EducationalTooltip 
-                    content={`Risk Level indicates volatility: Low = stable returns, Medium = some fluctuation, High = potential for large gains/losses`}
-                    className="text-white/70 hover:text-white transition-colors"
-                  />
-                  {onViewDetails && (
-                    <button
-                      onClick={handleViewDetails}
-                      aria-label="View stock details"
-                      className="bg-white/20 hover:bg-white/30 text-white p-1 sm:p-2 rounded-full transition-colors"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap items-center gap-2 text-white/90 animate-fade-in delay-200 text-xs sm:text-sm">
-                <Building className="w-4 h-4" />
-                <span>{stock.sector}</span>
-                <TrendingUp className="w-4 h-4 ml-2" />
-                <span className={`font-semibold transition-colors ${stock.oneYearReturn >= 0 ? 'text-green-200' : 'text-red-200'}`}>{stock.oneYearReturn > 0 ? '+' : ''}{stock.oneYearReturn.toFixed(1)}%</span>
-                <EducationalTooltip 
-                  content="1-Year Return shows how much the stock price has changed over the past 12 months"
-                  className="text-white/70 hover:text-white transition-colors"
-                />
-              </div>
-              
-              <div className="mt-2 flex flex-wrap items-center gap-2 animate-fade-in delay-300">
-                <DataFreshnessIndicator 
-                  lastUpdated={live.lastUpdated} 
-                  variant="inline"
-                  className="bg-black/20 backdrop-blur-sm rounded-full px-2 py-1 text-xs"
-                />
-                <StockNewsPill ticker={stock.ticker} companyName={stock.companyName} />
-              </div>
+          {/* Story first: who they are and what they work on, then proof, then the numbers */}
+          {header()}
+          <div className="p-4 space-y-4">
+            {updateBody}
+            {!isUpdate && <ValuesSummary stock={stock} />}
+            <KeyNumbers stock={stock} price={live.price} explain={explain} />
+            <div className="flex flex-wrap items-center gap-2">
+              <DataFreshnessIndicator lastUpdated={live.lastUpdated} variant="inline" className="bg-muted rounded-full px-2.5 py-1 text-xs" />
+              <StockNewsPill ticker={stock.ticker} companyName={stock.companyName} />
             </div>
-          </div>
-
-          {/* Company Snapshot - Compact */}
-          <CompanySnapshot 
-            ticker={stock.ticker} 
-            companyName={stock.companyName} 
-            sector={stock.sector}
-            variant="compact" 
-          />
-
-          {/* Why it fits section - More prominent */}
-          <div className="p-4 sm:p-6 lg:p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 animate-fade-in delay-400 flex-shrink-0">
-            <h4 className="font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2 text-base sm:text-lg lg:text-xl">
-              <span className="text-lg lg:text-xl">{whyIcon}</span>
-              {whyHeading}
-            </h4>
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 sm:p-5 lg:p-4 rounded-xl border border-white/50 dark:border-gray-600/50 shadow-lg">
-              <div className="text-sm sm:text-base lg:text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                {whyBody}
-              </div>
-            </div>
-
-            {/* Tap to expand hint */}
-            <div className="mt-3 text-center">
-              <p className="text-xs text-gray-500 dark:text-gray-400 animate-pulse">
-                Tap to expand • Swipe to match or pass
-              </p>
-            </div>
-          </div>
-
-          {/* Financials Grid */}
-          <div className="p-4 sm:p-6 lg:p-3 bg-white dark:bg-gray-800 animate-fade-in delay-500">
-            <h4 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 text-base sm:text-lg lg:text-xl">
-              <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
-              Key Metrics
-            </h4>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-3">
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs sm:text-sm lg:text-base text-blue-600 dark:text-blue-400 font-medium">P/E Ratio</p>
-                  <EducationalTooltip
-                    content="P/E Ratio compares a company's share price to its earnings per share. Lower values may indicate undervalued stocks."
-                  />
-                </div>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-700 dark:text-blue-300">{stock.peRatio}</p>
-              </div>
-              <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs sm:text-sm lg:text-base text-purple-600 dark:text-purple-400 font-medium">Market Cap</p>
-                  <EducationalTooltip
-                    content="Market Capitalization is the total value of all company shares. Larger caps are typically more stable."
-                  />
-                </div>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-700 dark:text-purple-300">{stock.marketCap}</p>
-              </div>
-              <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <p className="text-xs sm:text-sm lg:text-base text-green-600 dark:text-green-400 font-medium">Price/Share</p>
-                  <EducationalTooltip
-                    content="Current trading price per individual share of the company's stock."
-                  />
-                </div>
-                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-green-700 dark:text-green-300">{formatNumber(live.price)}</p>
-              </div>
-              {stock.dividendYield > 0 && (
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-800/20 p-3 sm:p-4 lg:p-3 rounded-xl text-center transform hover:scale-105 transition-all duration-200">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <p className="text-xs sm:text-sm lg:text-base text-orange-600 dark:text-orange-400 font-medium">Dividend</p>
-                    <EducationalTooltip
-                      content="Dividend Yield shows the annual dividend payments as a percentage of the stock price. Higher yields provide more regular income."
-                    />
-                  </div>
-                  <p className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-700 dark:text-orange-300">{stock.dividendYield.toFixed(2)}%</p>
-                </div>
-              )}
-            </div>
+            <p className="text-center text-xs text-muted-foreground pb-1">
+              Tap for the full picture · Swipe right if you'd be proud to own a piece
+            </p>
           </div>
         </CardContent>
       </Card>

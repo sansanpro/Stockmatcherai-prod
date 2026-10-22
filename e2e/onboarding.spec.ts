@@ -78,6 +78,9 @@ test('new user: onboarding, reveal, first matches and the save prompt, all witho
   await expect(page.getByText('P/E Ratio').first()).toBeVisible();
   await expect(page.getByText("Swipe right if you'd be proud to own a piece of this company.")).toBeVisible();
   await expect(page.getByText('7 of 7 matches left today')).toBeVisible();
+  // Never bought a stock: each number also says what it means
+  await expect(page.getByText('Cost of one share').first()).toBeVisible();
+  await expect(page.getByText('What the whole company is worth').first()).toBeVisible();
   await page.screenshot({ path: 'e2e/screens/onboarding-8-first-card.png' });
   const deck = await page.evaluate(() => JSON.parse(localStorage.getItem('device_feed_v1') ?? '{}'));
   const tickers: string[] = deck.deck.cards.map((c: { ticker: string }) => c.ticker);

@@ -1,26 +1,30 @@
-
 import { HelpCircle } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface EducationalTooltipProps {
   content: string;
   className?: string;
+  label?: string;
 }
 
-const EducationalTooltip = ({ content, className = "" }: EducationalTooltipProps) => {
+// A plain-English explanation behind a "?" button. A popover rather than a hover tooltip, so it
+// opens on tap on phones. Drawn above sheets and dialogs (z-[80]/[81]).
+const EducationalTooltip = ({ content, className = '', label = 'What does this mean?' }: EducationalTooltipProps) => {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button className={`ml-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 ${className}`}>
-            <HelpCircle className="w-4 h-4" />
-          </button>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-xs">
-          <p className="text-sm">{content}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label={label}
+          className={`ml-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 ${className}`}
+        >
+          <HelpCircle className="w-4 h-4" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent side="top" className="z-[90] w-auto max-w-[min(18rem,85vw)] p-3 text-sm leading-snug">
+        {content}
+      </PopoverContent>
+    </Popover>
   );
 };
 

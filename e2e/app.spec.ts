@@ -10,11 +10,22 @@ const chatInput = (page: Page) => page.getByPlaceholder(/Ask about stocks|Try as
 // The chat panel (the deck has its own "not investment advice" footer, so answers are matched in here)
 const chatPanel = (page: Page) => page.locator('div[data-ai-assistant].fixed');
 
-test('swipe deck loads a values-matched card', async ({ page }) => {
+test('swipe deck loads a values-matched card, story first', async ({ page }) => {
   await openApp(page);
   await expect(page.getByText('P/E Ratio').first()).toBeVisible();
-  await expect(page.getByText('Why this matches you').first()).toBeVisible();
   await expect(page.getByText(/matches left today/)).toBeVisible();
+  // Card v2 order: values match chips, proof (with its source), things to know, then the numbers
+  const card = page.locator('[class*="cursor-grab"]').first();
+  await expect(card.getByText('Values match')).toBeVisible();
+  await expect(card.getByText(/· (core business|part of the business)$/).first()).toBeVisible();
+  await expect(card.getByText('Proof', { exact: true })).toBeVisible();
+  await expect(card.getByRole('link', { name: 'Source ↗' })).toHaveAttribute('href', /^https:\/\//);
+  await expect(card.getByText('Things to know')).toBeVisible();
+  await expect(card.getByText(/(Steadier: a large, established company|Moderate price swings|Bigger price swings)$/)).toBeVisible();
+  const y = async (text: string) => (await card.getByText(text, { exact: true }).first().boundingBox())!.y;
+  expect(await y('Values match')).toBeLessThan(await y('Proof'));
+  expect(await y('Proof')).toBeLessThan(await y('Things to know'));
+  expect(await y('Things to know')).toBeLessThan(await y('The numbers'));
   // Profile chips are the user's causes now, not age or sector
   await expect(page.getByText(/^\d+yo$/)).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'View stock details' }).first()).toBeVisible();
@@ -79,12 +90,44 @@ test('details button opens only the details panel, not the expanded card too', a
   await page.screenshot({ path: 'e2e/screens/details-only.png' });
 });
 
-test('tapping a tooltip on the card does not expand the card', async ({ page }) => {
+test('tapping a "?" on the card explains the number and does not expand the card', async ({ page }) => {
   await openApp(page);
   await page.getByRole('button', { name: 'View stock details' }).first().waitFor();
-  await page.locator('button:has(svg.lucide-circle-help), button:has(svg.lucide-help-circle)').first().click();
+  await page.getByRole('button', { name: 'What is Share price?' }).first().click();
+  // Opens on tap (hover tooltips never open on a phone)
+  await expect(page.getByText('What one share costs right now.', { exact: false })).toBeVisible();
   await page.waitForTimeout(600);
   await expect(page.getByRole('heading', { name: 'Stock Details' })).toHaveCount(0);
+  await page.screenshot({ path: 'e2e/screens/number-explained.png' });
+});
+
+test('news about a liked company shows as an update card', async ({ page }) => {
+  // Put an update card on top of today's deck, the way match-feed sends them
+  await page.route(/\/functions\/v1\/match-feed/, async (route) => {
+    if (route.request().method() !== 'POST' || !(route.request().postData() ?? '').includes('"deck"')) return route.continue();
+    const response = await route.fetch();
+    const body = await response.json();
+    const update = {
+      type: 'update', ticker: 'MRK', companyName: 'Merck & Co., Inc.', sector: 'healthcare',
+      headline: 'Merck reports results from a late-stage cancer study', source: 'Reuters',
+      url: 'https://www.reuters.com/', publishedAt: new Date(Date.now() - 2 * 3_600_000).toISOString(),
+      pricePerShare: 100, oneYearReturn: 5, marketCap: '$250B', peRatio: 14, dividendYield: 2.5, riskLevel: 'low',
+      missionStory: 'Develops medicines and vaccines, led by Keytruda, an immunotherapy that helps the immune system find and attack cancer.',
+    };
+    await route.fulfill({
+      status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify({ ...body, cards: [update, ...(body.cards ?? [])], swiped: [] }),
+    });
+  });
+  await openApp(page);
+  const card = page.locator('[class*="cursor-grab"]').first();
+  await expect(card.getByText('News on a company you liked')).toBeVisible();
+  await expect(card.getByText('Merck reports results from a late-stage cancer study')).toBeVisible();
+  await expect(card.getByText('Reuters · 2h ago')).toBeVisible();
+  await expect(card.getByRole('link', { name: 'Read it on Reuters ↗' })).toHaveAttribute('href', 'https://www.reuters.com/');
+  await expect(card.getByText('Why you liked it')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Interested' })).toBeVisible();
+  await page.screenshot({ path: 'e2e/screens/update-card.png' });
 });
 
 test('expanded card can be collapsed (AI button does not cover it)', async ({ page }) => {

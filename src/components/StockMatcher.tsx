@@ -245,8 +245,13 @@ const StockMatcher = ({
   return (
     <div className="w-full h-full flex flex-col bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto flex flex-col flex-1 min-h-0 px-4 lg:px-2">
-        {/* Header: the user's causes, in rank order */}
-        <div className="text-center mb-2 pt-3 flex-shrink-0">
+        {/* Header: the user's causes, in rank order (the one-time hint sits on top of it) */}
+        <div className="relative text-center mb-2 pt-3 flex-shrink-0">
+          <CoachMark
+            id="first_card"
+            text="Swipe right if you'd be proud to own a piece of this company."
+            className="absolute top-1 left-1/2 -translate-x-1/2 w-[92%]"
+          />
           <TooltipProvider>
             <div className="flex flex-wrap items-center justify-center gap-2">
               {myCauses.map(c => (
@@ -276,11 +281,6 @@ const StockMatcher = ({
               </div>
             </>
           )}
-          <CoachMark
-            id="first_card"
-            text="Swipe right if you'd be proud to own a piece of this company."
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[85%]"
-          />
           {visibleCards.map((stock, stackIndex) => {
             const isActiveCard = stackIndex === 0;
             return (
@@ -297,6 +297,7 @@ const StockMatcher = ({
                 scale={1 - stackIndex * 0.05}
                 isHighMatch={isActiveCard && (stock.matchedCauses?.length ?? 0) > 1}
                 isActive={isActiveCard}
+                explain={answers.experience === 'never'}
               />
             );
           })}
