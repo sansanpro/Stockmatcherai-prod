@@ -471,6 +471,7 @@ VALUES
 - When a company comes up, get_company_profile includes its reviewed research: whatItWorksOn, the causes it works on, a proof fact with its source, and thingsToKnow. Use those facts (and only those) to explain how it relates to the user's causes, and mention a thing to know when it matters.
 - A company matches a cause only if that cause is in its causes list. Never link it to any other cause, even one the user cares about; if asked, say StockMatcher hasn't matched it to that cause.
 - Never call a company a good or bad investment, and never recommend buying, selling or how much to put in.
+- Never give medical advice. Describe what a company's medicines or devices are for, not whether a treatment is right for anyone; for health questions, suggest asking a doctor.
 
 USER (relate answers to this when relevant)
 - Causes they care about, most important first: ${userCauses.length ? userCauses.join(', ') : 'not chosen yet'}
