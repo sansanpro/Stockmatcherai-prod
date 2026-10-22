@@ -15,7 +15,6 @@ import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, Refere
 import CompanySnapshot from '@/components/CompanySnapshot';
 import { useCompanyNews } from '@/hooks/useCompanyNews';
 import { usePricePerformance } from '@/hooks/usePricePerformance';
-import { getMomentum } from '@/utils/momentum';
 import { useLiveQuote } from '@/hooks/useLiveQuote';
 
 interface StockDetailsModalProps {
@@ -68,7 +67,6 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
   if (!stock) return null;
 
   const isPositive = stock.oneYearReturn >= 0;
-  const momentum = getMomentum(stock.oneYearReturn);
   const rangeHigh = performance?.fiftyTwoWeekHigh;
   const rangeLow = performance?.fiftyTwoWeekLow;
   const rangePosition = rangeHigh && rangeLow && rangeHigh > rangeLow
@@ -115,18 +113,15 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                   {isPositive
                     ? <TrendingUp className="w-4 h-4" />
                     : <TrendingDown className="w-4 h-4" />}
-                  {isPositive ? '+' : ''}{stock.oneYearReturn.toFixed(1)}% 1Y
+                  {isPositive ? '+' : ''}{stock.oneYearReturn.toFixed(1)}% past year
                 </div>
               </div>
             </div>
 
-            {/* Risk + momentum badges */}
+            {/* Risk in plain words */}
             <div className="flex gap-2 mt-3 flex-wrap">
               <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm text-xs font-semibold px-3 py-1">
                 {(RISK_WORDS[stock.riskLevel] ?? RISK_WORDS.medium).emoji} {(RISK_WORDS[stock.riskLevel] ?? RISK_WORDS.medium).text}
-              </Badge>
-              <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm text-xs font-semibold px-3 py-1">
-                {momentum.label}
               </Badge>
             </div>
           </div>
@@ -210,10 +205,10 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
               <div className="grid grid-cols-2 gap-3">
                 <MetricTile
                   label="P/E Ratio"
-                  value={String(stock.peRatio)}
+                  value={stock.peRatio > 0 ? stock.peRatio.toFixed(1) : '—'}
                   gradient="from-blue-500/15 to-blue-600/5"
                   accent="text-blue-600 dark:text-blue-400"
-                  hint="Lower = potentially undervalued"
+                  hint="Share price compared with profit"
                 />
                 <MetricTile
                   label="Market Cap"
@@ -223,37 +218,21 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                   hint="Total company value"
                 />
                 <MetricTile
-                  label="1Y Return"
+                  label="Past year"
                   value={`${isPositive ? '+' : ''}${stock.oneYearReturn.toFixed(1)}%`}
                   gradient={isPositive ? 'from-emerald-500/15 to-emerald-600/5' : 'from-rose-500/15 to-rose-600/5'}
                   accent={isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}
-                  hint="Price change last 12 months"
+                  hint="Share price change over 12 months"
                 />
                 <MetricTile
                   label="Dividend Yield"
                   value={stock.dividendYield > 0 ? `${stock.dividendYield.toFixed(2)}%` : '—'}
                   gradient="from-amber-500/15 to-amber-600/5"
                   accent="text-amber-600 dark:text-amber-400"
-                  hint="Annual income as % of price"
+                  hint="Yearly cash paid to owners, as % of price"
                 />
               </div>
 
-              {/* 1-year momentum (computed from price change, not analyst ratings) */}
-              <div className="bg-muted/50 rounded-2xl p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold">1-Year Momentum</span>
-                  <span className={`text-sm font-bold ${momentum.textColor}`}>{momentum.label}</span>
-                </div>
-                <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className={`h-2 rounded-full ${momentum.barColor} transition-all duration-700`}
-                    style={{ width: momentum.width }}
-                  />
-                </div>
-                <p className="text-[11px] text-muted-foreground mt-2">
-                  Based on the past year's price change. Not a recommendation.
-                </p>
-              </div>
             </TabsContent>
 
             {/* ── Returns ──────────────────────────────────────────────────── */}

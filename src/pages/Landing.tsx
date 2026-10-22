@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, TrendingUp, Heart, Zap, Shield, Target, Sparkles } from "lucide-react";
+import { ArrowRight, Heart, Shield, Target, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import ScreenshotShowcase from "@/components/landing/ScreenshotShowcase";
@@ -25,21 +25,21 @@ const Landing = () => {
         <div className="container relative mx-auto px-4 py-20 md:py-32">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium">
-              <Zap className="h-4 w-4 text-primary" />
-              <span>Smart Investing Made Simple</span>
+              <Heart className="h-4 w-4 text-primary" />
+              <span>Values-first investing for beginners</span>
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-              It's like Tinder...
-              <span className="block text-primary mt-2">But for Stocks!</span>
+              Invest in what
+              <span className="block text-primary mt-2">you believe in.</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Invest in your future before you invest in somebody else.
+              Find companies working on the causes you care about. You decide.
             </p>
 
             <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-              Swipe through stocks tailored to your goals. Chat with your <span className="text-primary font-semibold">AI Research Assistant 24/7</span>. No jargon, no overwhelm—just instant insights that power your financial future.
+              Pick what matters to you, like beating cancer or clean energy. Each day you get a short deck of companies working on it, with the story, the proof and the numbers in plain English. Swipe right on the ones you'd be proud to own a piece of.
             </p>
 
             <div className="flex justify-center pt-4">
@@ -64,34 +64,34 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              Investing Should Be This Easy
+              Know what your money supports
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Built for new investors who want to grow their wealth without the complexity
+              Built for first-time investors who want their money to stand for something
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             <FeatureCard
-              icon={<Sparkles className="h-8 w-8" />}
-              title="AI Research Assistant"
-              description="Get instant, real-time stock insights from your personal AI advisor. Ask anything, anytime—live market intelligence at your fingertips."
-              featured
-            />
-            <FeatureCard
               icon={<Heart className="h-8 w-8" />}
-              title="Swipe to Match"
-              description="Like dating, but better. Swipe right on stocks that align with your financial goals and risk tolerance."
+              title="Start with your causes"
+              description="Choose what you care about, like beating cancer, healthier lives, clean energy or keeping people safe. Rule out what you'd never fund."
             />
             <FeatureCard
               icon={<Target className="h-8 w-8" />}
-              title="Personalized Picks"
-              description="AI-powered recommendations based on your profile. No two portfolios are the same."
+              title="A short daily deck"
+              description="A few companies a day that work on your causes, so you can take your time with each one."
             />
             <FeatureCard
               icon={<Shield className="h-8 w-8" />}
-              title="Beginner Friendly"
-              description="Clear explanations, no financial jargon. Learn as you swipe and build confidence."
+              title="Proof, not hype"
+              description="Every company comes with its story, a fact with its source, and the things to know before you decide."
+            />
+            <FeatureCard
+              icon={<Sparkles className="h-8 w-8" />}
+              title="Ask AI"
+              description="Ask what a company does, how it connects to your causes, or what a number means. Educational only, never advice."
+              featured
             />
           </div>
         </div>
@@ -109,18 +109,18 @@ const Landing = () => {
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <StepCard
               number="1"
-              title="Create Your Profile"
-              description="Tell us your goals, risk tolerance, and investment timeline in minutes."
+              title="Pick your causes"
+              description="Tell us what you care about and what you'd never fund. It takes about a minute."
             />
             <StepCard
               number="2"
-              title="Start Swiping"
-              description="Browse stocks matched to your profile. Right for yes, left for pass."
+              title="Swipe your daily matches"
+              description="Right if you'd be proud to own a piece, left to pass."
             />
             <StepCard
               number="3"
-              title="Build Your Portfolio"
-              description="Review your matches and take action. Your financial future starts now."
+              title="Decide for yourself"
+              description="Keep your likes in one place, read up and ask questions. Whether and when to invest is always your call."
             />
           </div>
         </div>
@@ -130,12 +130,12 @@ const Landing = () => {
       <section className="py-20 md:py-32 bg-gradient-to-br from-primary/20 via-secondary/15 to-accent/20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <TrendingUp className="h-16 w-16 mx-auto text-primary" />
+            <Heart className="h-16 w-16 mx-auto text-primary" />
             <h2 className="text-3xl md:text-5xl font-bold">
-              Ready to Make Your Money Work?
+              Let your money stand for something.
             </h2>
             <p className="text-xl text-muted-foreground">
-              Join thousands of new investors taking control of their financial future.
+              Find the companies working on what you care about.
             </p>
             <Button 
               size="lg" 
@@ -152,7 +152,7 @@ const Landing = () => {
       {/* Footer */}
       <footer className="py-12 border-t">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 StockMatcherAI. Your financial future, simplified.</p>
+          <p>© {new Date().getFullYear()} StockMatcherAI. Educational only, not investment advice.</p>
         </div>
       </footer>
     </div>
@@ -177,7 +177,7 @@ const FeatureCard = ({ icon, title, description, featured }: { icon: React.React
     {featured && (
       <div className="mt-3 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-xs font-medium text-primary">
         <Sparkles className="h-3 w-3" />
-        Premium Feature
+        Unlimited with Premium
       </div>
     )}
   </div>

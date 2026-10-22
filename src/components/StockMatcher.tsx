@@ -6,7 +6,7 @@ import TinderStockCard from '@/components/TinderStockCard';
 import UpgradeModal from '@/components/UpgradeModal';
 import CoachMark from '@/components/CoachMark';
 import { useApp } from '@/contexts/AppContext';
-import { useSubscription } from '@/contexts/SubscriptionContext';
+import { PLAN_LIMITS, useSubscription } from '@/contexts/SubscriptionContext';
 import { Heart, X, TrendingUp, ChevronLeft, ChevronRight, RefreshCw, Crown, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
@@ -227,14 +227,14 @@ const StockMatcher = ({
           )}
           {signedIn && !subscribed && (
             <Button onClick={() => setShowUpgradeModal(true)} className="w-full h-12 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold border-0">
-              <Crown className="w-4 h-4 mr-2" /> Get 12 matches a day with Premium
+              <Crown className="w-4 h-4 mr-2" /> Get {PLAN_LIMITS.premium.dailyMatches} matches a day with Premium
             </Button>
           )}
           <Button onClick={onEditCauses} className="w-full h-12 rounded-xl bg-white/15 hover:bg-white/25 text-white border-0">
             <Pencil className="w-4 h-4 mr-2" /> Change my causes
           </Button>
         </div>
-        <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+        <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} reason="deck" />
       </>,
     );
   }

@@ -250,7 +250,8 @@ serve(async (req) => {
 
       const conversationIds = userConversations?.map(c => c.id) || [];
 
-      // Count user messages from the last 24 hours only
+      // Count answered questions (saved answers) from the last 24 hours, so a question the AI
+      // couldn't answer (e.g. Gemini busy) doesn't use one up
       let totalUserMessages = 0;
       if (conversationIds.length > 0) {
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
@@ -258,7 +259,7 @@ serve(async (req) => {
         const { count } = await supabaseServiceRole
           .from('ai_chat_messages')
           .select('id', { count: 'exact', head: true })
-          .eq('role', 'user')
+          .eq('role', 'assistant')
           .in('conversation_id', conversationIds)
           .gte('created_at', twentyFourHoursAgo);
         
@@ -273,7 +274,7 @@ serve(async (req) => {
         console.log('[stock-assistant] User exceeded free message limit');
         return new Response(JSON.stringify({
           type: 'upgrade_required',
-          message: 'You\'ve used your 5 free AI messages in the last 24 hours! Your limit will reset automatically, or upgrade to Premium for unlimited AI stock research, real-time analysis, and expert market guidance.',
+          message: 'You\'ve used your 5 free questions. Each one frees up again 24 hours after you asked it, or upgrade to Premium to ask as many as you like.',
           freeMessagesSent: messagesUsedIncludingCurrent - 1
         }), {
           status: 403,

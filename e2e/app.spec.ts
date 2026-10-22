@@ -2,11 +2,11 @@ import { test, expect, type Page } from '@playwright/test';
 import { openApp } from './helpers';
 
 const openChat = async (page: Page) => {
-  await page.getByRole('button', { name: 'Open AI Assistant' }).click();
-  await expect(page.getByText('AI Stock Assistant')).toBeVisible();
+  await page.getByRole('button', { name: 'Open Ask AI' }).click();
+  await expect(chatPanel(page).getByRole('heading', { name: 'Ask AI' })).toBeVisible();
 };
 
-const chatInput = (page: Page) => page.getByPlaceholder(/Ask about stocks|Try asking about a stock/);
+const chatInput = (page: Page) => page.getByPlaceholder('Ask about a company or term…');
 // The chat panel (the deck has its own "not investment advice" footer, so answers are matched in here)
 const chatPanel = (page: Page) => page.locator('div[data-ai-assistant].fixed');
 
@@ -70,6 +70,71 @@ test('chat answers a data question without showing raw tool output', async ({ pa
   await page.screenshot({ path: 'e2e/screens/chat-answer.png' });
 });
 
+// Answers the chat with a fixed status, so these run without calling Gemini
+const stubChat = (page: Page, status: number, body: Record<string, unknown>) =>
+  page.route(/\/functions\/v1\/stock-assistant/, (route) => {
+    if (route.request().method() !== 'POST') return route.continue();
+    return route.fulfill({ status, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(body) });
+  });
+
+test('when the AI is busy, the chat says so next to the question', async ({ page }) => {
+  await stubChat(page, 429, { error: 'The AI service is busy right now. Please try again in a moment.' });
+  await openApp(page);
+  await openChat(page);
+  await chatInput(page).fill('What does Merck do?');
+  await page.getByRole('button', { name: 'Send message' }).click();
+  await expect(chatPanel(page).getByText('What does Merck do?')).toBeVisible();
+  await expect(chatPanel(page).getByText('The AI service is busy right now. Please try again in a moment.')).toBeVisible();
+  await page.screenshot({ path: 'e2e/screens/chat-busy.png' });
+});
+
+test('running out of free questions explains why and lists only real Premium perks', async ({ page }) => {
+  await stubChat(page, 403, { type: 'upgrade_required', freeMessagesSent: 5 });
+  await openApp(page);
+  await openChat(page);
+  await chatInput(page).fill('What does Merck do?');
+  await page.getByRole('button', { name: 'Send message' }).click();
+  const sheet = page.getByRole('dialog');
+  await expect(sheet.getByText("You've used your 5 free questions")).toBeVisible();
+  await expect(sheet.getByText('12 matches a day instead of 7')).toBeVisible();
+  await expect(sheet.getByText('Unlimited Ask AI questions instead of 5 a day')).toBeVisible();
+  await expect(sheet.getByText(/unlimited (daily )?swipes|portfolio tracking|advanced filtering/i)).toHaveCount(0);
+  await page.waitForTimeout(500); // let the sheet finish opening
+  await expect(sheet.getByRole('heading', { name: 'Upgrade to Premium' })).toBeInViewport();
+  await page.screenshot({ path: 'e2e/screens/upgrade-ai.png' });
+  // Apple requires the subscription screen to link the privacy policy and terms
+  for (const name of ['Privacy Policy', 'Terms of Service']) {
+    const link = sheet.getByRole('link', { name });
+    await link.scrollIntoViewIfNeeded();
+    await expect(link).toBeInViewport();
+  }
+});
+
+test('Likes shows each company with its causes and story, and no momentum labels', async ({ page }) => {
+  await openApp(page);
+  await page.getByRole('button', { name: 'View stock details' }).first().waitFor(); // deck loaded
+  await page.getByRole('button', { name: 'Likes' }).click();
+  await expect(page.getByRole('heading', { name: 'Your Likes' })).toBeVisible();
+  const details = page.getByRole('button', { name: /^View (?!stock\b).+ details$/ }).first();
+  await expect(details).toBeVisible();
+  // (the deck stays mounted, hidden, behind the Likes tab)
+  await expect(page.getByText('Values match').filter({ visible: true }).first()).toBeVisible();
+  await expect(page.getByText(/momentum|Expert Insights|Why this fits you/i)).toHaveCount(0);
+  await page.screenshot({ path: 'e2e/screens/likes.png' });
+  await details.click();
+  await expect(page.getByRole('dialog').getByText(/% past year$/)).toBeVisible();
+});
+
+test('AI data sharing can be turned off in Settings', async ({ page }) => {
+  await openApp(page);
+  await page.getByRole('button', { name: 'Profile' }).click();
+  await expect(page.getByText('Ask AI data sharing')).toBeVisible();
+  await page.getByRole('button', { name: 'Turn off' }).click();
+  await expect(page.getByText(/^Off: Ask AI will ask before sending anything/)).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('ai_data_consent'))).toBeNull();
+  await expect(page.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute('href', 'https://stockmatcherai.com/support');
+});
+
 test('chat input accepts typing while stock details are open', async ({ page }) => {
   await openApp(page);
   await page.getByRole('button', { name: 'View stock details' }).first().click();
@@ -83,7 +148,7 @@ test('chat input accepts typing while stock details are open', async ({ page }) 
 test('details button opens only the details panel, not the expanded card too', async ({ page }) => {
   await openApp(page);
   await page.getByRole('button', { name: 'View stock details' }).first().click();
-  await expect(page.getByRole('dialog').getByText(/% 1Y$/)).toBeVisible(); // StockDetailsModal hero
+  await expect(page.getByRole('dialog').getByText(/% past year$/)).toBeVisible(); // StockDetailsModal hero
   await page.waitForTimeout(600); // let any sheet animation finish
   // The card's own expanded sheet has a "Stock Details" header; it must stay closed
   await expect(page.getByRole('heading', { name: 'Stock Details' })).toHaveCount(0);
@@ -166,7 +231,9 @@ test('details panel shows real returns, real news and no buy/sell ratings', asyn
 
   // No analyst-style ratings (they were derived from 1Y return, not analysts)
   await expect(details.getByText(/Strong Buy|Analyst Rating|\bSell\b/)).toHaveCount(0);
-  await expect(details.getByText(/momentum|^Flat$/i).first()).toBeVisible();
+  // Plain-English risk instead of momentum labels
+  await expect(details.getByText(/momentum/i)).toHaveCount(0);
+  await expect(details.getByText(/Steadier: a large, established company|Moderate price swings|Bigger price swings/).first()).toBeVisible();
 
   // Returns tab: real periods from market data, no simulated chart
   await details.getByRole('tab', { name: /Returns/ }).click();

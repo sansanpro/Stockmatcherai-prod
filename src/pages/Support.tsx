@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { PLAN_LIMITS } from '@/contexts/SubscriptionContext';
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Mail, MessageCircle, Shield, HelpCircle, FileText } from "lucide-react";
 import {
@@ -70,17 +71,19 @@ const Support = () => {
             <AccordionItem value="what-is">
               <AccordionTrigger>What is StockMatcherAI?</AccordionTrigger>
               <AccordionContent>
-                StockMatcherAI is an AI-powered stock discovery app that matches you with stocks 
-                based on your financial goals, risk tolerance, and investment preferences — similar 
-                to how dating apps match people, but for investing.
+                StockMatcherAI helps you find companies working on the causes you care about, like
+                beating cancer or clean energy. Each day you get a short deck of companies, each with
+                its story, a fact with its source, the things to know and the numbers in plain
+                English. Swipe right on the ones you'd be proud to own a piece of. You decide.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="free">
               <AccordionTrigger>Is StockMatcherAI free to use?</AccordionTrigger>
               <AccordionContent>
-                Yes! StockMatcherAI offers a free tier with daily swipes. Premium features like 
-                unlimited swipes and the AI Research Assistant are available with a subscription.
+                Yes. The free plan includes {PLAN_LIMITS.free.dailyMatches} matches a day and{' '}
+                {PLAN_LIMITS.free.aiQuestionsPer24h} Ask AI questions a day. Premium gives you{' '}
+                {PLAN_LIMITS.premium.dailyMatches} matches a day and unlimited Ask AI questions.
               </AccordionContent>
             </AccordionItem>
 
@@ -96,8 +99,10 @@ const Support = () => {
             <AccordionItem value="data">
               <AccordionTrigger>Where does the stock data come from?</AccordionTrigger>
               <AccordionContent>
-                We use reputable financial data providers to source real-time and historical stock 
-                data. Prices and metrics are updated regularly to ensure accuracy.
+                Prices, company numbers and news come from Finnhub and are updated throughout the
+                trading day. Each company's story, proof and things to know are researched from public
+                sources such as annual reports and company announcements, and every fact links to its
+                source.
               </AccordionContent>
             </AccordionItem>
 
@@ -106,16 +111,16 @@ const Support = () => {
               <AccordionContent>
                 You can delete your account directly in the app by going to{" "}
                 <strong>Settings → Danger Zone → Delete Account</strong>. This will
-                permanently remove all your data including your profile, matches, watchlists,
-                and chat history.
+                permanently remove all your data, including your causes and answers, your likes,
+                and your chat history.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="subscription">
               <AccordionTrigger>How do I cancel my subscription?</AccordionTrigger>
               <AccordionContent>
-                You can manage or cancel your subscription from the Settings page within the app. 
-                If you need further assistance, contact us at support@stockmatcherai.com.
+                Subscriptions are managed by Apple: on your iPhone, open Settings → your name →
+                Subscriptions. If you need further assistance, contact us at support@stockmatcherai.com.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -131,7 +136,7 @@ const Support = () => {
           </div>
           <div className="prose prose-sm text-muted-foreground space-y-4">
             <p>
-              <strong className="text-foreground">Last updated:</strong> March 16, 2026
+              <strong className="text-foreground">Last updated:</strong> October 22, 2026
             </p>
             <p>
               StockMatcherAI ("we", "our", "us") respects your privacy and is committed to 
@@ -141,36 +146,39 @@ const Support = () => {
 
             <h3 className="text-foreground font-semibold text-base">Information We Collect</h3>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Account information (name, email address)</li>
-              <li>Investment profile data (goals, risk tolerance, experience level)</li>
-              <li>Usage data (swipe history, watchlist activity)</li>
-              <li>Device information (device type, operating system)</li>
+              <li>Account information (your email address, and your name if you add it)</li>
+              <li>What you tell us you care about: your causes, companies you'd never fund, why you want to invest, how you'd react to a drop, what the money is for, roughly how much you plan to start with, and your investing experience</li>
+              <li>Usage data: the companies you like or pass on, your daily matches, and your questions to Ask AI</li>
+              <li>App analytics: which steps and screens you use, with a random ID for your install, your platform (iOS or web) and the app version. We collect this ourselves; the app has no third-party advertising trackers.</li>
+              <li>Subscription status (payments are handled by Apple; we never see your payment details)</li>
             </ul>
 
             <h3 className="text-foreground font-semibold text-base">How We Use Your Data</h3>
             <ul className="list-disc pl-5 space-y-1">
-              <li>To provide personalized stock recommendations</li>
-              <li>To improve our AI matching algorithms</li>
-              <li>To communicate important updates about the service</li>
-              <li>To process subscriptions and payments</li>
+              <li>To show you companies working on the causes you care about</li>
+              <li>To answer your questions in Ask AI</li>
+              <li>To understand how the app is used and improve it</li>
+              <li>To send account emails, such as password resets</li>
+              <li>To provide Premium and check your subscription</li>
             </ul>
 
             <h3 className="text-foreground font-semibold text-base">Third-Party AI Services</h3>
             <p>
               Our AI Stock Assistant feature uses <strong>Google Gemini</strong>, a third-party
-              AI service provided by Google, to generate personalized stock education responses.
+              AI service provided by Google, to answer your questions about companies and investing.
             </p>
             <p><strong>Data shared with the AI service:</strong></p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Your investment profile (risk tolerance, investment goals, experience level, sector interests)</li>
-              <li>Chat messages you send to the AI assistant</li>
+              <li>What you told us you care about: your causes, companies you'd never fund, how you'd react to a drop, what the money is for, and your investing experience</li>
+              <li>The questions you send to Ask AI</li>
             </ul>
             <p><strong>How this data is used:</strong></p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Solely to generate personalized educational responses about stocks</li>
+              <li>We send it only to answer your questions</li>
+              <li>Google may use your questions and its answers to improve its services, and its reviewers may read them, so please don't include personal details like your name or account numbers</li>
               <li>Your data is not used for third-party marketing or advertising</li>
               <li>You must provide explicit consent before any data is shared with the AI service</li>
-              <li>You can revoke consent at any time by clearing your app data or contacting support</li>
+              <li>You can turn this off at any time in Settings → Privacy</li>
             </ul>
             <p>
               Google Gemini processes your data in accordance with{" "}

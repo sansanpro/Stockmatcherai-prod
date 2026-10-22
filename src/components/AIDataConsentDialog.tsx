@@ -1,7 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Shield, ExternalLink } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Shield } from 'lucide-react';
+
+// Where the AI consent lives; Settings can turn it off again
+export const AI_CONSENT_KEY = 'ai_data_consent';
 
 interface AIDataConsentDialogProps {
   isOpen: boolean;
@@ -10,10 +12,8 @@ interface AIDataConsentDialogProps {
 }
 
 const AIDataConsentDialog = ({ isOpen, onConsent, onCancel }: AIDataConsentDialogProps) => {
-  const navigate = useNavigate();
-
   const handleConsent = () => {
-    localStorage.setItem('ai_data_consent', 'true');
+    localStorage.setItem(AI_CONSENT_KEY, 'true');
     onConsent();
   };
 
@@ -34,8 +34,8 @@ const AIDataConsentDialog = ({ isOpen, onConsent, onCancel }: AIDataConsentDialo
           <div>
             <p className="font-semibold text-foreground mb-1">What data is shared:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Your investment profile (risk tolerance, goals, experience level, sector interests)</li>
-              <li>Your chat messages sent to the AI assistant</li>
+              <li>What you told us you care about: your causes, companies you'd never fund, how you'd react to a drop, what the money is for, and your investing experience</li>
+              <li>The questions you send to Ask AI</li>
             </ul>
           </div>
 
@@ -46,21 +46,19 @@ const AIDataConsentDialog = ({ isOpen, onConsent, onCancel }: AIDataConsentDialo
 
           <div>
             <p className="font-semibold text-foreground mb-1">Purpose:</p>
-            <p>To provide personalized stock education and research responses tailored to your investment profile.</p>
+            <p>To answer your questions about companies and investing terms, with your causes in mind.</p>
           </div>
 
           <div>
             <p className="font-semibold text-foreground mb-1">Data protection:</p>
             <ul className="list-disc pl-5 space-y-1">
               <li>Your data is not used for third-party marketing</li>
-              <li>You can revoke consent at any time in Settings</li>
+              <li>Google may use your questions and its answers to improve its services, and its reviewers may read them. Please don't include personal details like your name or account numbers.</li>
+              <li>You can turn this off at any time in Settings</li>
               <li>See our{' '}
-                <button
-                  onClick={() => { onCancel(); navigate('/support'); }}
-                  className="text-primary underline inline"
-                >
+                <a href="https://stockmatcherai.com/support" target="_blank" rel="noopener noreferrer" className="text-primary underline">
                   Privacy Policy
-                </button>{' '}
+                </a>{' '}
                 for full details
               </li>
             </ul>

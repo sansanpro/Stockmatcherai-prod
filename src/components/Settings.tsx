@@ -3,13 +3,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import UpgradeModal from '@/components/UpgradeModal';
+import { PLAN_LIMITS } from '@/contexts/SubscriptionContext';
 import CausePicker from '@/components/onboarding/CausePicker';
 import { ChipGroup, ChoiceList } from '@/components/onboarding/Choices';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { User, Save, ArrowLeft, Trash2, AlertTriangle, RotateCcw, Crown, Heart } from 'lucide-react';
+import { User, Save, ArrowLeft, Trash2, AlertTriangle, RotateCcw, Crown, Heart, Shield } from 'lucide-react';
+import { AI_CONSENT_KEY } from '@/components/AIDataConsentDialog';
 import { Capacitor } from '@capacitor/core';
 import { fetchCauses, type CauseInfo } from '@/lib/matchFeed';
 import { DEALBREAKERS, GOAL_OPTIONS, RISK_OPTIONS, toProfileRow, type OnboardingAnswers } from '@/lib/onboarding';
@@ -47,6 +49,16 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [aiSharing, setAiSharing] = useState(() => {
+    try { return localStorage.getItem(AI_CONSENT_KEY) === 'true'; } catch { return false; }
+  });
+
+  // Ask AI asks for permission again before it next sends anything
+  const turnOffAiSharing = () => {
+    try { localStorage.removeItem(AI_CONSENT_KEY); } catch { /* storage blocked */ }
+    setAiSharing(false);
+    toast.success("Ask AI will ask for your permission again before sending anything.");
+  };
 
   const handleRestorePurchases = async () => {
     setIsRestoring(true);
@@ -124,7 +136,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white">Upgrade to Premium</p>
-                <p className="text-xs text-white/60">More matches every day, AI assistant & more</p>
+                <p className="text-xs text-white/60">{PLAN_LIMITS.premium.dailyMatches} matches a day and unlimited Ask AI</p>
               </div>
               <Button
                 size="sm"
@@ -207,6 +219,37 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
               <Save className="w-4 h-4" />
               {loading ? 'Saving...' : 'Save Changes'}
             </Button>
+          </div>
+        </section>
+
+        {/* Privacy */}
+        <section className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm">
+          <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-sky-500 to-primary flex items-center justify-center">
+              <Shield className="w-3.5 h-3.5 text-white" />
+            </div>
+            <h2 className="font-semibold text-sm">Privacy</h2>
+          </div>
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm font-medium">Ask AI data sharing</p>
+                <p className="text-xs text-white/50">
+                  {aiSharing
+                    ? 'On: your causes and questions are sent to Google Gemini when you use Ask AI.'
+                    : "Off: Ask AI will ask before sending anything."}
+                </p>
+              </div>
+              {aiSharing && (
+                <Button size="sm" variant="outline" onClick={turnOffAiSharing}
+                  className="flex-shrink-0 rounded-xl border-white/20 bg-white/5 text-white hover:bg-white/10">
+                  Turn off
+                </Button>
+              )}
+            </div>
+            <a href="https://stockmatcherai.com/support" target="_blank" rel="noopener noreferrer" className="inline-block text-sm text-primary underline">
+              Privacy Policy
+            </a>
           </div>
         </section>
 

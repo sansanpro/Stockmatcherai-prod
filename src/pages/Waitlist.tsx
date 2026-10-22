@@ -52,7 +52,7 @@ const Waitlist = () => {
           <TrendingUp className="h-12 w-12 mx-auto text-primary" />
           <h1 className="text-3xl font-bold">Join the Waitlist</h1>
           <p className="text-muted-foreground">
-            Be among the first to experience smart stock matching. We'll notify you when we launch!
+            Be among the first to find companies working on the causes you care about. We'll let you know when we launch.
           </p>
         </div>
 

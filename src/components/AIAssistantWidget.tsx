@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sparkles, Send, X, Minimize2, Crown } from 'lucide-react';
-import AIDataConsentDialog from '@/components/AIDataConsentDialog';
+import AIDataConsentDialog, { AI_CONSENT_KEY } from '@/components/AIDataConsentDialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSubscription } from '@/contexts/SubscriptionContext';
+import { PLAN_LIMITS, useSubscription } from '@/contexts/SubscriptionContext';
+import { useApp } from '@/contexts/AppContext';
 import UpgradeModal from '@/components/UpgradeModal';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
@@ -52,6 +53,8 @@ export default function AIAssistantWidget() {
   
   const { user } = useAuth();
   const { subscribed } = useSubscription();
+  const { watchlist } = useApp();
+  const freeQuestions = PLAN_LIMITS.free.aiQuestionsPer24h;
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const timeoutRef = useRef<number | null>(null);
@@ -83,11 +86,11 @@ export default function AIAssistantWidget() {
         const conversationIds = conversations.map(c => c.id);
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-        // Count messages from last 24 hours
+        // Count answered questions from the last 24 hours (the server counts the same way)
         const { count } = await supabase
           .from('ai_chat_messages')
           .select('id', { count: 'exact', head: true })
-          .eq('role', 'user')
+          .eq('role', 'assistant')
           .in('conversation_id', conversationIds)
           .gte('created_at', twentyFourHoursAgo);
 
@@ -172,17 +175,19 @@ export default function AIAssistantWidget() {
 
       if (response.status === 403) {
         const data = await response.json();
-        // Free user hit limit - remove the placeholder message and show upgrade
+        // Free user hit the limit: remove the placeholder message; the upgrade sheet explains why
         setMessages(prev => prev.filter(m => m.id !== assistantMsgId && m.id !== userMsg.id));
-        toast.error(data.message || 'You\'ve reached your free message limit');
+        setFreeMessageCount(data.freeMessagesSent ?? freeQuestions);
         setShowUpgradeModal(true);
         setIsStreaming(false);
         return;
       }
 
       if (response.status === 429) {
-        toast.error('Rate limit exceeded. Please try again in a moment.');
-        setMessages(prev => prev.filter(m => m.id !== assistantMsgId));
+        // Say so in the chat, where the question is waiting, rather than in a toast that vanishes
+        const data = await response.json().catch(() => ({}));
+        const busy = data.error || 'The AI is busy right now. Please try again in a moment.';
+        setMessages(prev => prev.map(m => m.id === assistantMsgId ? { ...m, status: 'error', content: busy } : m));
         setIsStreaming(false);
         return;
       }
@@ -312,7 +317,7 @@ export default function AIAssistantWidget() {
 
   const handleSend = () => {
     if (!inputValue.trim() || isStreaming) return;
-    const hasConsent = localStorage.getItem('ai_data_consent') === 'true';
+    const hasConsent = localStorage.getItem(AI_CONSENT_KEY) === 'true';
     if (!hasConsent) {
       setPendingMessage(inputValue.trim());
       setShowConsentDialog(true);
@@ -361,7 +366,7 @@ export default function AIAssistantWidget() {
               localStorage.setItem('ai_widget_opened', 'true');
             }
           }}
-          aria-label="Open AI Assistant"
+          aria-label="Open Ask AI"
           data-ai-assistant
           className="fixed bottom-[7.5rem] right-4 md:bottom-8 md:right-6 z-[75] flex items-center gap-2 h-14 rounded-full shadow-2xl px-4
             bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700
@@ -386,7 +391,7 @@ export default function AIAssistantWidget() {
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold">AI Stock Assistant</h3>
+              <h3 className="font-semibold">Ask AI</h3>
               {subscribed && (
                 <Crown className="h-4 w-4 text-yellow-500" />
               )}
@@ -419,19 +424,19 @@ export default function AIAssistantWidget() {
                 <Sparkles className="h-10 w-10 text-primary opacity-50" />
                 <div>
                   <p className="font-semibold mb-1">
-                    {subscribed ? 'Ask me anything about stocks!' : 'Try the AI Assistant'}
+                    Ask about any company or term
                   </p>
                   <p className="text-xs text-muted-foreground mb-4">
                     {subscribed
-                      ? 'Real-time data, company insights, and market analysis.'
-                      : 'Upgrade for unlimited access. Try a question below!'}
+                      ? 'What a company does, how it connects to your causes, or what a number means.'
+                      : `You get ${freeQuestions} free questions a day. Try one below.`}
                   </p>
                 </div>
                 {/* Suggested prompts */}
                 <div className="w-full space-y-2">
                   {[
-                    "Why is NVIDIA a good match for me?",
-                    "What's the safest dividend stock right now?",
+                    `How does ${watchlist[0]?.companyName ?? 'Merck'} connect to my causes?`,
+                    "What should I know before buying my first stock?",
                     "Explain P/E ratio in simple terms",
                   ].map((prompt) => (
                     <button
@@ -495,7 +500,7 @@ export default function AIAssistantWidget() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={subscribed ? "Ask about stocks..." : "Try asking about a stock..."}
+                placeholder="Ask about a company or term…"
                 disabled={isStreaming}
                 autoCorrect="off"
                 autoComplete="off"
@@ -514,7 +519,7 @@ export default function AIAssistantWidget() {
             </div>
             {!subscribed && (
               <p className="text-xs text-muted-foreground mt-2 text-center">
-                Free users: {Math.max(0, 5 - freeMessageCount)} messages remaining
+                Free plan: {Math.max(0, freeQuestions - freeMessageCount)} of {freeQuestions} questions left (each frees up after 24 hours)
               </p>
             )}
           </div>
@@ -523,6 +528,7 @@ export default function AIAssistantWidget() {
 
       {/* Upgrade Modal */}
       <UpgradeModal
+        reason="ai"
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
       />
