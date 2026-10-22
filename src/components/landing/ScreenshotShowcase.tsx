@@ -2,20 +2,21 @@ import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import showcaseSwipe from "@/assets/showcase-swipe-stocks.png";
-import showcaseAiMatch from "@/assets/showcase-ai-match.png";
-import showcaseInvest from "@/assets/showcase-invest-smartly.png";
-import showcasePersonal from "@/assets/showcase-personal-investor.png";
-import showcaseMatches from "@/assets/showcase-personalized-matches.png";
-import showcaseInsights from "@/assets/showcase-realtime-insights.png";
+import showcaseHook from "@/assets/showcase-invest-in-what-you-believe.jpg";
+import showcaseCauses from "@/assets/showcase-pick-your-causes.jpg";
+import showcaseReveal from "@/assets/showcase-see-who-is-working.jpg";
+import showcaseCard from "@/assets/showcase-story-first-card.jpg";
+import showcaseLikes from "@/assets/showcase-keep-your-likes.jpg";
+import showcaseAskAi from "@/assets/showcase-ask-ai.jpg";
 
+// Made from the real app by scripts/make-screenshots.mjs
 const screenshots = [
-  { src: showcaseSwipe, alt: "Swipe through stocks like a dating app" },
-  { src: showcaseAiMatch, alt: "AI-powered stock matching" },
-  { src: showcaseInvest, alt: "Invest smartly with AI assistant" },
-  { src: showcasePersonal, alt: "Your personal investor dashboard" },
-  { src: showcaseMatches, alt: "Personalized stock matches with details" },
-  { src: showcaseInsights, alt: "Real-time stock insights and data" },
+  { src: showcaseHook, alt: "StockMatcherAI: invest in what you believe in" },
+  { src: showcaseCauses, alt: "Pick the causes you care about" },
+  { src: showcaseReveal, alt: "See how many companies are working on your causes" },
+  { src: showcaseCard, alt: "A company card: its story, proof with a source, things to know and the numbers" },
+  { src: showcaseLikes, alt: "Your likes, with the causes each company works on" },
+  { src: showcaseAskAi, alt: "Ask AI about any company or investing term" },
 ];
 
 const ScreenshotShowcase = () => {

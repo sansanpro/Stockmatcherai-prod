@@ -2,6 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StockRecommendation } from '@/types/stock-matcher';
 import { Eye } from 'lucide-react';
+import { capitalize } from '@/lib/utils';
 import StockNewsPill from '@/components/StockNewsPill';
 import CompanyLogo from '@/components/values/CompanyLogo';
 import CauseChips, { causeGradient } from '@/components/values/CauseChips';
@@ -26,7 +27,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
           <CompanyLogo src={stock.logoUrl} name={stock.companyName} ticker={stock.ticker} className="w-11 h-11" />
           <div className="min-w-0 flex-1">
             <h3 className="text-lg font-bold leading-tight truncate">{stock.companyName}</h3>
-            <p className="text-sm text-white/80 truncate">{stock.ticker}{stock.sector ? ` · ${stock.sector}` : ''}</p>
+            <p className="text-sm text-white/80 truncate">{stock.ticker}{stock.sector ? ` · ${capitalize(stock.sector)}` : ''}</p>
           </div>
           {onViewDetails && (
             <Button

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { capitalize } from '@/lib/utils';
 import { useLiveQuote } from '@/hooks/useLiveQuote';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,7 +14,6 @@ import CauseChips, { causeGradient } from '@/components/values/CauseChips';
 import ValuesSummary from '@/components/values/ValuesSummary';
 import KeyNumbers from '@/components/values/KeyNumbers';
 
-const capitalize = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
 const timeAgo = (iso?: string) => {
   if (!iso) return '';
