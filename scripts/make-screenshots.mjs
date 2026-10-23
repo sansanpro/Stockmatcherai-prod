@@ -53,7 +53,6 @@ const shot = async (page, name) => {
   await page.getByRole('button', { name: 'Find my matches' }).waitFor();
   await shot(page, '1-hook');
   await page.getByRole('button', { name: 'Find my matches' }).click();
-  await page.getByRole('radio', { name: 'I want my money to actually mean something' }).click();
   await page.getByRole('button', { name: /^Beat cancer & disease/ }).click();
   await page.getByRole('button', { name: /^Clean energy & climate/ }).click();
   await page.getByText(/\d+ companies are working on this/).first().waitFor();
@@ -61,18 +60,19 @@ const shot = async (page, name) => {
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('checkbox', { name: 'Fossil fuels' }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByText('Imagine a company you own drops 20% in a month.').waitFor();
+  await page.waitForTimeout(900); // the art spins in
+  await shot(page, '3-question');
   await page.getByRole('radio', { name: 'Wait it out.' }).click();
   await page.getByRole('radio', { name: 'Never' }).click();
   await page.getByRole('radio', { name: 'Growing it for the long haul (5+ years)' }).click();
-  await page.getByRole('radio', { name: '$500' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByText('I invest in what I believe in:').waitFor();
   await page.waitForTimeout(3500); // build animation and count
-  await shot(page, '3-reveal');
+  await shot(page, '4-reveal');
   await page.getByRole('button', { name: /^See my first \d+ matches$/ }).click();
   await page.getByRole('button', { name: 'Got it' }).click();
   await page.getByText('P/E Ratio').first().waitFor();
-  await shot(page, '4-card');
+  await shot(page, '5-card');
   // Like three companies (closing the save prompts a new user sees), then open Likes
   const like = () => page.getByRole('button', { name: 'Like this company' }).click();
   await like();
@@ -84,7 +84,7 @@ const shot = async (page, name) => {
   await page.getByRole('button', { name: 'Likes' }).click();
   await page.getByRole('heading', { name: 'Your Likes' }).waitFor();
   await page.waitForTimeout(1500); // logos
-  await shot(page, '5-likes');
+  await shot(page, '6-likes');
   await page.context().close();
 }
 
@@ -121,12 +121,12 @@ const shot = async (page, name) => {
   if (answered) {
     // Start of the answer in view
     await panel.getByText('How does First Solar connect to my causes?').last().evaluate(el => el.scrollIntoView({ block: 'start' }));
-    await shot(page, '6-ask-ai');
+    await shot(page, '7-ask-ai');
   } else {
     console.log('Ask AI did not answer (Gemini busy); capturing the empty chat instead');
     await page.reload();
     await page.getByRole('button', { name: 'Open Ask AI' }).click();
-    await shot(page, '6-ask-ai');
+    await shot(page, '7-ask-ai');
   }
   await page.context().close();
 }
@@ -135,31 +135,32 @@ const shot = async (page, name) => {
 const FRAMES = [
   ['1-hook', 'Invest in what', 'you believe in', 'invest-in-what-you-believe'],
   ['2-causes', 'Pick the causes', 'you care about', 'pick-your-causes'],
-  ['3-reveal', "See who's working", 'on them', 'see-who-is-working'],
-  ['4-card', 'The story first,', 'then the numbers', 'story-first-card'],
-  ['5-likes', "Keep the ones you'd", 'be proud to own', 'keep-your-likes'],
-  ['6-ask-ai', 'Ask anything,', 'in plain English', 'ask-ai'],
+  ['3-question', 'Simple questions,', 'one at a time', 'one-question-at-a-time'],
+  ['4-reveal', "See who's working", 'on them', 'see-who-is-working'],
+  ['5-card', 'The story first,', 'then the numbers', 'story-first-card'],
+  ['6-likes', "Keep the ones you'd", 'be proud to own', 'keep-your-likes'],
+  ['7-ask-ai', 'Ask anything,', 'in plain English', 'ask-ai'],
 ];
 const statusBar = `
   <div class="status"><span>9:41</span><span class="icons">
     <svg width="54" height="34" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
     <svg width="50" height="36" viewBox="0 0 16 12"><path d="M8 11.5 5.6 9a3.4 3.4 0 0 1 4.8 0zM3.4 6.8a6.5 6.5 0 0 1 9.2 0l-1.1 1.1a5 5 0 0 0-7 0zM1.1 4.6a9.7 9.7 0 0 1 13.8 0l-1.1 1.1a8.1 8.1 0 0 0-11.6 0z"/></svg>
-    <svg width="80" height="38" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="#fff" stroke-opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2"/><path d="M25 4.5v4c.8-.3 1.5-1.1 1.5-2s-.7-1.7-1.5-2z" fill-opacity=".4"/></svg>
+    <svg width="80" height="38" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="20" height="9" rx="2"/><path d="M25 4.5v4c.8-.3 1.5-1.1 1.5-2s-.7-1.7-1.5-2z" fill-opacity=".4"/></svg>
   </span></div>`;
-const frameHtml = (img, a, b, topColor) => `<!doctype html><html><head><style>
+const frameHtml = (img, a, b, topColor, glyphs) => `<!doctype html><html><head><style>
   * { margin: 0; box-sizing: border-box; }
   body { width: 1320px; height: 2868px; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: radial-gradient(1200px 900px at 50% 62%, #5b21b6 0%, rgba(91,33,182,0) 70%), linear-gradient(180deg, #0b0716 0%, #160a2b 100%); }
-  h1 { position: absolute; top: 150px; width: 100%; text-align: center; color: #fff; font-size: 116px; line-height: 1.08;
+    background: radial-gradient(1100px 800px at 50% 0%, #FBE7DC 0%, rgba(251,231,220,0) 70%), radial-gradient(1000px 900px at 50% 75%, #F6D3C1 0%, rgba(246,211,193,0) 65%), #FAF6EF; }
+  h1 { position: absolute; top: 150px; width: 100%; text-align: center; color: #1F1A15; font-size: 116px; line-height: 1.08;
     font-weight: 700; letter-spacing: -2px; }
-  h1 span { display: block; background: linear-gradient(90deg, #f472b6, #a78bfa); -webkit-background-clip: text; color: transparent; }
+  h1 span { display: block; color: #B54A22; }
   .phone { position: absolute; left: 50%; top: 610px; transform: translateX(-50%); width: 1034px; height: 2200px;
-    background: #111; border-radius: 150px; padding: 20px; box-shadow: 0 0 0 4px #2a2a2e, 0 40px 120px rgba(0,0,0,.6), 0 0 140px rgba(168,85,247,.35); }
+    background: #1F1A15; border-radius: 150px; padding: 20px; box-shadow: 0 0 0 4px #3a322b, 0 40px 120px rgba(120,72,40,.28); }
   .screen { position: relative; width: 994px; height: 2160px; border-radius: 132px; overflow: hidden; background: ${topColor}; }
   .screen img { position: absolute; left: 0; top: ${Math.round(2160 * STATUS_H / SCREEN_H)}px; width: 994px; }
   .status { position: absolute; top: 0; left: 0; right: 0; height: ${Math.round(2160 * STATUS_H / SCREEN_H)}px; z-index: 2;
     display: flex; align-items: center; justify-content: space-between; padding: 22px 92px 0 112px; color: #fff; font-size: 50px; font-weight: 600; }
-  .status .icons { display: flex; gap: 14px; align-items: center; } .status svg { fill: #fff; }
+  .status { color: ${glyphs}; } .status .icons { display: flex; gap: 14px; align-items: center; } .status svg { fill: ${glyphs}; }
   .island { position: absolute; top: 34px; left: 50%; transform: translateX(-50%); width: 280px; height: 82px; background: #000; border-radius: 41px; z-index: 3; }
 </style></head><body>
   <h1>${a}<span>${b}</span></h1>
@@ -181,10 +182,12 @@ for (const [raw, a, b, slug] of FRAMES) {
     const ctx = c.getContext('2d');
     ctx.drawImage(img, 0, 0);
     const [r, g, b] = ctx.getImageData(Math.floor(img.naturalWidth / 2), 1, 1, 1).data;
-    return `rgb(${r},${g},${b})`;
+    return [r, g, b];
   });
   await probe.close();
-  const html = frameHtml(dataUrl, a, b, topColor);
+  // Dark status bar glyphs on light screens, as iOS draws them
+  const glyphs = (0.299 * topColor[0] + 0.587 * topColor[1] + 0.114 * topColor[2]) > 150 ? '#1F1A15' : '#FFFFFF';
+  const html = frameHtml(dataUrl, a, b, `rgb(${topColor.join(',')})`, glyphs);
   // JPEG: App Store Connect rejects screenshots with an alpha channel, and it keeps the site light
   for (const [ctx, out, quality] of [[framer, `marketing/app-store/${raw}-${slug}.jpg`, 92], [landing, `src/assets/showcase-${slug}.jpg`, 82]]) {
     const page = await ctx.newPage();

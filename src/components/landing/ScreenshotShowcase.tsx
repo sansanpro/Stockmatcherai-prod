@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 
 import showcaseHook from "@/assets/showcase-invest-in-what-you-believe.jpg";
 import showcaseCauses from "@/assets/showcase-pick-your-causes.jpg";
+import showcaseQuestion from "@/assets/showcase-one-question-at-a-time.jpg";
 import showcaseReveal from "@/assets/showcase-see-who-is-working.jpg";
 import showcaseCard from "@/assets/showcase-story-first-card.jpg";
 import showcaseLikes from "@/assets/showcase-keep-your-likes.jpg";
@@ -13,6 +14,7 @@ import showcaseAskAi from "@/assets/showcase-ask-ai.jpg";
 const screenshots = [
   { src: showcaseHook, alt: "StockMatcherAI: invest in what you believe in" },
   { src: showcaseCauses, alt: "Pick the causes you care about" },
+  { src: showcaseQuestion, alt: "Onboarding asks simple questions, one at a time" },
   { src: showcaseReveal, alt: "See how many companies are working on your causes" },
   { src: showcaseCard, alt: "A company card: its story, proof with a source, things to know and the numbers" },
   { src: showcaseLikes, alt: "Your likes, with the causes each company works on" },
