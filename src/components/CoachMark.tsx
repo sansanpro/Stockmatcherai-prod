@@ -21,7 +21,7 @@ const CoachMark = ({ id, text, className = '' }: CoachMarkProps) => {
   };
 
   return (
-    <div role="status" className={`z-30 max-w-xs rounded-2xl bg-white text-gray-900 shadow-2xl px-4 py-3 animate-fade-in ${className}`}>
+    <div role="status" className={`z-30 max-w-xs rounded-2xl bg-white text-ink border border-line shadow-[0_12px_30px_rgba(60,40,20,0.16)] px-4 py-3 animate-fade-in ${className}`}>
       <p className="text-sm font-medium leading-snug">{text}</p>
       <button onClick={dismiss} className="mt-2 min-h-[36px] text-sm font-semibold text-primary">
         Got it

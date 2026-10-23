@@ -21,8 +21,6 @@ interface AppContextType {
   passStock: (stock: StockRecommendation) => void;
   swipeStats: SwipeStats;
   updateSwipeStats: (isMatch: boolean) => void;
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -121,7 +119,6 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     passes: 0,
     matchRate: 0
   });
-  const [isDarkMode, setIsDarkMode] = useState(true);
 
   // Likes follow the account when signed in; before sign-in they live on this device
   const reloadWatchlist = useCallback(async () => {
@@ -140,25 +137,10 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const savedStats = localStorage.getItem('stockMatcher_swipeStats');
-    const savedDarkMode = localStorage.getItem('stockMatcher_darkMode');
     if (savedStats) {
       setSwipeStats(JSON.parse(savedStats));
     }
-    if (savedDarkMode !== null) {
-      setIsDarkMode(JSON.parse(savedDarkMode));
-    } else {
-      setIsDarkMode(true); // Default to dark mode
-    }
   }, []);
-
-  // Apply dark mode class to document
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
 
   // Signed in, match-feed saves the like to the account; this only updates what's on screen
   const addToWatchlist = (stock: StockRecommendation) => {
@@ -200,12 +182,6 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem('stockMatcher_swipeStats', JSON.stringify(newStats));
   };
 
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    localStorage.setItem('stockMatcher_darkMode', JSON.stringify(newDarkMode));
-  };
-
   return (
     <AppContext.Provider value={{
       watchlist,
@@ -216,8 +192,6 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       passStock,
       swipeStats,
       updateSwipeStats,
-      isDarkMode,
-      toggleDarkMode
     }}>
       {children}
     </AppContext.Provider>

@@ -24,15 +24,15 @@ class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-gray-900 to-gray-800">
+        <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-cream">
           <span className="text-6xl mb-6">😬</span>
-          <h2 className="text-2xl font-bold text-white mb-2">Something went wrong</h2>
-          <p className="text-gray-400 mb-8 max-w-sm">
+          <h2 className="text-2xl font-bold text-ink mb-2">Something went wrong</h2>
+          <p className="text-ink-soft mb-8 max-w-sm">
             Don't worry — your matches are safe. Try refreshing the page.
           </p>
           <Button
             onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-primary to-purple-600 rounded-xl px-8"
+            className="bg-primary hover:bg-primary/90 text-white rounded-xl px-8"
           >
             Refresh App
           </Button>

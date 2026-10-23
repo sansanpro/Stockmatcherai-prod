@@ -5,90 +5,48 @@
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
 @layer base {
+  /* Warm, light-only palette: cream background, warm near-black text, burnt orange for actions.
+     Contrast (WCAG AA, as Apple's HIG asks): ink on cream 16:1, muted text 5.4:1,
+     white on primary 5.3:1, primary on cream 4.9:1. */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 38 52% 96%;          /* cream #FAF6EF */
+    --foreground: 30 19% 10%;          /* ink #1F1A15 */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 30 19% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 30 19% 10%;
 
-    --primary: 262 91% 62%;
+    --primary: 16 68% 42%;             /* burnt orange #B54A22: buttons, links, selection */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 195 92% 52%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 37 43% 92%;           /* sand #F3ECE1 */
+    --secondary-foreground: 30 19% 10%;
 
-    --muted: 262 20% 94%;
-    --muted-foreground: 262 15% 45%;
+    --muted: 37 43% 92%;
+    --muted-foreground: 30 10% 39%;    /* #6E645A */
 
-    --accent: 322 88% 62%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 21 79% 92%;              /* peach #FBE7DC */
+    --accent-foreground: 18 70% 32%;   /* #8A3A18 */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 74% 42%;          /* #B91C1C */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 262 20% 88%;
-    --input: 262 20% 88%;
-    --ring: 262 91% 62%;
+    --border: 37 33% 86%;              /* #E8DFD1 */
+    --input: 36 28% 81%;
+    --ring: 16 68% 42%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 252 25% 7%;
-    --foreground: 250 30% 96%;
-
-    --card: 252 22% 10%;
-    --card-foreground: 250 30% 96%;
-
-    --popover: 252 22% 10%;
-    --popover-foreground: 250 30% 96%;
-
-    --primary: 262 91% 65%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 195 92% 55%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 252 20% 18%;
-    --muted-foreground: 252 15% 62%;
-
-    --accent: 322 88% 65%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 252 20% 20%;
-    --input: 252 20% 20%;
-    --ring: 262 91% 65%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 38 52% 96%;
+    --sidebar-foreground: 30 19% 10%;
+    --sidebar-primary: 16 68% 42%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 37 43% 92%;
+    --sidebar-accent-foreground: 30 19% 10%;
+    --sidebar-border: 37 33% 86%;
+    --sidebar-ring: 16 68% 42%;
   }
 }
 
@@ -100,10 +58,21 @@
     height: 100%;
   }
 
+  /* Keyboard focus in the brand color (instead of the browser's default blue) */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
   * {
     @apply border-border;
     /* Remove iOS tap flash highlight on all elements */
     -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    color-scheme: light;
+    background: hsl(var(--background));
   }
 
   body {
@@ -136,5 +105,51 @@
   .transform-gpu {
     -webkit-transform: translateZ(0);
     will-change: transform;
+  }
+}
+
+/* 3D art motion: spins in, then floats and gently tilts; its shadow breathes with it */
+@layer utilities {
+  .art-3d {
+    animation: art-in 0.9s cubic-bezier(0.2, 0.9, 0.25, 1.15) both, art-float 4.2s ease-in-out 0.9s infinite;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .art-3d-shadow {
+    animation: art-shadow-in 0.9s ease-out both, art-shadow 4.2s ease-in-out 0.9s infinite;
+  }
+  .art-3d-pop { animation: art-pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+
+  @keyframes art-in {
+    from { opacity: 0; transform: perspective(700px) translateY(28px) rotateY(-70deg) rotateX(18deg) scale(0.55); }
+    to { opacity: 1; transform: perspective(700px) translateY(0) rotateY(0) rotateX(0) scale(1); }
+  }
+  /* Starts and ends on the pose art-in finishes with, so there's no jump */
+  @keyframes art-float {
+    0%, 100% { transform: perspective(700px) translateY(0) rotateY(0) rotateX(0) rotateZ(0); }
+    25% { transform: perspective(700px) translateY(-5px) rotateY(-11deg) rotateX(4deg) rotateZ(-2deg); }
+    50% { transform: perspective(700px) translateY(-10px) rotateY(0) rotateX(0) rotateZ(0); }
+    75% { transform: perspective(700px) translateY(-5px) rotateY(11deg) rotateX(-4deg) rotateZ(2deg); }
+  }
+  @keyframes art-shadow-in { from { opacity: 0; transform: scale(0.4); } to { opacity: 0.55; transform: scale(1); } }
+  @keyframes art-shadow {
+    0%, 100% { transform: scale(1); opacity: 0.55; }
+    50% { transform: scale(0.8); opacity: 0.32; }
+  }
+  @keyframes art-pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.12) rotateZ(-4deg); }
+    100% { transform: scale(1); }
+  }
+
+  /* Question text and answers rise in after the art */
+  .rise-in { animation: rise-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .art-3d, .art-3d-shadow, .art-3d-pop, .rise-in { animation: none; }
   }
 }

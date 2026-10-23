@@ -30,41 +30,39 @@ test('new user: onboarding, reveal, first matches and the save prompt, all witho
   // 1. Hook (no sign-in wall)
   await expect(page.getByText('Your money is already saying something.', { exact: false })).toBeVisible();
   await expect(page.getByText('No account needed.', { exact: false })).toBeVisible();
+  await page.waitForTimeout(900); // entrance animations
   await page.screenshot({ path: 'e2e/screens/onboarding-1-hook.png' });
   await page.getByRole('button', { name: 'Find my matches' }).click();
 
-  // 2. Why (one tap moves on)
-  await expect(page.getByText("What's finally pushing you to start?")).toBeVisible();
-  await page.getByRole('radio', { name: 'I want my money to actually mean something' }).click();
-
-  // 3. Causes: tap order is the rank, each pick shows its live count
+  // 2. Causes (first of five questions, one per screen): tap order is the rank, each pick shows its live count
   await expect(page.getByText('What do you want your money to fight for?')).toBeVisible();
   await page.getByRole('button', { name: /^Beat cancer & disease/ }).click();
   await page.getByRole('button', { name: /^Clean energy & climate/ }).click();
   await expect(page.getByRole('button', { name: 'Beat cancer & disease, pick 1' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Clean energy & climate, pick 2' })).toBeVisible();
   await expect(page.getByText(/\d+ companies are working on this/).first()).toBeVisible();
+  await page.waitForTimeout(900); // entrance animations
   await page.screenshot({ path: 'e2e/screens/onboarding-3-causes.png' });
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  // 4. Dealbreakers (no animal testing option)
+  // 3. Dealbreakers (no animal testing option)
   await expect(page.getByText("Anything you'd never want your money to fund?")).toBeVisible();
   await expect(page.getByText(/animal testing/i)).toHaveCount(0);
   await page.getByRole('checkbox', { name: 'Fossil fuels' }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  // 5. Risk as behavior, plus experience
+  // 4-6. One tap each, and each screen moves on by itself: risk as behavior, experience, goal
   await expect(page.getByText('Imagine a company you own drops 20% in a month.', { exact: false })).toBeVisible();
+  await page.waitForTimeout(900); // let the art spin in
+  await page.screenshot({ path: 'e2e/screens/onboarding-4-risk.png' });
   await page.getByRole('radio', { name: 'Wait it out.' }).click();
+  await expect(page.getByText('Have you ever bought a stock?')).toBeVisible();
   await page.getByRole('radio', { name: 'Never' }).click();
-
-  // 6. Goal and (optional) starting amount
   await expect(page.getByText("What's this money for?")).toBeVisible();
-  await page.getByRole('radio', { name: 'Growing it for the long haul (5+ years)' }).click();
-  await page.getByRole('radio', { name: '$500' }).click();
-  await expect(page.getByText(/slice of a share for as little as \$5/)).toBeVisible();
+  await expect(page.getByText(/What's finally pushing you|Thinking of starting with/)).toHaveCount(0); // dropped questions
+  await page.waitForTimeout(900);
   await page.screenshot({ path: 'e2e/screens/onboarding-6-goal.png' });
-  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('radio', { name: 'Growing it for the long haul (5+ years)' }).click();
 
   // 7. Reveal: real count of matching companies (minus fossil-flagged ones) and the values card
   await expect(page.getByText(/We found \d+ companies working on Beat cancer & disease and Clean energy & climate\./)).toBeVisible();
@@ -136,14 +134,12 @@ test('saving from the prompt creates an account that keeps the answers and likes
 
   // Onboarding with one cause, no dealbreakers
   await page.getByRole('button', { name: 'Find my matches' }).click();
-  await page.getByRole('radio', { name: "I've been meaning to for years" }).click();
   await page.getByRole('button', { name: /^Live longer & healthier/ }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'Skip' }).click();
   await page.getByRole('radio', { name: 'Wait it out.' }).click();
   await page.getByRole('radio', { name: 'A few times' }).click();
   await page.getByRole('radio', { name: 'A little extra income' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'See my first 7 matches' }).click();
   await page.getByRole('button', { name: 'Got it' }).click();
 

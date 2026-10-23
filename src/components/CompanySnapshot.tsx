@@ -40,8 +40,8 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
       : 'w-14 h-14 sm:w-16 sm:h-16 text-lg sm:text-xl';
 
     const initials = (
-      <div className={`${sizeClasses} bg-gradient-to-br from-blue-600 to-indigo-800 rounded-xl flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-blue-500/20 flex-shrink-0`}>
-        <span className="text-white font-bold tracking-wide">
+      <div className={`${sizeClasses} bg-sand rounded-xl flex items-center justify-center shadow-sm border border-line flex-shrink-0`}>
+        <span className="text-ink-soft font-bold tracking-wide">
           {getTickerInitials(ticker)}
         </span>
       </div>
@@ -54,7 +54,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
     return (
       <div className="relative flex-shrink-0">
         {!imageLoaded && initials}
-        <div className={`${sizeClasses} rounded-xl overflow-hidden bg-white shadow-lg border-2 border-white ring-2 ring-blue-500/20 ${imageLoaded ? '' : 'absolute inset-0 opacity-0'}`}>
+        <div className={`${sizeClasses} rounded-xl overflow-hidden bg-white shadow-sm border border-line ${imageLoaded ? '' : 'absolute inset-0 opacity-0'}`}>
           <img
             src={currentImageUrl}
             alt={`${companyName} logo`}
@@ -70,7 +70,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
   // Loading state
   if (isLoading) {
     return (
-      <div className="p-4 sm:p-6 lg:p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-pulse">
+      <div className="p-4 sm:p-6 lg:p-4 bg-sand/60 animate-pulse">
         <div className="flex items-center gap-3 sm:gap-4 mb-3">
           <Skeleton className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl" />
           <div className="flex-1">
@@ -90,14 +90,14 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
     const ipoYear = profile?.ipoDate ? formatIPODate(profile.ipoDate) : null;
 
     return (
-      <div className="p-4 sm:p-6 lg:p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 animate-fade-in delay-300">
+      <div className="p-4 sm:p-6 lg:p-4 bg-sand/60 animate-fade-in delay-300">
         <div className="flex items-start gap-3 sm:gap-4 lg:gap-5 mb-3">
           {renderLogo('sm')}
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-gray-900 dark:text-white text-base sm:text-lg lg:text-xl truncate">
+            <h3 className="font-bold text-ink text-base sm:text-lg lg:text-xl truncate">
               {companyName || profile?.companyName}
             </h3>
-            <p className="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-300">
+            <p className="text-xs sm:text-sm lg:text-base text-ink-soft">
               {displayIndustry} {ipoYear && `• ${ipoYear}`}
             </p>
           </div>
@@ -105,13 +105,13 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
 
         {/* Mission/Description */}
         {mission && (
-          <p className="text-xs sm:text-sm lg:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-3 line-clamp-2 italic">
+          <p className="text-xs sm:text-sm lg:text-base text-ink-soft leading-relaxed mb-3 line-clamp-2 italic">
             "{mission}..."
           </p>
         )}
 
         {/* Quick Facts Row */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-ink-faint">
           <StockNewsPill ticker={ticker} companyName={companyName} />
           
           {profile?.website && (
@@ -120,7 +120,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
               target="_blank" 
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="flex items-center gap-1 hover:text-primary transition-colors"
             >
               <Globe className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Website</span>
@@ -143,19 +143,19 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
   const showExpandButton = description.length > 300;
   
   return (
-    <div className="p-5 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700 dark:to-gray-600">
+    <div className="p-5 bg-sand/60">
       {/* Header with large logo */}
       <div className="flex items-center gap-4 mb-4">
         {renderLogo('lg')}
         <div>
-          <h3 className="font-bold text-gray-900 dark:text-white text-xl">
+          <h3 className="font-bold text-ink text-xl">
             {companyName || profile?.companyName}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-ink-soft">
             {profile?.industry || sector || 'Company'}
           </p>
           {profile?.country && (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-ink-faint">
               {formatHeadquarters(profile.city, profile.state, profile.country)}
             </p>
           )}
@@ -164,10 +164,10 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
 
       {/* About Section */}
       <div className="mb-4">
-        <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm uppercase tracking-wide">
+        <h4 className="font-semibold text-ink mb-2 text-sm uppercase tracking-wide">
           About {companyName || profile?.companyName}
         </h4>
-        <p className={`text-base text-gray-700 dark:text-gray-300 leading-relaxed ${
+        <p className={`text-base text-ink-soft leading-relaxed ${
           !isDescriptionExpanded && showExpandButton ? 'line-clamp-4' : ''
         }`}>
           {description}
@@ -178,7 +178,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
               e.stopPropagation();
               setIsDescriptionExpanded(!isDescriptionExpanded);
             }}
-            className="mt-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm font-medium flex items-center gap-1 transition-colors"
+            className="mt-2 text-primary hover:text-clay-ink text-sm font-medium flex items-center gap-1 transition-colors"
           >
             {isDescriptionExpanded ? (
               <>Show less <ChevronUp className="w-4 h-4" /></>
@@ -192,30 +192,30 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
       {/* Facts Grid */}
       <div className="grid grid-cols-3 gap-3 mb-4">
         {profile?.ipoDate && (
-          <div className="bg-white/60 dark:bg-gray-800/60 rounded-xl p-3 text-center">
-            <Calendar className="w-5 h-5 mx-auto mb-1 text-blue-600 dark:text-blue-400" />
-            <p className="text-xs text-gray-500 dark:text-gray-400">Went Public</p>
-            <p className="font-semibold text-gray-900 dark:text-white text-sm">
+          <div className="bg-white border border-line rounded-xl p-3 text-center">
+            <Calendar className="w-5 h-5 mx-auto mb-1 text-primary" />
+            <p className="text-xs text-ink-faint">Went Public</p>
+            <p className="font-semibold text-ink text-sm">
               {new Date(profile.ipoDate).getUTCFullYear() || 'N/A'}
             </p>
           </div>
         )}
         
         {profile?.fullTimeEmployees && (
-          <div className="bg-white/60 dark:bg-gray-800/60 rounded-xl p-3 text-center">
-            <Users className="w-5 h-5 mx-auto mb-1 text-green-600 dark:text-green-400" />
-            <p className="text-xs text-gray-500 dark:text-gray-400">Employees</p>
-            <p className="font-semibold text-gray-900 dark:text-white text-sm">
+          <div className="bg-white border border-line rounded-xl p-3 text-center">
+            <Users className="w-5 h-5 mx-auto mb-1 text-[#3B6A2A]" />
+            <p className="text-xs text-ink-faint">Employees</p>
+            <p className="font-semibold text-ink text-sm">
               {formatEmployeeCount(profile.fullTimeEmployees)}
             </p>
           </div>
         )}
         
         {(profile?.city || profile?.country) && (
-          <div className="bg-white/60 dark:bg-gray-800/60 rounded-xl p-3 text-center">
-            <Building2 className="w-5 h-5 mx-auto mb-1 text-purple-600 dark:text-purple-400" />
-            <p className="text-xs text-gray-500 dark:text-gray-400">Headquarters</p>
-            <p className="font-semibold text-gray-900 dark:text-white text-sm truncate">
+          <div className="bg-white border border-line rounded-xl p-3 text-center">
+            <Building2 className="w-5 h-5 mx-auto mb-1 text-[#2C5288]" />
+            <p className="text-xs text-ink-faint">Headquarters</p>
+            <p className="font-semibold text-ink text-sm truncate">
               {profile.city || profile.state || profile.country || 'N/A'}
             </p>
           </div>
@@ -229,7 +229,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
           target="_blank" 
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors mb-4"
+          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors mb-4"
         >
           <Globe className="w-4 h-4" />
           Visit Website
@@ -238,8 +238,8 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
       )}
 
       {/* News Section */}
-      <div className="pt-3 border-t border-gray-200 dark:border-gray-600">
-        <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
+      <div className="pt-3 border-t border-line">
+        <h4 className="font-semibold text-ink mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
           📰 Latest News
         </h4>
         <StockNewsPill ticker={ticker} companyName={companyName} />

@@ -10,7 +10,7 @@ import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/she
 import StockNewsPill from '@/components/StockNewsPill';
 import CompanySnapshot from '@/components/CompanySnapshot';
 import CompanyLogo from '@/components/values/CompanyLogo';
-import CauseChips, { causeGradient } from '@/components/values/CauseChips';
+import CauseChips, { causeTone } from '@/components/values/CauseChips';
 import ValuesSummary from '@/components/values/ValuesSummary';
 import KeyNumbers from '@/components/values/KeyNumbers';
 
@@ -184,20 +184,20 @@ const TinderStockCard = ({
   const isUpdate = stock.cardType === 'update' && !!stock.update;
   const primaryCause = stock.cause ?? stock.matchedCauses?.[0]?.cause;
 
-  // Logo, name and the causes it matches, on the cause's color
+  // Logo, name and the causes it matches, on a soft tint of the cause's color
   const header = (large = false) => (
-    <div className={`bg-gradient-to-br ${causeGradient(primaryCause)} text-white ${large ? 'p-5' : 'p-4'} flex-shrink-0`}>
+    <div className={`${causeTone(primaryCause).header} text-ink ${large ? 'p-5' : 'p-4'} flex-shrink-0`}>
       <div className="flex items-start gap-3">
         <CompanyLogo src={stock.logoUrl} name={stock.companyName} ticker={stock.ticker} className={large ? 'w-14 h-14' : 'w-12 h-12'} />
         <div className="flex-1 min-w-0">
           <h2 className={`${large ? 'text-2xl' : 'text-xl'} font-bold leading-tight truncate`}>{stock.companyName}</h2>
-          <p className="text-white/80 text-sm">{stock.ticker}{stock.sector ? ` · ${capitalize(stock.sector)}` : ''}</p>
+          <p className="text-ink-faint text-sm">{stock.ticker}{stock.sector ? ` · ${capitalize(stock.sector)}` : ''}</p>
         </div>
         {!large && onViewDetails && (
           <button
             onClick={handleViewDetails}
             aria-label="View stock details"
-            className="bg-white/20 hover:bg-white/30 text-white w-10 h-10 flex items-center justify-center rounded-full transition-colors flex-shrink-0"
+            className="bg-white/80 hover:bg-white text-ink-soft border border-black/5 w-10 h-10 flex items-center justify-center rounded-full shadow-sm transition-colors flex-shrink-0"
           >
             <Eye className="w-4 h-4" />
           </button>
@@ -205,7 +205,7 @@ const TinderStockCard = ({
       </div>
       <div className="mt-3">
         {isUpdate ? (
-          <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-white/20 border border-white/25">
+          <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-white border border-line text-ink">
             📰 News on a company you liked
           </span>
         ) : (
@@ -218,8 +218,8 @@ const TinderStockCard = ({
   // Update cards: the news, and why the user liked the company in the first place
   const updateBody = isUpdate && (
     <div className="space-y-3">
-      <div className="rounded-xl bg-blue-50 dark:bg-blue-900/25 border border-blue-200/70 dark:border-blue-700/40 p-3">
-        <p className="text-[15px] font-semibold leading-snug text-gray-900 dark:text-white">{stock.update!.headline}</p>
+      <div className="rounded-xl bg-sand border border-line p-3">
+        <p className="text-[15px] font-semibold leading-snug text-ink">{stock.update!.headline}</p>
         <p className="text-xs text-muted-foreground mt-1">
           {[stock.update!.source, timeAgo(stock.update!.publishedAt)].filter(Boolean).join(' · ')}
         </p>
@@ -232,7 +232,7 @@ const TinderStockCard = ({
       {stock.missionStory && (
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Why you liked it</p>
-          <p className="text-sm text-gray-800 dark:text-gray-200 mt-1 leading-snug">{stock.missionStory}</p>
+          <p className="text-sm text-ink mt-1 leading-snug">{stock.missionStory}</p>
         </div>
       )}
     </div>
@@ -242,7 +242,7 @@ const TinderStockCard = ({
   const whyLines = !isUpdate && (stock.matchedCauses ?? []).some(c => c.whyLine) && (
     <div>
       <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Why it matches you</p>
-      <ul className="space-y-1 text-sm text-gray-800 dark:text-gray-200">
+      <ul className="space-y-1 text-sm text-ink">
         {(stock.matchedCauses ?? []).filter(c => c.whyLine).map(c => (
           <li key={c.cause}><span aria-hidden>{c.icon}</span> {c.whyLine}</li>
         ))}
@@ -299,7 +299,7 @@ const TinderStockCard = ({
         style={{ 
           zIndex,
           transform: `scale(${cardScale})`,
-          filter: zIndex === 1 ? 'none' : 'brightness(0.9)',
+          filter: isActive ? 'none' : 'brightness(0.94)', // only the cards behind are dimmed
         }}
       >
       {/* Overlay indicators */}
@@ -310,9 +310,7 @@ const TinderStockCard = ({
               dragOffset.x > 50 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             style={{
-              background: isHighMatch
-                ? 'linear-gradient(45deg, rgba(236, 72, 153, 0.9), rgba(219, 39, 119, 0.9))'
-                : 'linear-gradient(45deg, rgba(59, 130, 246, 0.9), rgba(6, 182, 212, 0.9))'
+              background: 'linear-gradient(45deg, rgba(181, 74, 34, 0.92), rgba(138, 58, 24, 0.92))'
             }}
           >
             <div className="text-white text-center animate-pulse">
@@ -332,7 +330,7 @@ const TinderStockCard = ({
               dragOffset.x < -50 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             style={{
-              background: 'linear-gradient(45deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9))'
+              background: 'linear-gradient(45deg, rgba(31, 26, 21, 0.82), rgba(70, 60, 50, 0.82))'
             }}
           >
             <div className="text-white text-center animate-pulse">
@@ -345,7 +343,7 @@ const TinderStockCard = ({
 
       <Card 
         ref={cardRef}
-className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[min(85vw,800px)] xl:max-w-[min(80vw,900px)] mx-auto shadow-2xl border-0 bg-card overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
+className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[min(85vw,800px)] xl:max-w-[min(80vw,900px)] mx-auto shadow-[0_18px_40px_rgba(60,40,20,0.14)] border border-line bg-white overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
           isExiting ? 'animate-scale-out' : 'animate-scale-in'
         } h-full max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh] lg:max-h-[calc(100vh-10rem)] rounded-2xl flex flex-col relative`}
         style={{

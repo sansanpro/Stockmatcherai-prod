@@ -31,23 +31,24 @@ const ValuesCard = ({ causes }: { causes: CauseInfo[] }) => {
   };
 
   return (
-    <div className="rounded-3xl p-5 bg-gradient-to-br from-primary via-purple-600 to-pink-500 shadow-2xl shadow-primary/30 text-white">
-      <p className="text-xs uppercase tracking-widest text-white/70 font-semibold">My values card</p>
+    // Deep orange so white text stays readable (5:1 or better); this card gets shared
+    <div className="rounded-3xl p-5 bg-gradient-to-br from-clay-deep to-clay-ink shadow-xl shadow-[#8A3A18]/25 text-white">
+      <p className="text-xs uppercase tracking-widest text-white/80 font-semibold">My values card</p>
       <p className="text-xl font-bold mt-2 leading-snug">I invest in what I believe in:</p>
       <div className="flex flex-wrap gap-2 mt-3">
         {causes.map(c => (
-          <span key={c.id} className="px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-sm font-semibold">
+          <span key={c.id} className="px-3 py-1.5 rounded-full bg-white/15 border border-white/25 text-sm font-semibold">
             <span aria-hidden>{c.icon}</span> {c.label}
           </span>
         ))}
       </div>
       <div className="flex items-center justify-between mt-5">
-        <span className="text-sm font-bold text-white/80">StockMatcher</span>
+        <span className="text-sm font-bold text-white/90">StockMatcher</span>
         <button
           type="button"
           onClick={share}
           disabled={sharing}
-          className="min-h-[44px] px-4 rounded-full bg-white text-purple-700 font-semibold text-sm flex items-center gap-2 active:scale-95 transition-transform disabled:opacity-60"
+          className="min-h-[44px] px-4 rounded-full bg-white text-clay-ink font-semibold text-sm flex items-center gap-2 active:scale-95 transition-transform disabled:opacity-60"
         >
           <Share2 className="w-4 h-4" /> Share
         </button>

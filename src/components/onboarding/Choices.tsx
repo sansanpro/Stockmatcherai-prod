@@ -5,16 +5,17 @@ interface Option<T extends string> {
   label: string;
 }
 
-// Full-width answer buttons, one per row (single choice)
-export function ChoiceList<T extends string>({ options, value, onSelect, name }: {
+// Full-width answer buttons, one per row (single choice). animated: each rises in, one after another.
+export function ChoiceList<T extends string>({ options, value, onSelect, name, animated = false }: {
   options: readonly Option<T>[];
   value?: T;
   onSelect: (id: T) => void;
   name: string;
+  animated?: boolean;
 }) {
   return (
     <div role="radiogroup" aria-label={name} className="space-y-3">
-      {options.map(o => {
+      {options.map((o, i) => {
         const selected = value === o.id;
         return (
           <button
@@ -23,16 +24,17 @@ export function ChoiceList<T extends string>({ options, value, onSelect, name }:
             role="radio"
             aria-checked={selected}
             onClick={() => onSelect(o.id)}
-            className={`w-full min-h-[56px] px-4 py-3 rounded-2xl border-2 text-left text-base font-medium transition-all duration-150 flex items-center gap-3 active:scale-[0.98] ${
-              selected ? 'border-primary bg-primary/15 text-white' : 'border-white/10 bg-white/5 text-white/90 hover:border-white/25'
+            style={animated ? { animationDelay: `${260 + i * 70}ms` } : undefined}
+            className={`${animated ? 'rise-in ' : ''}w-full min-h-[56px] px-5 py-3.5 rounded-2xl border text-left text-[17px] font-medium text-ink shadow-sm transition-all duration-150 flex items-center gap-3 active:scale-[0.98] ${
+              selected ? 'border-primary bg-clay-tint ring-1 ring-primary' : 'border-line bg-white hover:border-clay-soft'
             }`}
           >
             <span className="flex-1">{o.label}</span>
-            {selected && (
-              <span className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                <Check className="w-3.5 h-3.5 text-white" />
-              </span>
-            )}
+            <span className={`w-6 h-6 rounded-full border flex items-center justify-center flex-shrink-0 transition-colors ${
+              selected ? 'bg-primary border-primary' : 'bg-white border-line'
+            }`}>
+              {selected && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+            </span>
           </button>
         );
       })}
@@ -41,15 +43,16 @@ export function ChoiceList<T extends string>({ options, value, onSelect, name }:
 }
 
 // Pill buttons that wrap; single or multiple choice
-export function ChipGroup<T extends string>({ options, selected, onToggle, name, multiple = false }: {
+export function ChipGroup<T extends string>({ options, selected, onToggle, name, multiple = false, center = false }: {
   options: readonly Option<T>[];
   selected: readonly T[];
   onToggle: (id: T) => void;
   name: string;
   multiple?: boolean;
+  center?: boolean;
 }) {
   return (
-    <div role={multiple ? 'group' : 'radiogroup'} aria-label={name} className="flex flex-wrap gap-2.5">
+    <div role={multiple ? 'group' : 'radiogroup'} aria-label={name} className={`flex flex-wrap gap-2.5 ${center ? 'justify-center' : ''}`}>
       {options.map(o => {
         const isOn = selected.includes(o.id);
         return (
@@ -59,8 +62,8 @@ export function ChipGroup<T extends string>({ options, selected, onToggle, name,
             role={multiple ? 'checkbox' : 'radio'}
             aria-checked={isOn}
             onClick={() => onToggle(o.id)}
-            className={`min-h-[44px] px-4 py-2 rounded-full border-2 text-sm font-medium transition-all duration-150 active:scale-95 ${
-              isOn ? 'border-primary bg-primary/15 text-white' : 'border-white/10 bg-white/5 text-white/80 hover:border-white/25'
+            className={`min-h-[44px] px-4 py-2 rounded-full border text-[15px] font-medium shadow-sm transition-all duration-150 active:scale-95 ${
+              isOn ? 'border-primary bg-primary text-white' : 'border-line bg-white text-ink-soft hover:border-clay-soft'
             }`}
           >
             {isOn && multiple ? '✓ ' : ''}{o.label}

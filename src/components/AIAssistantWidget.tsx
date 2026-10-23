@@ -368,14 +368,13 @@ export default function AIAssistantWidget() {
           }}
           aria-label="Open Ask AI"
           data-ai-assistant
-          className="fixed bottom-[7.5rem] right-4 md:bottom-8 md:right-6 z-[75] flex items-center gap-2 h-14 rounded-full shadow-2xl px-4
-            bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700
+          className="fixed bottom-[7.5rem] right-4 md:bottom-8 md:right-6 z-[75] flex items-center gap-2 h-14 rounded-full px-4
+            bg-primary hover:bg-primary/90 shadow-[0_10px_26px_rgba(181,74,34,0.35)]
             text-white transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none"
-          style={{ boxShadow: '0 8px 32px rgba(99,102,241,0.45)' }}
         >
           {/* Pulsing attention ring for new users */}
           {!hasOpenedWidget && (
-            <span className="absolute inset-0 rounded-full bg-purple-400/50 animate-ping pointer-events-none" />
+            <span className="absolute inset-0 rounded-full bg-clay/40 animate-ping pointer-events-none" />
           )}
           <Sparkles className="h-5 w-5 flex-shrink-0" />
           {!hasOpenedWidget && (
@@ -393,7 +392,7 @@ export default function AIAssistantWidget() {
               <Sparkles className="h-5 w-5 text-primary" />
               <h3 className="font-semibold">Ask AI</h3>
               {subscribed && (
-                <Crown className="h-4 w-4 text-yellow-500" />
+                <Crown className="h-4 w-4 text-clay" />
               )}
             </div>
             <div className="flex gap-2">
@@ -464,7 +463,7 @@ export default function AIAssistantWidget() {
                       }`}
                     >
                       {msg.role === 'assistant' ? (
-                        <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
+                        <div className="text-sm prose prose-sm max-w-none">
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div>
                       ) : (

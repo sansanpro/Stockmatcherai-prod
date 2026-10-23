@@ -64,18 +64,13 @@ const StockNewsPill = ({ ticker, companyName }: StockNewsPillProps) => {
         onMouseDown={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
         className="group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
-          bg-gradient-to-r from-blue-500/20 to-cyan-500/20 
-          hover:from-blue-500/30 hover:to-cyan-500/30
-          dark:from-blue-400/20 dark:to-cyan-400/20
-          dark:hover:from-blue-400/30 dark:hover:to-cyan-400/30
-          text-blue-700 dark:text-blue-300
-          border border-blue-200/50 dark:border-blue-500/30
-          transition-all duration-200 hover:scale-105 active:scale-95
+          bg-clay-tint hover:bg-clay-soft
+                              text-clay-ink           border border-clay-soft           transition-all duration-200 hover:scale-105 active:scale-95
           backdrop-blur-sm shadow-sm hover:shadow-md"
       >
         <Newspaper className="w-3 h-3" />
         {isLoading ? (
-          <span className="w-12 h-2.5 bg-blue-400/40 rounded-full animate-pulse inline-block" />
+          <span className="w-12 h-2.5 bg-clay-soft rounded-full animate-pulse inline-block" />
         ) : (
           <>
             <span>{news.length} update{news.length !== 1 ? 's' : ''}</span>
@@ -93,7 +88,7 @@ const StockNewsPill = ({ ticker, companyName }: StockNewsPillProps) => {
         >
           <SheetHeader className="px-5 pb-4 border-b">
             <SheetTitle className="flex items-center gap-2 text-lg">
-              <Newspaper className="w-5 h-5 text-blue-500" />
+              <Newspaper className="w-5 h-5 text-primary" />
               Latest News for {ticker}
             </SheetTitle>
             <p className="text-sm text-muted-foreground">{companyName}</p>

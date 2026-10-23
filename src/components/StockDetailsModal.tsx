@@ -1,6 +1,7 @@
 import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/sheet';
+import { capitalize } from '@/lib/utils';
 import CoachMark from '@/components/CoachMark';
-import CauseChips, { causeGradient } from '@/components/values/CauseChips';
+import CauseChips, { causeTone } from '@/components/values/CauseChips';
 import ValuesSummary from '@/components/values/ValuesSummary';
 import { RISK_WORDS } from '@/components/values/KeyNumbers';
 import { Button } from '@/components/ui/button';
@@ -27,12 +28,13 @@ interface StockDetailsModalProps {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const getRiskGradient = (risk: string) => {
+// Hero tint for companies without a cause (e.g. ones liked before values matching)
+const getRiskTint = (risk: string) => {
   switch (risk) {
-    case 'low':    return 'from-emerald-500 to-green-600';
-    case 'medium': return 'from-yellow-400 to-orange-500';
-    case 'high':   return 'from-rose-500 to-pink-600';
-    default:       return 'from-gray-500 to-gray-700';
+    case 'low':    return 'bg-[#E6EFDB]';
+    case 'medium': return 'bg-[#FBF0DC]';
+    case 'high':   return 'bg-[#FBE4E7]';
+    default:       return 'bg-[#F0E8DD]';
   }
 };
 
@@ -82,33 +84,33 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
         onInteractOutside={keepOpenForAIAssistant}
         className="h-[92vh] p-0 rounded-t-3xl flex flex-col overflow-hidden"
       >
-        {/* ── Gradient hero header ─────────────────────────────────────────── */}
-        <div className={`bg-gradient-to-br ${stock.cause || stock.matchedCauses?.length ? causeGradient(stock.cause ?? stock.matchedCauses?.[0]?.cause) : getRiskGradient(stock.riskLevel)} flex-shrink-0 relative overflow-hidden`}>
+        {/* ── Hero: a soft tint of the company's cause ─────────────────────── */}
+        <div className={`${stock.cause || stock.matchedCauses?.length ? causeTone(stock.cause ?? stock.matchedCauses?.[0]?.cause).header : getRiskTint(stock.riskLevel)} flex-shrink-0 relative overflow-hidden`}>
           {/* Decorative circles */}
-          <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full" />
-          <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-white/10 rounded-full" />
+          <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/35 rounded-full" />
+          <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-white/35 rounded-full" />
 
           {/* Drag handle */}
           <div className="flex justify-center pt-3 pb-1">
-            <div className="w-10 h-1 bg-white/40 rounded-full" />
+            <div className="w-10 h-1 bg-ink/20 rounded-full" />
           </div>
 
           <div className="relative z-10 px-5 pt-2 pb-5">
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <h2 className="text-2xl font-bold text-white leading-tight truncate">
+                <h2 className="text-2xl font-bold text-ink leading-tight truncate">
                   {stock.companyName}
                 </h2>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <span className="text-white/80 font-semibold text-base">{stock.ticker}</span>
-                  <span className="text-white/50 text-sm">·</span>
-                  <span className="text-white/75 text-sm">{stock.sector}</span>
+                  <span className="text-ink-soft font-semibold text-base">{stock.ticker}</span>
+                  <span className="text-ink-faint text-sm">·</span>
+                  <span className="text-ink-faint text-sm">{capitalize(stock.sector)}</span>
                 </div>
               </div>
               <div className="flex-shrink-0 text-right">
-                <p className="text-white text-xl font-bold">${live.price.toFixed(2)}</p>
+                <p className="text-ink text-xl font-bold">${live.price.toFixed(2)}</p>
                 <div className={`flex items-center justify-end gap-1 mt-0.5 text-sm font-semibold ${
-                  isPositive ? 'text-green-200' : 'text-red-200'
+                  isPositive ? 'text-gain' : 'text-loss'
                 }`}>
                   {isPositive
                     ? <TrendingUp className="w-4 h-4" />
@@ -120,7 +122,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
 
             {/* Risk in plain words */}
             <div className="flex gap-2 mt-3 flex-wrap">
-              <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm text-xs font-semibold px-3 py-1">
+              <Badge className="bg-white/80 hover:bg-white/80 text-ink border border-black/5 text-xs font-semibold px-3 py-1">
                 {(RISK_WORDS[stock.riskLevel] ?? RISK_WORDS.medium).emoji} {(RISK_WORDS[stock.riskLevel] ?? RISK_WORDS.medium).text}
               </Badge>
             </div>
@@ -135,7 +137,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
 
         {/* ── Tabs ─────────────────────────────────────────────────────────── */}
         <Tabs defaultValue="overview" className="flex-1 flex flex-col overflow-hidden">
-          <TabsList className="grid grid-cols-4 mx-4 mt-3 mb-1 rounded-xl h-10 flex-shrink-0 bg-muted">
+          <TabsList className="grid grid-cols-4 mx-4 mt-3 mb-1 rounded-xl h-10 flex-shrink-0 bg-sand">
             <TabsTrigger value="overview"    className="rounded-lg text-xs data-[state=active]:shadow-sm gap-1">
               <Building2 className="w-3 h-3" />Overview
             </TabsTrigger>
@@ -158,12 +160,12 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
               {/* What they work on, the causes it matches, proof and things to know */}
               {(stock.matchedCauses?.length || stock.missionStory) ? (
                 <div className="px-4 pt-3 pb-1 space-y-4">
-                  <CauseChips causes={stock.matchedCauses} tone="muted" label={stock.cause ? 'Values match' : 'Works on'} />
+                  <CauseChips causes={stock.matchedCauses} label={stock.cause ? 'Values match' : 'Works on'} />
                   <ValuesSummary stock={stock} />
                   {(stock.matchedCauses ?? []).some(c => c.whyLine) && (
                     <div>
                       <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Why it matches you</p>
-                      <ul className="space-y-1 text-sm text-gray-800 dark:text-gray-200">
+                      <ul className="space-y-1 text-sm text-ink">
                         {(stock.matchedCauses ?? []).filter(c => c.whyLine).map(c => (
                           <li key={c.cause}><span aria-hidden>{c.icon}</span> {c.whyLine}</li>
                         ))}
@@ -172,9 +174,9 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                   )}
                 </div>
               ) : stock.whyItFits ? (
-                <div className="mx-4 mt-3 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-4 border border-indigo-100 dark:border-indigo-800/30">
-                  <p className="text-xs font-semibold text-indigo-500 dark:text-indigo-400 uppercase tracking-wide mb-2">Why you liked it</p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{stock.whyItFits}</p>
+                <div className="mx-4 mt-3 bg-sand rounded-2xl p-4 border border-line">
+                  <p className="text-xs font-semibold text-ink-faint uppercase tracking-wide mb-2">Why you liked it</p>
+                  <p className="text-sm text-ink-soft leading-relaxed">{stock.whyItFits}</p>
                 </div>
               ) : null}
 
@@ -188,11 +190,11 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
 
               {/* CEO highlights */}
               {stock.ceoHighlights && (
-                <div className="mx-4 mb-4 bg-muted/60 rounded-2xl p-4">
+                <div className="mx-4 mb-4 bg-sand/70 rounded-2xl p-4">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                     👤 Leadership — {stock.ceoName}
                   </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                  <p className="text-sm text-ink-soft leading-relaxed">
                     {stock.ceoHighlights}
                   </p>
                 </div>
@@ -206,29 +208,22 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                 <MetricTile
                   label="P/E Ratio"
                   value={stock.peRatio > 0 ? stock.peRatio.toFixed(1) : '—'}
-                  gradient="from-blue-500/15 to-blue-600/5"
-                  accent="text-blue-600 dark:text-blue-400"
                   hint="Share price compared with profit"
                 />
                 <MetricTile
                   label="Market Cap"
                   value={stock.marketCap}
-                  gradient="from-purple-500/15 to-purple-600/5"
-                  accent="text-purple-600 dark:text-purple-400"
                   hint="Total company value"
                 />
                 <MetricTile
                   label="Past year"
                   value={`${isPositive ? '+' : ''}${stock.oneYearReturn.toFixed(1)}%`}
-                  gradient={isPositive ? 'from-emerald-500/15 to-emerald-600/5' : 'from-rose-500/15 to-rose-600/5'}
-                  accent={isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}
+                  valueClass={isPositive ? 'text-gain' : 'text-loss'}
                   hint="Share price change over 12 months"
                 />
                 <MetricTile
                   label="Dividend Yield"
                   value={stock.dividendYield > 0 ? `${stock.dividendYield.toFixed(2)}%` : '—'}
-                  gradient="from-amber-500/15 to-amber-600/5"
-                  accent="text-amber-600 dark:text-amber-400"
                   hint="Yearly cash paid to owners, as % of price"
                 />
               </div>
@@ -245,8 +240,8 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                   </div>
                   <div className={`px-3 py-1.5 rounded-xl text-sm font-semibold ${
                     isPositive
-                      ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                      : 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
+                      ? 'bg-[#E6EFDB] text-gain'
+                      : 'bg-[#FBE4E7] text-loss'
                   }`}>
                     {isPositive ? '▲' : '▼'} {Math.abs(stock.oneYearReturn).toFixed(1)}% past year
                   </div>
@@ -280,7 +275,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                         <Tooltip content={<ReturnTooltip />} cursor={{ fill: 'currentColor', fillOpacity: 0.05 }} />
                         <Bar dataKey="percent" radius={[6, 6, 6, 6]} isAnimationActive={false}>
                           {performance.returns.map((r) => (
-                            <Cell key={r.period} fill={r.percent >= 0 ? '#10b981' : '#f43f5e'} />
+                            <Cell key={r.period} fill={r.percent >= 0 ? '#4D7C3A' : '#C2453B'} />
                           ))}
                         </Bar>
                       </BarChart>
@@ -293,7 +288,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
               {rangePosition !== null && (
                 <div className="bg-muted/40 rounded-2xl p-4">
                   <p className="text-sm font-semibold mb-3">52-Week Range</p>
-                  <div className="relative h-2 bg-gradient-to-r from-rose-400 via-yellow-400 to-emerald-500 rounded-full">
+                  <div className="relative h-2 bg-gradient-to-r from-[#E9A39A] via-[#EED9B0] to-[#9CC08A] rounded-full">
                     <div
                       className="absolute -top-1 w-4 h-4 rounded-full bg-background border-2 border-foreground shadow"
                       style={{ left: `calc(${rangePosition}% - 8px)` }}
@@ -368,15 +363,15 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
             <Button
               onClick={() => { onPass(stock); onClose(); }}
               variant="outline"
-              className="flex-1 h-12 rounded-xl border-2 font-semibold gap-2"
+              className="flex-1 h-12 rounded-xl border border-line bg-white text-ink hover:bg-sand font-semibold gap-2"
             >
               <X className="w-4 h-4" /> Pass
             </Button>
             <Button
               onClick={() => { onMatch(stock); onClose(); }}
-              className="flex-[2] h-12 rounded-xl font-semibold gap-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 border-0 shadow-lg shadow-emerald-500/25"
+              className="flex-[2] h-12 rounded-xl font-semibold gap-2 bg-primary hover:bg-primary/90 border-0 shadow-lg shadow-[#B54A22]/25"
             >
-              <Heart className="w-4 h-4 fill-white" /> Add to Watchlist
+              <Heart className="w-4 h-4 fill-white" /> Like
             </Button>
           </div>
         </div>
@@ -388,13 +383,13 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
 // ─── Metric tile sub-component ────────────────────────────────────────────────
 
 const MetricTile = ({
-  label, value, gradient, accent, hint,
+  label, value, hint, valueClass = 'text-ink',
 }: {
-  label: string; value: string; gradient: string; accent: string; hint: string;
+  label: string; value: string; hint: string; valueClass?: string;
 }) => (
-  <div className={`bg-gradient-to-br ${gradient} rounded-2xl p-4 border border-white/10 dark:border-white/5`}>
+  <div className="bg-sand/70 rounded-2xl p-4 border border-line">
     <p className="text-xs text-muted-foreground mb-1">{label}</p>
-    <p className={`text-2xl font-bold ${accent} leading-none mb-1`}>{value}</p>
+    <p className={`text-2xl font-bold ${valueClass} leading-none mb-1`}>{value}</p>
     <p className="text-[10px] text-muted-foreground leading-tight">{hint}</p>
   </div>
 );

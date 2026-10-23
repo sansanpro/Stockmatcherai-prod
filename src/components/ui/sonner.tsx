@@ -1,16 +1,13 @@
-import { useTheme } from "next-themes"
 import { Toaster as Sonner, toast } from "sonner"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
-
   return (
     <Sonner
       duration={3000}
       visibleToasts={1}
-      theme={theme as ToasterProps["theme"]}
+      theme="light" // the app is light only
       className="toaster group"
       // Top: the bottom of the screen holds the like/pass buttons and the tab bar
       position="top-center"

@@ -109,17 +109,17 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
   }));
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-[#0f0a1e] via-[#130d2a] to-[#0a0614] text-white overflow-x-hidden">
+    <div className="min-h-screen w-full bg-cream text-ink overflow-x-hidden">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#130d2a]/80 backdrop-blur-md border-b border-white/10 px-4 pb-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
+      <div className="sticky top-0 z-10 bg-cream/85 backdrop-blur-md border-b border-line px-4 pb-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
         <div className="flex items-center gap-3 max-w-2xl mx-auto">
           <button onClick={onBack}
-            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+            className="w-9 h-9 rounded-full bg-white border border-line hover:bg-sand flex items-center justify-center transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <h1 className="text-xl font-bold">Settings</h1>
           {subscribed && (
-            <span className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-yellow-400 bg-yellow-400/10 px-2.5 py-1 rounded-full border border-yellow-400/20">
+            <span className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-clay-ink bg-clay-tint px-2.5 py-1 rounded-full border border-clay-soft">
               <Crown className="w-3 h-3" /> Premium
             </span>
           )}
@@ -129,19 +129,19 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
       <div className="max-w-2xl mx-auto p-4 space-y-4 pb-24">
         {/* Upgrade banner — only shown to free users */}
         {!subscribed && (
-          <section className="rounded-2xl overflow-hidden border border-yellow-400/30 bg-gradient-to-r from-yellow-400/10 to-orange-500/10">
+          <section className="rounded-2xl overflow-hidden border border-clay-soft bg-clay-tint">
             <div className="p-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                 <Crown className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white">Upgrade to Premium</p>
-                <p className="text-xs text-white/60">{PLAN_LIMITS.premium.dailyMatches} matches a day and unlimited Ask AI</p>
+                <p className="text-sm font-semibold text-ink">Upgrade to Premium</p>
+                <p className="text-xs text-ink-soft">{PLAN_LIMITS.premium.dailyMatches} matches a day and unlimited Ask AI</p>
               </div>
               <Button
                 size="sm"
                 onClick={() => setShowUpgradeModal(true)}
-                className="flex-shrink-0 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-semibold border-0"
+                className="flex-shrink-0 bg-primary hover:bg-primary/90 text-white font-semibold border-0"
               >
                 Upgrade
               </Button>
@@ -150,27 +150,27 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
         )}
 
         {/* Account section */}
-        <section className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm">
-          <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
-              <User className="w-3.5 h-3.5 text-white" />
+        <section className="rounded-2xl overflow-hidden border border-line bg-white shadow-sm">
+          <div className="px-4 py-3 border-b border-line flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-clay-tint flex items-center justify-center">
+              <User className="w-3.5 h-3.5 text-primary" />
             </div>
             <h2 className="font-semibold text-sm">Account</h2>
           </div>
           <div className="p-4 space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs text-white/60 uppercase tracking-wide">Name</Label>
+              <Label className="text-xs text-ink-faint uppercase tracking-wide">Name</Label>
               <Input value={fullName} onChange={e => setFullName(e.target.value)}
                 placeholder="Your name"
                 autoCorrect="off"
                 autoComplete="name"
-                className="bg-white/8 border-white/15 text-white placeholder:text-white/30 focus:border-primary rounded-xl h-11 text-base" />
+                className="bg-white border-line text-ink placeholder:text-ink-muted focus:border-primary rounded-xl h-11 text-base" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs text-white/60 uppercase tracking-wide">Email</Label>
+              <Label className="text-xs text-ink-faint uppercase tracking-wide">Email</Label>
               <Input value={user?.email || ''} disabled
-                className="bg-white/5 border-white/10 text-white/40 rounded-xl h-11 cursor-not-allowed" />
-              <p className="text-xs text-white/30">Email cannot be changed</p>
+                className="bg-sand border-line text-ink-faint rounded-xl h-11 cursor-not-allowed" />
+              <p className="text-xs text-ink-faint">Email cannot be changed</p>
             </div>
             {isIOSNative && (
               <button onClick={handleRestorePurchases} disabled={isRestoring}
@@ -183,39 +183,39 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
         </section>
 
         {/* What you care about (drives matching) */}
-        <section className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm">
-          <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-pink-500 to-primary flex items-center justify-center">
-              <Heart className="w-3.5 h-3.5 text-white" />
+        <section className="rounded-2xl overflow-hidden border border-line bg-white shadow-sm">
+          <div className="px-4 py-3 border-b border-line flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-clay-tint flex items-center justify-center">
+              <Heart className="w-3.5 h-3.5 text-primary" />
             </div>
             <h2 className="font-semibold text-sm">What you care about</h2>
           </div>
           <div className="p-4 space-y-6">
             <div>
-              <Label className="text-xs text-white/60 uppercase tracking-wide">Your causes</Label>
-              <p className="text-xs text-white/40 mt-1 mb-3">Pick up to 3. Your first pick matters most.</p>
+              <Label className="text-xs text-ink-faint uppercase tracking-wide">Your causes</Label>
+              <p className="text-xs text-ink-faint mt-1 mb-3">Pick up to 3. Your first pick matters most.</p>
               <CausePicker causes={causes} selected={values.causes} onChange={c => setValues(v => ({ ...v, causes: c }))} />
             </div>
             <div>
-              <Label className="text-xs text-white/60 uppercase tracking-wide">Never show me companies tied to</Label>
+              <Label className="text-xs text-ink-faint uppercase tracking-wide">Never show me companies tied to</Label>
               <div className="mt-3">
                 <ChipGroup name="Dealbreakers" multiple options={DEALBREAKERS} selected={values.dealbreakers} onToggle={toggleDealbreaker} />
               </div>
             </div>
             <div>
-              <Label className="text-xs text-white/60 uppercase tracking-wide">If a company you own drops 20% in a month</Label>
+              <Label className="text-xs text-ink-faint uppercase tracking-wide">If a company you own drops 20% in a month</Label>
               <div className="mt-3">
                 <ChoiceList name="If a stock drops 20%" options={RISK_OPTIONS} value={values.risk} onSelect={id => setValues(v => ({ ...v, risk: id }))} />
               </div>
             </div>
             <div>
-              <Label className="text-xs text-white/60 uppercase tracking-wide">What this money is for</Label>
+              <Label className="text-xs text-ink-faint uppercase tracking-wide">What this money is for</Label>
               <div className="mt-3">
                 <ChoiceList name="Goal" options={GOAL_OPTIONS} value={values.goal} onSelect={id => setValues(v => ({ ...v, goal: id }))} />
               </div>
             </div>
             <Button onClick={handleValuesSave} disabled={loading || !changed || values.causes.length === 0}
-              className="w-full h-12 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 rounded-xl font-semibold flex items-center justify-center gap-2">
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold flex items-center justify-center gap-2">
               <Save className="w-4 h-4" />
               {loading ? 'Saving...' : 'Save Changes'}
             </Button>
@@ -223,10 +223,10 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
         </section>
 
         {/* Privacy */}
-        <section className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm">
-          <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-sky-500 to-primary flex items-center justify-center">
-              <Shield className="w-3.5 h-3.5 text-white" />
+        <section className="rounded-2xl overflow-hidden border border-line bg-white shadow-sm">
+          <div className="px-4 py-3 border-b border-line flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-clay-tint flex items-center justify-center">
+              <Shield className="w-3.5 h-3.5 text-primary" />
             </div>
             <h2 className="font-semibold text-sm">Privacy</h2>
           </div>
@@ -234,7 +234,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-sm font-medium">Ask AI data sharing</p>
-                <p className="text-xs text-white/50">
+                <p className="text-xs text-ink-faint">
                   {aiSharing
                     ? 'On: your causes and questions are sent to Google Gemini when you use Ask AI.'
                     : "Off: Ask AI will ask before sending anything."}
@@ -242,7 +242,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
               </div>
               {aiSharing && (
                 <Button size="sm" variant="outline" onClick={turnOffAiSharing}
-                  className="flex-shrink-0 rounded-xl border-white/20 bg-white/5 text-white hover:bg-white/10">
+                  className="flex-shrink-0 rounded-xl border-line bg-white text-ink hover:bg-sand">
                   Turn off
                 </Button>
               )}
@@ -254,19 +254,19 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
         </section>
 
         {/* Danger Zone */}
-        <section className="rounded-2xl overflow-hidden border border-red-500/20 bg-red-500/5">
-          <div className="px-4 py-3 border-b border-red-500/20 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-400" />
-            <h2 className="font-semibold text-sm text-red-400">Danger Zone</h2>
+        <section className="rounded-2xl overflow-hidden border border-[#F0C2C2] bg-[#FDF3F1]">
+          <div className="px-4 py-3 border-b border-[#F0C2C2] flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-loss" />
+            <h2 className="font-semibold text-sm text-loss">Danger Zone</h2>
           </div>
           <div className="p-4">
-            <p className="text-xs text-white/40 mb-4">
+            <p className="text-xs text-ink-faint mb-4">
               Permanently delete your account and all data. This cannot be undone.
             </p>
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive"
-                  className="flex items-center gap-2 rounded-xl h-11 bg-red-500/20 hover:bg-red-500/40 text-red-400 border border-red-500/30">
+                  className="flex items-center gap-2 rounded-xl h-11 bg-white hover:bg-[#FDECEA] text-loss border border-[#F0C2C2]">
                   <Trash2 className="w-4 h-4" />
                   Delete Account
                 </Button>

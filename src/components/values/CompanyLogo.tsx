@@ -16,7 +16,7 @@ const CompanyLogo = ({ src, name, ticker, className = 'w-12 h-12' }: CompanyLogo
   return (
     <div className={`relative flex-shrink-0 rounded-xl overflow-hidden bg-white shadow-md ${className}`}>
       {(!loaded || failed || !src) && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-600 to-slate-800 text-white font-bold">
+        <div className="absolute inset-0 flex items-center justify-center bg-sand text-ink-soft font-bold">
           {initials}
         </div>
       )}

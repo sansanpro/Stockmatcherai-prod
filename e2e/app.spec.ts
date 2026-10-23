@@ -207,11 +207,12 @@ test('expanded card can be collapsed (AI button does not cover it)', async ({ pa
   await expect(page.getByRole('heading', { name: 'Stock Details' })).toHaveCount(0);
 });
 
-test('deck shows one pair of swipe arrows', async ({ page }) => {
+test('swiping is explained by the hint line, with no arrows over the card text', async ({ page }) => {
   await openApp(page);
   await expect(page.getByText('P/E Ratio').first()).toBeVisible();
-  await expect(page.locator('svg.lucide-chevron-left:visible')).toHaveCount(1);
-  await expect(page.locator('svg.lucide-chevron-right:visible').filter({ hasNot: page.locator('xpath=ancestor::button') })).toHaveCount(1);
+  await expect(page.getByText('← Swipe left to pass · Swipe right to like →')).toBeVisible();
+  await expect(page.locator('svg.lucide-chevron-left:visible')).toHaveCount(0);
+  await expect(page.locator('svg.lucide-chevron-right:visible').filter({ hasNot: page.locator('xpath=ancestor::button') })).toHaveCount(0);
 });
 
 test('company logo loads instead of a blank tile', async ({ page }) => {

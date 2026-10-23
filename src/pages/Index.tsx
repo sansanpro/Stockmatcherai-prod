@@ -42,16 +42,16 @@ interface AppHeaderProps {
   onSaveMatches: () => void;
 }
 const AppHeader = ({ currentStep, signedIn, onMatchTab, onLikesTab, onOpenSettings, onSaveMatches }: AppHeaderProps) => (
-  <div className="bg-background/80 backdrop-blur-md border-b border-border px-4 pb-3 w-full sticky top-0 z-40" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
+  <div className="bg-cream/85 backdrop-blur-md border-b border-line px-4 pb-3 w-full sticky top-0 z-40" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
     <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-4">
       <div className="flex items-center gap-1">
-        <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mr-3">
-          StockMatch
+        <span className="text-lg font-bold text-ink mr-3">
+          Stock<span className="text-primary">Match</span>
         </span>
         <Button
           onClick={onMatchTab}
           variant={currentStep === 'matching' ? 'default' : 'ghost'}
-          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matching' ? 'bg-gradient-to-r from-primary to-purple-600 text-white shadow-md shadow-primary/20' : ''}`}
+          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matching' ? 'bg-primary text-white shadow-md shadow-[#B54A22]/20' : 'text-ink-soft'}`}
         >
           <Heart className="w-4 h-4" />
           Match
@@ -59,7 +59,7 @@ const AppHeader = ({ currentStep, signedIn, onMatchTab, onLikesTab, onOpenSettin
         <Button
           onClick={onLikesTab}
           variant={currentStep === 'matches' ? 'default' : 'ghost'}
-          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matches' ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md shadow-pink-500/20' : ''}`}
+          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matches' ? 'bg-primary text-white shadow-md shadow-[#B54A22]/20' : 'text-ink-soft'}`}
         >
           <Heart className="w-4 h-4 fill-current" />
           Likes
@@ -95,7 +95,7 @@ const BottomNavBar = ({ currentStep, onStepChange, watchlistLength }: BottomNavB
       className="fixed bottom-0 left-0 w-full z-50 pb-safe-area-inset-bottom"
       style={{ fontFamily: 'SF Pro Text, SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif' }}
     >
-      <div className="mx-3 mb-3 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/10 shadow-2xl flex justify-around items-center py-2 px-2">
+      <div className="mx-3 mb-3 rounded-2xl bg-white/90 backdrop-blur-xl border border-line shadow-[0_8px_30px_rgba(60,40,20,0.12)] flex justify-around items-center py-2 px-2">
         {navItems.map(({ step, icon: Icon, label }) => {
           const active = currentStep === step;
           return (
@@ -103,13 +103,13 @@ const BottomNavBar = ({ currentStep, onStepChange, watchlistLength }: BottomNavB
               key={step}
               onClick={() => onStepChange(step)}
               className={`flex flex-col items-center min-h-[44px] min-w-[52px] justify-center rounded-xl transition-all duration-200 ${
-                active ? 'bg-primary/20 text-primary scale-105' : 'text-white/40 hover:text-white/70'
+                active ? 'bg-clay-tint text-primary scale-105' : 'text-ink-faint hover:text-ink'
               }`}
             >
               <div className="relative">
                 <Icon className={`w-5 h-5 mb-0.5 ${active && step === 'matches' ? 'fill-current' : ''}`} />
                 {step === 'matches' && watchlistLength > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 bg-pink-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 bg-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
                     {watchlistLength > 99 ? '99+' : watchlistLength}
                   </span>
                 )}
@@ -307,7 +307,7 @@ const IndexContent = () => {
 
   if (loading || gate === 'loading') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-950 to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-cream flex items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary" />
       </div>
     );
@@ -377,7 +377,7 @@ const IndexContent = () => {
         aria-hidden={currentStep !== 'matches'}
         style={{ display: currentStep === 'matches' ? 'block' : 'none' }}
       >
-        <div className="min-h-[100dvh] w-full min-w-0 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 px-4 overflow-auto pb-[max(env(safe-area-inset-bottom),6.5rem)]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="min-h-[100dvh] w-full min-w-0 bg-cream px-4 overflow-auto pb-[max(env(safe-area-inset-bottom),6.5rem)]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="w-full pt-4">
             <Matches onViewDetails={handleViewStockDetails} signedIn={signedIn} onSaveMatches={openSavePrompt} />
           </div>

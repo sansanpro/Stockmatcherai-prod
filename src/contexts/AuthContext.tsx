@@ -61,9 +61,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       password,
       options: {
         emailRedirectTo: redirectUrl,
-        data: {
-          full_name: fullName || email
-        }
+        // The name is optional; without one the app just doesn't greet you by name
+        data: fullName ? { full_name: fullName } : {}
       }
     });
 

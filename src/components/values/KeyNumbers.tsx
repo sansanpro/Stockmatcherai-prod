@@ -30,12 +30,12 @@ interface KeyNumbersProps {
 const Stat = ({ label, value, help, explain, valueClass = '' }: {
   label: string; value: string; help: { full: string; short: string }; explain?: boolean; valueClass?: string;
 }) => (
-  <div className="rounded-xl bg-muted/60 dark:bg-gray-700/40 p-3">
+  <div className="rounded-xl bg-sand/70 p-3">
     <div className="flex items-center text-xs text-muted-foreground font-medium">
       {label}
       <EducationalTooltip content={help.full} label={`What is ${label}?`} />
     </div>
-    <p className={`text-lg font-bold mt-0.5 ${valueClass || 'text-gray-900 dark:text-white'}`}>{value}</p>
+    <p className={`text-lg font-bold mt-0.5 ${valueClass || 'text-ink'}`}>{value}</p>
     {explain && <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{help.short}</p>}
   </div>
 );
@@ -50,14 +50,14 @@ const KeyNumbers = ({ stock, price, explain = false }: KeyNumbersProps) => {
       <div className="grid grid-cols-2 gap-2">
         <Stat label="Share price" value={formatPrice(price)} help={HELP.price} explain={explain} />
         <Stat label="Past year" value={`${change > 0 ? '+' : ''}${change.toFixed(1)}%`} help={HELP.pastYear} explain={explain}
-          valueClass={change >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'} />
+          valueClass={change >= 0 ? 'text-gain' : 'text-loss'} />
         <Stat label="Market Cap" value={stock.marketCap || '—'} help={HELP.marketCap} explain={explain} />
         <Stat label="P/E Ratio" value={stock.peRatio > 0 ? stock.peRatio.toFixed(1) : '—'} help={HELP.pe} explain={explain} />
         {stock.dividendYield > 0 && (
           <Stat label="Dividend" value={`${stock.dividendYield.toFixed(2)}%`} help={HELP.dividend} explain={explain} />
         )}
       </div>
-      <div className="flex items-center gap-1 mt-2 text-sm text-gray-700 dark:text-gray-300">
+      <div className="flex items-center gap-1 mt-2 text-sm text-ink-soft">
         <span aria-hidden>{risk.emoji}</span> {risk.text}
         <EducationalTooltip content={RISK_HELP} label="How is this decided?" />
       </div>

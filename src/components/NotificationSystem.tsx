@@ -73,16 +73,16 @@ const NotificationSystem = () => {
 
       {showNotifications && (
         <div className="absolute top-10 sm:top-12 right-0 w-64 sm:w-80 z-50">
-          <Card className="shadow-lg dark:bg-gray-800 dark:border-gray-700">
+          <Card className="shadow-lg ">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2 dark:text-white">
+              <CardTitle className="text-lg flex items-center gap-2 ">
                 <Bell className="w-5 h-5" />
                 Weekly Summaries
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 max-h-96 overflow-y-auto">
               {notifications.map((notification, index) => (
-                <div key={index} className="relative p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div key={index} className="relative p-3 bg-sand rounded-lg">
                   <Button
                     onClick={() => dismissNotification(index)}
                     variant="ghost"
@@ -93,10 +93,10 @@ const NotificationSystem = () => {
                   </Button>
                   
                   <div className="pr-6">
-                    <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+                    <p className="text-sm font-medium text-ink mb-2">
                       Week of {notification.date}
                     </p>
-                    <div className="space-y-1 text-xs text-blue-700 dark:text-blue-300">
+                    <div className="space-y-1 text-xs text-ink-soft">
                       <p>📊 {notification.totalMatches} total matches</p>
                       <p className="flex items-center gap-1">
                         {notification.avgPerformance >= 0 ? (

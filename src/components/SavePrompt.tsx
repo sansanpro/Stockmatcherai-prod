@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import heart3d from '@/assets/3d/red-heart.png';
 import { useNavigate } from 'react-router-dom';
-import { Heart } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
 import { track } from '@/lib/analytics';
@@ -42,15 +42,13 @@ const SavePrompt = ({ open, likes, onClose }: SavePromptProps) => {
 
   return (
     <Sheet open={open} onOpenChange={o => { if (!o) { act('dismiss'); onClose(); } }}>
-      <SheetContent side="bottom" className="dark rounded-t-3xl border-white/10 bg-gray-900 text-white px-6 pt-8 pb-[max(env(safe-area-inset-bottom),1.5rem)]">
+      <SheetContent side="bottom" className="rounded-t-3xl border-line bg-cream text-ink px-6 pt-8 pb-[max(env(safe-area-inset-bottom),1.5rem)]">
         <div className="max-w-md mx-auto">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center mb-4">
-            <Heart className="w-6 h-6 text-white fill-white" />
-          </div>
-          <SheetTitle className="text-2xl font-bold text-white">
+          <img src={heart3d} alt="" aria-hidden className="w-14 h-14 mb-3 art-3d-pop drop-shadow-[0_8px_10px_rgba(120,72,40,0.2)]" />
+          <SheetTitle className="text-2xl font-bold text-ink">
             {required ? 'Keep your matches' : 'Save your matches?'}
           </SheetTitle>
-          <SheetDescription className="text-white/60 mt-2 text-base">
+          <SheetDescription className="text-ink-soft mt-2 text-base">
             {required
               ? `You've liked ${likes} companies. Create a free account to keep them all and get tomorrow's matches.`
               : 'Create a free account so your likes and causes are saved on any device.'}
@@ -59,20 +57,20 @@ const SavePrompt = ({ open, likes, onClose }: SavePromptProps) => {
             <button
               onClick={apple}
               disabled={appleLoading}
-              className="w-full h-14 bg-white hover:bg-gray-100 text-black font-semibold rounded-2xl flex items-center justify-center gap-3 disabled:opacity-60"
+              className="w-full h-14 bg-black hover:bg-black/85 text-white font-semibold rounded-2xl flex items-center justify-center gap-3 disabled:opacity-60"
             >
-              {appleLoading ? <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : <AppleIcon />}
+              {appleLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <AppleIcon />}
               Continue with Apple
             </button>
             <button
               onClick={() => { act('email'); navigate('/auth?mode=save'); }}
-              className="w-full h-14 rounded-2xl border-2 border-white/15 text-white font-semibold hover:border-white/30"
+              className="w-full h-14 rounded-2xl border border-line bg-white text-ink font-semibold hover:bg-sand"
             >
               Use email
             </button>
             <button
               onClick={() => { act('dismiss'); onClose(); }}
-              className="w-full min-h-[44px] text-white/50 hover:text-white text-sm"
+              className="w-full min-h-[44px] text-ink-soft hover:text-ink text-sm"
             >
               {required ? 'Keep swiping without saving' : 'Not now'}
             </button>

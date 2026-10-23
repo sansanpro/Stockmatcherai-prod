@@ -7,7 +7,9 @@ import UpgradeModal from '@/components/UpgradeModal';
 import CoachMark from '@/components/CoachMark';
 import { useApp } from '@/contexts/AppContext';
 import { PLAN_LIMITS, useSubscription } from '@/contexts/SubscriptionContext';
-import { Heart, X, TrendingUp, ChevronLeft, ChevronRight, RefreshCw, Crown, Pencil } from 'lucide-react';
+import { Heart, X, RefreshCw, Crown, Pencil } from 'lucide-react';
+import Art3D from '@/components/onboarding/Art3D';
+import { STEP_ART } from '@/lib/art';
 import { toast } from 'sonner';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { track, trackLike } from '@/lib/analytics';
@@ -41,7 +43,6 @@ const StockMatcher = ({
   const [likedToday, setLikedToday] = useState(0);
   const [status, setStatus] = useState<Status>('loading');
   const [animatingCard, setAnimatingCard] = useState(false);
-  const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [causeInfo, setCauseInfo] = useState<CauseInfo[]>([]);
@@ -108,7 +109,6 @@ const StockMatcher = ({
     const card = cards[0];
     if (animatingCard || !card) return;
     setAnimatingCard(true);
-    if (!hasSwipedOnce) setHasSwipedOnce(true);
     const position = deckSize - cards.length;
 
     if (signedIn) {
@@ -161,17 +161,12 @@ const StockMatcher = ({
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex items-center justify-center">
+      <div className="min-h-screen bg-cream flex items-center justify-center" role="status">
         <div className="text-center space-y-6">
-          <div className="relative">
-            <div className="animate-spin w-16 h-16 border-4 border-white/30 border-t-white rounded-full mx-auto"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-white" />
-            </div>
-          </div>
-          <div className="text-white space-y-2">
-            <h2 className="text-2xl font-bold">Finding today's matches</h2>
-            <p className="text-white/70">Companies working on what you care about</p>
+          <Art3D src={STEP_ART.causes} size={96} />
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-ink">Finding today's matches</h2>
+            <p className="text-ink-soft">Companies working on what you care about</p>
           </div>
         </div>
       </div>
@@ -179,8 +174,8 @@ const StockMatcher = ({
   }
 
   const centered = (content: React.ReactNode) => (
-    <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 p-6 flex items-center justify-center" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-      <div className="max-w-md w-full text-center text-white pb-24">{content}</div>
+    <div className="min-h-screen bg-cream p-6 flex items-center justify-center" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <div className="max-w-md w-full text-center text-ink pb-24">{content}</div>
     </div>
   );
 
@@ -188,8 +183,8 @@ const StockMatcher = ({
     return centered(
       <>
         <h1 className="text-2xl font-bold mb-2">We couldn't load your matches</h1>
-        <p className="text-white/70 mb-6">Check your connection and try again.</p>
-        <Button onClick={() => loadDeck()} className="h-12 px-6 rounded-xl bg-white/20 hover:bg-white/30 text-white border-0">
+        <p className="text-ink-soft mb-6">Check your connection and try again.</p>
+        <Button onClick={() => loadDeck()} className="h-12 px-6 rounded-xl">
           <RefreshCw className="w-4 h-4 mr-2" /> Try again
         </Button>
       </>,
@@ -200,8 +195,8 @@ const StockMatcher = ({
     return centered(
       <>
         <h1 className="text-2xl font-bold mb-2">You've seen every company in your causes for now</h1>
-        <p className="text-white/70 mb-6">Add another cause to see more, or check back soon. New companies are added regularly.</p>
-        <Button onClick={onEditCauses} className="h-12 px-6 rounded-xl bg-white text-purple-700 hover:bg-white/90 font-semibold">
+        <p className="text-ink-soft mb-6">Add another cause to see more, or check back soon. New companies are added regularly.</p>
+        <Button onClick={onEditCauses} className="h-12 px-6 rounded-xl font-semibold">
           <Pencil className="w-4 h-4 mr-2" /> Change my causes
         </Button>
       </>,
@@ -211,26 +206,24 @@ const StockMatcher = ({
   if (isFinished) {
     return centered(
       <>
-        <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Heart className="w-10 h-10 text-white fill-current" />
-        </div>
+        <Art3D src={STEP_ART.reveal} size={112} className="mb-5" />
         <h1 className="text-3xl font-bold mb-2">That's today's matches</h1>
-        <p className="text-white/80">
+        <p className="text-ink-soft">
           {likedToday > 0 ? `You liked ${likedToday} ${likedToday === 1 ? 'company' : 'companies'} today. ` : ''}
           New matches arrive every morning.
         </p>
         <div className="space-y-3 mt-8">
           {!signedIn && onSaveMatches && (
-            <Button onClick={onSaveMatches} className="w-full h-12 rounded-xl bg-white text-purple-700 hover:bg-white/90 font-semibold">
+            <Button onClick={onSaveMatches} className="w-full h-12 rounded-xl font-semibold">
               Save my matches
             </Button>
           )}
           {signedIn && !subscribed && (
-            <Button onClick={() => setShowUpgradeModal(true)} className="w-full h-12 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold border-0">
+            <Button onClick={() => setShowUpgradeModal(true)} className="w-full h-12 rounded-xl font-semibold">
               <Crown className="w-4 h-4 mr-2" /> Get {PLAN_LIMITS.premium.dailyMatches} matches a day with Premium
             </Button>
           )}
-          <Button onClick={onEditCauses} className="w-full h-12 rounded-xl bg-white/15 hover:bg-white/25 text-white border-0">
+          <Button onClick={onEditCauses} variant="outline" className="w-full h-12 rounded-xl bg-white border-line text-ink hover:bg-sand">
             <Pencil className="w-4 h-4 mr-2" /> Change my causes
           </Button>
         </div>
@@ -243,7 +236,7 @@ const StockMatcher = ({
   const currentStock = cards[0];
 
   return (
-    <div className="w-full h-full flex flex-col bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-600 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <div className="w-full h-full flex flex-col bg-cream" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto flex flex-col flex-1 min-h-0 px-4 lg:px-2">
         {/* Header: the user's causes, in rank order (the one-time hint sits on top of it) */}
         <div className="relative text-center mb-2 pt-3 flex-shrink-0">
@@ -257,7 +250,7 @@ const StockMatcher = ({
               {myCauses.map(c => (
                 <Tooltip key={c.id}>
                   <TooltipTrigger asChild>
-                    <button onClick={onEditCauses} className="min-h-[32px] px-3 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-semibold transition-colors">
+                    <button onClick={onEditCauses} className="min-h-[32px] px-3 rounded-full bg-white hover:bg-sand border border-line text-ink text-xs font-semibold shadow-sm transition-colors">
                       <span aria-hidden>{c.icon}</span> {c.label}
                     </button>
                   </TooltipTrigger>
@@ -266,21 +259,11 @@ const StockMatcher = ({
               ))}
             </div>
           </TooltipProvider>
-          <p className="text-white/60 text-xs mt-2">{cards.length} of {deckSize} matches left today</p>
+          <p className="text-ink-faint text-xs mt-2">{cards.length} of {deckSize} matches left today</p>
         </div>
 
         {/* Card stack */}
         <div className="flex-1 min-h-0 relative mb-2">
-          {!hasSwipedOnce && (
-            <>
-              <div className="absolute left-2 top-1/2 -translate-y-1/2 z-20 opacity-30 animate-bounce pointer-events-none">
-                <ChevronLeft className="w-8 h-8 text-white" />
-              </div>
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 z-20 opacity-30 animate-bounce pointer-events-none">
-                <ChevronRight className="w-8 h-8 text-white" />
-              </div>
-            </>
-          )}
           {visibleCards.map((stock, stackIndex) => {
             const isActiveCard = stackIndex === 0;
             return (
@@ -311,23 +294,23 @@ const StockMatcher = ({
                 onClick={() => { Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); handlePass(); }}
                 disabled={animatingCard}
                 aria-label="Pass"
-                className="w-16 h-16 rounded-full bg-red-500/80 hover:bg-red-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+                className="w-16 h-16 rounded-full bg-white hover:bg-white border border-line text-ink-soft shadow-[0_8px_24px_rgba(60,40,20,0.14)] transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
               >
-                <X className="w-8 h-8" />
+                <X className="w-8 h-8" strokeWidth={2.5} />
               </Button>
               <Button
                 onClick={() => { Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {}); handleMatch(); }}
                 disabled={animatingCard}
                 aria-label={currentStock.cardType === 'update' ? 'Interested' : 'Like this company'}
-                className="w-16 h-16 rounded-full bg-green-500/80 hover:bg-green-600 border-0 text-white shadow-2xl transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+                className="w-16 h-16 rounded-full bg-primary hover:bg-primary border-0 text-white shadow-[0_10px_26px_rgba(181,74,34,0.35)] transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
               >
-                <Heart className="w-8 h-8" />
+                <Heart className="w-8 h-8 fill-current" />
               </Button>
             </div>
             {showSwipeHint && (
-              <p className="text-center text-white/40 text-xs">← Swipe left to pass · Swipe right to like →</p>
+              <p className="text-center text-ink-faint text-xs">← Swipe left to pass · Swipe right to like →</p>
             )}
-            <p className="text-center text-white/30 text-xs mt-2">Educational only, not investment advice.</p>
+            <p className="text-center text-ink-faint text-xs mt-2">Educational only, not investment advice.</p>
           </div>
         )}
       </div>

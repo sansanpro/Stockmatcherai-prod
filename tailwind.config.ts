@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
-	darkMode: ["class"],
+	darkMode: ["class"], // never enabled: the app is light only
 	content: [
 		"./pages/**/*.{ts,tsx}",
 		"./components/**/*.{ts,tsx}",
@@ -19,6 +19,14 @@ export default {
 		},
 		extend: {
 			colors: {
+				// Named palette (light only; see src/index.css for the contrast notes)
+				cream: '#FAF6EF',
+				sand: { DEFAULT: '#F3ECE1', deep: '#E9DFD0' },
+				line: '#E8DFD1',
+				ink: { DEFAULT: '#1F1A15', soft: '#5F554B', faint: '#6E645A', muted: '#8A7F74' },
+				clay: { DEFAULT: '#CC6A44', deep: '#B54A22', ink: '#8A3A18', tint: '#FBE7DC', soft: '#F6D3C1' },
+				gain: '#166534',
+				loss: '#B91C1C',
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',

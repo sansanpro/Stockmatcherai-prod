@@ -16,7 +16,7 @@ const EducationalTooltip = ({ content, className = '', label = 'What does this m
         <button
           type="button"
           aria-label={label}
-          className={`ml-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 ${className}`}
+          className={`ml-1 text-ink-muted hover:text-ink-soft ${className}`}
         >
           <HelpCircle className="w-4 h-4" />
         </button>

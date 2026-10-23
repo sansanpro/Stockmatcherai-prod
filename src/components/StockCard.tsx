@@ -5,7 +5,7 @@ import { Eye } from 'lucide-react';
 import { capitalize } from '@/lib/utils';
 import StockNewsPill from '@/components/StockNewsPill';
 import CompanyLogo from '@/components/values/CompanyLogo';
-import CauseChips, { causeGradient } from '@/components/values/CauseChips';
+import CauseChips, { causeTone } from '@/components/values/CauseChips';
 import { RISK_WORDS } from '@/components/values/KeyNumbers';
 
 interface StockCardProps {
@@ -21,13 +21,13 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
   const story = stock.missionStory || stock.whyItFits;
 
   return (
-    <Card className="w-full overflow-hidden border-0 shadow-xl bg-card">
-      <div className={`bg-gradient-to-br ${causeGradient(stock.matchedCauses?.[0]?.cause)} text-white p-4 space-y-3`}>
+    <Card className="w-full overflow-hidden border border-line shadow-[0_8px_24px_rgba(60,40,20,0.08)] bg-white">
+      <div className={`${causeTone(stock.matchedCauses?.[0]?.cause).header} text-ink p-4 space-y-3`}>
         <div className="flex items-center gap-3">
           <CompanyLogo src={stock.logoUrl} name={stock.companyName} ticker={stock.ticker} className="w-11 h-11" />
           <div className="min-w-0 flex-1">
             <h3 className="text-lg font-bold leading-tight truncate">{stock.companyName}</h3>
-            <p className="text-sm text-white/80 truncate">{stock.ticker}{stock.sector ? ` · ${capitalize(stock.sector)}` : ''}</p>
+            <p className="text-sm text-ink-faint truncate">{stock.ticker}{stock.sector ? ` · ${capitalize(stock.sector)}` : ''}</p>
           </div>
           {onViewDetails && (
             <Button
@@ -35,7 +35,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
               variant="secondary"
               onClick={() => onViewDetails(stock)}
               aria-label={`View ${stock.companyName} details`}
-              className="flex-shrink-0 gap-1 bg-white/20 hover:bg-white/30 text-white border-0 h-9 px-3"
+              className="flex-shrink-0 gap-1 bg-white/80 hover:bg-white text-ink border border-black/5 shadow-sm h-9 px-3"
             >
               <Eye className="w-4 h-4" />
               Details
@@ -46,14 +46,14 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
       </div>
 
       <div className="p-4 space-y-3">
-        {story && <p className="text-sm leading-snug text-gray-800 dark:text-gray-200 line-clamp-3">{story}</p>}
+        {story && <p className="text-sm leading-snug text-ink line-clamp-3">{story}</p>}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
           {stock.pricePerShare > 0 && (
             <span>Share price <span className="font-semibold text-foreground">${stock.pricePerShare.toFixed(2)}</span></span>
           )}
           <span>
             Past year{' '}
-            <span className={`font-semibold ${change >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+            <span className={`font-semibold ${change >= 0 ? 'text-gain' : 'text-loss'}`}>
               {change > 0 ? '+' : ''}{change.toFixed(1)}%
             </span>
           </span>

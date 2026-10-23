@@ -3,7 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { PLAN_LIMITS, useSubscription } from '@/contexts/SubscriptionContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Crown, Check, Apple } from 'lucide-react';
+import { Check, Apple } from 'lucide-react';
+import Art3D from '@/components/onboarding/Art3D';
+import { STEP_ART } from '@/lib/art';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
@@ -119,36 +121,34 @@ const UpgradeModal = ({ isOpen, onClose, reason = 'settings' }: UpgradeModalProp
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       {/* Scrolls on small phones so the title and the required Privacy/Terms links stay reachable */}
-      <DialogContent className="max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto">
+      <DialogContent className="max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto bg-cream border-line">
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <DialogTitle className="text-center text-2xl font-bold text-ink">
             Upgrade to Premium
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 p-4">
           <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Crown className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">{HEADLINES[reason].title}</h3>
-            <p className="text-gray-600 dark:text-gray-400">{HEADLINES[reason].text}</p>
+            <Art3D src={STEP_ART.intro} size={76} className="mb-4" />
+            <h3 className="text-lg font-semibold text-ink mb-2">{HEADLINES[reason].title}</h3>
+            <p className="text-ink-faint">{HEADLINES[reason].text}</p>
           </div>
 
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-lg p-4">
+          <div className="bg-white border border-line rounded-2xl shadow-sm p-4">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-lg font-semibold">Premium Plan</span>
+              <span className="text-lg font-semibold text-ink">Premium Plan</span>
               <div className="text-right">
-                <div className="text-2xl font-bold text-blue-600">{price}</div>
-                <div className="text-sm text-gray-500">/month</div>
+                <div className="text-2xl font-bold text-ink">{price}</div>
+                <div className="text-sm text-ink-faint">/month</div>
               </div>
             </div>
 
             <ul className="space-y-2">
               {PERKS.map(perk => (
                 <li key={perk} className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                  <span className="text-sm">{perk}</span>
+                  <Check className="w-5 h-5 text-primary flex-shrink-0" strokeWidth={2.5} />
+                  <span className="text-sm text-ink">{perk}</span>
                 </li>
               ))}
             </ul>
@@ -158,7 +158,7 @@ const UpgradeModal = ({ isOpen, onClose, reason = 'settings' }: UpgradeModalProp
             <Button
               onClick={handleApplePurchase}
               disabled={isProcessing || !appleProductAvailable}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3"
+              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold"
             >
               {isProcessing ? (
                 <>
@@ -175,20 +175,20 @@ const UpgradeModal = ({ isOpen, onClose, reason = 'settings' }: UpgradeModalProp
             <Button
               onClick={handleClose}
               variant="outline"
-              className="w-full"
+              className="w-full h-12 rounded-xl border-line bg-white text-ink hover:bg-sand"
             >
               Maybe Later
             </Button>
           </div>
 
-          <div className="text-center text-xs text-gray-500 space-y-1">
+          <div className="text-center text-xs text-ink-faint space-y-1">
             <p>Subscription auto-renews monthly at {applePrice} until cancelled.</p>
             <p>Payment will be charged to your Apple ID account at confirmation of purchase.</p>
             <p>Manage or cancel anytime in Settings → Apple ID → Subscriptions.</p>
             <p className="mt-1">
-              <a href="https://stockmatcherai.com/support" className="underline">Privacy Policy</a>
+              <a href="https://stockmatcherai.com/support" className="text-primary underline">Privacy Policy</a>
               {' · '}
-              <a href="https://stockmatcherai.com/terms" className="underline">Terms of Service</a>
+              <a href="https://stockmatcherai.com/terms" className="text-primary underline">Terms of Service</a>
             </p>
           </div>
         </div>

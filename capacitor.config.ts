@@ -5,13 +5,11 @@ const config: CapacitorConfig = {
   appId: 'com.hassanomar.stockmatcherai',
   appName: 'StockMatcherAI',
   webDir: 'dist',
-  plugins: {
-    SplashScreen: {
-      launchShowDuration: 2000,
-      backgroundColor: '#4f46e5',
-      showSpinner: false
-    }
-  }
+  // Cream behind the web view, so there's no flash of another color while it loads
+  backgroundColor: '#FAF6EF',
+  ios: {
+    backgroundColor: '#FAF6EF',
+  },
 };
 
 export default config;

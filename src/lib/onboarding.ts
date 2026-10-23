@@ -6,31 +6,16 @@ export type Goal = 'growth' | 'income' | 'short_term' | 'learning';
 export type Experience = 'never' | 'few' | 'comfortable';
 
 export interface OnboardingAnswers {
-  motivation?: string;
+  motivation?: string; // no longer asked (Oct 2026); kept for answers saved before then
   causes: string[]; // cause ids, in the order tapped (that order is the rank)
   dealbreakers: string[];
   risk?: Risk;
   experience?: Experience;
   goal?: Goal;
-  startingAmount?: string;
+  startingAmount?: string; // no longer asked, as above
 }
 
 export const MAX_CAUSES = 3;
-
-export const MOTIVATIONS = [
-  { id: 'savings_idle', label: 'My savings are just sitting there' },
-  { id: 'family', label: 'I want to build something for my family' },
-  { id: 'meaning', label: 'I want my money to actually mean something' },
-  { id: 'overdue', label: "I've been meaning to for years" },
-] as const;
-
-// Shown back to the user on the reveal screen
-export const MOTIVATION_LINES: Record<string, string> = {
-  savings_idle: 'Your savings can start working on something you care about.',
-  family: "You're building something for your family. Start with companies you believe in.",
-  meaning: 'Now your money can say what you believe.',
-  overdue: "You've been meaning to for years. Today you start learning.",
-};
 
 export const DEALBREAKERS = [
   { id: 'tobacco', label: 'Tobacco' },
@@ -58,13 +43,6 @@ export const GOAL_OPTIONS: { id: Goal; label: string }[] = [
   { id: 'short_term', label: 'Something in the next few years' },
   { id: 'learning', label: 'Just learning for now' },
 ];
-
-export const STARTING_AMOUNTS = [
-  { id: '100', label: '$100' },
-  { id: '500', label: '$500' },
-  { id: '1000_plus', label: '$1K+' },
-  { id: 'not_sure', label: 'Not sure yet' },
-] as const;
 
 export const emptyAnswers = (): OnboardingAnswers => ({ causes: [], dealbreakers: [] });
 

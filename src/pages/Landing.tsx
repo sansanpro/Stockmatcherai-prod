@@ -162,11 +162,11 @@ const Landing = () => {
 const FeatureCard = ({ icon, title, description, featured }: { icon: React.ReactNode; title: string; description: string; featured?: boolean }) => (
   <div className={`p-6 rounded-lg bg-card border transition-all hover:shadow-lg ${
     featured 
-      ? 'border-primary/70 shadow-lg shadow-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5' 
+      ? 'border-primary/70 shadow-lg shadow-primary/20 bg-clay-tint/60' 
       : 'border-border hover:border-primary/50'
   }`}>
     <div className={`h-12 w-12 rounded-lg flex items-center justify-center text-primary mb-4 ${
-      featured ? 'bg-gradient-to-br from-primary to-purple-500' : 'bg-primary/10'
+      featured ? 'bg-primary' : 'bg-primary/10'
     }`}>
       <div className={featured ? 'text-white' : ''}>
         {icon}
