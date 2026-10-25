@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import EmailInput from '@/components/EmailInput';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
@@ -109,7 +110,7 @@ const Auth = () => {
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="signin-email" className="text-ink-soft text-sm">Email</Label>
-                <Input id="signin-email" name="email" type="email" placeholder="you@example.com" required className={fieldClass} />
+                <EmailInput id="signin-email" placeholder="you@example.com" className={fieldClass} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="signin-password" className="text-ink-soft text-sm">Password</Label>
@@ -125,7 +126,7 @@ const Auth = () => {
             </button>
             {showReset && (
               <form onSubmit={handleResetPassword} className="mt-2 space-y-3">
-                <Input name="email" type="email" placeholder="Enter your email" required className={fieldClass} />
+                <EmailInput placeholder="Enter your email" className={fieldClass} />
                 <Button type="submit" variant="outline" disabled={isLoading}
                   className="w-full h-11 border-line bg-white text-ink hover:bg-sand rounded-xl">
                   {isLoading ? 'Sending...' : 'Send Reset Email'}
@@ -150,7 +151,7 @@ const Auth = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="signup-email" className="text-ink-soft text-sm">Email</Label>
-                <Input id="signup-email" name="email" type="email" placeholder="you@example.com" required className={fieldClass} />
+                <EmailInput id="signup-email" placeholder="you@example.com" className={fieldClass} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="signup-password" className="text-ink-soft text-sm">Password</Label>

@@ -13,6 +13,7 @@ interface SavePromptProps {
   open: boolean;
   likes: number;
   onClose: () => void;
+  reason?: 'save' | 'ai'; // ai: opened from the Ask AI button
 }
 
 export const AppleIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
@@ -21,14 +22,14 @@ export const AppleIcon = ({ className = 'w-5 h-5' }: { className?: string }) => 
   </svg>
 );
 
-const SavePrompt = ({ open, likes, onClose }: SavePromptProps) => {
+const SavePrompt = ({ open, likes, onClose, reason = 'save' }: SavePromptProps) => {
   const { signInWithApple } = useAuth();
   const navigate = useNavigate();
   const [appleLoading, setAppleLoading] = useState(false);
-  const required = likes >= FREE_LIKES_WITHOUT_ACCOUNT;
+  const required = reason === 'save' && likes >= FREE_LIKES_WITHOUT_ACCOUNT;
 
   useEffect(() => {
-    if (open) track('save_prompt_shown', { likes, required });
+    if (open) track('save_prompt_shown', { likes, required, reason });
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const act = (action: 'apple' | 'email' | 'dismiss') => track('save_prompt_action', { action, likes, required });
@@ -46,12 +47,14 @@ const SavePrompt = ({ open, likes, onClose }: SavePromptProps) => {
         <div className="max-w-md mx-auto">
           <img src={heart3d} alt="" aria-hidden className="w-14 h-14 mb-3 art-3d-pop drop-shadow-[0_8px_10px_rgba(120,72,40,0.2)]" />
           <SheetTitle className="text-2xl font-bold text-ink">
-            {required ? 'Keep your matches' : 'Save your matches?'}
+            {reason === 'ai' ? 'Ask AI with a free account' : required ? 'Keep your matches' : 'Save your matches?'}
           </SheetTitle>
           <SheetDescription className="text-ink-soft mt-2 text-base">
-            {required
-              ? `You've liked ${likes} companies. Create a free account to keep them all and get tomorrow's matches.`
-              : 'Create a free account so your likes and causes are saved on any device.'}
+            {reason === 'ai'
+              ? 'Ask what a company does, how it connects to your causes, or what a number means. Free accounts get 5 questions a day, and your likes come with you.'
+              : required
+                ? `You've liked ${likes} companies. Create a free account to keep them all and get tomorrow's matches.`
+                : 'Create a free account so your likes and causes are saved on any device.'}
           </SheetDescription>
           <div className="space-y-3 mt-6">
             <button

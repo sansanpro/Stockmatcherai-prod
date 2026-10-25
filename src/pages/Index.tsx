@@ -154,6 +154,7 @@ const IndexContent = () => {
   const [currentStep, setCurrentStep] = useState<MainStep>('matching');
   const [causesVersion, setCausesVersion] = useState(0);
   const [savePromptOpen, setSavePromptOpen] = useState(false);
+  const [savePromptReason, setSavePromptReason] = useState<'save' | 'ai'>('save');
   const [deviceLikes, setDeviceLikes] = useState(() => loadDeviceFeed().liked.length);
   const [selectedStockForDetails, setSelectedStockForDetails] = useState<StockRecommendation | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -268,13 +269,13 @@ const IndexContent = () => {
     setCausesVersion(v => v + 1);
   };
 
-  const openSavePrompt = () => setSavePromptOpen(true);
+  const openSavePrompt = () => { setSavePromptReason('save'); setSavePromptOpen(true); };
 
   // Signed out: offer to save after the first like, and again (required to keep them) at the third
   const handleLikedOnDevice = (likes: number) => {
     setDeviceLikes(likes);
     const prompt = likes === 1 || likes === FREE_LIKES_WITHOUT_ACCOUNT;
-    if (prompt) setSavePromptOpen(true);
+    if (prompt) openSavePrompt();
     return prompt;
   };
 
@@ -398,8 +399,8 @@ const IndexContent = () => {
           watchlistLength={watchlist.length}
         />
       )}
-      {signedIn && <AIAssistantWidget />}
-      {!signedIn && <SavePrompt open={savePromptOpen} likes={deviceLikes} onClose={() => setSavePromptOpen(false)} />}
+      <AIAssistantWidget onNeedAccount={() => { setSavePromptReason('ai'); setSavePromptOpen(true); }} />
+      {!signedIn && <SavePrompt open={savePromptOpen} likes={deviceLikes} reason={savePromptReason} onClose={() => setSavePromptOpen(false)} />}
     </>
   );
 };

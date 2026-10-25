@@ -23,6 +23,9 @@ export type AnalyticsEvent =
   | 'save_prompt_action'
   | 'causes_updated'
   | 'ai_message_sent'
+  | 'ai_widget_signed_out_tap'
+  | 'recap_shown'
+  | 'recap_shared'
   | 'paywall_shown'
   | 'purchase_started'
   | 'purchase_completed';

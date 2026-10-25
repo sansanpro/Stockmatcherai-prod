@@ -36,7 +36,12 @@ function describeToolCall(tool: { name: string; args?: Record<string, unknown> }
   }
 }
 
-export default function AIAssistantWidget() {
+interface AIAssistantWidgetProps {
+  // Signed out: the button stays visible and asks for a free account instead of opening the chat
+  onNeedAccount?: () => void;
+}
+
+export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -352,7 +357,7 @@ export default function AIAssistantWidget() {
     // Don't reset freeMessageCount - it persists across conversations in 24h period
   };
 
-  if (!user) return null;
+  if (!user && !onNeedAccount) return null;
 
   return (
     <>
@@ -360,6 +365,7 @@ export default function AIAssistantWidget() {
       {!isOpen && (
         <button
           onClick={() => {
+            if (!user) { track('ai_widget_signed_out_tap'); onNeedAccount?.(); return; }
             setIsOpen(true);
             if (!hasOpenedWidget) {
               setHasOpenedWidget(true);

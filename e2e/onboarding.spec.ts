@@ -190,3 +190,37 @@ test('saving from the prompt creates an account that keeps the answers and likes
   await page.getByRole('button', { name: 'Delete My Account' }).click();
   await expect(page.getByText('Your account has been deleted.')).toBeVisible();
 });
+
+test('email fields take "@" from one-tap endings as well as the keyboard', async ({ page }) => {
+  await freshInstall(page);
+  await page.goto('/auth?mode=signin');
+  const email = page.locator('#signin-email');
+  await expect(email).toHaveAttribute('inputmode', 'email');
+  await expect(email).toHaveAttribute('autocapitalize', 'none');
+  await email.click();
+  await page.keyboard.type('pat');
+  await page.getByRole('group', { name: 'Email endings' }).getByRole('button', { name: '@icloud.com' }).click();
+  await expect(email).toHaveValue('pat@icloud.com');
+  await expect(page.getByRole('group', { name: 'Email endings' })).toHaveCount(0); // done once there's an "@"
+  await email.fill('');
+  await page.keyboard.type('sam');
+  await page.getByRole('group', { name: 'Email endings' }).getByRole('button', { name: '@', exact: true }).click();
+  await page.keyboard.type('example.org');
+  await expect(email).toHaveValue('sam@example.org');
+});
+
+test('signed out, Ask AI is on screen and asks for a free account', async ({ page }) => {
+  await freshInstall(page);
+  await page.addInitScript(() => {
+    localStorage.setItem('onboarding_v2_answers', JSON.stringify({ causes: ['clean_energy'], dealbreakers: [], risk: 'medium', experience: 'few', goal: 'growth' }));
+    localStorage.setItem('coach_first_card', 'seen');
+  });
+  await page.goto('/app');
+  await page.getByRole('button', { name: 'View stock details' }).first().waitFor();
+  await page.getByRole('button', { name: 'Open Ask AI' }).click();
+  const sheet = page.getByRole('dialog');
+  await expect(sheet.getByText('Ask AI with a free account')).toBeVisible();
+  await expect(sheet.getByRole('button', { name: 'Continue with Apple' })).toBeVisible();
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: 'e2e/screens/ask-ai-signed-out.png' });
+});
