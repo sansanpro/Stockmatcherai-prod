@@ -149,7 +149,16 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
+  /* Recap reel: the current slide's progress bar fills over its time; logos pop in */
+  .reel-progress { width: 0; animation: reel-fill linear forwards; }
+  @keyframes reel-fill { from { width: 0; } to { width: 100%; } }
+  .reel-pop { animation: reel-pop 0.55s cubic-bezier(0.3, 1.5, 0.5, 1) both; }
+  @keyframes reel-pop {
+    from { opacity: 0; transform: translateY(18px) scale(0.4) rotate(-8deg); }
+    to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .art-3d, .art-3d-shadow, .art-3d-pop, .rise-in { animation: none; }
+    .art-3d, .art-3d-shadow, .art-3d-pop, .rise-in, .reel-pop { animation: none; }
   }
 }

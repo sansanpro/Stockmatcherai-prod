@@ -7,7 +7,8 @@ import UpgradeModal from '@/components/UpgradeModal';
 import CoachMark from '@/components/CoachMark';
 import { useApp } from '@/contexts/AppContext';
 import { PLAN_LIMITS, useSubscription } from '@/contexts/SubscriptionContext';
-import { Heart, X, RefreshCw, Crown, Pencil } from 'lucide-react';
+import { Heart, X, RefreshCw, Crown, Pencil, Play } from 'lucide-react';
+import DailyRecap from '@/components/DailyRecap';
 import Art3D from '@/components/onboarding/Art3D';
 import { STEP_ART } from '@/lib/art';
 import { toast } from 'sonner';
@@ -41,6 +42,8 @@ const StockMatcher = ({
   const [cards, setCards] = useState<StockRecommendation[]>([]); // still to swipe today, in order
   const [deckSize, setDeckSize] = useState(0);
   const [likedToday, setLikedToday] = useState(0);
+  const [likedCards, setLikedCards] = useState<StockRecommendation[]>([]); // companies liked today, in order
+  const [showRecap, setShowRecap] = useState(false);
   const [status, setStatus] = useState<Status>('loading');
   const [animatingCard, setAnimatingCard] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
@@ -83,7 +86,9 @@ const StockMatcher = ({
       const inDeck = deck.cards.filter(c => swiped.has(c.ticker));
       const remaining = deck.cards.filter(c => !swiped.has(c.ticker));
       setDeckSize(deck.cards.length);
-      setLikedToday(inDeck.filter(c => swiped.get(c.ticker) && c.type === 'company').length);
+      const likedInDeck = inDeck.filter(c => swiped.get(c.ticker) && c.type === 'company');
+      setLikedToday(likedInDeck.length);
+      setLikedCards(likedInDeck.map(cardToRecommendation));
       setCards(remaining.map(cardToRecommendation));
       finishedTracked.current = remaining.length === 0;
       setStatus('ready');
@@ -127,6 +132,7 @@ const StockMatcher = ({
       trackLike({ ticker: card.ticker, cause: card.cause, sector: card.sector, position, signed_in: signedIn });
       if (!isInWatchlist(card.ticker)) addToWatchlist(card);
       setLikedToday(n => n + 1);
+      setLikedCards(prev => [...prev, card]);
       // The save prompt is its own confirmation; a toast would sit on top of its buttons
       const prompted = !signedIn && !!onLikedOnDevice?.(loadDeviceFeed().liked.length);
       if (!prompted) toast(`${card.companyName} saved to your likes`, { duration: 1800 });
@@ -154,6 +160,17 @@ const StockMatcher = ({
       track('deck_finished', { cards: deckSize, liked: likedToday, signed_in: signedIn });
     }
   }, [isFinished]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // The day's highlight reel plays once, when the last card is swiped (if anything was liked)
+  useEffect(() => {
+    if (!isFinished || likedCards.length === 0) return;
+    const key = `recap_seen_${feedDate()}`;
+    try {
+      if (localStorage.getItem(key)) return;
+      localStorage.setItem(key, '1');
+    } catch { /* storage blocked: still show it */ }
+    setShowRecap(true);
+  }, [isFinished, likedCards.length]);
 
   const myCauses = answers.causes
     .map(id => causeInfo.find(c => c.id === id))
@@ -212,6 +229,11 @@ const StockMatcher = ({
           {likedToday > 0 ? `You liked ${likedToday} ${likedToday === 1 ? 'company' : 'companies'} today. ` : ''}
           New matches arrive every morning.
         </p>
+        {likedCards.length > 0 && (
+          <button onClick={() => setShowRecap(true)} className="mt-4 inline-flex items-center gap-2 min-h-[44px] px-4 rounded-full bg-clay-tint text-clay-ink text-sm font-semibold border border-clay-soft">
+            <Play className="w-4 h-4 fill-current" /> Replay today's recap
+          </button>
+        )}
         <div className="space-y-3 mt-8">
           {!signedIn && onSaveMatches && (
             <Button onClick={onSaveMatches} className="w-full h-12 rounded-xl font-semibold">
@@ -228,6 +250,9 @@ const StockMatcher = ({
           </Button>
         </div>
         <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} reason="deck" />
+        {showRecap && (
+          <DailyRecap liked={likedCards} deckSize={deckSize} myCauses={myCauses} onClose={() => setShowRecap(false)} />
+        )}
       </>,
     );
   }

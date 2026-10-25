@@ -224,3 +224,54 @@ test('signed out, Ask AI is on screen and asks for a free account', async ({ pag
   await page.waitForTimeout(600);
   await page.screenshot({ path: 'e2e/screens/ask-ai-signed-out.png' });
 });
+
+test('finishing the day plays a recap reel of the likes and what they say about you', async ({ page }) => {
+  await freshInstall(page);
+  await page.addInitScript(() => {
+    localStorage.setItem('onboarding_v2_answers', JSON.stringify({ causes: ['clean_energy'], dealbreakers: [], risk: 'medium', experience: 'few', goal: 'growth' }));
+    localStorage.setItem('coach_first_card', 'seen');
+  });
+  await page.goto('/app');
+  // Three likes (closing the save prompts a new user sees), then pass on the rest
+  const names: string[] = [];
+  for (let i = 0; i < 3; i++) {
+    await page.getByRole('button', { name: 'View stock details' }).first().waitFor();
+    names.push((await page.locator('h2').first().innerText()).trim());
+    await like(page);
+    if (i === 0) await page.getByRole('button', { name: 'Not now' }).click();
+    if (i === 2) await page.getByRole('button', { name: 'Keep swiping without saving' }).click();
+    await page.waitForTimeout(450);
+  }
+  while (await page.getByRole('button', { name: 'Pass' }).isVisible().catch(() => false)) {
+    await page.getByRole('button', { name: 'Pass' }).click();
+    await page.waitForTimeout(450);
+  }
+
+  const reel = page.getByRole('dialog', { name: 'Your day in values' });
+  await expect(reel.getByText('You liked 3 of 7 companies today.')).toBeVisible();
+  await page.waitForTimeout(1200);
+  await page.screenshot({ path: 'e2e/screens/recap-1-intro.png' });
+  await reel.getByRole('button', { name: 'Next' }).click();
+  await expect(reel.getByText('Like 1 of 3')).toBeVisible();
+  await expect(reel.getByRole('heading', { name: names[0] })).toBeVisible();
+  await page.waitForTimeout(1100);
+  await page.screenshot({ path: 'e2e/screens/recap-2-company.png' });
+  await reel.getByRole('button', { name: 'Next' }).click();
+  await reel.getByRole('button', { name: 'Next' }).click();
+  await expect(reel.getByText('Like 3 of 3')).toBeVisible();
+  await reel.getByRole('button', { name: 'Next' }).click();
+  await expect(reel.getByText('What your likes say about you')).toBeVisible();
+  await expect(reel.getByRole('heading', { name: 'The Clean Power Backer' })).toBeVisible();
+  await expect(reel.getByText('All 3 of your likes work on Clean energy & climate.')).toBeVisible();
+  await page.waitForTimeout(3200); // facts appear one by one
+  await page.screenshot({ path: 'e2e/screens/recap-3-insight.png' });
+  await reel.getByRole('button', { name: 'Next' }).click();
+  await expect(reel.getByText("That's your day.")).toBeVisible();
+  await expect(reel.getByRole('button', { name: 'Share my day' })).toBeVisible();
+  await reel.getByRole('button', { name: 'Done' }).click();
+  await expect(reel).toHaveCount(0);
+
+  // It played once; the finished screen can replay it
+  await page.getByRole('button', { name: "Replay today's recap" }).click();
+  await expect(page.getByRole('dialog', { name: 'Your day in values' })).toBeVisible();
+});
