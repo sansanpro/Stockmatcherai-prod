@@ -9,7 +9,7 @@ interface CausePickerProps {
 }
 
 // One row per cause. Tap order sets the rank; tapping a picked cause removes it and moves the
-// others up. A picked cause shows how many companies work on it in place of its description.
+// others up. A picked cause shows how many companies match it in place of its description.
 const CausePicker = ({ causes, selected, onChange }: CausePickerProps) => {
   const toggle = (id: string) => {
     if (selected.includes(id)) onChange(selected.filter(c => c !== id));
@@ -18,7 +18,7 @@ const CausePicker = ({ causes, selected, onChange }: CausePickerProps) => {
   const full = selected.length >= MAX_CAUSES;
 
   return (
-    <div className="space-y-2.5" role="group" aria-label="Causes">
+    <div className="space-y-2" role="group" aria-label="Causes">
       {causes.map(cause => {
         const rank = selected.indexOf(cause.id) + 1;
         const isOn = rank > 0;
@@ -31,19 +31,19 @@ const CausePicker = ({ causes, selected, onChange }: CausePickerProps) => {
             aria-label={`${cause.label}${isOn ? `, pick ${rank}` : ''}`}
             onClick={() => toggle(cause.id)}
             disabled={!isOn && full}
-            className={`w-full min-h-[76px] rounded-2xl border px-3.5 py-3 text-left flex items-center gap-3.5 shadow-sm transition-all duration-150 active:scale-[0.98] disabled:opacity-40 ${
+            className={`w-full min-h-[60px] rounded-2xl border px-3 py-2.5 text-left flex items-center gap-3 shadow-sm transition-all duration-150 active:scale-[0.98] disabled:opacity-40 ${
               isOn ? 'border-primary bg-clay-tint ring-1 ring-primary' : 'border-line bg-white hover:border-clay-soft'
             }`}
           >
             {art
               ? <img key={isOn ? 'on' : 'off'} src={art} alt="" aria-hidden draggable={false}
-                  className={`w-11 h-11 flex-shrink-0 drop-shadow-[0_6px_8px_rgba(120,72,40,0.18)] ${isOn ? 'art-3d-pop' : ''}`} />
-              : <span className="w-11 text-4xl text-center flex-shrink-0" aria-hidden>{cause.icon}</span>}
+                  className={`w-9 h-9 flex-shrink-0 drop-shadow-[0_5px_6px_rgba(120,72,40,0.18)] ${isOn ? 'art-3d-pop' : ''}`} />
+              : <span className="w-9 text-3xl text-center flex-shrink-0" aria-hidden>{cause.icon}</span>}
             <span className="flex-1 min-w-0">
-              <span className="block text-ink text-[16px] font-semibold leading-snug">{cause.label}</span>
+              <span className="block text-ink text-[15px] font-semibold leading-snug">{cause.label}</span>
               {isOn
-                ? <span className="block text-clay-ink text-[13px] font-semibold leading-snug mt-0.5">{cause.companies} companies are working on this</span>
-                : <span className="block text-ink-faint text-[13px] leading-snug mt-0.5">{cause.tagline}</span>}
+                ? <span className="block text-clay-ink text-[12.5px] font-semibold leading-snug mt-0.5 truncate">{cause.companies} companies match</span>
+                : <span className="block text-ink-faint text-[12.5px] leading-snug mt-0.5 truncate">{cause.tagline}</span>}
             </span>
             <span className={`w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold transition-colors ${
               isOn ? 'bg-primary text-white' : 'border border-line bg-white'

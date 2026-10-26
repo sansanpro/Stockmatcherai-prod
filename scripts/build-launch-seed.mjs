@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Builds the launch-universe migration and review document from supabase/seed/launch-universe.json.
-// Usage: node scripts/build-launch-seed.mjs [migration-file-name]
+// Usage: node scripts/build-launch-seed.mjs [migration-file-name] [--check-only <file.json>]
 //   writes supabase/migrations/<name> (default: 20261019190000_launch_universe.sql)
 //   writes supabase/seed/launch-universe-review.md
+//   --check-only validates another file in the same format and writes nothing
 // The JSON is the source of truth: re-running and re-applying the migration syncs the database to it
 // (missions, flags and feed membership not in the JSON are removed).
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -12,14 +13,18 @@ const CAUSES = {
   live_healthier: 'Live longer & healthier',
   clean_energy: 'Clean energy & climate',
   keeping_safe: 'Keeping people safe',
+  clean_food: 'Healthy food & farming',
+  mental_health: 'Mental health & wellbeing',
 };
 const EXPOSURES = ['core', 'partial', 'peripheral'];
 const DEALBREAKERS = ['tobacco', 'weapons', 'fossil_fuels', 'gambling', 'animal_testing', 'factory_farming'];
 const SECTORS = ['technology', 'healthcare', 'finance', 'energy', 'consumer', 'utilities', 'industrials'];
 const RISKS = ['low', 'medium', 'high'];
 
-const { companies, verified } = JSON.parse(readFileSync('supabase/seed/launch-universe.json', 'utf8'));
-const migrationName = process.argv[2] ?? '20261019190000_launch_universe.sql';
+const checkAt = process.argv.indexOf('--check-only');
+const checkOnly = checkAt >= 0 ? process.argv[checkAt + 1] : null;
+const { companies, verified } = JSON.parse(readFileSync(checkOnly ?? 'supabase/seed/launch-universe.json', 'utf8'));
+const migrationName = (checkAt === 2 ? undefined : process.argv[2]) ?? '20261019190000_launch_universe.sql';
 
 // --- validation ---
 const errors = [];
@@ -61,6 +66,10 @@ for (const c of companies) {
 if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
+}
+if (checkOnly) {
+  console.log(`OK: ${companies.length} companies in ${checkOnly} pass validation`);
+  process.exit(0);
 }
 
 // SEC EDGAR filings page for the company (annual report type where known), linked in the review doc

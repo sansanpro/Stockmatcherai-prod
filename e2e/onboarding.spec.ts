@@ -40,7 +40,7 @@ test('new user: onboarding, reveal, first matches and the save prompt, all witho
   await page.getByRole('button', { name: /^Clean energy & climate/ }).click();
   await expect(page.getByRole('button', { name: 'Beat cancer & disease, pick 1' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Clean energy & climate, pick 2' })).toBeVisible();
-  await expect(page.getByText(/\d+ companies are working on this/).first()).toBeVisible();
+  await expect(page.getByText(/\d+ companies match/).first()).toBeVisible();
   await page.waitForTimeout(900); // entrance animations
   await page.screenshot({ path: 'e2e/screens/onboarding-3-causes.png' });
   await page.getByRole('button', { name: 'Continue' }).click();

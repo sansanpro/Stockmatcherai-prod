@@ -55,7 +55,7 @@ const shot = async (page, name) => {
   await page.getByRole('button', { name: 'Find my matches' }).click();
   await page.getByRole('button', { name: /^Beat cancer & disease/ }).click();
   await page.getByRole('button', { name: /^Clean energy & climate/ }).click();
-  await page.getByText(/\d+ companies are working on this/).first().waitFor();
+  await page.getByText(/\d+ companies match/).first().waitFor();
   await shot(page, '2-causes');
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('checkbox', { name: 'Fossil fuels' }).click();

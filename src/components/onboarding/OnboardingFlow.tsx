@@ -141,16 +141,17 @@ const OnboardingFlow = ({ mode, initial, onComplete, onSignIn }: OnboardingFlowP
   };
 
   // One question: its 3D art, the question, a short line under it, then the answers
-  const question = (art: string, title: string, subtitle: string | null, answersEl: React.ReactNode, artSize = 120) => (
+  // compact: smaller art and title, for the screen with the longest list of answers
+  const question = (art: string, title: string, subtitle: string | null, answersEl: React.ReactNode, artSize = 120, compact = false) => (
     <div className="text-center">
-      <Art3D src={art} size={artSize} className="mb-5" />
-      <h1 className="rise-in text-[28px] leading-[1.15] font-bold text-ink tracking-tight" style={{ animationDelay: '120ms' }}>
+      <Art3D src={art} size={compact ? 56 : artSize} className={compact ? 'mb-3' : 'mb-5'} />
+      <h1 className={`rise-in ${compact ? 'text-[24px]' : 'text-[28px]'} leading-[1.15] font-bold text-ink tracking-tight`} style={{ animationDelay: '120ms' }}>
         {title}
       </h1>
       {subtitle && (
         <p className="rise-in text-ink-faint text-[15px] mt-2" style={{ animationDelay: '190ms' }}>{subtitle}</p>
       )}
-      {answersEl && <div className="mt-7 text-left">{answersEl}</div>}
+      {answersEl && <div className={`${compact ? 'mt-5' : 'mt-7'} text-left`}>{answersEl}</div>}
     </div>
   );
 
@@ -218,11 +219,12 @@ const OnboardingFlow = ({ mode, initial, onComplete, onSignIn }: OnboardingFlowP
             <button onClick={loadCauses} className="text-primary font-semibold mt-2 min-h-[44px]">Try again</button>
           </div>
         ) : (
-          <div className="space-y-2.5" aria-busy>
-            {[0, 1, 2, 3].map(i => <div key={i} className="h-[76px] rounded-2xl bg-sand animate-pulse" />)}
+          <div className="space-y-2" aria-busy>
+            {[0, 1, 2, 3].map(i => <div key={i} className="h-[60px] rounded-2xl bg-sand animate-pulse" />)}
           </div>
         ),
-        88,
+        72,
+        true,
       ),
       continueButton('Continue', answers.causes.length > 0),
     );
