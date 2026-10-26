@@ -42,7 +42,7 @@ const rest = async (path, { token = anonKey, method = 'GET', body, prefer } = {}
   const stocks = await rest('stocks?select=ticker,price_per_share&in_feed=eq.true&limit=5');
   check('signed out: launch companies are readable', stocks.status === 200 && stocks.body.length === 5);
   const causes = await rest('cause_company_counts?select=cause,companies&is_live=eq.true');
-  check('signed out: live causes and their counts are readable', causes.status === 200 && causes.body.length === 4 && causes.body.every(c => c.companies > 0), JSON.stringify(causes.body));
+  check('signed out: live causes and their counts are readable', causes.status === 200 && causes.body.length === 6 && causes.body.every(c => c.companies > 0), JSON.stringify(causes.body));
   const pending = await rest("stock_missions?select=ticker&status=neq.approved&limit=1");
   check('signed out: unapproved mission tags are hidden', pending.status === 200 && pending.body.length === 0);
   const legacy = await rest('healthcare_stocks?select=ticker,price_per_share&limit=3');

@@ -320,7 +320,7 @@ test('profile settings edit causes and no longer ask for age, gender or income',
   await expect(page.getByText('P/E Ratio').first()).toBeVisible();
   await page.getByRole('button', { name: 'Profile' }).click();
   await expect(page.getByText('What you care about')).toBeVisible();
-  await expect(page.getByRole('group', { name: 'Causes' }).getByRole('button')).toHaveCount(4);
+  await expect(page.getByRole('group', { name: 'Causes' }).getByRole('button')).toHaveCount(6);
   await expect(page.getByRole('button', { name: /, pick 1$/ })).toBeVisible(); // the account's #1 cause
   await expect(page.getByText(/^(Age|Gender|Annual Income)$/)).toHaveCount(0);
   await page.screenshot({ path: 'e2e/screens/settings-causes.png', fullPage: true });
