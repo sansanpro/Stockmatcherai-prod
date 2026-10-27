@@ -6168,6 +6168,418 @@
           "https://www.sec.gov/Archives/edgar/data/1707753/000170775326000018/estc-20260430.htm"
         ]
       }
+    },
+    {
+      "ticker": "XENE",
+      "company_name": "Xenon Pharmaceuticals Inc.",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Is developing azetukalner, a once-daily pill being tested for epilepsy seizures and for major depression.",
+      "proof": "Azetukalner is in two late-stage depression trials, X-NOVA2 and X-NOVA3, with first results expected in the first half of 2027.",
+      "things_to_know": [
+        "It has no approved medicine yet and lost $110.7 million in the second quarter of 2026.",
+        "Its first planned approval is for epilepsy; whether the drug works for depression won't be known until 2027."
+      ],
+      "missions": [
+        {
+          "cause": "mental_health",
+          "exposure": "partial",
+          "evidence": "Xenon is enrolling the Phase 3 X-NOVA2 and X-NOVA3 studies of azetukalner in major depressive disorder, alongside its epilepsy program.",
+          "why_line": "It is testing a new pill for major depression.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Xenon Pharmaceuticals is a biotech developing medicines for neurological and psychiatric conditions, led by azetukalner for epilepsy and depression.",
+        "city": "Vancouver",
+        "state": "",
+        "country": "CA"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "GHRS",
+      "company_name": "GH Research PLC",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "high",
+      "filing_type": "20-F",
+      "mission_story": "Is developing mebufotenin treatments, a fast-acting psychedelic-based approach, for depression that other treatments haven't helped.",
+      "proof": "In a mid-stage trial, its GH001 cut depression scores by 15.5 points more than placebo after eight days.",
+      "things_to_know": [
+        "It has no approved product; its main drug still has to pass late-stage trials, which it planned to start in 2026.",
+        "The FDA had paused U.S. testing of GH001 until lifting that hold in January 2026."
+      ],
+      "missions": [
+        {
+          "cause": "mental_health",
+          "exposure": "core",
+          "evidence": "GH Research focuses on mebufotenin therapies for the treatment of patients with treatment-resistant depression.",
+          "why_line": "It is developing a fast-acting treatment for hard-to-treat depression.",
+          "source_url": "https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "GH Research is a clinical-stage biotech developing mebufotenin therapies for treatment-resistant depression.",
+        "city": "Dublin",
+        "state": "",
+        "country": "IE"
+      },
+      "sources": {
+        "story": [
+          "https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/"
+        ],
+        "proof": [
+          "https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/"
+        ],
+        "things_to_know": [
+          [
+            "https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/"
+          ],
+          [
+            "https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/"
+          ]
+        ],
+        "profile": [
+          "https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "LBRX",
+      "company_name": "LB Pharmaceuticals Inc.",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Is developing LB-102, a once-daily pill for schizophrenia based on an antipsychotic widely used outside the U.S.",
+      "proof": "LB-102 is in a pivotal late-stage schizophrenia trial, NOVA-2, with results expected in the first half of 2027.",
+      "things_to_know": [
+        "It has no approved medicine and lost $51.6 million in the second quarter of 2026 as trial spending rose.",
+        "It only began trading publicly in 2025, and its stock more than doubled over the past year, so it can swing sharply on trial news."
+      ],
+      "missions": [
+        {
+          "cause": "mental_health",
+          "exposure": "core",
+          "evidence": "LB-102 is being developed as a potential first benzamide antipsychotic in the U.S., with a pivotal Phase 3 trial in schizophrenia and a Phase 2 trial in bipolar depression.",
+          "why_line": "It is developing a new medicine for schizophrenia.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "LB Pharmaceuticals is a clinical-stage biotech developing LB-102 for schizophrenia and other neuropsychiatric disorders.",
+        "city": "New York",
+        "state": "NY",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm"
+          ],
+          [
+            "https://stockanalysis.com/stocks/lbrx/statistics/",
+            "https://www.biospace.com/press-releases/lb-pharmaceuticals-reports-3q-2025-financial-results-and-recent-corporate-updates"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "TAK",
+      "company_name": "Takeda Pharmaceutical Company Limited",
+      "new": true,
+      "sector": "healthcare",
+      "risk_level": "low",
+      "filing_type": "20-F",
+      "mission_story": "Japanese drugmaker with medicines for cancer, rare diseases, blood disorders and gut diseases, plus vaccines and new sleep-disorder and depression treatments.",
+      "proof": "In August 2026 the FDA approved Takeda's Mimrylo (rusfertide) for adults with polycythemia vera, a chronic blood disorder.",
+      "things_to_know": [
+        "A U.S. jury found it liable in May 2026 in an antitrust case over delaying a cheaper generic of its drug Amitiza, awarding about $885 million, much of it to be tripled; Takeda plans to appeal.",
+        "Cheaper generics are cutting sales of Vyvanse, and its depression drug Trintellix faces generics after key patents expire in December 2026."
+      ],
+      "missions": [
+        {
+          "cause": "beat_cancer",
+          "exposure": "partial",
+          "evidence": "Takeda's six key business areas, gastroenterology, rare diseases, plasma-derived therapies, oncology, vaccines and neuroscience, made 95.0% of revenue in the year to March 2026.",
+          "why_line": "Its medicines treat cancers, rare diseases and blood disorders.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001395064/000139506426000177/tak-20260331.htm"
+        },
+        {
+          "cause": "mental_health",
+          "exposure": "partial",
+          "evidence": "In August 2026 the FDA approved Takeda's Orzeyful for narcolepsy type 1, which the source describes as a lifelong neuropsychiatric sleep disorder.",
+          "why_line": "Its new medicine treats narcolepsy, a serious sleep disorder.",
+          "source_url": "https://www.pharmacytimes.com/view/fda-approves-oveporexton-for-narcolepsy-type-1"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Takeda is a Japanese drugmaker whose top-selling product is the gastroenterology medicine Entyvio. It also sells rare-disease, plasma-based, cancer and neuroscience medicines, plus vaccines.",
+        "city": "Tokyo",
+        "state": "",
+        "country": "JP"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001395064/000139506426000177/tak-20260331.htm",
+          "https://www.pharmacytimes.com/view/fda-approves-oveporexton-for-narcolepsy-type-1"
+        ],
+        "proof": [
+          "https://www.onclive.com/view/fda-approves-rusfertide-for-polycythemia-vera",
+          "https://www.cancernetwork.com/view/fda-approves-rusfertide-in-polycythemia-vera"
+        ],
+        "things_to_know": [
+          [
+            "https://www.takeda.com/newsroom/newsreleases/2026/takeda-provides-update-regarding-jury-verdict-in-amitiza-antitrust-litigation-in-the-us-and-related-revision-to-fy2025-financial-results/"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001395064/000139506426000177/tak-20260331.htm",
+            "https://www.trintellixhcp.com/"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001395064/000139506426000177/tak-20260331.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "UNFI",
+      "company_name": "United Natural Foods, Inc.",
+      "new": true,
+      "sector": "consumer",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Delivers natural, organic and specialty foods to more than 30,000 grocery stores across North America.",
+      "proof": "Its natural products business grew 7.0% to $17.1 billion in sales in the fiscal year ended August 1, 2026.",
+      "things_to_know": [
+        "Its profit is thin: $84 million on $31.2 billion of sales in fiscal 2026.",
+        "About 42% of its sales are conventional groceries, not natural or organic, and that business shrank 11.5% in fiscal 2026."
+      ],
+      "missions": [
+        {
+          "cause": "clean_food",
+          "exposure": "partial",
+          "evidence": "UNFI's Natural segment, which distributes natural, organic and specialty products, had $17.1 billion of its $31.2 billion fiscal 2026 net sales.",
+          "why_line": "Its biggest business delivers natural and organic food to stores.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "United Natural Foods is a North American grocery wholesaler supplying natural, organic, specialty and conventional products to grocers.",
+        "city": "Providence",
+        "state": "RI",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "DMC",
+      "company_name": "Del Monte Corporation",
+      "new": true,
+      "sector": "consumer",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Grows, packs and ships fresh fruit and vegetables, including bananas, pineapples and fresh-cut produce, and sells Del Monte packaged foods.",
+      "proof": "Its fresh produce and banana businesses had about $930 million in sales in the second quarter of 2026.",
+      "things_to_know": [
+        "Its profit margins are thin: gross margin was 9.9% in the second quarter of 2026, and banana sales fell.",
+        "Formerly Fresh Del Monte Produce, it took its new name in June 2026 after buying assets of Del Monte Foods, adding canned and packaged foods."
+      ],
+      "missions": [
+        {
+          "cause": "clean_food",
+          "exposure": "core",
+          "evidence": "Fresh and Value-Added Products ($569.3 million) and Bananas ($361.1 million) made up most of Del Monte Corporation's $1,219.1 million Q2 2026 net sales.",
+          "why_line": "It puts fresh fruit and vegetables in stores worldwide.",
+          "source_url": "https://investorrelations.freshdelmonte.com/news/news-details/2026/Del-Monte-Corporation-Reports-Second-Quarter-Earnings-for-Fiscal-2026/default.aspx"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Del Monte Corporation, formerly Fresh Del Monte Produce, produces and distributes fresh and fresh-cut fruit and vegetables and Del Monte shelf-stable foods.",
+        "city": "Coral Gables",
+        "state": "FL",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://investorrelations.freshdelmonte.com/news/news-details/2026/Del-Monte-Corporation-Reports-Second-Quarter-Earnings-for-Fiscal-2026/default.aspx"
+        ],
+        "proof": [
+          "https://investorrelations.freshdelmonte.com/news/news-details/2026/Del-Monte-Corporation-Reports-Second-Quarter-Earnings-for-Fiscal-2026/default.aspx"
+        ],
+        "things_to_know": [
+          [
+            "https://investorrelations.freshdelmonte.com/news/news-details/2026/Del-Monte-Corporation-Reports-Second-Quarter-Earnings-for-Fiscal-2026/default.aspx"
+          ],
+          [
+            "https://freshdelmonte.com/news/fresh-del-monte-produce-inc-announces-name-change-to-del-monte-corporation-and-nyse-ticker-symbol-change-to-dmc/"
+          ]
+        ],
+        "profile": [
+          "https://investorrelations.freshdelmonte.com/news/news-details/2026/Del-Monte-Corporation-Reports-Second-Quarter-Earnings-for-Fiscal-2026/default.aspx"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "AVO",
+      "company_name": "Mission Produce, Inc.",
+      "new": true,
+      "sector": "consumer",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Grows, packs and ships fresh Hass avocados, plus mangos and blueberries, to customers in more than 25 countries.",
+      "proof": "It sold 38% more avocados in the quarter ended July 31, 2026, bringing in $450.0 million in revenue.",
+      "things_to_know": [
+        "It lost $6.5 million in that quarter, including $25.4 million of costs from buying rival avocado company Calavo.",
+        "It had about $400 million of debt at the end of July 2026, and its stock market value is only just above $1 billion."
+      ],
+      "missions": [
+        {
+          "cause": "clean_food",
+          "exposure": "core",
+          "evidence": "Mission Produce calls itself a world leader in sourcing, producing and distributing fresh Hass avocados, and also grows blueberries.",
+          "why_line": "It grows and delivers fresh avocados around the world.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Mission Produce sources, grows and distributes fresh Hass avocados and other produce such as mangos and blueberries.",
+        "city": "Oxnard",
+        "state": "CA",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm",
+            "https://stockanalysis.com/stocks/avo/statistics/"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "COCO",
+      "company_name": "The Vita Coco Company, Inc.",
+      "new": true,
+      "sector": "consumer",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Sells Vita Coco coconut water and other better-for-you drinks, plus store-brand coconut water for retailers.",
+      "proof": "Its sales grew 28% to $216 million in the second quarter of 2026, led by 21% growth in Vita Coco coconut water.",
+      "things_to_know": [
+        "One-time tariff refunds boosted its second-quarter 2026 profit margin by about 7 percentage points.",
+        "Its stock rose about 41% over the past year, so expectations for its growth are high."
+      ],
+      "missions": [
+        {
+          "cause": "clean_food",
+          "exposure": "core",
+          "evidence": "Vita Coco describes itself as a leading high-growth platform of better-for-you beverage brands, led by Vita Coco Coconut Water.",
+          "why_line": "It sells coconut water as a better-for-you drink.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001482981/000162828026049279/coco-20260630xexx991pressr.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "The Vita Coco Company makes better-for-you drinks, led by Vita Coco coconut water, and private-label coconut water.",
+        "city": "New York",
+        "state": "NY",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001482981/000162828026049279/coco-20260630xexx991pressr.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001482981/000162828026049279/coco-20260630xexx991pressr.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001482981/000162828026049279/coco-20260630xexx991pressr.htm"
+          ],
+          [
+            "https://stockanalysis.com/stocks/coco/statistics/"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001482981/000162828026049279/coco-20260630xexx991pressr.htm"
+        ]
+      },
+      "reviewed": true
     }
   ],
   "verified": {
@@ -6243,7 +6655,15 @@
         "FFIV",
         "YOU",
         "BB",
-        "ESTC"
+        "ESTC",
+        "XENE",
+        "GHRS",
+        "LBRX",
+        "TAK",
+        "UNFI",
+        "DMC",
+        "AVO",
+        "COCO"
       ],
       "tagged": [
         "ABBV:mental_health"
@@ -6298,12 +6718,19 @@
         "FFIV": "$25.79B on 2026-10-23 close per stockanalysis.com",
         "YOU": "$6.14B on 2026-10-23 close per stockanalysis.com",
         "BB": "$5.23B on 2026-10-23 close per stockanalysis.com",
-        "ESTC": "$10.75B on 2026-10-23 close per stockanalysis.com"
+        "ESTC": "$10.75B on 2026-10-23 close per stockanalysis.com",
+        "XENE": "$3.46B on 2026-10-26 per stockanalysis.com (beta 0.60; down about 12% over 52 weeks)",
+        "GHRS": "$1.32B on 2026-10-26 per stockanalysis.com (beta 1.33; up about 37% over 52 weeks)",
+        "LBRX": "$1.27B on 2026-10-26 per stockanalysis.com (up about 146% over 52 weeks; IPO September 2025)",
+        "TAK": "$65.1B on 2026-10-23 close per stockanalysis.com",
+        "UNFI": "$2.91B on 2026-10-26 per stockanalysis.com (beta 0.97; up about 22% over 52 weeks)",
+        "DMC": "$1.37B on 2026-10-26 per stockanalysis.com (beta 0.24; down about 15% over 52 weeks). Ticker changed from FDP to DMC on 2026-06-29.",
+        "AVO": "$1.03B on 2026-10-26 per stockanalysis.com (beta 0.44). Right at the $1B floor: recheck before each rebuild.",
+        "COCO": "$3.18B on 2026-10-26 per stockanalysis.com (beta 0.75; up about 41% over 52 weeks)"
       },
       "reserve": {
         "GSK": "reserve",
         "SNY": "reserve",
-        "TAK": "reserve",
         "ADPT": "reserve",
         "NVAX": "reserve",
         "INSM": "reserve",
@@ -6316,7 +6743,25 @@
         "AAON": "reserve",
         "RDWR": "reserve"
       },
-      "note": "Every cited page was opened by scripts/check-universe-sources.mjs; claims it could not match automatically were checked by hand."
+      "note": "Every cited page was opened by scripts/check-universe-sources.mjs; claims it could not match automatically were checked by hand.",
+      "round2": {
+        "on": "2026-10-26",
+        "added": [
+          "XENE",
+          "GHRS",
+          "LBRX",
+          "TAK",
+          "UNFI",
+          "DMC",
+          "AVO",
+          "COCO"
+        ],
+        "not_added": {
+          "TEVA": "criminal price-fixing deferred prosecution (2023) and opioid settlement",
+          "CMG": "criminal food-safety deferred prosecution (2020)",
+          "HIMS (mental_health)": "mental health is a minor, unquantified category"
+        }
+      }
     }
   }
 }

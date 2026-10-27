@@ -17,12 +17,12 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 
 | Cause | Companies | Verified |
 |---|---|---|
-| Beat cancer & disease | 29 | 29 |
+| Beat cancer & disease | 30 | 30 |
 | Live longer & healthier | 30 | 30 |
 | Clean energy & climate | 27 | 27 |
 | Keeping people safe | 28 | 28 |
-| Healthy food & farming | 12 | 12 |
-| Mental health & wellbeing | 14 | 14 |
+| Healthy food & farming | 16 | 16 |
+| Mental health & wellbeing | 18 | 18 |
 
 
 ## Beat cancer & disease
@@ -292,6 +292,19 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
   *Evidence:* Vaxcyte is a clinical-stage vaccine company whose lead programs, VAX-31 and VAX-24, aim to prevent pneumococcal disease such as pneumonia, meningitis and bloodstream infections. [source](https://www.sec.gov/Archives/edgar/data/1649094/000164909426000007/pcvx-20251231.htm)
 - **Profile:** Vaxcyte is a vaccine company developing broad pneumococcal conjugate vaccines, led by VAX-31 for adults and children. It has no approved products yet. (San Carlos, CA) · sector healthcare · risk high [source](https://www.sec.gov/Archives/edgar/data/1649094/000164909426000007/pcvx-20251231.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=PCVX&type=10-K&dateb=&owner=include&count=40)
+
+### 27. TAK: Takeda Pharmaceutical Company Limited (new) ✅
+
+- **Story:** Japanese drugmaker with medicines for cancer, rare diseases, blood disorders and gut diseases, plus vaccines and new sleep-disorder and depression treatments. [source 1](https://www.sec.gov/Archives/edgar/data/0001395064/000139506426000177/tak-20260331.htm) [source 2](https://www.pharmacytimes.com/view/fda-approves-oveporexton-for-narcolepsy-type-1)
+- **Proof:** In August 2026 the FDA approved Takeda's Mimrylo (rusfertide) for adults with polycythemia vera, a chronic blood disorder. [source 1](https://www.onclive.com/view/fda-approves-rusfertide-for-polycythemia-vera) [source 2](https://www.cancernetwork.com/view/fda-approves-rusfertide-in-polycythemia-vera)
+- **Thing to know:** A U.S. jury found it liable in May 2026 in an antitrust case over delaying a cheaper generic of its drug Amitiza, awarding about $885 million, much of it to be tripled; Takeda plans to appeal. [source](https://www.takeda.com/newsroom/newsreleases/2026/takeda-provides-update-regarding-jury-verdict-in-amitiza-antitrust-litigation-in-the-us-and-related-revision-to-fy2025-financial-results/)
+- **Thing to know:** Cheaper generics are cutting sales of Vyvanse, and its depression drug Trintellix faces generics after key patents expire in December 2026. [source 1](https://www.sec.gov/Archives/edgar/data/0001395064/000139506426000177/tak-20260331.htm) [source 2](https://www.trintellixhcp.com/)
+- **Beat cancer & disease (partial):** Its medicines treat cancers, rare diseases and blood disorders.  
+  *Evidence:* Takeda's six key business areas, gastroenterology, rare diseases, plasma-derived therapies, oncology, vaccines and neuroscience, made 95.0% of revenue in the year to March 2026. [source](https://www.sec.gov/Archives/edgar/data/0001395064/000139506426000177/tak-20260331.htm)
+- **Mental health & wellbeing (partial):** Its new medicine treats narcolepsy, a serious sleep disorder.  
+  *Evidence:* In August 2026 the FDA approved Takeda's Orzeyful for narcolepsy type 1, which the source describes as a lifelong neuropsychiatric sleep disorder. [source](https://www.pharmacytimes.com/view/fda-approves-oveporexton-for-narcolepsy-type-1)
+- **Profile:** Takeda is a Japanese drugmaker whose top-selling product is the gastroenterology medicine Entyvio. It also sells rare-disease, plasma-based, cancer and neuroscience medicines, plus vaccines. (Tokyo, JP) · sector healthcare · risk low [source](https://www.sec.gov/Archives/edgar/data/0001395064/000139506426000177/tak-20260331.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=TAK&type=20-F&dateb=&owner=include&count=40)
 
 
 ## Live longer & healthier
@@ -1257,6 +1270,50 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Profile:** Dole is one of the world's largest growers and distributors of fresh fruit and vegetables. (Dublin, IE) · sector consumer · risk high [source](https://www.sec.gov/Archives/edgar/data/0001857475/000185747526000074/doleplcreportssecondquarte.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=DOLE&type=10-K&dateb=&owner=include&count=40)
 
+### 13. UNFI: United Natural Foods, Inc. (new) ✅
+
+- **Story:** Delivers natural, organic and specialty foods to more than 30,000 grocery stores across North America. [source](https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm)
+- **Proof:** Its natural products business grew 7.0% to $17.1 billion in sales in the fiscal year ended August 1, 2026. [source](https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm)
+- **Thing to know:** Its profit is thin: $84 million on $31.2 billion of sales in fiscal 2026. [source](https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm)
+- **Thing to know:** About 42% of its sales are conventional groceries, not natural or organic, and that business shrank 11.5% in fiscal 2026. [source](https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm)
+- **Healthy food & farming (partial):** Its biggest business delivers natural and organic food to stores.  
+  *Evidence:* UNFI's Natural segment, which distributes natural, organic and specialty products, had $17.1 billion of its $31.2 billion fiscal 2026 net sales. [source](https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm)
+- **Profile:** United Natural Foods is a North American grocery wholesaler supplying natural, organic, specialty and conventional products to grocers. (Providence, RI) · sector consumer · risk high [source](https://www.sec.gov/Archives/edgar/data/0001020859/000102085926000022/f26q4earningsrelease.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=UNFI&type=10-K&dateb=&owner=include&count=40)
+
+### 14. DMC: Del Monte Corporation (new) ✅
+
+- **Story:** Grows, packs and ships fresh fruit and vegetables, including bananas, pineapples and fresh-cut produce, and sells Del Monte packaged foods. [source](https://investorrelations.freshdelmonte.com/news/news-details/2026/Del-Monte-Corporation-Reports-Second-Quarter-Earnings-for-Fiscal-2026/default.aspx)
+- **Proof:** Its fresh produce and banana businesses had about $930 million in sales in the second quarter of 2026. [source](https://investorrelations.freshdelmonte.com/news/news-details/2026/Del-Monte-Corporation-Reports-Second-Quarter-Earnings-for-Fiscal-2026/default.aspx)
+- **Thing to know:** Its profit margins are thin: gross margin was 9.9% in the second quarter of 2026, and banana sales fell. [source](https://investorrelations.freshdelmonte.com/news/news-details/2026/Del-Monte-Corporation-Reports-Second-Quarter-Earnings-for-Fiscal-2026/default.aspx)
+- **Thing to know:** Formerly Fresh Del Monte Produce, it took its new name in June 2026 after buying assets of Del Monte Foods, adding canned and packaged foods. [source](https://freshdelmonte.com/news/fresh-del-monte-produce-inc-announces-name-change-to-del-monte-corporation-and-nyse-ticker-symbol-change-to-dmc/)
+- **Healthy food & farming (core):** It puts fresh fruit and vegetables in stores worldwide.  
+  *Evidence:* Fresh and Value-Added Products ($569.3 million) and Bananas ($361.1 million) made up most of Del Monte Corporation's $1,219.1 million Q2 2026 net sales. [source](https://investorrelations.freshdelmonte.com/news/news-details/2026/Del-Monte-Corporation-Reports-Second-Quarter-Earnings-for-Fiscal-2026/default.aspx)
+- **Profile:** Del Monte Corporation, formerly Fresh Del Monte Produce, produces and distributes fresh and fresh-cut fruit and vegetables and Del Monte shelf-stable foods. (Coral Gables, FL) · sector consumer · risk high [source](https://investorrelations.freshdelmonte.com/news/news-details/2026/Del-Monte-Corporation-Reports-Second-Quarter-Earnings-for-Fiscal-2026/default.aspx)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=DMC&type=10-K&dateb=&owner=include&count=40)
+
+### 15. AVO: Mission Produce, Inc. (new) ✅
+
+- **Story:** Grows, packs and ships fresh Hass avocados, plus mangos and blueberries, to customers in more than 25 countries. [source](https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm)
+- **Proof:** It sold 38% more avocados in the quarter ended July 31, 2026, bringing in $450.0 million in revenue. [source](https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm)
+- **Thing to know:** It lost $6.5 million in that quarter, including $25.4 million of costs from buying rival avocado company Calavo. [source](https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm)
+- **Thing to know:** It had about $400 million of debt at the end of July 2026, and its stock market value is only just above $1 billion. [source 1](https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm) [source 2](https://stockanalysis.com/stocks/avo/statistics/)
+- **Healthy food & farming (core):** It grows and delivers fresh avocados around the world.  
+  *Evidence:* Mission Produce calls itself a world leader in sourcing, producing and distributing fresh Hass avocados, and also grows blueberries. [source](https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm)
+- **Profile:** Mission Produce sources, grows and distributes fresh Hass avocados and other produce such as mangos and blueberries. (Oxnard, CA) · sector consumer · risk high [source](https://www.sec.gov/Archives/edgar/data/0001802974/000180297426000042/exh991avoq32026earningsrel.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=AVO&type=10-K&dateb=&owner=include&count=40)
+
+### 16. COCO: The Vita Coco Company, Inc. (new) ✅
+
+- **Story:** Sells Vita Coco coconut water and other better-for-you drinks, plus store-brand coconut water for retailers. [source](https://www.sec.gov/Archives/edgar/data/0001482981/000162828026049279/coco-20260630xexx991pressr.htm)
+- **Proof:** Its sales grew 28% to $216 million in the second quarter of 2026, led by 21% growth in Vita Coco coconut water. [source](https://www.sec.gov/Archives/edgar/data/0001482981/000162828026049279/coco-20260630xexx991pressr.htm)
+- **Thing to know:** One-time tariff refunds boosted its second-quarter 2026 profit margin by about 7 percentage points. [source](https://www.sec.gov/Archives/edgar/data/0001482981/000162828026049279/coco-20260630xexx991pressr.htm)
+- **Thing to know:** Its stock rose about 41% over the past year, so expectations for its growth are high. [source](https://stockanalysis.com/stocks/coco/statistics/)
+- **Healthy food & farming (core):** It sells coconut water as a better-for-you drink.  
+  *Evidence:* Vita Coco describes itself as a leading high-growth platform of better-for-you beverage brands, led by Vita Coco Coconut Water. [source](https://www.sec.gov/Archives/edgar/data/0001482981/000162828026049279/coco-20260630xexx991pressr.htm)
+- **Profile:** The Vita Coco Company makes better-for-you drinks, led by Vita Coco coconut water, and private-label coconut water. (New York, NY) · sector consumer · risk high [source](https://www.sec.gov/Archives/edgar/data/0001482981/000162828026049279/coco-20260630xexx991pressr.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=COCO&type=10-K&dateb=&owner=include&count=40)
+
 
 ## Mental health & wellbeing
 
@@ -1392,3 +1449,36 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
   *Evidence:* COMP360 is Compass's investigational synthetic psilocybin treatment for treatment-resistant depression, backed by two positive Phase 3 trials. [source](https://www.sec.gov/Archives/edgar/data/0001816590/000181659026000059/q22026pressrelease.htm)
 - **Profile:** Compass Pathways is a biotech developing a synthetic psilocybin treatment for treatment-resistant depression. (London, GB) · sector healthcare · risk high [source](https://www.sec.gov/Archives/edgar/data/0001816590/000181659026000059/q22026pressrelease.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=CMPS&type=10-K&dateb=&owner=include&count=40)
+
+### 13. XENE: Xenon Pharmaceuticals Inc. (new) ✅
+
+- **Story:** Is developing azetukalner, a once-daily pill being tested for epilepsy seizures and for major depression. [source](https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm)
+- **Proof:** Azetukalner is in two late-stage depression trials, X-NOVA2 and X-NOVA3, with first results expected in the first half of 2027. [source](https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm)
+- **Thing to know:** It has no approved medicine yet and lost $110.7 million in the second quarter of 2026. [source](https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm)
+- **Thing to know:** Its first planned approval is for epilepsy; whether the drug works for depression won't be known until 2027. [source](https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm)
+- **Mental health & wellbeing (partial):** It is testing a new pill for major depression.  
+  *Evidence:* Xenon is enrolling the Phase 3 X-NOVA2 and X-NOVA3 studies of azetukalner in major depressive disorder, alongside its epilepsy program. [source](https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm)
+- **Profile:** Xenon Pharmaceuticals is a biotech developing medicines for neurological and psychiatric conditions, led by azetukalner for epilepsy and depression. (Vancouver, CA) · sector healthcare · risk high [source](https://www.sec.gov/Archives/edgar/data/0001582313/000119312526338019/xene-ex99_1.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=XENE&type=10-K&dateb=&owner=include&count=40)
+
+### 14. GHRS: GH Research PLC (new) ✅
+
+- **Story:** Is developing mebufotenin treatments, a fast-acting psychedelic-based approach, for depression that other treatments haven't helped. [source](https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/)
+- **Proof:** In a mid-stage trial, its GH001 cut depression scores by 15.5 points more than placebo after eight days. [source](https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/)
+- **Thing to know:** It has no approved product; its main drug still has to pass late-stage trials, which it planned to start in 2026. [source](https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/)
+- **Thing to know:** The FDA had paused U.S. testing of GH001 until lifting that hold in January 2026. [source](https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/)
+- **Mental health & wellbeing (core):** It is developing a fast-acting treatment for hard-to-treat depression.  
+  *Evidence:* GH Research focuses on mebufotenin therapies for the treatment of patients with treatment-resistant depression. [source](https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/)
+- **Profile:** GH Research is a clinical-stage biotech developing mebufotenin therapies for treatment-resistant depression. (Dublin, IE) · sector healthcare · risk high [source](https://www.samedanltd.com/press-releases/gh-research-announces-fda-lifts-clinical-hold-on-gh001-clearing-path-for-global-phase-3-initiation-in-2026/)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=GHRS&type=20-F&dateb=&owner=include&count=40)
+
+### 15. LBRX: LB Pharmaceuticals Inc. (new) ✅
+
+- **Story:** Is developing LB-102, a once-daily pill for schizophrenia based on an antipsychotic widely used outside the U.S. [source](https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm)
+- **Proof:** LB-102 is in a pivotal late-stage schizophrenia trial, NOVA-2, with results expected in the first half of 2027. [source](https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm)
+- **Thing to know:** It has no approved medicine and lost $51.6 million in the second quarter of 2026 as trial spending rose. [source](https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm)
+- **Thing to know:** It only began trading publicly in 2025, and its stock more than doubled over the past year, so it can swing sharply on trial news. [source 1](https://stockanalysis.com/stocks/lbrx/statistics/) [source 2](https://www.biospace.com/press-releases/lb-pharmaceuticals-reports-3q-2025-financial-results-and-recent-corporate-updates)
+- **Mental health & wellbeing (core):** It is developing a new medicine for schizophrenia.  
+  *Evidence:* LB-102 is being developed as a potential first benzamide antipsychotic in the U.S., with a pivotal Phase 3 trial in schizophrenia and a Phase 2 trial in bipolar depression. [source](https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm)
+- **Profile:** LB Pharmaceuticals is a clinical-stage biotech developing LB-102 for schizophrenia and other neuropsychiatric disorders. (New York, NY) · sector healthcare · risk high [source](https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=LBRX&type=10-K&dateb=&owner=include&count=40)
