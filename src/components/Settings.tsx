@@ -95,7 +95,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
       if (error) throw error;
       track('causes_updated', { source: 'settings', causes: values.causes });
       onCausesSaved(values);
-      toast.success('Saved. Your matches will follow these from now on.');
+      toast.success('Saved.');
     } catch {
       toast.error("Couldn't save. Please try again.");
     } finally {

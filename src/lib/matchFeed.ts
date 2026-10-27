@@ -38,6 +38,8 @@ export interface FeedDeck {
   cards: FeedCard[];
   swiped: { ticker: string; liked: boolean }[];
   signedIn: boolean;
+  // Answer to a rebuild request: whether today's remaining cards now follow the new preferences
+  rebuilt?: boolean;
 }
 
 export class FeedError extends Error {

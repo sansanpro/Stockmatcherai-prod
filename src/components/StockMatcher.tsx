@@ -63,8 +63,8 @@ const StockMatcher = ({
     return () => clearTimeout(timer);
   }, []);
 
-  // rebuild: the user's causes changed, so ask for a fresh deck (the server only grants it if
-  // nothing from today's deck was swiped yet)
+  // rebuild: the user's causes changed, so the rest of today's deck is refilled from them
+  // (cards already swiped stay, and the day's size doesn't change)
   const loadDeck = useCallback(async (rebuild = false) => {
     setStatus('loading');
     try {
@@ -93,6 +93,11 @@ const StockMatcher = ({
       finishedTracked.current = remaining.length === 0;
       setStatus('ready');
       track('deck_loaded', { cards: deck.cards.length, remaining: remaining.length, signed_in: signedIn });
+      if (rebuild && signedIn) {
+        toast.success(deck.rebuilt
+          ? "Today's remaining matches now follow your new picks."
+          : "You've seen today's matches. Your new picks start with tomorrow's deck.");
+      }
     } catch (error) {
       if (error instanceof FeedError && error.status === 409) {
         onNeedsCauses?.();

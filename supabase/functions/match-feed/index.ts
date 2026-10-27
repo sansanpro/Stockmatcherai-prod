@@ -299,25 +299,35 @@ Deno.serve(async (req) => {
     const { data: swipedToday } = await db.from('swipes').select('ticker, liked').eq('user_id', user.id).eq('deck_date', today);
     const { data: existing } = await db.from('daily_decks').select('cards').eq('user_id', user.id).eq('deck_date', today).maybeSingle();
     let cards = existing?.cards as DeckCard[] | undefined;
-    // After the user changes their causes: today's deck is rebuilt only if none of it was swiped
-    // yet, so a rebuild can never add swipes to the day
-    if (cards && body.rebuild === true) {
-      const deckTickers = new Set(cards.map(c => c.ticker));
-      if (!(swipedToday ?? []).some(s => deckTickers.has(s.ticker))) {
-        await db.from('daily_decks').delete().eq('user_id', user.id).eq('deck_date', today);
-        cards = undefined;
-      }
-    }
     let stocks = new Map<string, Record<string, unknown>>();
-
-    if (!cards) {
-      const { data: sub } = await db.from('subscribers').select('subscribed').eq('user_id', user.id).maybeSingle();
-      const size = sub?.subscribed ? PREMIUM_DECK_SIZE : FREE_DECK_SIZE;
+    const { data: sub } = await db.from('subscribers').select('subscribed').eq('user_id', user.id).maybeSingle();
+    const size = sub?.subscribed ? PREMIUM_DECK_SIZE : FREE_DECK_SIZE;
+    const buildFor = async (slots: number, updateCards: number) => {
       const [loaded, history] = await Promise.all([loadCandidates(db, prefs.causes), loadHistory(db, user.id)]);
       stocks = loaded.stocks;
       const names = new Map([...stocks.values()].map(s => [s.ticker as string, s.company_name as string]));
-      const updates = await loadUpdates(db, history.liked, names);
-      cards = buildDeck(loaded.candidates, prefs, history, updates, { size, updateCards: UPDATE_CARDS });
+      const updates = updateCards > 0 ? await loadUpdates(db, history.liked, names) : [];
+      return buildDeck(loaded.candidates, prefs, history, updates, { size: slots, updateCards });
+    };
+
+    // After the user changes their causes or dealbreakers: cards already swiped today stay, and
+    // the rest of today's deck is refilled from the new preferences. The deck never grows past
+    // the day's size, so changing causes can't add swipes to the day.
+    let rebuilt = false;
+    if (cards && body.rebuild === true) {
+      const swipedTickers = new Set((swipedToday ?? []).map(s => s.ticker));
+      const kept = cards.filter(c => swipedTickers.has(c.ticker));
+      const open = Math.max(0, size - kept.length);
+      if (open > 0) {
+        const fresh = (await buildFor(open, kept.length === 0 ? UPDATE_CARDS : 0)).filter(c => !swipedTickers.has(c.ticker));
+        cards = [...kept, ...fresh];
+        await db.from('daily_decks').update({ cards }).eq('user_id', user.id).eq('deck_date', today);
+        rebuilt = true;
+      }
+    }
+
+    if (!cards) {
+      cards = await buildFor(size, UPDATE_CARDS);
       if (cards.length > 0) {
         // Another request may have built it at the same moment; keep whichever was saved first
         await db.from('daily_decks').upsert({ user_id: user.id, deck_date: today, cards }, { onConflict: 'user_id,deck_date', ignoreDuplicates: true });
@@ -331,6 +341,8 @@ Deno.serve(async (req) => {
       cards: await enrichCards(db, cards, stocks),
       swiped: swipedToday ?? [],
       signedIn: true,
+      // Only for rebuild requests: whether today's remaining cards now follow the new preferences
+      ...(body.rebuild === true ? { rebuilt } : {}),
     });
   } catch (error) {
     console.error('[match-feed] error:', error);

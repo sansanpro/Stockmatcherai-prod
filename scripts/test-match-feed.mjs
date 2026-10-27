@@ -76,9 +76,19 @@ const token = auth.access_token;
     const after = await call({ action: 'deck' }, token);
     check('signed in: deck reports swiped cards', after.body.swiped?.length >= 1);
 
+    // Changing causes refills the unswiped part of today's deck; swiped cards stay and the deck doesn't grow
     const rebuilt = await call({ action: 'deck', rebuild: true }, token);
-    check("signed in: no rebuild once today's deck has swipes",
-      JSON.stringify(rebuilt.body.cards?.map(c => c.ticker)) === JSON.stringify(after.body.cards?.map(c => c.ticker)));
+    const swipedNow = new Set((rebuilt.body.swiped ?? []).map(s => s.ticker));
+    const rebuiltTickers = (rebuilt.body.cards ?? []).map(c => c.ticker);
+    check('signed in: rebuild keeps the cards already swiped today',
+      [...swipedNow].every(t => rebuiltTickers.includes(t)), JSON.stringify(rebuiltTickers));
+    check("signed in: rebuild doesn't grow today's deck past its size",
+      rebuiltTickers.length <= Math.max(after.body.cards.length, 12) && new Set(rebuiltTickers).size === rebuiltTickers.length,
+      `${after.body.cards.length} -> ${rebuiltTickers.length}`);
+    check('signed in: rebuild says whether it applied', typeof rebuilt.body.rebuilt === 'boolean', JSON.stringify(rebuilt.body.rebuilt));
+    const reloaded = await call({ action: 'deck' }, token);
+    check('signed in: the rebuilt deck is the one kept for the day',
+      JSON.stringify(reloaded.body.cards?.map(c => c.ticker)) === JSON.stringify(rebuiltTickers));
 
     // Swipes made on the device before sign-in. ZS is already liked and PFE is out of the feed,
     // so this doesn't change what the test account sees.
