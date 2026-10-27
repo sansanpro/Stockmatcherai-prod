@@ -24,6 +24,10 @@ for (const c of companies) {
   (c.missions ?? []).forEach(m => add(`mission:${m.cause}`, m.evidence, [m.source_url]));
   (c.flags ?? []).forEach(f => add(`flag:${f.dealbreaker}`, f.evidence, [f.source_url]));
   if (c.profile?.description) add('profile', c.profile.description, s.profile);
+  if (c.caution) {
+    add('caution:headline', c.caution.headline, [c.caution.data_url]);
+    add('caution:reason', c.caution.reason, [c.caution.source_url]);
+  }
 }
 
 // --- fetch every page once ---

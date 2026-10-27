@@ -4,6 +4,7 @@ import { MatchedCause, StockRecommendation } from '@/types/stock-matcher';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchCauses, type CauseInfo } from '@/lib/matchFeed';
+import { cautionFor, latestMoves, moveWindowStart, type PriceMove } from '@/lib/caution';
 
 interface SwipeStats {
   totalSwipes: number;
@@ -61,14 +62,16 @@ async function loadAccountWatchlist(userId: string): Promise<StockRecommendation
   if (error) throw error;
   const tickers = [...new Set((matches ?? []).map(m => m.ticker))];
   if (tickers.length === 0) return [];
-  const [{ data: stocks }, { data: missions }, causes] = await Promise.all([
+  const [{ data: stocks }, { data: missions }, causes, { data: moves }] = await Promise.all([
     supabase
       .from('stocks')
-      .select('ticker, company_name, sector, price_per_share, one_year_return, pe_ratio, market_cap, dividend_yield, risk_level, updated_at, logo_url, mission_story, proof, proof_source_url, things_to_know, ceo_name')
+      .select('ticker, company_name, sector, price_per_share, one_year_return, pe_ratio, market_cap, dividend_yield, risk_level, updated_at, logo_url, mission_story, proof, proof_source_url, things_to_know, ceo_name, caution_headline, caution_reason, caution_source_url, caution_checked_on')
       .in('ticker', tickers),
     supabase.from('stock_missions').select('ticker, cause, exposure, why_line').eq('status', 'approved').in('ticker', tickers).neq('exposure', 'peripheral'),
     fetchCauses().catch(() => [] as CauseInfo[]),
+    supabase.from('price_moves').select('ticker, move_date, pct').in('ticker', tickers).gte('move_date', moveWindowStart()),
   ]);
+  const recentMoves = latestMoves((moves ?? []) as PriceMove[]);
   const byTicker = new Map((stocks ?? []).map(s => [s.ticker, s]));
   const causeInfo = new Map(causes.map(c => [c.id, c]));
   const causesOf = (ticker: string): MatchedCause[] => (missions ?? [])
@@ -105,6 +108,7 @@ async function loadAccountWatchlist(userId: string): Promise<StockRecommendation
       proof: s.proof ?? undefined,
       proofSourceUrl: s.proof_source_url ?? undefined,
       thingsToKnow: s.things_to_know ?? [],
+      caution: cautionFor(s, recentMoves.get(t)),
       matchedCauses: causesOf(t),
     };
   });

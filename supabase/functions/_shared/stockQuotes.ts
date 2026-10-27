@@ -13,6 +13,9 @@ const metricsKey = (ticker: string) => `metrics:${ticker}`;
 
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 
+// A one-day move this large (up or down, in percent) is recorded in price_moves
+export const BIG_MOVE_PCT = 15;
+
 // Finnhub reports market cap in the currency a company reports its results in. For these
 // foreign filers that isn't dollars, so it's converted with the day's ECB rate.
 const REPORTING_CURRENCY: Record<string, string> = { NVO: 'DKK', TAK: 'JPY', SBS: 'BRL' };
@@ -78,6 +81,15 @@ export async function applyQuote(db: Db, ticker: string, quote: FinnhubQuote, me
     ...(metrics ? metricsToColumns(metrics, await usdPerReportingUnit(ticker)) : {}),
   };
   const { data, error } = await db.from('stocks').update(columns).eq('ticker', ticker).select('ticker');
+  // A big one-day jump or drop gets a caution on the company's card until it's explained
+  if (isNum(quote.dp) && Math.abs(quote.dp) >= BIG_MOVE_PCT && quote.t > 0) {
+    await db.from('price_moves').upsert({
+      ticker,
+      move_date: new Date(quote.t * 1000).toISOString().slice(0, 10),
+      pct: Number(quote.dp.toFixed(2)),
+      price: quote.c,
+    });
+  }
   if (metrics) {
     await db.from('market_data_cache').upsert({ cache_key: metricsKey(ticker), data: metrics, fetched_at: new Date().toISOString() });
   }

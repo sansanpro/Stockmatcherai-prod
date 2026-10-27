@@ -14,6 +14,11 @@ test('swipe deck loads a values-matched card, story first', async ({ page }) => 
   await openApp(page);
   await expect(page.getByText('P/E Ratio').first()).toBeVisible();
   await expect(page.getByText(/matches left today/)).toBeVisible();
+  // The test account's real deck can start with news updates; pass them to reach a company card
+  for (let i = 0; i < 3 && await page.getByRole('button', { name: 'Interested' }).isVisible(); i++) {
+    await page.getByRole('button', { name: 'Pass' }).click();
+    await page.waitForTimeout(600);
+  }
   // Card v2 order: values match chips, proof (with its source), things to know, then the numbers
   const card = page.locator('[class*="cursor-grab"]').first();
   await expect(card.getByText('Values match')).toBeVisible();

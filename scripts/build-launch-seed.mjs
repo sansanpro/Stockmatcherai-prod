@@ -55,6 +55,14 @@ for (const c of companies) {
     if (!isUrl(f.source_url)) errors.push(`${where}: flag ${f.dealbreaker} needs a source_url`);
   }
   if (c.new && !c.profile?.description) errors.push(`${where}: new company needs profile.description`);
+  // optional "big swings" caution: what moved, why, the source, and when it was checked
+  if (c.caution) {
+    const k = c.caution;
+    if (!k.headline?.trim() || !k.reason?.trim()) errors.push(`${where}: caution needs a headline and a reason`);
+    if (!isUrl(k.source_url)) errors.push(`${where}: caution needs a source_url (for the reason)`);
+    if (!isUrl(k.data_url)) errors.push(`${where}: caution needs a data_url (for the headline's numbers)`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(k.checked_on ?? '')) errors.push(`${where}: caution needs checked_on (YYYY-MM-DD)`);
+  }
   // every claim shown to users cites what it was checked against
   const src = c.sources ?? {};
   if (!isUrlList(src.story)) errors.push(`${where}: sources.story needs at least one https link`);
@@ -106,7 +114,9 @@ ON CONFLICT (ticker) DO UPDATE SET company_name = EXCLUDED.company_name, sector 
 sql.push(`\n-- Mission story, proof and things to know for every launch company`);
 for (const c of companies) {
   sql.push(`UPDATE public.stocks SET mission_story = ${q(c.mission_story)}, proof = ${q(c.proof)}, proof_source_url = ${q(c.sources.proof[0])},
-  things_to_know = ${arr(c.things_to_know)}, in_feed = true WHERE ticker = ${q(c.ticker)};`);
+  things_to_know = ${arr(c.things_to_know)}, in_feed = true,
+  caution_headline = ${q(c.caution?.headline)}, caution_reason = ${q(c.caution?.reason)}, caution_source_url = ${q(c.caution?.source_url)}, caution_checked_on = ${q(c.caution?.checked_on)}
+  WHERE ticker = ${q(c.ticker)};`);
 }
 sql.push(`UPDATE public.stocks SET in_feed = false WHERE in_feed AND ticker NOT IN (${tickers});`);
 
@@ -167,6 +177,7 @@ for (const [id, label] of Object.entries(CAUSES)) {
       ...c.things_to_know.map((t, j) => `- **Thing to know:** ${t} ${links(c.sources.things_to_know[j])}`),
       ...c.missions.map(m => `- **${CAUSES[m.cause]} (${m.exposure}):** ${m.why_line}  \n  *Evidence:* ${m.evidence} ${links([m.source_url])}`),
       ...(c.flags ?? []).map(f => `- **Flag (${f.dealbreaker.replace('_', ' ')}):** ${f.evidence} ${links([f.source_url])}`),
+      ...(c.caution ? [`- **Caution (checked ${c.caution.checked_on}):** ${c.caution.headline} ${links([c.caution.data_url])}. ${c.caution.reason} ${links([c.caution.source_url])}`] : []),
       ...(c.new ? [`- **Profile:** ${c.profile.description} (${[c.profile.city, c.profile.state, c.profile.country !== 'US' ? c.profile.country : null].filter(Boolean).join(', ')}) · sector ${c.sector} · risk ${c.risk_level} ${links(c.sources.profile)}`] : []),
       `- [SEC filings](${edgarUrl(c)})`,
     ];

@@ -9,6 +9,7 @@ import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-
 import {
   buildDeck, Candidate, DeckCard, Goal, NewsUpdate, RECYCLE_AFTER_DAYS, Risk, SwipeHistory, UserPrefs,
 } from '../_shared/matching.ts';
+import { cautionFor, latestMoves, moveWindowStart, PriceMove } from '../_shared/caution.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -177,8 +178,12 @@ async function enrichCards(db: SupabaseClient, cards: DeckCard[], stocks: Map<st
     const { data } = await db.from('stocks').select('*').in('ticker', missing);
     for (const s of data ?? []) stocks.set(s.ticker, s);
   }
-  const { data: causes } = await db.from('causes').select('id, label, icon');
+  const [{ data: causes }, { data: moves }] = await Promise.all([
+    db.from('causes').select('id, label, icon'),
+    db.from('price_moves').select('ticker, move_date, pct').in('ticker', cards.map(c => c.ticker)).gte('move_date', moveWindowStart()),
+  ]);
   const causeInfo = new Map((causes ?? []).map(c => [c.id, c]));
+  const recentMoves = latestMoves((moves ?? []) as PriceMove[]);
   return cards.map(card => {
     const s = stocks.get(card.ticker) ?? {};
     const company = {
@@ -192,6 +197,7 @@ async function enrichCards(db: SupabaseClient, cards: DeckCard[], stocks: Map<st
       marketCap: s.market_cap,
       dividendYield: num(s.dividend_yield),
       riskLevel: s.risk_level,
+      caution: cautionFor(s, recentMoves.get(card.ticker)),
     };
     if (card.type === 'update') return { ...card, ...company, missionStory: s.mission_story };
     return {

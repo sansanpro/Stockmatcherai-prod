@@ -12,6 +12,7 @@ import CompanySnapshot from '@/components/CompanySnapshot';
 import CompanyLogo from '@/components/values/CompanyLogo';
 import CauseChips, { causeTone } from '@/components/values/CauseChips';
 import ValuesSummary from '@/components/values/ValuesSummary';
+import { CautionChip, CautionNote } from '@/components/values/Caution';
 import KeyNumbers from '@/components/values/KeyNumbers';
 
 
@@ -211,6 +212,7 @@ const TinderStockCard = ({
         ) : (
           <CauseChips causes={stock.matchedCauses} />
         )}
+        {stock.caution && <div className="mt-2"><CautionChip caution={stock.caution} /></div>}
       </div>
     </div>
   );
@@ -218,6 +220,7 @@ const TinderStockCard = ({
   // Update cards: the news, and why the user liked the company in the first place
   const updateBody = isUpdate && (
     <div className="space-y-3">
+      <CautionNote caution={stock.caution} />
       <div className="rounded-xl bg-sand border border-line p-3">
         <p className="text-[15px] font-semibold leading-snug text-ink">{stock.update!.headline}</p>
         <p className="text-xs text-muted-foreground mt-1">

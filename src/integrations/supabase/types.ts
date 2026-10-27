@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "12.2.3"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       ai_chat_conversations: {
@@ -103,6 +128,24 @@ export type Database = {
           stage?: string
           status?: number | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      ai_model_status: {
+        Row: {
+          cooling_until: string
+          model: string
+          updated_at: string
+        }
+        Insert: {
+          cooling_until: string
+          model: string
+          updated_at?: string
+        }
+        Update: {
+          cooling_until?: string
+          model?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -276,6 +319,129 @@ export type Database = {
           fetched_at?: string
         }
         Relationships: []
+      }
+      price_moves: {
+        Row: {
+          move_date: string
+          pct: number
+          price: number | null
+          recorded_at: string
+          ticker: string
+        }
+        Insert: {
+          move_date: string
+          pct: number
+          price?: number | null
+          recorded_at?: string
+          ticker: string
+        }
+        Update: {
+          move_date?: string
+          pct?: number
+          price?: number | null
+          recorded_at?: string
+          ticker?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "company_profiles"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "consumer_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "consumer_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "energy_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "energy_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "finance_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "finance_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "healthcare_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "healthcare_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "technology_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "technology_stocks"
+            referencedColumns: ["ticker"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "utilities_stocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_moves_ticker_fkey"
+            columns: ["ticker"]
+            isOneToOne: false
+            referencedRelation: "utilities_stocks"
+            referencedColumns: ["ticker"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -672,6 +838,10 @@ export type Database = {
       stocks: {
         Row: {
           beta: number | null
+          caution_checked_on: string | null
+          caution_headline: string | null
+          caution_reason: string | null
+          caution_source_url: string | null
           ceo_highlights: string | null
           ceo_name: string | null
           city: string | null
@@ -709,6 +879,10 @@ export type Database = {
         }
         Insert: {
           beta?: number | null
+          caution_checked_on?: string | null
+          caution_headline?: string | null
+          caution_reason?: string | null
+          caution_source_url?: string | null
           ceo_highlights?: string | null
           ceo_name?: string | null
           city?: string | null
@@ -746,6 +920,10 @@ export type Database = {
         }
         Update: {
           beta?: number | null
+          caution_checked_on?: string | null
+          caution_headline?: string | null
+          caution_reason?: string | null
+          caution_source_url?: string | null
           ceo_highlights?: string | null
           ceo_name?: string | null
           city?: string | null
@@ -1587,6 +1765,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

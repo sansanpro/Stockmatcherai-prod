@@ -1,7 +1,7 @@
 // Client for the match-feed function (today's values-matched deck), the causes users pick from,
 // and the swipe history kept on the device before sign-in.
 import { supabase } from '@/integrations/supabase/client';
-import type { MatchedCause, StockRecommendation } from '@/types/stock-matcher';
+import type { MatchedCause, StockCaution, StockRecommendation } from '@/types/stock-matcher';
 import { toPrefs, type OnboardingAnswers } from '@/lib/onboarding';
 
 export interface FeedCard {
@@ -30,6 +30,7 @@ export interface FeedCard {
   proofSourceUrl?: string | null;
   thingsToKnow?: string[];
   ceoName?: string | null;
+  caution?: StockCaution | null;
 }
 
 export interface FeedDeck {
@@ -106,6 +107,7 @@ export function cardToRecommendation(card: FeedCard): StockRecommendation {
     proof: card.proof ?? undefined,
     proofSourceUrl: card.proofSourceUrl ?? undefined,
     thingsToKnow: card.thingsToKnow ?? [],
+    caution: card.caution ?? undefined,
     update: card.type === 'update'
       ? { headline: card.headline ?? '', source: card.source, url: card.url, publishedAt: card.publishedAt }
       : undefined,

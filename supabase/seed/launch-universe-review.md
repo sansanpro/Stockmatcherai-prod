@@ -23,7 +23,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 | Keeping people safe | 28 | 28 |
 | Healthy food & farming | 16 | 16 |
 | Mental health & wellbeing | 18 | 18 |
-| Clean water | 16 | 16 |
+| Clean water | 17 | 17 |
 
 
 ## Beat cancer & disease
@@ -91,6 +91,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Its shares jumped 177% in one day on those trial results, but the vaccine isn't approved yet, and it lost about $2.8 billion in 2025. [source 1](https://www-web.itiger.com/news/1193854306) [source 2](https://www.merck.com/news/merck-and-moderna-announce-phase-3-interpath-001-trial-of-intismeran-autogene-plus-keytruda-met-endpoints-of-recurrence-free-survival-rfs-and-distant-metastasis-free-survival-dmfs-in-patient/) [source 3](https://www.biospace.com/press-releases/moderna-reports-fourth-quarter-and-fiscal-year-2025-financial-results-and-provides-business-updates)
 - **Beat cancer & disease (core):** Its whole platform is built on vaccines and treatments for disease.  
   *Evidence:* Moderna's business is mRNA vaccines and therapies for infectious disease and cancer. [source](https://www.biospace.com/press-releases/moderna-reports-fourth-quarter-and-fiscal-year-2025-financial-results-and-provides-business-updates)
+- **Caution (checked 2026-10-27):** Up about 644% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/mrna/statistics/). It jumped about 177% in one day in August 2026 after Moderna and Merck said their personalized melanoma vaccine met its main goal in a late-stage trial. The vaccine is not approved yet. [source](https://www.tikr.com/blog/moderna-mrna-stock-skyrockets-melanoma-vaccine-trial-results)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=MRNA&type=10-K&dateb=&owner=include&count=40)
 
 ### 8. BNTX: BioNTech SE ✅
@@ -136,6 +137,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Lost about $416 million in 2025; growth depends on doctors and insurers adopting its tests. [source](https://www.sec.gov/Archives/edgar/data/1576280/000157628026000013/gh-20251231.htm)
 - **Beat cancer & disease (core):** Its blood tests aim to catch cancer earlier and guide treatment.  
   *Evidence:* Guardant Health's business is blood-based cancer detection and monitoring tests. [source](https://www.sec.gov/Archives/edgar/data/1576280/000157628026000013/gh-20251231.htm)
+- **Caution (checked 2026-10-27):** Up about 140% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/gh/statistics/). In July 2026 UnitedHealth became the first large private insurer to cover its Shield colon cancer blood test, which an analyst called a watershed moment. [source](https://www.medtechdive.com/news/guardants-shield-colon-cancer-blood-test-snags-unitedhealth-coverage/824365/)
 - **Profile:** Guardant Health develops blood tests that detect cancer and guide treatment, including Guardant360 for advanced cancer and the Shield colorectal cancer screening test. (Palo Alto, CA) · sector healthcare · risk high [source](https://www.sec.gov/Archives/edgar/data/1576280/000157628026000013/gh-20251231.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=GH&type=10-K&dateb=&owner=include&count=40)
 
@@ -146,6 +148,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Has reported a net loss every year since it was founded. [source](https://www.sec.gov/Archives/edgar/data/1604821/000110465926020881/ntra-20251231x10k.htm)
 - **Beat cancer & disease (core):** Its blood tests help catch cancer coming back earlier.  
   *Evidence:* Natera's cell-free DNA tests are used to detect cancer recurrence and screen for genetic conditions. [source](https://www.sec.gov/Archives/edgar/data/1604821/000110465926020881/ntra-20251231x10k.htm)
+- **Caution (checked 2026-10-27):** Up about 110% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/ntra/statistics/). Its revenue grew about 38% in the second quarter of 2026 as more doctors ordered its tests, led by its Signatera cancer-recurrence test. [source](https://www.360dx.com/cancer/natera-preparing-prospective-study-readouts-accelerate-q2-revenue-climbs-38-percent)
 - **Profile:** Natera develops cell-free DNA tests for cancer monitoring, prenatal screening and organ transplant health. (Austin, TX) · sector healthcare · risk high [source](https://s201.q4cdn.com/354493536/files/doc_news/Natera-Announces-Expansion-in-Austin-Creating-What-Is-Believed-to-Be-the-Largest-Sequencing-Facility-in-the-World-2026.pdf)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=NTRA&type=10-K&dateb=&owner=include&count=40)
 
@@ -156,6 +159,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Spun off the cancer-test maker Grail in June 2024 after European regulators blocked the deal. [source 1](https://www.illumina.com/company/news-center/press-releases/2024/d2e2aec7-563a-4301-9d60-db56ea067bfb.html) [source 2](https://www.fiercebiotech.com/medtech/jpm23-illumina-could-face-eus-maximum-fine-jumping-gun-grail-deal-report)
 - **Beat cancer & disease (partial):** Its machines power much of the genetic research behind new cancer tests.  
   *Evidence:* Illumina's sequencing is used in cancer research and genetic disease diagnosis. [source](https://www.medtechdive.com/news/illumina-ushers-in-200-genome-with-the-launch-of-new-sequencers/633133/)
+- **Caution (checked 2026-10-27):** Up about 171% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/ilmn/statistics/). It beat sales expectations and raised its 2026 forecast three quarters in a row as demand for gene sequencing in cancer care grew. [source](https://www.tikr.com/blog/illumina-stock-is-up-82-in-six-months-the-streets-target-still-trails-it)
 - **Profile:** Illumina makes DNA sequencing machines and chemistry used in genetic research, cancer testing and disease diagnosis. (San Diego, CA) · sector healthcare · risk medium [source](https://www.illumina.com/company/news-center/press-releases/2024/d2e2aec7-563a-4301-9d60-db56ea067bfb.html)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=ILMN&type=10-K&dateb=&owner=include&count=40)
 
@@ -186,6 +190,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Turned profitable for the first time in 2025, but its shares fell about 28% in one day in July 2026 when sales of its main medicine, Amvuttra, missed forecasts. [source 1](https://www.fiercepharma.com/pharma/alnylam-turns-profitable-even-amvuttra-attr-revenue-disappoints-q4) [source 2](https://www.fiercepharma.com/pharma/alnylam-shares-tank-27-amvuttra-disappoints-attr-outlook-cut-2026)
 - **Beat cancer & disease (core):** It treats diseases by silencing the genes that cause them.  
   *Evidence:* Alnylam develops RNAi medicines for genetic and cardiometabolic diseases. [source](https://www.fiercepharma.com/pharma/alnylam-turns-profitable-even-amvuttra-attr-revenue-disappoints-q4)
+- **Caution (checked 2026-10-27):** Down about 51% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/alny/statistics/). It fell about 28% in one day in July 2026 when sales of its main medicine, Amvuttra, missed forecasts. [source](https://www.fiercepharma.com/pharma/alnylam-turns-profitable-even-amvuttra-attr-revenue-disappoints-q4)
 - **Profile:** Alnylam develops RNA interference (RNAi) medicines that silence disease-causing genes, for rare and common diseases. (Cambridge, MA) · sector healthcare · risk medium [source](https://www.sec.gov/Archives/edgar/data/1178670/000117867021000010/alny-20201231.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=ALNY&type=10-K&dateb=&owner=include&count=40)
 
@@ -269,6 +274,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** In July 2026 it agreed to buy Personalis for about $1.5 billion, paid mostly in new Tempus shares; the deal still needs approvals. [source 1](https://www.sec.gov/Archives/edgar/data/1717115/000119312526326083/tem-ex99_1.htm) [source 2](https://www.sec.gov/Archives/edgar/data/1717115/000119312526309073/d128960d8k.htm)
 - **Beat cancer & disease (core):** Its tumor tests help match cancer patients to the right treatment.  
   *Evidence:* Tempus says cancer is its primary focus: most revenue comes from oncology and hereditary genetic testing, plus licensing de-identified cancer data to drugmakers. [source](https://www.sec.gov/Archives/edgar/data/1717115/000119312526066961/tem-20251231.htm)
+- **Caution (checked 2026-10-27):** Typically swings about 3.5 times as much as the overall market [source](https://stockanalysis.com/stocks/tem/statistics/). It lost about $245 million in 2025 and only recently reported a small profit, helped by gains on investments it holds. [source](https://www.sec.gov/Archives/edgar/data/1717115/000119312526066931/tem-ex99_1.htm)
 - **Profile:** Tempus AI runs genetic and molecular tests, mostly for cancer, and licenses a library of more than 8.6 million de-identified patient records to drug developers. (Chicago, IL) · sector healthcare · risk high [source](https://www.sec.gov/Archives/edgar/data/1717115/000119312526066961/tem-20251231.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=TEM&type=10-K&dateb=&owner=include&count=40)
 
@@ -336,6 +342,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Competes with other insulin pump makers, including Medtronic's MiniMed and Tandem Diabetes Care. [source](https://www.sec.gov/Archives/edgar/data/1145197/000114519723000020/podd-20221231.htm)
 - **Live longer & healthier (core):** Its pump makes managing insulin simpler for people with diabetes.  
   *Evidence:* Insulet's business is the Omnipod insulin delivery system. [source](https://www.omnipod.com/about-omnipod/omnipod-CGM/)
+- **Caution (checked 2026-10-27):** Down about 53% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/podd/statistics/). It forecast slower growth for 2026, then in March recalled some Omnipod 5 insulin pods because a tear in the tubing could let insulin leak. [source](https://www.tikr.com/blog/insulet-podd-stock-drops-7-after-omnipod-5-recall)
 - **Profile:** Insulet makes the Omnipod, a tubeless, wearable insulin pump for people with diabetes. (Acton, MA) · sector healthcare · risk medium [source](https://www.sec.gov/Archives/edgar/data/1145197/000114519725000007/podd-20241231.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=PODD&type=10-K&dateb=&owner=include&count=40)
 
@@ -365,6 +372,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Agreed in January 2026 to buy Penumbra for about $14.5 billion. [source](https://www.medtechdive.com/news/boston-scientific-penumbra-deal-takeaways/809988/)
 - **Live longer & healthier (core):** Its devices treat heart conditions with less invasive procedures.  
   *Evidence:* Boston Scientific makes medical devices for cardiology, vascular and other conditions. [source](https://www.fiercebiotech.com/medtech/boston-scientific-clocks-over-1b-farapulse-revenue-afib-therapys-first-year)
+- **Caution (checked 2026-10-27):** Down about 55% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/bsx/statistics/). It fell about 17% in one day in February 2026 when sales of its heart-rhythm devices missed forecasts as rival devices from Johnson & Johnson and Medtronic took share. [source](https://www.startribune.com/boston-scientific-stock/601576627)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=BSX&type=10-K&dateb=&owner=include&count=40)
 
 ### 7. MDT: Medtronic PLC ✅
@@ -432,6 +440,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Lost money in 2025, partly due to a one-time $113 million write-down, even as sales grew 32%. [source](https://investors.glaukos.com/news/news-details/2026/Glaukos-Announces-Fourth-Quarter-and-Full-Year-2025-Financial-Results/default.aspx)
 - **Live longer & healthier (core):** Its implants help protect people's eyesight from glaucoma.  
   *Evidence:* Glaukos focuses on glaucoma and corneal disease treatments. [source](https://www.ocbj.com/healthcare/glaukos-tiny-medical-devices-fuel-expansion-for-ophthalmology/)
+- **Caution (checked 2026-10-27):** Up about 139% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/gkos/statistics/). Its sales jumped about 50% in the second quarter of 2026 as its iDose TR glaucoma implant and Epioxa eye treatment took off. [source](https://www.biospace.com/press-releases/glaukos-announces-second-quarter-2026-financial-results)
 - **Profile:** Glaukos develops treatments for glaucoma and other eye diseases, including tiny stents implanted during eye surgery. (Aliso Viejo, CA) · sector healthcare · risk high [source](https://investors.glaukos.com/news/news-details/2026/Glaukos-Announces-Fourth-Quarter-and-Full-Year-2025-Financial-Results/default.aspx)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=GKOS&type=10-K&dateb=&owner=include&count=40)
 
@@ -575,6 +584,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** It carries about $1.3 billion of debt, though that is largely offset by about $1.2 billion of cash. [source](https://www.sec.gov/Archives/edgar/data/0001639825/000163982526000032/q4fy2026earningspressrelea.htm)
 - **Live longer & healthier (core):** Its bikes, treadmills and classes help people exercise at home.  
   *Evidence:* Peloton describes itself as a fitness and wellness company that sells connected fitness equipment and subscriptions to instructor-led classes. [source](https://www.sec.gov/Archives/edgar/data/1639825/000163982526000038/pton-20260630.htm)
+- **Caution (checked 2026-10-27):** Typically swings about 2.6 times as much as the overall market [source](https://stockanalysis.com/stocks/pton/statistics/). Its paid equipment subscriptions fell 8.8% in the year to June 2026, and it expects sales to shrink again. [source](https://www.sec.gov/Archives/edgar/data/0001639825/000163982526000032/q4fy2026earningspressrelea.htm)
 - **Profile:** Peloton is a fitness and wellness company that makes connected bikes, treadmills and rowers and offers app memberships with live and on-demand classes in cycling, running, strength, meditation and more. (New York, NY) · sector consumer · risk high [source](https://www.sec.gov/Archives/edgar/data/1639825/000163982526000038/pton-20260630.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=PTON&type=10-K&dateb=&owner=include&count=40)
 
@@ -641,6 +651,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Clean energy & climate (partial):** It offers cleaner on-site power than traditional generators.  
   *Evidence:* Bloom's fuel cells provide lower-emission on-site power and can run on hydrogen. [source](https://www.sec.gov/Archives/edgar/data/1664703/000162828026028021/be-20260331.htm)
 - **Flag (fossil fuels):** Most Bloom fuel cells run on natural gas. [source](https://www.datacenterknowledge.com/energy/effectively-locked-out-key-data-center-market-bloom-sues-santa-clara)
+- **Caution (checked 2026-10-27):** Typically swings about 3.8 times as much as the overall market [source](https://stockanalysis.com/stocks/be/statistics/). Excitement about powering AI data centers sent it soaring in 2026, then it fell about 18% in one day in June as investors took profits. [source](https://www.tikr.com/blog/bloom-energy-fell-18-today-heres-where-the-stock-could-head-in-2026)
 - **Profile:** Bloom Energy makes solid-oxide fuel cells that generate electricity on-site, including for data centers. (San Jose, CA) · sector energy · risk high [source](https://www.sec.gov/Archives/edgar/data/1664703/000162828026028021/be-20260331.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=BE&type=10-K&dateb=&owner=include&count=40)
 
@@ -651,6 +662,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Cut its sales forecast in August 2026 after factory delays, and its gross margin fell to about 5% that quarter. [source](https://stocktwits.com/news-articles/markets/equity/why-is-flnc-stock-down-25-after-hours/cZoId3GRJel)
 - **Clean energy & climate (core):** Batteries let solar and wind power keep flowing after the sun sets.  
   *Evidence:* Fluence's business is grid-scale energy storage. [source](https://www.sec.gov/Archives/edgar/data/1868941/000186894124000070/flnc-20240930.htm)
+- **Caution (checked 2026-10-27):** Down about 72% in the year to Oct 26, 2026, and swings about 2.8 times as much as the overall market [source](https://stockanalysis.com/stocks/flnc/statistics/). In August 2026 it cut its sales and profit forecasts because new contract factories were slow to start production. [source](https://www.sec.gov/Archives/edgar/data/0001868941/000186894126000028/flncq3fy26earningspressrel.htm)
 - **Profile:** Fluence Energy provides battery energy storage systems and software for power grids. (Arlington, VA) · sector energy · risk high [source](https://www.iposcoop.com/ipo/fluence-energy-inc)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=FLNC&type=10-K&dateb=&owner=include&count=40)
 
@@ -715,6 +727,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Relies on federal tax credits for its solar leases, which start shrinking in 2028. [source](https://taiyangnews.info/business/sunrun-q2-2025-financial-results)
 - **Clean energy & climate (core):** It puts solar panels and batteries on people's homes.  
   *Evidence:* Sunrun's business is residential solar and battery systems. [source](https://seekingalpha.com/pr/20416508)
+- **Caution (checked 2026-10-27):** Down about 65% in the year to Oct 26, 2026, and swings about 2.4 times as much as the overall market [source](https://stockanalysis.com/stocks/run/statistics/). It fell about 35% in one day in February 2026 after forecasting less cash generation and lower customer value for 2026. [source](https://www.trefis.com/stock/run/articles/591852/sunrun-stock-35-2026-guidance-miss-overshadows-q4-beat/2026-02-28)
 - **Profile:** Sunrun installs and finances rooftop solar and home battery systems for households. (San Francisco, CA) · sector energy · risk high [source](https://seekingalpha.com/pr/20416508)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=RUN&type=10-K&dateb=&owner=include&count=40)
 
@@ -896,6 +909,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Part of its sales depend on customers replacing older firewalls, which happens in cycles. [source](https://www.nasdaq.com/articles/fortinet-stock-attractive-fortigate-and-cloud-platform-growth)
 - **Keeping people safe (core):** Its firewalls keep attackers out of business networks.  
   *Evidence:* Fortinet's business is network security. [source](https://www.nasdaq.com/articles/fortinet-stock-attractive-fortigate-and-cloud-platform-growth)
+- **Caution (checked 2026-10-27):** Up about 114% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/ftnt/statistics/). Its sales growth sped up to 26% in the second quarter of 2026, and it raised its full-year outlook. [source](https://www.sec.gov/Archives/edgar/data/0001262039/000126203926000018/ftntq2-2026ex991.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=FTNT&type=10-K&dateb=&owner=include&count=40)
 
 ### 4. ZS: Zscaler Inc ✅
@@ -923,6 +937,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** In 2023, hackers broke into its customer support system and stole the names and email addresses of all its support users. [source](https://www.helpnetsecurity.com/2023/11/29/okta-breach-customer-support/)
 - **Keeping people safe (core):** It makes sure only the right people can get into accounts.  
   *Evidence:* Okta's business is identity and access security. [source](https://www.businesswire.com/news/home/20210503005412/en)
+- **Caution (checked 2026-10-27):** Up about 147% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/okta/statistics/). After sitting near $70 through April, it jumped 28% in one day in May 2026 when results beat forecasts and it argued that AI agents will need identity security. [source](https://www.tikr.com/blog/okta-stock-is-up-71-this-year-can-the-rally-continue-in-the-rest-of-2026)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=OKTA&type=10-K&dateb=&owner=include&count=40)
 
 ### 7. S: SentinelOne (new) ✅
@@ -1062,6 +1077,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Lost about $392 million in 2025 under standard accounting, even as revenue grew 15%. [source](https://en.globes.co.il/en/article-1001532861)
 - **Keeping people safe (core):** Its chips help cars brake and steer to avoid crashes.  
   *Evidence:* Mobileye's business is driver-assistance and self-driving technology for carmakers. [source](https://www.sec.gov/Archives/edgar/data/1910139/000110465926014300/mbly-20251227x10k.htm)
+- **Caution (checked 2026-10-27):** Down about 50% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/mbly/statistics/). It fell about 15% in one day in July 2026 when founder Amnon Shashua said he would step down as CEO. [source](https://www.jpost.com/business-and-innovation/tech-and-start-ups/article-903726)
 - **Profile:** Mobileye develops driver-assistance and self-driving systems, including its EyeQ chips, for carmakers worldwide. (Jerusalem, Israel) · sector technology · risk high [source 1](https://www.sec.gov/Archives/edgar/data/1910139/000110465925101678/tm2524891d2_ex99-1.htm) [source 2](https://www.sec.gov/Archives/edgar/data/1910139/000110465926014300/mbly-20251227x10k.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=MBLY&type=10-K&dateb=&owner=include&count=40)
 
@@ -1084,6 +1100,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** The stock has swung sharply: it fell as low as about $7.67 in 2026 amid a software selloff and worries about a flood of newly sellable shares, then climbed back to about $25 by late October. [source 1](https://www.tikr.com/blog/ntsk-stock-down-over-65-from-highs-heres-whats-driving-the-move) [source 2](https://stockanalysis.com/stocks/ntsk/)
 - **Keeping people safe (core):** It shields company data and workers from online attacks.  
   *Evidence:* Netskope's Netskope One platform secures organizations' data and internet, cloud and AI activity and stops threats. [source](https://www.sec.gov/Archives/edgar/data/2063196/000119312526135011/ck0002063196-20260131.htm)
+- **Caution (checked 2026-10-27):** Fell to about $7.67 in 2026, then more than tripled to about $25 by Oct 26 [source](https://stockanalysis.com/stocks/ntsk/). Early in 2026 software stocks sold off and investors worried about a wave of newly sellable shares after its stock market debut. [source](https://www.tikr.com/blog/ntsk-stock-down-over-65-from-highs-heres-whats-driving-the-move)
 - **Profile:** Netskope sells Netskope One, a cloud-based security and networking platform that protects data and blocks threats as employees use the web, cloud apps and AI tools. (Santa Clara, CA) · sector technology · risk high [source](https://www.sec.gov/Archives/edgar/data/2063196/000119312526135011/ck0002063196-20260131.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=NTSK&type=10-K&dateb=&owner=include&count=40)
 
@@ -1246,6 +1263,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Its profit for the first half of 2026 came from a one-time gain on selling its kitchen-robot business, Spyce. [source](https://www.sec.gov/Archives/edgar/data/0001477815/000162828026054324/q226sweetgreenearningsrele.htm)
 - **Healthy food & farming (core):** It serves salads and bowls made from real, fresh food.  
   *Evidence:* Sweetgreen says it is on a mission to build healthier communities by connecting people to real food. [source](https://www.sec.gov/Archives/edgar/data/0001477815/000162828026054324/q226sweetgreenearningsrele.htm)
+- **Caution (checked 2026-10-27):** Typically swings about 2.2 times as much as the overall market [source](https://stockanalysis.com/stocks/sg/statistics/). Sales at its existing restaurants fell 6.2% in the second quarter of 2026, and it lost $26.3 million that quarter. [source](https://www.sec.gov/Archives/edgar/data/0001477815/000162828026054324/q226sweetgreenearningsrele.htm)
 - **Profile:** Sweetgreen runs a chain of fast-casual restaurants serving salads and warm bowls. (Los Angeles, CA) · sector consumer · risk high [source](https://www.sec.gov/Archives/edgar/data/0001477815/000162828026054324/q226sweetgreenearningsrele.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=SG&type=10-K&dateb=&owner=include&count=40)
 
@@ -1347,6 +1365,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** It only turned a profit in 2025, earning $9.7 million after losing $57 million in 2024; its stock more than doubled over the past year as results improved. [source 1](https://www.sec.gov/Archives/edgar/data/1845257/000119312526067858/lfst-ex99_1.htm) [source 2](https://stockanalysis.com/stocks/lfst/statistics/)
 - **Mental health & wellbeing (core):** It connects people with therapists and psychiatrists in person or online.  
   *Evidence:* LifeStance describes itself as one of the nation's largest providers of virtual and in-person outpatient mental healthcare. [source](https://www.sec.gov/Archives/edgar/data/0001845257/000119312526336057/lfst-ex99_1.htm)
+- **Caution (checked 2026-10-27):** Up about 151% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/lfst/statistics/). Its results improved sharply: it turned its first profit in 2025, earning $9.7 million after losing $57 million in 2024. [source](https://www.sec.gov/Archives/edgar/data/1845257/000119312526067858/lfst-ex99_1.htm)
 - **Profile:** LifeStance Health runs outpatient mental health practices with more than 550 centers in 33 states, offering therapy, psychiatry and psychological testing in person and online. (Scottsdale, AZ) · sector healthcare · risk high [source](https://www.sec.gov/Archives/edgar/data/0001845257/000119312526336057/lfst-ex99_1.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=LFST&type=10-K&dateb=&owner=include&count=40)
 
@@ -1358,6 +1377,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** In 2023 BetterHelp paid $7.8 million to settle FTC charges that it shared users' health questionnaire data with advertisers such as Facebook. [source](https://www.ftc.gov/news-events/news/press-releases/2023/07/ftc-gives-final-approval-order-banning-betterhelp-sharing-sensitive-health-data-advertising)
 - **Mental health & wellbeing (partial):** Its BetterHelp service connects people with licensed therapists online.  
   *Evidence:* Teladoc's BetterHelp segment, its mental health platform, brought in $212.6 million of its $606.9 million revenue in the second quarter of 2026. [source](https://www.sec.gov/Archives/edgar/data/0001477449/000147744926000036/tdoc-20260630xexx991.htm)
+- **Caution (checked 2026-10-27):** Typically swings about 2.1 times as much as the overall market [source](https://stockanalysis.com/stocks/tdoc/statistics/). It is losing money, and revenue from its BetterHelp therapy service fell 12% in the second quarter of 2026. [source](https://www.sec.gov/Archives/edgar/data/0001477449/000147744926000036/tdoc-20260630xexx991.htm)
 - **Profile:** Teladoc Health provides virtual care: doctor visits by video or phone, programs for chronic conditions such as diabetes, and BetterHelp online therapy. (New York, NY) · sector healthcare · risk high [source](https://www.sec.gov/Archives/edgar/data/1477449/000147744926000012/tdoc-20251231.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=TDOC&type=10-K&dateb=&owner=include&count=40)
 
@@ -1437,6 +1457,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** Its stock nearly tripled over the past year on trial successes, so it can swing sharply on news such as the FDA's decision. [source 1](https://stockanalysis.com/stocks/dftx/statistics/) [source 2](https://www.psychiatrictimes.com/view/positive-topline-results-from-phase-3-panorama-study-of-dt120-odt-in-generalized-anxiety-disorder)
 - **Mental health & wellbeing (core):** It is developing a new treatment for anxiety and depression.  
   *Evidence:* Definium develops therapies for psychiatric and neurological disorders; its lead drug DT120 has positive Phase 3 results in generalized anxiety disorder and major depressive disorder. [source](https://ir.definiumtx.com/news-events/press-releases/detail/242)
+- **Caution (checked 2026-10-27):** Up about 188% in the year to Oct 26, 2026, and swings about 2.2 times as much as the overall market [source](https://stockanalysis.com/stocks/dftx/statistics/). Its LSD-based anxiety treatment succeeded in late-stage trials in 2026, but it has no approved product yet, so FDA news can move the stock sharply. [source](https://www.psychiatrictimes.com/view/positive-topline-results-from-phase-3-panorama-study-of-dt120-odt-in-generalized-anxiety-disorder)
 - **Profile:** Definium Therapeutics, formerly MindMed, is a late-stage biotech developing treatments for psychiatric disorders, led by an LSD-based tablet for anxiety and depression. (New York, NY) · sector healthcare · risk high [source 1](https://ir.definiumtx.com/news-events/press-releases/detail/242) [source 2](https://ir.definiumtx.com/news-events/press-releases/detail/207/mindmed-rebrands-to-definium-therapeutics-advancing-a-leading-late-stage-psychiatry-pipeline-with-three-phase-3-readouts-expected-in-2026)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=DFTX&type=10-K&dateb=&owner=include&count=40)
 
@@ -1448,6 +1469,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** It lost $253.8 million in the second quarter of 2026, mostly from non-cash charges, and has no product sales. [source](https://www.sec.gov/Archives/edgar/data/0001816590/000181659026000059/q22026pressrelease.htm)
 - **Mental health & wellbeing (core):** It is developing a new treatment for hard-to-treat depression.  
   *Evidence:* COMP360 is Compass's investigational synthetic psilocybin treatment for treatment-resistant depression, backed by two positive Phase 3 trials. [source](https://www.sec.gov/Archives/edgar/data/0001816590/000181659026000059/q22026pressrelease.htm)
+- **Caution (checked 2026-10-27):** Typically swings about 2.6 times as much as the overall market [source](https://stockanalysis.com/stocks/cmps/statistics/). Its value rests on one treatment that isn't approved yet, a psilocybin therapy for hard-to-treat depression, so trial and FDA news can move the stock sharply. [source](https://www.sec.gov/Archives/edgar/data/0001816590/000181659026000059/q22026pressrelease.htm)
 - **Profile:** Compass Pathways is a biotech developing a synthetic psilocybin treatment for treatment-resistant depression. (London, GB) · sector healthcare · risk high [source](https://www.sec.gov/Archives/edgar/data/0001816590/000181659026000059/q22026pressrelease.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=CMPS&type=10-K&dateb=&owner=include&count=40)
 
@@ -1481,6 +1503,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 - **Thing to know:** It only began trading publicly in 2025, and its stock more than doubled over the past year, so it can swing sharply on trial news. [source 1](https://stockanalysis.com/stocks/lbrx/statistics/) [source 2](https://www.biospace.com/press-releases/lb-pharmaceuticals-reports-3q-2025-financial-results-and-recent-corporate-updates)
 - **Mental health & wellbeing (core):** It is developing a new medicine for schizophrenia.  
   *Evidence:* LB-102 is being developed as a potential first benzamide antipsychotic in the U.S., with a pivotal Phase 3 trial in schizophrenia and a Phase 2 trial in bipolar depression. [source](https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm)
+- **Caution (checked 2026-10-27):** Up about 146% in the year to Oct 26, 2026 [source](https://stockanalysis.com/stocks/lbrx/statistics/). It has no approved medicine, so its stock moves on news about its schizophrenia drug, which is in a final-stage trial with results expected in the first half of 2027. [source](https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm)
 - **Profile:** LB Pharmaceuticals is a clinical-stage biotech developing LB-102 for schizophrenia and other neuropsychiatric disorders. (New York, NY) · sector healthcare · risk high [source](https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=LBRX&type=10-K&dateb=&owner=include&count=40)
 
@@ -1659,3 +1682,15 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
   *Evidence:* Franklin Electric makes systems for the movement of water and energy; Water Systems had $358.5 million of its $622.9 million Q2 2026 sales. [source](https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm)
 - **Profile:** Franklin Electric makes water pumping systems and fueling equipment, and distributes water-system products. (Fort Wayne, IN) · sector industrials · risk high [source](https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=FELE&type=10-K&dateb=&owner=include&count=40)
+
+### 17. SBS: Companhia de Saneamento Básico do Estado de São Paulo - SABESP (new) ✅
+
+- **Story:** Provides water and sewage services in 375 cities in Brazil's São Paulo state and is racing to reach nearly everyone there by 2029. [source 1](https://www.sec.gov/Archives/edgar/data/0001170858/000129281426002681/sbsform20f_2025.htm) [source 2](https://www.sec.gov/Archives/edgar/data/1170858/000129281426000919/sbsfs4q25_6k.htm)
+- **Proof:** It invested R$15.2 billion (Brazilian reais) in 2025, 120% more than the year before, to expand water and sewage service. [source](https://www.sec.gov/Archives/edgar/data/1170858/000129281426000919/sbsfs4q25_6k.htm)
+- **Thing to know:** It is borrowing heavily for the buildout: net debt rose to R$34 billion by mid-2026 from R$23 billion a year earlier. [source](https://www.sec.gov/Archives/edgar/data/0001170858/000129281426004210/sbsitr2q26_6k.htm)
+- **Thing to know:** Its adjusted profit fell 41.2% in the second quarter of 2026, and it reports in Brazilian reais, so currency swings affect U.S. investors. [source](https://www.sec.gov/Archives/edgar/data/0001170858/000129281426004210/sbsitr2q26_6k.htm)
+- **Clean water (core):** It is bringing clean water and sewage treatment to millions in Brazil.  
+  *Evidence:* SABESP estimates about R$70 billion of investment to universalize water supply and sewage services across the 371 municipalities of its URAE-1 concession by 2029. [source](https://www.sec.gov/Archives/edgar/data/1170858/000129281426000919/sbsfs4q25_6k.htm)
+- **Caution (checked 2026-10-27):** Fell about 26% in one day (Oct 26, 2026) [source](https://stockanalysis.com/stocks/sbs/). That was the day after Lula won Brazil's presidential runoff. Brazil's main stock index fell 13.88% and the dollar rose more than 8% against the Brazilian real, and SABESP's U.S. shares were likely hit by both. [source](https://www.riotimesonline.com/brazil-runoff-october-25-2026-flavio-bolsonaro-lula/)
+- **Profile:** SABESP is the water and sewage company serving most of the cities in Brazil's São Paulo state; the state sold its controlling stake in 2024. (São Paulo, BR) · sector utilities · risk high [source](https://www.sec.gov/Archives/edgar/data/0001170858/000129281426002681/sbsform20f_2025.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=SBS&type=20-F&dateb=&owner=include&count=40)

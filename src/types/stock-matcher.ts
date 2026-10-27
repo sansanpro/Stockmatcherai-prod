@@ -8,6 +8,12 @@ export interface MatchedCause {
   whyLine?: string | null;
 }
 
+export interface StockCaution {
+  headline: string;
+  reason: string | null;
+  sourceUrl: string | null;
+}
+
 export interface StockRecommendation {
   id: string;
   companyName: string;
@@ -33,6 +39,8 @@ export interface StockRecommendation {
   proof?: string;
   proofSourceUrl?: string;
   thingsToKnow?: string[];
+  // "Big swings" caution: a large recent move, why it happened (null until explained) and the source
+  caution?: StockCaution;
   // Update cards: news about a company the user already liked
   update?: { headline: string; source?: string; url?: string; publishedAt?: string };
 }

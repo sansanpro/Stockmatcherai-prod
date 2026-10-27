@@ -1,21 +1,23 @@
 import { BadgeCheck, Scale } from 'lucide-react';
 import type { StockRecommendation } from '@/types/stock-matcher';
+import { CautionNote } from '@/components/values/Caution';
 
 interface ValuesSummaryProps {
-  stock: Pick<StockRecommendation, 'missionStory' | 'proof' | 'proofSourceUrl' | 'thingsToKnow'>;
+  stock: Pick<StockRecommendation, 'missionStory' | 'proof' | 'proofSourceUrl' | 'thingsToKnow' | 'caution'>;
   className?: string;
 }
 
 // What the company is working on, one checkable fact (with its source), and the honest counterpoints
 const ValuesSummary = ({ stock, className = '' }: ValuesSummaryProps) => {
-  const { missionStory, proof, proofSourceUrl, thingsToKnow = [] } = stock;
-  if (!missionStory && !proof && thingsToKnow.length === 0) return null;
+  const { missionStory, proof, proofSourceUrl, thingsToKnow = [], caution } = stock;
+  if (!missionStory && !proof && thingsToKnow.length === 0 && !caution) return null;
 
   return (
     <div className={`space-y-3 ${className}`}>
       {missionStory && (
         <p className="text-[15px] leading-snug font-medium text-ink">{missionStory}</p>
       )}
+      <CautionNote caution={caution} />
       {proof && (
         <div className="rounded-xl bg-[#EEF4E6] border border-[#CFE0BC] p-3">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-[#3B6A2A] flex items-center gap-1">

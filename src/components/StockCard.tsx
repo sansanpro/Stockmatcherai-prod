@@ -6,6 +6,7 @@ import { capitalize } from '@/lib/utils';
 import StockNewsPill from '@/components/StockNewsPill';
 import CompanyLogo from '@/components/values/CompanyLogo';
 import CauseChips, { causeTone } from '@/components/values/CauseChips';
+import { CautionChip } from '@/components/values/Caution';
 import { RISK_WORDS } from '@/components/values/KeyNumbers';
 
 interface StockCardProps {
@@ -43,6 +44,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
           )}
         </div>
         <CauseChips causes={stock.matchedCauses} />
+        {stock.caution && <div className="mt-2"><CautionChip caution={stock.caution} /></div>}
       </div>
 
       <div className="p-4 space-y-3">
