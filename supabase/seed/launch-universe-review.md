@@ -23,6 +23,7 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
 | Keeping people safe | 28 | 28 |
 | Healthy food & farming | 16 | 16 |
 | Mental health & wellbeing | 18 | 18 |
+| Clean water | 16 | 16 |
 
 
 ## Beat cancer & disease
@@ -1482,3 +1483,179 @@ Added as replacements: PLNT, RIVN, ALV, TT, CCJ, MBLY
   *Evidence:* LB-102 is being developed as a potential first benzamide antipsychotic in the U.S., with a pivotal Phase 3 trial in schizophrenia and a Phase 2 trial in bipolar depression. [source](https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm)
 - **Profile:** LB Pharmaceuticals is a clinical-stage biotech developing LB-102 for schizophrenia and other neuropsychiatric disorders. (New York, NY) · sector healthcare · risk high [source](https://www.sec.gov/Archives/edgar/data/0001691082/000119312526343479/d303033dex991.htm)
 - [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=LBRX&type=10-K&dateb=&owner=include&count=40)
+
+
+## Clean water
+
+### 1. AWK: American Water Works Company, Inc. (new) ✅
+
+- **Story:** The largest regulated U.S. water and wastewater utility, supplying safe drinking water to about 14 million people in 14 states. [source](https://ir.amwater.com/news-and-events/financial-releases/financial-release-details/2026/American-Water-and-Essential-Utilities-Receive-Kentucky-Public-Service-Commission-Approval-for-Proposed-Merger/default.aspx)
+- **Proof:** It spent $1.519 billion on pipes, plants and other infrastructure in the first half of 2026. [source](https://www.sec.gov/Archives/edgar/data/0001410636/000141063626000120/awk-20260630.htm)
+- **Thing to know:** It agreed to merge with Essential Utilities, which also runs natural gas utilities; the deal is expected to close by early 2027 if regulators approve. [source 1](https://www.sec.gov/Archives/edgar/data/0001410636/000141063626000120/awk-20260630.htm) [source 2](https://ir.amwater.com/news-and-events/financial-releases/financial-release-details/2026/American-Water-and-Essential-Utilities-Receive-Kentucky-Public-Service-Commission-Approval-for-Proposed-Merger/default.aspx)
+- **Thing to know:** Its long-term debt rose to about $14.0 billion by June 2026, and its prices are set by state regulators. [source](https://www.sec.gov/Archives/edgar/data/0001410636/000141063626000120/awk-20260630.htm)
+- **Clean water (core):** It delivers clean drinking water to about 14 million people.  
+  *Evidence:* American Water is the largest regulated water and wastewater utility in the U.S., providing safe, clean drinking water and wastewater services to about 14 million people in 14 states and on 18 military installations. [source](https://ir.amwater.com/news-and-events/financial-releases/financial-release-details/2026/American-Water-and-Essential-Utilities-Receive-Kentucky-Public-Service-Commission-Approval-for-Proposed-Merger/default.aspx)
+- **Profile:** American Water is the largest regulated water and wastewater utility company in the United States. (Camden, NJ) · sector utilities · risk medium [source](https://ir.amwater.com/news-and-events/financial-releases/financial-release-details/2026/American-Water-and-Essential-Utilities-Receive-Kentucky-Public-Service-Commission-Approval-for-Proposed-Merger/default.aspx)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=AWK&type=10-K&dateb=&owner=include&count=40)
+
+### 2. AWR: American States Water Company (new) ✅
+
+- **Story:** Supplies water to more than 80 California communities and runs water and wastewater systems on 12 U.S. military bases. [source](https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm)
+- **Proof:** Its Golden State Water utility serves about 265,200 customer connections in more than 80 California communities. [source](https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm)
+- **Thing to know:** Its profits depend on California regulators approving rate increases; second-quarter 2026 earnings rose mainly because of new rates. [source 1](https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm) [source 2](https://americanstateswatercompany.gcs-web.com/node/23231)
+- **Thing to know:** It also owns a small electric utility in Big Bear Lake, California, and its military-base work depends on U.S. government contracts. [source](https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm)
+- **Clean water (core):** It delivers drinking water across California communities.  
+  *Evidence:* American States Water serves over one million people in ten states through Golden State Water and its water and wastewater services on twelve military bases. [source](https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm)
+- **Profile:** American States Water owns Golden State Water, a small electric utility, and a business running water systems on U.S. military bases. (San Dimas, CA) · sector utilities · risk high [source](https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=AWR&type=10-K&dateb=&owner=include&count=40)
+
+### 3. CWT: California Water Service Group (new) ✅
+
+- **Story:** Provides drinking water to more than 2.2 million people in California, Hawaii, New Mexico, Washington and Texas. [source](https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm)
+- **Proof:** It invested a record $276.4 million in water infrastructure in the first half of 2026. [source](https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm)
+- **Thing to know:** Its profits depend on regulators' rate decisions; second-quarter 2026 results were lifted by a delayed California rate increase applied back to January. [source](https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm)
+- **Thing to know:** New federal limits on PFAS "forever chemicals" in drinking water may require costly treatment upgrades. [source](https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm)
+- **Clean water (core):** It delivers clean drinking water to over 2 million people.  
+  *Evidence:* California Water Service Group serves more than 2.2 million people in California, Hawaii, New Mexico, Washington and Texas through its regulated water utilities. [source](https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm)
+- **Profile:** California Water Service Group owns regulated water utilities including Cal Water, Hawaii Water, New Mexico Water and Washington Water. (San Jose, CA) · sector utilities · risk high [source](https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=CWT&type=10-K&dateb=&owner=include&count=40)
+
+### 4. HTO: H2O America (new) ✅
+
+- **Story:** Formerly SJW Group, it runs water and wastewater utilities serving over 1.6 million people in California, Connecticut, Maine and Texas. [source](https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm)
+- **Proof:** It invested $206.9 million in water infrastructure in the first half of 2026. [source](https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm)
+- **Thing to know:** Its profits depend on state regulators approving rate increases to pay back what it spends on pipes and plants. [source](https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm)
+- **Thing to know:** It is buying Texas water utility Quadvest for about $540 million, a deal still going through regulators in mid-2026. [source](https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm)
+- **Clean water (core):** It delivers clean water to over 1.6 million people.  
+  *Evidence:* H2O America describes itself as one of the largest investor-owned pure-play water and wastewater utilities in the U.S., serving over 1.6 million people. [source](https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm)
+- **Profile:** H2O America, formerly SJW Group, owns San Jose Water, Connecticut Water, Maine Water and The Texas Water Company. (San Jose, CA) · sector utilities · risk high [source](https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=HTO&type=10-K&dateb=&owner=include&count=40)
+
+### 5. XYL: Xylem Inc. (new) ✅
+
+- **Story:** Makes pumps, treatment systems, smart meters and services that move, clean and track water for cities and industries. [source](https://www.sec.gov/Archives/edgar/data/0001524472/000152447226000108/xyl07282026ex991.htm)
+- **Proof:** It took in $3.1 billion of new orders in the second quarter of 2026, up 42% from a year earlier. [source](https://www.sec.gov/Archives/edgar/data/0001524472/000152447226000108/xyl07282026ex991.htm)
+- **Thing to know:** It is dropping less profitable customers and products on purpose, which it expects to cut 2026 revenue by about 2%. [source](https://www.tikr.com/blog/xylem-stock-fell-10-in-2026-while-operating-margins-hit-a-four-year-high-does-wall-streets-157-target-hold)
+- **Thing to know:** Weak demand from water utilities in China has been a drag on its sales. [source](https://www.tikr.com/blog/xylem-stock-fell-10-in-2026-while-operating-margins-hit-a-four-year-high-does-wall-streets-157-target-hold)
+- **Clean water (core):** It builds the equipment that cleans and moves water.  
+  *Evidence:* Xylem is a global water solutions company; all four of its segments (Water Infrastructure, Applied Water, Measurement & Control Solutions, and Integrated Solutions & Services) serve water customers. [source](https://www.sec.gov/Archives/edgar/data/0001524472/000152447226000108/xyl07282026ex991.htm)
+- **Profile:** Xylem is a global water technology company making pumps, treatment, testing and metering equipment for utilities, industry and buildings. (Washington, DC) · sector industrials · risk medium [source](https://www.sec.gov/Archives/edgar/data/0001524472/000152447226000108/xyl07282026ex991.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=XYL&type=10-K&dateb=&owner=include&count=40)
+
+### 6. VLTO: Veralto Corporation (new) ✅
+
+- **Story:** Owns Hach water-testing instruments, Trojan UV disinfection and ChemTreat water treatment, helping utilities and factories keep water clean. [source](https://www.sec.gov/Archives/edgar/data/1967680/000196768026000018/a2025_annualxreportxfina.htm)
+- **Proof:** Its Water Quality business had $3.3 billion in sales in 2025. [source](https://www.sec.gov/Archives/edgar/data/1967680/000196768026000018/a2025_annualxreportxfina.htm)
+- **Thing to know:** About 40% of its sales ($2.2 billion of $5.5 billion in 2025) come from a packaging and product-labeling business, not water. [source](https://www.sec.gov/Archives/edgar/data/1967680/000196768026000018/a2025_annualxreportxfina.htm)
+- **Thing to know:** Its second-quarter 2026 results included a boost from refunds of tariffs it had paid earlier. [source](https://www.sec.gov/Archives/edgar/data/0001967680/000196768026000043/vlto-20260728xex991.htm)
+- **Clean water (partial):** Its biggest business tests and treats water to keep it safe.  
+  *Evidence:* Veralto's Water Quality segment ($3.3 billion of $5.5 billion 2025 sales) offers water analytics and treatment through Hach, Trojan Technologies and ChemTreat. [source](https://www.sec.gov/Archives/edgar/data/1967680/000196768026000018/a2025_annualxreportxfina.htm)
+- **Profile:** Veralto makes water analytics and treatment products (Hach, Trojan, ChemTreat) and product-quality and packaging technology. (Waltham, MA) · sector industrials · risk medium [source 1](https://www.sec.gov/Archives/edgar/data/1967680/000196768026000018/a2025_annualxreportxfina.htm) [source 2](https://www.sec.gov/Archives/edgar/data/0001967680/000196768026000043/vlto-20260728xex991.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=VLTO&type=10-K&dateb=&owner=include&count=40)
+
+### 7. ECL: Ecolab Inc. (new) ✅
+
+- **Story:** Helps factories, data centers and other businesses clean, reuse and save water, with a goal of saving enough drinking water for 1 billion people by 2030. [source](https://www.sec.gov/Archives/edgar/data/0000031462/000162828026049933/ecl_ex99x1.htm)
+- **Proof:** Its Global Water business had $2.22 billion in sales in the second quarter of 2026, about half of the company's total. [source](https://www.sec.gov/Archives/edgar/data/0000031462/000162828026049933/ecl_ex99x1.htm)
+- **Thing to know:** About half its sales come from cleaning, hygiene and pest control rather than water. [source](https://www.sec.gov/Archives/edgar/data/0000031462/000162828026049933/ecl_ex99x1.htm)
+- **Thing to know:** Its water business profit margin slipped to 15.7% from 16.4% in the second quarter of 2026 as costs rose. [source](https://www.ecolab.com/en-us/media-center/news/ecolab-delivers-accelerated-sales-growth-and-double-digit-eps-growth-reported-diluted-eps-1-90-adjusted-diluted-eps-2-09-11-raises-2026-adjusted-diluted-eps-outlook-8-05--8-25-7--10)
+- **Clean water (partial):** Its largest business helps companies clean and save water.  
+  *Evidence:* Ecolab's Global Water segment had $2,223.4 million of its $4,415.4 million Q2 2026 sales; its 2030 goal is to conserve enough drinking water for 1 billion people. [source](https://www.sec.gov/Archives/edgar/data/0000031462/000162828026049933/ecl_ex99x1.htm)
+- **Profile:** Ecolab provides water treatment, hygiene and infection-prevention products and services to customers in more than 170 countries. (Saint Paul, MN) · sector industrials · risk low [source](https://www.sec.gov/Archives/edgar/data/0000031462/000162828026049933/ecl_ex99x1.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=ECL&type=10-K&dateb=&owner=include&count=40)
+
+### 8. PNR: Pentair plc (new) ✅
+
+- **Story:** Makes water filters, softeners, pumps and treatment systems for homes, businesses and industry, plus pool equipment. [source](https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm)
+- **Proof:** Its Water Solutions business, which treats and filters water, had $422.0 million in sales in the second quarter of 2026. [source](https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm)
+- **Thing to know:** Pool equipment sales fell 42% in the second quarter of 2026 as pool dealers cut back their inventories. [source](https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm)
+- **Thing to know:** Its total sales fell 17% from a year earlier in that quarter. [source](https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm)
+- **Clean water (partial):** Its filters and pumps help homes and businesses get clean water.  
+  *Evidence:* Pentair says it helps the world sustainably move, improve and enjoy water; Water Solutions ($422.0 million) and Flow ($263.7 million) made up most of its $933 million Q2 2026 sales. [source](https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm)
+- **Profile:** Pentair makes residential, commercial and industrial water treatment, filtration and pumping products, and pool equipment. (London, GB) · sector industrials · risk medium [source](https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=PNR&type=10-K&dateb=&owner=include&count=40)
+
+### 9. ZWS: Zurn Elkay Water Solutions Corporation (new) ✅
+
+- **Story:** Makes filtered drinking-water fountains and bottle fillers, plus valves and drains that keep building water safe. [source](https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm)
+- **Proof:** Its sales grew 10% to $491 million in the second quarter of 2026, with growth in every product category. [source](https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm)
+- **Thing to know:** It expected growth to slow to about 6% to 7% in the third quarter of 2026. [source](https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm)
+- **Thing to know:** It recently bought Intellihot, a water-heater maker, adding a business outside drinking water. [source](https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm)
+- **Clean water (core):** It makes the filters and fountains that serve clean drinking water.  
+  *Evidence:* Zurn Elkay describes itself as a pure-play water management business whose portfolio includes water safety and control products and filtered drinking water products for public and private spaces. [source](https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm)
+- **Profile:** Zurn Elkay makes water safety, drainage and filtered drinking water products for commercial, public and residential buildings. (Milwaukee, WI) · sector industrials · risk medium [source](https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=ZWS&type=10-K&dateb=&owner=include&count=40)
+
+### 10. WTS: Watts Water Technologies, Inc. (new) ✅
+
+- **Story:** Makes valves, filters and water-quality products that keep drinking water safe and flowing in homes and buildings. [source](https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm)
+- **Proof:** Its sales rose 19% to a record $763 million in the second quarter of 2026. [source](https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm)
+- **Thing to know:** Much of its recent sales growth came from data center construction projects. [source](https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm)
+- **Thing to know:** Its operating profit margin slipped to 20.2% from 21.0% in the second quarter of 2026. [source](https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm)
+- **Clean water (partial):** Its products help keep the water in buildings safe.  
+  *Evidence:* Watts' plumbing, heating and water quality products control the efficiency, safety and quality of water within residential, commercial and institutional buildings. [source](https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm)
+- **Profile:** Watts Water Technologies makes plumbing, heating and water quality products for homes and commercial buildings. (North Andover, MA) · sector industrials · risk medium [source](https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=WTS&type=10-K&dateb=&owner=include&count=40)
+
+### 11. MWA: Mueller Water Products, Inc. (new) ✅
+
+- **Story:** Makes the valves, fire hydrants, pipe repair parts, meters and leak detectors that keep city water systems running. [source](https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm)
+- **Proof:** Its sales rose 4.1% to $395.9 million in the quarter ended June 30, 2026. [source](https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm)
+- **Thing to know:** Its sales depend on city budgets and new home building, and some products go to natural gas utilities. [source](https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm)
+- **Thing to know:** Recent sales growth came from higher prices while the number of products sold slipped slightly. [source](https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm)
+- **Clean water (core):** Its valves and leak detectors keep city water flowing safely.  
+  *Evidence:* Mueller's valves, hydrants, pipe connection and repair, metering and leak detection products are used in the transmission, distribution and measurement of water in North America. [source](https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm)
+- **Profile:** Mueller Water Products makes valves, fire hydrants, pipe repair, metering and leak detection products for water systems. (Atlanta, GA) · sector industrials · risk high [source](https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=MWA&type=10-K&dateb=&owner=include&count=40)
+
+### 12. BMI: Badger Meter, Inc. (new) ✅
+
+- **Story:** Makes smart water meters, sensors and software that help utilities spot leaks and manage water. [source](https://www.sec.gov/Archives/edgar/data/0000009092/000119312526428396/bmi-ex99_pressrelease.htm)
+- **Proof:** It raised its dividend for the 34th year in a row in 2026, with third-quarter sales of $235.9 million. [source](https://www.sec.gov/Archives/edgar/data/0000009092/000119312526428396/bmi-ex99_pressrelease.htm)
+- **Thing to know:** Its utility water sales were flat in the third quarter of 2026 because utilities rolled out meter projects unevenly. [source](https://www.sec.gov/Archives/edgar/data/0000009092/000119312526428396/bmi-ex99_pressrelease.htm)
+- **Clean water (core):** Its smart meters help utilities find leaks and save water.  
+  *Evidence:* Badger Meter provides water management solutions through its BlueEdge suite of smart measurement hardware, communications and analytics software. [source](https://www.sec.gov/Archives/edgar/data/0000009092/000119312526428396/bmi-ex99_pressrelease.htm)
+- **Profile:** Badger Meter makes water meters, sensors and software for water utilities and industry. (Milwaukee, WI) · sector industrials · risk high [source](https://www.sec.gov/Archives/edgar/data/0000009092/000119312526428396/bmi-ex99_pressrelease.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=BMI&type=10-K&dateb=&owner=include&count=40)
+
+### 13. WMS: Advanced Drainage Systems, Inc. (new) ✅
+
+- **Story:** Makes pipes and systems that manage stormwater and treat household wastewater, and is one of North America's largest plastic recyclers. [source](https://www.sec.gov/Archives/edgar/data/0001604028/000160402826000034/wms-08062026x8kex991.htm)
+- **Proof:** Its sales rose 20.6% to $1,001.1 million in the quarter ended June 30, 2026. [source](https://www.sec.gov/Archives/edgar/data/0001604028/000160402826000034/wms-08062026x8kex991.htm)
+- **Thing to know:** Some of that quarter's sales were pulled forward from the next quarter as customers bought ahead of price increases. [source](https://www.sec.gov/Archives/edgar/data/0001604028/000160402826000034/wms-08062026x8kex991.htm)
+- **Clean water (core):** Its pipes and systems manage stormwater and treat wastewater.  
+  *Evidence:* ADS is a leading manufacturer of stormwater and onsite wastewater solutions and one of the largest plastic recycling companies in North America. [source](https://www.sec.gov/Archives/edgar/data/0001604028/000160402826000034/wms-08062026x8kex991.htm)
+- **Profile:** Advanced Drainage Systems makes stormwater pipes and onsite wastewater treatment products, largely from recycled plastic. (Hilliard, OH) · sector industrials · risk medium [source](https://www.sec.gov/Archives/edgar/data/0001604028/000160402826000034/wms-08062026x8kex991.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=WMS&type=10-K&dateb=&owner=include&count=40)
+
+### 14. CNM: Core & Main, Inc. (new) ✅
+
+- **Story:** Supplies pipes, valves, meters and fire protection gear to cities and contractors building and fixing water and sewer systems. [source](https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm)
+- **Proof:** It runs more than 370 locations across the U.S. and Canada, with $2,145 million in sales in the quarter ended August 2, 2026. [source](https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm)
+- **Thing to know:** It had about $2.5 billion of debt in August 2026. [source](https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm)
+- **Thing to know:** Sales of storm drainage products were flat to down in 2026 as volumes fell. [source](https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm)
+- **Clean water (core):** It supplies the parts that build and repair water systems.  
+  *Evidence:* Core & Main is a specialty distributor focused on water, wastewater, storm drainage and fire protection products for municipalities, private water companies and contractors. [source](https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm)
+- **Profile:** Core & Main distributes water, wastewater, storm drainage and fire protection products across the U.S. and Canada. (St. Louis, MO) · sector industrials · risk medium [source](https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=CNM&type=10-K&dateb=&owner=include&count=40)
+
+### 15. TTEK: Tetra Tech, Inc. (new) ✅
+
+- **Story:** An engineering and consulting firm that designs water treatment, supply and environmental projects for governments and companies worldwide. [source](https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/)
+- **Proof:** It had a $4.49 billion backlog of work at the end of June 2026 and more than 25,000 employees. [source](https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/)
+- **Thing to know:** U.S. cuts to foreign aid programs (USAID and the State Department) took away some of its work. [source](https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/)
+- **Thing to know:** Much of its revenue comes from government agencies, so budgets and policy shifts affect it. [source](https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/)
+- **Clean water (partial):** It designs projects that bring clean water to communities.  
+  *Evidence:* Tetra Tech describes itself as the leader in water, environment and sustainable infrastructure. [source](https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/)
+- **Profile:** Tetra Tech provides consulting and engineering services in water, environment and sustainable infrastructure. (Pasadena, CA) · sector industrials · risk medium [source](https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=TTEK&type=10-K&dateb=&owner=include&count=40)
+
+### 16. FELE: Franklin Electric Co., Inc. (new) ✅
+
+- **Story:** Makes pumps and controls that move water from wells, for homes, farms, cities and water treatment. [source](https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm)
+- **Proof:** Its Water Systems business had $358.5 million in sales in the second quarter of 2026. [source](https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm)
+- **Thing to know:** Part of its business ($80.2 million in the second quarter of 2026) makes pumping equipment for fuel stations. [source](https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm)
+- **Clean water (partial):** Its pumps bring water from wells to homes and farms.  
+  *Evidence:* Franklin Electric makes systems for the movement of water and energy; Water Systems had $358.5 million of its $622.9 million Q2 2026 sales. [source](https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm)
+- **Profile:** Franklin Electric makes water pumping systems and fueling equipment, and distributes water-system products. (Fort Wayne, IN) · sector industrials · risk high [source](https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm)
+- [SEC filings](https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=FELE&type=10-K&dateb=&owner=include&count=40)

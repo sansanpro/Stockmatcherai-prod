@@ -13,6 +13,7 @@ import sun from '@/assets/3d/sun.png';
 import shield from '@/assets/3d/shield.png';
 import salad from '@/assets/3d/green-salad.png';
 import brain from '@/assets/3d/brain.png';
+import droplet from '@/assets/3d/droplet.png';
 
 // One piece of art per onboarding screen
 export const STEP_ART = {
@@ -34,4 +35,5 @@ export const CAUSE_ART: Record<string, string> = {
   keeping_safe: shield,
   clean_food: salad,
   mental_health: brain,
+  clean_water: droplet,
 };

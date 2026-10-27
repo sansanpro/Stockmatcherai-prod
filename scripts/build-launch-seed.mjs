@@ -15,6 +15,7 @@ const CAUSES = {
   keeping_safe: 'Keeping people safe',
   clean_food: 'Healthy food & farming',
   mental_health: 'Mental health & wellbeing',
+  clean_water: 'Clean water',
 };
 const EXPOSURES = ['core', 'partial', 'peripheral'];
 const DEALBREAKERS = ['tobacco', 'weapons', 'fossil_fuels', 'gambling', 'animal_testing', 'factory_farming'];

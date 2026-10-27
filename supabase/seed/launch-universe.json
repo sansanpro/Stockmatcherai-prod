@@ -6580,6 +6580,797 @@
         ]
       },
       "reviewed": true
+    },
+    {
+      "ticker": "AWK",
+      "company_name": "American Water Works Company, Inc.",
+      "new": true,
+      "sector": "utilities",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "The largest regulated U.S. water and wastewater utility, supplying safe drinking water to about 14 million people in 14 states.",
+      "proof": "It spent $1.519 billion on pipes, plants and other infrastructure in the first half of 2026.",
+      "things_to_know": [
+        "It agreed to merge with Essential Utilities, which also runs natural gas utilities; the deal is expected to close by early 2027 if regulators approve.",
+        "Its long-term debt rose to about $14.0 billion by June 2026, and its prices are set by state regulators."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "core",
+          "evidence": "American Water is the largest regulated water and wastewater utility in the U.S., providing safe, clean drinking water and wastewater services to about 14 million people in 14 states and on 18 military installations.",
+          "why_line": "It delivers clean drinking water to about 14 million people.",
+          "source_url": "https://ir.amwater.com/news-and-events/financial-releases/financial-release-details/2026/American-Water-and-Essential-Utilities-Receive-Kentucky-Public-Service-Commission-Approval-for-Proposed-Merger/default.aspx"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "American Water is the largest regulated water and wastewater utility company in the United States.",
+        "city": "Camden",
+        "state": "NJ",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://ir.amwater.com/news-and-events/financial-releases/financial-release-details/2026/American-Water-and-Essential-Utilities-Receive-Kentucky-Public-Service-Commission-Approval-for-Proposed-Merger/default.aspx"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001410636/000141063626000120/awk-20260630.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001410636/000141063626000120/awk-20260630.htm",
+            "https://ir.amwater.com/news-and-events/financial-releases/financial-release-details/2026/American-Water-and-Essential-Utilities-Receive-Kentucky-Public-Service-Commission-Approval-for-Proposed-Merger/default.aspx"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001410636/000141063626000120/awk-20260630.htm"
+          ]
+        ],
+        "profile": [
+          "https://ir.amwater.com/news-and-events/financial-releases/financial-release-details/2026/American-Water-and-Essential-Utilities-Receive-Kentucky-Public-Service-Commission-Approval-for-Proposed-Merger/default.aspx"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "AWR",
+      "company_name": "American States Water Company",
+      "new": true,
+      "sector": "utilities",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Supplies water to more than 80 California communities and runs water and wastewater systems on 12 U.S. military bases.",
+      "proof": "Its Golden State Water utility serves about 265,200 customer connections in more than 80 California communities.",
+      "things_to_know": [
+        "Its profits depend on California regulators approving rate increases; second-quarter 2026 earnings rose mainly because of new rates.",
+        "It also owns a small electric utility in Big Bear Lake, California, and its military-base work depends on U.S. government contracts."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "core",
+          "evidence": "American States Water serves over one million people in ten states through Golden State Water and its water and wastewater services on twelve military bases.",
+          "why_line": "It delivers drinking water across California communities.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "American States Water owns Golden State Water, a small electric utility, and a business running water systems on U.S. military bases.",
+        "city": "San Dimas",
+        "state": "CA",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm",
+            "https://americanstateswatercompany.gcs-web.com/node/23231"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001056903/000162828026053403/exhibit991pressrelease2026.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "CWT",
+      "company_name": "California Water Service Group",
+      "new": true,
+      "sector": "utilities",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Provides drinking water to more than 2.2 million people in California, Hawaii, New Mexico, Washington and Texas.",
+      "proof": "It invested a record $276.4 million in water infrastructure in the first half of 2026.",
+      "things_to_know": [
+        "Its profits depend on regulators' rate decisions; second-quarter 2026 results were lifted by a delayed California rate increase applied back to January.",
+        "New federal limits on PFAS \"forever chemicals\" in drinking water may require costly treatment upgrades."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "core",
+          "evidence": "California Water Service Group serves more than 2.2 million people in California, Hawaii, New Mexico, Washington and Texas through its regulated water utilities.",
+          "why_line": "It delivers clean drinking water to over 2 million people.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "California Water Service Group owns regulated water utilities including Cal Water, Hawaii Water, New Mexico Water and Washington Water.",
+        "city": "San Jose",
+        "state": "CA",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001035201/000110465926088379/tm2621659d1_ex99-1.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "HTO",
+      "company_name": "H2O America",
+      "new": true,
+      "sector": "utilities",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Formerly SJW Group, it runs water and wastewater utilities serving over 1.6 million people in California, Connecticut, Maine and Texas.",
+      "proof": "It invested $206.9 million in water infrastructure in the first half of 2026.",
+      "things_to_know": [
+        "Its profits depend on state regulators approving rate increases to pay back what it spends on pipes and plants.",
+        "It is buying Texas water utility Quadvest for about $540 million, a deal still going through regulators in mid-2026."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "core",
+          "evidence": "H2O America describes itself as one of the largest investor-owned pure-play water and wastewater utilities in the U.S., serving over 1.6 million people.",
+          "why_line": "It delivers clean water to over 1.6 million people.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "H2O America, formerly SJW Group, owns San Jose Water, Connecticut Water, Maine Water and The Texas Water Company.",
+        "city": "San Jose",
+        "state": "CA",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0000766829/000162828026049836/exhibit991-2q2026.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "XYL",
+      "company_name": "Xylem Inc.",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes pumps, treatment systems, smart meters and services that move, clean and track water for cities and industries.",
+      "proof": "It took in $3.1 billion of new orders in the second quarter of 2026, up 42% from a year earlier.",
+      "things_to_know": [
+        "It is dropping less profitable customers and products on purpose, which it expects to cut 2026 revenue by about 2%.",
+        "Weak demand from water utilities in China has been a drag on its sales."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "core",
+          "evidence": "Xylem is a global water solutions company; all four of its segments (Water Infrastructure, Applied Water, Measurement & Control Solutions, and Integrated Solutions & Services) serve water customers.",
+          "why_line": "It builds the equipment that cleans and moves water.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001524472/000152447226000108/xyl07282026ex991.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Xylem is a global water technology company making pumps, treatment, testing and metering equipment for utilities, industry and buildings.",
+        "city": "Washington",
+        "state": "DC",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001524472/000152447226000108/xyl07282026ex991.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001524472/000152447226000108/xyl07282026ex991.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.tikr.com/blog/xylem-stock-fell-10-in-2026-while-operating-margins-hit-a-four-year-high-does-wall-streets-157-target-hold"
+          ],
+          [
+            "https://www.tikr.com/blog/xylem-stock-fell-10-in-2026-while-operating-margins-hit-a-four-year-high-does-wall-streets-157-target-hold"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001524472/000152447226000108/xyl07282026ex991.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "VLTO",
+      "company_name": "Veralto Corporation",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Owns Hach water-testing instruments, Trojan UV disinfection and ChemTreat water treatment, helping utilities and factories keep water clean.",
+      "proof": "Its Water Quality business had $3.3 billion in sales in 2025.",
+      "things_to_know": [
+        "About 40% of its sales ($2.2 billion of $5.5 billion in 2025) come from a packaging and product-labeling business, not water.",
+        "Its second-quarter 2026 results included a boost from refunds of tariffs it had paid earlier."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "partial",
+          "evidence": "Veralto's Water Quality segment ($3.3 billion of $5.5 billion 2025 sales) offers water analytics and treatment through Hach, Trojan Technologies and ChemTreat.",
+          "why_line": "Its biggest business tests and treats water to keep it safe.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1967680/000196768026000018/a2025_annualxreportxfina.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Veralto makes water analytics and treatment products (Hach, Trojan, ChemTreat) and product-quality and packaging technology.",
+        "city": "Waltham",
+        "state": "MA",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/1967680/000196768026000018/a2025_annualxreportxfina.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/1967680/000196768026000018/a2025_annualxreportxfina.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/1967680/000196768026000018/a2025_annualxreportxfina.htm"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001967680/000196768026000043/vlto-20260728xex991.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/1967680/000196768026000018/a2025_annualxreportxfina.htm",
+          "https://www.sec.gov/Archives/edgar/data/0001967680/000196768026000043/vlto-20260728xex991.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "ECL",
+      "company_name": "Ecolab Inc.",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "low",
+      "filing_type": "10-K",
+      "mission_story": "Helps factories, data centers and other businesses clean, reuse and save water, with a goal of saving enough drinking water for 1 billion people by 2030.",
+      "proof": "Its Global Water business had $2.22 billion in sales in the second quarter of 2026, about half of the company's total.",
+      "things_to_know": [
+        "About half its sales come from cleaning, hygiene and pest control rather than water.",
+        "Its water business profit margin slipped to 15.7% from 16.4% in the second quarter of 2026 as costs rose."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "partial",
+          "evidence": "Ecolab's Global Water segment had $2,223.4 million of its $4,415.4 million Q2 2026 sales; its 2030 goal is to conserve enough drinking water for 1 billion people.",
+          "why_line": "Its largest business helps companies clean and save water.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0000031462/000162828026049933/ecl_ex99x1.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Ecolab provides water treatment, hygiene and infection-prevention products and services to customers in more than 170 countries.",
+        "city": "Saint Paul",
+        "state": "MN",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0000031462/000162828026049933/ecl_ex99x1.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0000031462/000162828026049933/ecl_ex99x1.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0000031462/000162828026049933/ecl_ex99x1.htm"
+          ],
+          [
+            "https://www.ecolab.com/en-us/media-center/news/ecolab-delivers-accelerated-sales-growth-and-double-digit-eps-growth-reported-diluted-eps-1-90-adjusted-diluted-eps-2-09-11-raises-2026-adjusted-diluted-eps-outlook-8-05--8-25-7--10"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0000031462/000162828026049933/ecl_ex99x1.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "PNR",
+      "company_name": "Pentair plc",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes water filters, softeners, pumps and treatment systems for homes, businesses and industry, plus pool equipment.",
+      "proof": "Its Water Solutions business, which treats and filters water, had $422.0 million in sales in the second quarter of 2026.",
+      "things_to_know": [
+        "Pool equipment sales fell 42% in the second quarter of 2026 as pool dealers cut back their inventories.",
+        "Its total sales fell 17% from a year earlier in that quarter."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "partial",
+          "evidence": "Pentair says it helps the world sustainably move, improve and enjoy water; Water Solutions ($422.0 million) and Flow ($263.7 million) made up most of its $933 million Q2 2026 sales.",
+          "why_line": "Its filters and pumps help homes and businesses get clean water.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Pentair makes residential, commercial and industrial water treatment, filtration and pumping products, and pool equipment.",
+        "city": "London",
+        "state": "",
+        "country": "GB"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0000077360/000007736026000042/q22026pressrelease.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "ZWS",
+      "company_name": "Zurn Elkay Water Solutions Corporation",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes filtered drinking-water fountains and bottle fillers, plus valves and drains that keep building water safe.",
+      "proof": "Its sales grew 10% to $491 million in the second quarter of 2026, with growth in every product category.",
+      "things_to_know": [
+        "It expected growth to slow to about 6% to 7% in the third quarter of 2026.",
+        "It recently bought Intellihot, a water-heater maker, adding a business outside drinking water."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "core",
+          "evidence": "Zurn Elkay describes itself as a pure-play water management business whose portfolio includes water safety and control products and filtered drinking water products for public and private spaces.",
+          "why_line": "It makes the filters and fountains that serve clean drinking water.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Zurn Elkay makes water safety, drainage and filtered drinking water products for commercial, public and residential buildings.",
+        "city": "Milwaukee",
+        "state": "WI",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001439288/000162828026050151/ex991earningsrelease63026.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "WTS",
+      "company_name": "Watts Water Technologies, Inc.",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes valves, filters and water-quality products that keep drinking water safe and flowing in homes and buildings.",
+      "proof": "Its sales rose 19% to a record $763 million in the second quarter of 2026.",
+      "things_to_know": [
+        "Much of its recent sales growth came from data center construction projects.",
+        "Its operating profit margin slipped to 20.2% from 21.0% in the second quarter of 2026."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "partial",
+          "evidence": "Watts' plumbing, heating and water quality products control the efficiency, safety and quality of water within residential, commercial and institutional buildings.",
+          "why_line": "Its products help keep the water in buildings safe.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Watts Water Technologies makes plumbing, heating and water quality products for homes and commercial buildings.",
+        "city": "North Andover",
+        "state": "MA",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0000795403/000110465926091165/wts-20260805xex99d1.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "MWA",
+      "company_name": "Mueller Water Products, Inc.",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Makes the valves, fire hydrants, pipe repair parts, meters and leak detectors that keep city water systems running.",
+      "proof": "Its sales rose 4.1% to $395.9 million in the quarter ended June 30, 2026.",
+      "things_to_know": [
+        "Its sales depend on city budgets and new home building, and some products go to natural gas utilities.",
+        "Recent sales growth came from higher prices while the number of products sold slipped slightly."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "core",
+          "evidence": "Mueller's valves, hydrants, pipe connection and repair, metering and leak detection products are used in the transmission, distribution and measurement of water in North America.",
+          "why_line": "Its valves and leak detectors keep city water flowing safely.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Mueller Water Products makes valves, fire hydrants, pipe repair, metering and leak detection products for water systems.",
+        "city": "Atlanta",
+        "state": "GA",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001350593/000135059326000034/exhibit991pressreleasefy26.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "BMI",
+      "company_name": "Badger Meter, Inc.",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Makes smart water meters, sensors and software that help utilities spot leaks and manage water.",
+      "proof": "It raised its dividend for the 34th year in a row in 2026, with third-quarter sales of $235.9 million.",
+      "things_to_know": [
+        "Its utility water sales were flat in the third quarter of 2026 because utilities rolled out meter projects unevenly."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "core",
+          "evidence": "Badger Meter provides water management solutions through its BlueEdge suite of smart measurement hardware, communications and analytics software.",
+          "why_line": "Its smart meters help utilities find leaks and save water.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0000009092/000119312526428396/bmi-ex99_pressrelease.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Badger Meter makes water meters, sensors and software for water utilities and industry.",
+        "city": "Milwaukee",
+        "state": "WI",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0000009092/000119312526428396/bmi-ex99_pressrelease.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0000009092/000119312526428396/bmi-ex99_pressrelease.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0000009092/000119312526428396/bmi-ex99_pressrelease.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0000009092/000119312526428396/bmi-ex99_pressrelease.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "WMS",
+      "company_name": "Advanced Drainage Systems, Inc.",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Makes pipes and systems that manage stormwater and treat household wastewater, and is one of North America's largest plastic recyclers.",
+      "proof": "Its sales rose 20.6% to $1,001.1 million in the quarter ended June 30, 2026.",
+      "things_to_know": [
+        "Some of that quarter's sales were pulled forward from the next quarter as customers bought ahead of price increases."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "core",
+          "evidence": "ADS is a leading manufacturer of stormwater and onsite wastewater solutions and one of the largest plastic recycling companies in North America.",
+          "why_line": "Its pipes and systems manage stormwater and treat wastewater.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001604028/000160402826000034/wms-08062026x8kex991.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Advanced Drainage Systems makes stormwater pipes and onsite wastewater treatment products, largely from recycled plastic.",
+        "city": "Hilliard",
+        "state": "OH",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001604028/000160402826000034/wms-08062026x8kex991.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001604028/000160402826000034/wms-08062026x8kex991.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001604028/000160402826000034/wms-08062026x8kex991.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001604028/000160402826000034/wms-08062026x8kex991.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "CNM",
+      "company_name": "Core & Main, Inc.",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "Supplies pipes, valves, meters and fire protection gear to cities and contractors building and fixing water and sewer systems.",
+      "proof": "It runs more than 370 locations across the U.S. and Canada, with $2,145 million in sales in the quarter ended August 2, 2026.",
+      "things_to_know": [
+        "It had about $2.5 billion of debt in August 2026.",
+        "Sales of storm drainage products were flat to down in 2026 as volumes fell."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "core",
+          "evidence": "Core & Main is a specialty distributor focused on water, wastewater, storm drainage and fire protection products for municipalities, private water companies and contractors.",
+          "why_line": "It supplies the parts that build and repair water systems.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Core & Main distributes water, wastewater, storm drainage and fire protection products across the U.S. and Canada.",
+        "city": "St. Louis",
+        "state": "MO",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm"
+          ],
+          [
+            "https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0001856525/000185652526000091/cnmq22026earningspressrele.htm"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "TTEK",
+      "company_name": "Tetra Tech, Inc.",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "medium",
+      "filing_type": "10-K",
+      "mission_story": "An engineering and consulting firm that designs water treatment, supply and environmental projects for governments and companies worldwide.",
+      "proof": "It had a $4.49 billion backlog of work at the end of June 2026 and more than 25,000 employees.",
+      "things_to_know": [
+        "U.S. cuts to foreign aid programs (USAID and the State Department) took away some of its work.",
+        "Much of its revenue comes from government agencies, so budgets and policy shifts affect it."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "partial",
+          "evidence": "Tetra Tech describes itself as the leader in water, environment and sustainable infrastructure.",
+          "why_line": "It designs projects that bring clean water to communities.",
+          "source_url": "https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Tetra Tech provides consulting and engineering services in water, environment and sustainable infrastructure.",
+        "city": "Pasadena",
+        "state": "CA",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/"
+        ],
+        "proof": [
+          "https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/"
+        ],
+        "things_to_know": [
+          [
+            "https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/"
+          ],
+          [
+            "https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/"
+          ]
+        ],
+        "profile": [
+          "https://investor.tetratech.com/news/news-details/2026/Tetra-Tech-Reports-Strong-Third-Quarter-2026-Results/"
+        ]
+      },
+      "reviewed": true
+    },
+    {
+      "ticker": "FELE",
+      "company_name": "Franklin Electric Co., Inc.",
+      "new": true,
+      "sector": "industrials",
+      "risk_level": "high",
+      "filing_type": "10-K",
+      "mission_story": "Makes pumps and controls that move water from wells, for homes, farms, cities and water treatment.",
+      "proof": "Its Water Systems business had $358.5 million in sales in the second quarter of 2026.",
+      "things_to_know": [
+        "Part of its business ($80.2 million in the second quarter of 2026) makes pumping equipment for fuel stations."
+      ],
+      "missions": [
+        {
+          "cause": "clean_water",
+          "exposure": "partial",
+          "evidence": "Franklin Electric makes systems for the movement of water and energy; Water Systems had $358.5 million of its $622.9 million Q2 2026 sales.",
+          "why_line": "Its pumps bring water from wells to homes and farms.",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm"
+        }
+      ],
+      "flags": [],
+      "profile": {
+        "description": "Franklin Electric makes water pumping systems and fueling equipment, and distributes water-system products.",
+        "city": "Fort Wayne",
+        "state": "IN",
+        "country": "US"
+      },
+      "sources": {
+        "story": [
+          "https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm"
+        ],
+        "proof": [
+          "https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm"
+        ],
+        "things_to_know": [
+          [
+            "https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm"
+          ]
+        ],
+        "profile": [
+          "https://www.sec.gov/Archives/edgar/data/0000038725/000003872526000051/a20260728ex991earningsrele.htm"
+        ]
+      },
+      "reviewed": true
     }
   ],
   "verified": {
@@ -6663,7 +7454,23 @@
         "UNFI",
         "DMC",
         "AVO",
-        "COCO"
+        "COCO",
+        "AWK",
+        "AWR",
+        "CWT",
+        "HTO",
+        "XYL",
+        "VLTO",
+        "ECL",
+        "PNR",
+        "ZWS",
+        "WTS",
+        "MWA",
+        "BMI",
+        "WMS",
+        "CNM",
+        "TTEK",
+        "FELE"
       ],
       "tagged": [
         "ABBV:mental_health"
@@ -6726,7 +7533,24 @@
         "UNFI": "$2.91B on 2026-10-26 per stockanalysis.com (beta 0.97; up about 22% over 52 weeks)",
         "DMC": "$1.37B on 2026-10-26 per stockanalysis.com (beta 0.24; down about 15% over 52 weeks). Ticker changed from FDP to DMC on 2026-06-29.",
         "AVO": "$1.03B on 2026-10-26 per stockanalysis.com (beta 0.44). Right at the $1B floor: recheck before each rebuild.",
-        "COCO": "$3.18B on 2026-10-26 per stockanalysis.com (beta 0.75; up about 41% over 52 weeks)"
+        "COCO": "$3.18B on 2026-10-26 per stockanalysis.com (beta 0.75; up about 41% over 52 weeks)",
+        "AWK": "$28.16B on 2026-10-26 per stockanalysis.com industry list",
+        "AWR": "$3.38B on 2026-10-26 per stockanalysis.com industry list",
+        "CWT": "$2.95B on 2026-10-26 per stockanalysis.com industry list",
+        "HTO": "$2.45B on 2026-10-26 per stockanalysis.com industry list",
+        "SBS": "$16.26B on 2026-10-26 per stockanalysis.com industry list",
+        "XYL": "$25.27B on 2026-10-26 per stockanalysis.com industry list",
+        "VLTO": "$25.20B on 2026-10-26 per stockanalysis.com industry list",
+        "ECL": "$80.98B on 2026-10-26 per stockanalysis.com (beta 0.88)",
+        "PNR": "$8.82B on 2026-10-26 per stockanalysis.com industry list",
+        "ZWS": "$8.18B on 2026-10-26 per stockanalysis.com industry list",
+        "WTS": "$12.28B on 2026-10-26 per stockanalysis.com industry list",
+        "MWA": "$3.51B on 2026-10-26 per stockanalysis.com industry list",
+        "BMI": "$4.45B on 2026-10-26 per stockanalysis.com (beta 0.64; down about 17% over 52 weeks)",
+        "WMS": "$9.90B on 2026-10-26 per stockanalysis.com (beta 1.29)",
+        "CNM": "$8.07B on 2026-10-26 per stockanalysis.com (beta 0.91; down about 22% over 52 weeks)",
+        "TTEK": "$9.51B on 2026-10-26 per stockanalysis.com (beta 0.95; up about 10% over 52 weeks)",
+        "FELE": "$4.36B on 2026-10-26 per stockanalysis.com industry list"
       },
       "reserve": {
         "GSK": "reserve",
@@ -6741,7 +7565,8 @@
         "AMSC": "reserve",
         "PRIM": "reserve",
         "AAON": "reserve",
-        "RDWR": "reserve"
+        "RDWR": "reserve",
+        "SBS": "on hold (see clean_water.not_added)"
       },
       "note": "Every cited page was opened by scripts/check-universe-sources.mjs; claims it could not match automatically were checked by hand.",
       "round2": {
@@ -6760,6 +7585,33 @@
           "TEVA": "criminal price-fixing deferred prosecution (2023) and opioid settlement",
           "CMG": "criminal food-safety deferred prosecution (2020)",
           "HIMS (mental_health)": "mental health is a minor, unquantified category"
+        }
+      },
+      "clean_water": {
+        "on": "2026-10-26",
+        "added": [
+          "AWK",
+          "AWR",
+          "CWT",
+          "HTO",
+          "XYL",
+          "VLTO",
+          "ECL",
+          "PNR",
+          "ZWS",
+          "WTS",
+          "MWA",
+          "BMI",
+          "WMS",
+          "CNM",
+          "TTEK",
+          "FELE"
+        ],
+        "not_added": {
+          "WTRG": "Being merged into American Water (stock-for-stock deal signed 2025-10-26; closing expected by Q1 2027).",
+          "MSEX": "Market value about $1.06B, right at the floor.",
+          "ERII": "Market value about $347M.",
+          "SBS": "On hold: US shares fell about 25% on 2026-10-26 (day after Brazil's presidential runoff) with no confirmed cause; Q2 2026 revenue missed and adjusted profit fell 41%. Research kept in universe-research/clean-water.json."
         }
       }
     }

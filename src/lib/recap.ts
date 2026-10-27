@@ -16,6 +16,7 @@ const PERSONAS: Record<string, Persona> = {
   keeping_safe: { title: 'The Guardian', line: 'You back the companies keeping people safe.' },
   clean_food: { title: 'The Good Food Grower', line: 'You back better food and smarter farming.' },
   mental_health: { title: 'The Mind Champion', line: 'You back better care for mental health.' },
+  clean_water: { title: 'The Water Keeper', line: 'You back clean, safe water for everyone.' },
 };
 const MIXED: Persona = { title: 'The Big-Picture Backer', line: 'You spread your support across several causes.' };
 

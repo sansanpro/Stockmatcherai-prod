@@ -13,16 +13,44 @@ const metricsKey = (ticker: string) => `metrics:${ticker}`;
 
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 
-export function metricsToColumns(metrics: FinnhubMetrics): Record<string, unknown> {
+// Finnhub reports market cap in the currency a company reports its results in. For these
+// foreign filers that isn't dollars, so it's converted with the day's ECB rate.
+const REPORTING_CURRENCY: Record<string, string> = { NVO: 'DKK', TAK: 'JPY', SBS: 'BRL' };
+const unitsPerUsd = new Map<string, Promise<number | null>>(); // keyed by currency and day
+
+function fetchUnitsPerUsd(currency: string): Promise<number | null> {
+  const key = `${currency}:${new Date().toISOString().slice(0, 10)}`;
+  if (!unitsPerUsd.has(key)) {
+    const rate = fetch(`https://api.frankfurter.dev/v1/latest?base=USD&symbols=${currency}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(body => (isNum(body?.rates?.[currency]) && body.rates[currency] > 0 ? body.rates[currency] : null))
+      .catch(() => null);
+    unitsPerUsd.set(key, rate);
+    rate.then(value => { if (value === null) unitsPerUsd.delete(key); }); // retry next time after a failure
+  }
+  return unitsPerUsd.get(key)!;
+}
+
+// Dollars per unit of the company's reporting currency: 1 for most, null if the rate is unavailable
+async function usdPerReportingUnit(ticker: string): Promise<number | null> {
+  const currency = REPORTING_CURRENCY[ticker];
+  if (!currency) return 1;
+  const units = await fetchUnitsPerUsd(currency);
+  return units ? 1 / units : null;
+}
+
+export function metricsToColumns(metrics: FinnhubMetrics, usdPerUnit: number | null = 1): Record<string, unknown> {
   const columns: Record<string, unknown> = {};
   // Only overwrite fields Finnhub returned, so missing metrics keep their last known value
   if (isNum(metrics['52WeekPriceReturnDaily'])) columns.one_year_return = Number(metrics['52WeekPriceReturnDaily'].toFixed(2));
   const pe = metrics.peTTM ?? metrics.peBasicExclExtraTTM;
   if (isNum(pe) && pe > 0) columns.pe_ratio = Number(pe.toFixed(2));
   if (isNum(metrics.currentDividendYieldTTM)) columns.dividend_yield = Number(metrics.currentDividendYieldTTM.toFixed(2));
-  if (isNum(metrics.marketCapitalization) && metrics.marketCapitalization > 0) {
-    columns.market_cap = formatMarketCap(metrics.marketCapitalization);
-    columns.market_cap_usd = metrics.marketCapitalization * 1_000_000; // Finnhub reports millions
+  // Without a conversion rate, keep the last known market cap rather than store one in the wrong currency
+  if (isNum(metrics.marketCapitalization) && metrics.marketCapitalization > 0 && usdPerUnit !== null) {
+    const millionsUsd = metrics.marketCapitalization * usdPerUnit; // Finnhub reports millions
+    columns.market_cap = formatMarketCap(millionsUsd);
+    columns.market_cap_usd = millionsUsd * 1_000_000;
   }
   if (isNum(metrics.beta)) columns.beta = Number(metrics.beta.toFixed(3));
   return columns;
@@ -45,7 +73,10 @@ export async function getMetricsFreshness(db: Db): Promise<Map<string, number>> 
 
 // Writes the price (and optionally metrics). The table's trigger stamps updated_at on price writes.
 export async function applyQuote(db: Db, ticker: string, quote: FinnhubQuote, metrics?: FinnhubMetrics | null) {
-  const columns: Record<string, unknown> = { price_per_share: quote.c, ...(metrics ? metricsToColumns(metrics) : {}) };
+  const columns: Record<string, unknown> = {
+    price_per_share: quote.c,
+    ...(metrics ? metricsToColumns(metrics, await usdPerReportingUnit(ticker)) : {}),
+  };
   const { data, error } = await db.from('stocks').update(columns).eq('ticker', ticker).select('ticker');
   if (metrics) {
     await db.from('market_data_cache').upsert({ cache_key: metricsKey(ticker), data: metrics, fetched_at: new Date().toISOString() });

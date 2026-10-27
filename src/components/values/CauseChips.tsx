@@ -16,6 +16,7 @@ const CAUSE_TONES: Record<string, CauseTone> = {
   keeping_safe: { header: 'bg-[#E2EAF5]', text: 'text-[#2C5288]', border: 'border-[#C0D1E8]' },
   clean_food: { header: 'bg-[#F6EDD6]', text: 'text-[#735512]', border: 'border-[#E8D6A8]' },
   mental_health: { header: 'bg-[#DDF0EC]', text: 'text-[#1D6359]', border: 'border-[#B5DCD3]' },
+  clean_water: { header: 'bg-[#DDEEF7]', text: 'text-[#1B5A7A]', border: 'border-[#B4D6E8]' },
 };
 const DEFAULT_TONE: CauseTone = { header: 'bg-[#F0E8DD]', text: 'text-[#6B4F3A]', border: 'border-[#DCCBB6]' };
 export const causeTone = (cause?: string): CauseTone => CAUSE_TONES[cause ?? ''] ?? DEFAULT_TONE;
