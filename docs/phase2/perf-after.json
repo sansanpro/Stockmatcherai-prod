@@ -1,0 +1,28 @@
+{
+  "measured_on": "Playwright WebKit, iPhone 15 viewport, desktop CPU (not throttled)",
+  "idle": {
+    "frames": 178,
+    "p50": 17,
+    "p95": 25,
+    "pct_frames_on_time": 89.3
+  },
+  "frames": 328,
+  "frame_ms": {
+    "p50": 17,
+    "p95": 25,
+    "p99": 29,
+    "max": 31
+  },
+  "frames_over_20ms": 50,
+  "pct_frames_on_time": 84.8,
+  "move_to_frame_ms": {
+    "samples": 77,
+    "p50": 10,
+    "p95": 21,
+    "max": 22
+  },
+  "deck_counter": {
+    "before": "7 of 7 matches left today",
+    "after": "4 of 7 matches left today"
+  }
+}

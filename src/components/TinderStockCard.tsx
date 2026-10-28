@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { capitalize } from '@/lib/utils';
 import { useLiveQuote } from '@/hooks/useLiveQuote';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { haptic } from '@/lib/haptics';
+import { animateSpring, animateTween, DURATION, prefersReducedMotion, SPRING } from '@/lib/motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { StockRecommendation } from '@/types/stock-matcher';
 import { Heart, X, Eye, Minimize2, ThumbsUp } from 'lucide-react';
@@ -30,6 +31,8 @@ interface TinderStockCardProps {
   onMatch: () => void;
   onPass: () => void;
   onViewDetails?: (stock: StockRecommendation) => void;
+  // A swipe or fling has started leaving (liked or passed); the swipe is recorded when it's off screen
+  onRelease?: (liked: boolean) => void;
   isVisible?: boolean;
   zIndex?: number;
   scale?: number;
@@ -40,77 +43,166 @@ interface TinderStockCardProps {
   explain?: boolean;
 }
 
-const TinderStockCard = ({ 
-  stock, 
-  onMatch, 
-  onPass, 
+export interface SwipeCardHandle {
+  // Sends the card off screen (pass/like buttons, the details modal), then calls onMatch/onPass
+  fling: (liked: boolean) => void;
+}
+
+const TAP = 10; // px: less movement than this is a tap, which opens the card
+const TILT = 0.06; // degrees per px dragged
+const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
+
+const TinderStockCard = forwardRef<SwipeCardHandle, TinderStockCardProps>(({
+  stock,
+  onMatch,
+  onPass,
   onViewDetails,
-  isVisible = true, 
+  onRelease,
+  isVisible = true,
   zIndex = 1,
   scale = 1,
   isHighMatch = false,
   isActive = false,
   explain = false,
-}: TinderStockCardProps) => {
+}, ref) => {
   const live = useLiveQuote(stock.ticker, stock.pricePerShare, stock.lastUpdated, isActive);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
-  const [isExiting, setIsExiting] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [hasDragged, setHasDragged] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const tapThreshold = 10; // pixels - if drag is less than this, it's a tap
+  const likeRef = useRef<HTMLDivElement>(null);
+  const passRef = useRef<HTMLDivElement>(null);
 
-  const handleStart = (clientX: number, clientY: number) => {
-    setIsDragging(true);
-    setHasDragged(false);
-    setStartPos({ x: clientX, y: clientY });
-  };
+  // The gesture lives in refs and writes straight to the DOM, so following the finger never
+  // re-renders the card
+  const pos = useRef({ x: 0, y: 0, opacity: 1 });
+  const stopAnim = useRef<(() => void) | null>(null);
+  const exiting = useRef(false);
+  const drag = useRef<{
+    id: number; touch: boolean; startX: number; startY: number; originX: number; originY: number;
+    axis: 'none' | 'x' | 'scroll'; grabbedMoving: boolean; samples: { t: number; x: number; y: number }[];
+  } | null>(null);
+  const callbacks = useRef({ onMatch, onPass, onRelease });
+  callbacks.current = { onMatch, onPass, onRelease };
 
-  const handleMove = (clientX: number, clientY: number) => {
-    if (!isDragging) return;
-    
-    const deltaX = clientX - startPos.x;
-    const deltaY = clientY - startPos.y;
-    
-    // Check if we've moved enough to consider it a drag
-    if (Math.abs(deltaX) > tapThreshold || Math.abs(deltaY) > tapThreshold) {
-      setHasDragged(true);
+  const paint = () => {
+    const { x, y, opacity } = pos.current;
+    const tilt = prefersReducedMotion() ? 0 : x * TILT;
+    if (cardRef.current) {
+      cardRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${tilt}deg)`;
+      cardRef.current.style.opacity = String(opacity);
     }
-    
-    setDragOffset({ x: deltaX, y: deltaY });
+    if (likeRef.current) likeRef.current.style.opacity = String(clamp01((x - 20) / 80));
+    if (passRef.current) passRef.current.style.opacity = String(clamp01((-x - 20) / 80));
   };
 
-  const handleEnd = () => {
-    if (!isDragging) return;
-    
-    const threshold = 100;
-    
-    // If it was a tap (not a drag), expand the card
-    if (!hasDragged && Math.abs(dragOffset.x) < tapThreshold && Math.abs(dragOffset.y) < tapThreshold) {
-      setIsExpanded(true);
-      setIsDragging(false);
-      setDragOffset({ x: 0, y: 0 });
+  const springBack = (velocity = [0, 0]) => {
+    stopAnim.current?.();
+    if (prefersReducedMotion()) {
+      const { x, y } = pos.current;
+      stopAnim.current = animateTween(DURATION.reduced, t => { pos.current.x = x * (1 - t); pos.current.y = y * (1 - t); paint(); });
       return;
     }
-    
-    if (Math.abs(dragOffset.x) > threshold) {
-      setIsExiting(true);
-      const isMatch = dragOffset.x > 0;
-      Haptics.impact({ style: isMatch ? ImpactStyle.Medium : ImpactStyle.Light }).catch(() => {});
-      setTimeout(() => {
-        if (isMatch) {
-          onMatch();
-        } else {
-          onPass();
-        }
-      }, 200);
-    } else {
-      setDragOffset({ x: 0, y: 0 });
+    stopAnim.current = animateSpring({
+      from: [pos.current.x, pos.current.y], to: [0, 0], velocity, spring: SPRING.snappy,
+      onUpdate: ([x, y]) => { pos.current.x = x; pos.current.y = y; paint(); },
+    });
+  };
+
+  // dir: 1 = like, -1 = pass. Exits keep the finger's speed; the swipe is recorded once the card is off screen.
+  const fling = (dir: 1 | -1, velocity = [0, 0]) => {
+    if (exiting.current) return;
+    exiting.current = true;
+    stopAnim.current?.();
+    haptic(dir > 0 ? 'medium' : 'light');
+    callbacks.current.onRelease?.(dir > 0);
+    const finish = () => (dir > 0 ? callbacks.current.onMatch() : callbacks.current.onPass());
+    const { x, y } = pos.current;
+    if (prefersReducedMotion()) {
+      // Same change, no flying: a short slide and a cross-fade
+      stopAnim.current = animateTween(DURATION.reduced, t => {
+        pos.current.x = x + dir * 40 * t; pos.current.opacity = 1 - t; paint();
+      }, finish);
+      return;
     }
-    
-    setIsDragging(false);
+    const width = cardRef.current?.offsetWidth ?? 360;
+    const vx = dir * Math.max(Math.abs(velocity[0]), 1); // at least 1 px/ms, so button flings feel brisk
+    stopAnim.current = animateSpring({
+      from: [x, y], to: [dir * (width * 1.6 + 100), y + velocity[1] * 120], velocity: [vx, velocity[1]], spring: SPRING.snappy,
+      onUpdate: ([nx, ny]) => { pos.current.x = nx; pos.current.y = ny; paint(); },
+      done: ([nx]) => Math.abs(nx) > width + 60,
+      onComplete: finish,
+    });
+  };
+
+  useImperativeHandle(ref, () => ({ fling: (liked: boolean) => fling(liked ? 1 : -1) }));
+  useEffect(() => () => stopAnim.current?.(), []);
+
+  // Taps on buttons/links inside the card (details, tooltips, news, carousel) shouldn't also
+  // count as a tap on the card, which would expand it on top of whatever the button opens
+  const startsOnControl = (target: EventTarget) =>
+    target instanceof Element && !!target.closest('button, a, input, [role="button"]');
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (!isActive || exiting.current || drag.current || startsOnControl(e.target)) return;
+    if (e.pointerType === 'mouse') {
+      if (e.button !== 0) return;
+      e.preventDefault(); // no text selection while dragging with a mouse
+    }
+    const moving = !!stopAnim.current && (Math.abs(pos.current.x) > 1 || Math.abs(pos.current.y) > 1);
+    stopAnim.current?.(); // a new touch grabs the card wherever it is
+    stopAnim.current = null;
+    drag.current = {
+      id: e.pointerId, touch: e.pointerType !== 'mouse', startX: e.clientX, startY: e.clientY,
+      originX: pos.current.x, originY: pos.current.y, axis: 'none', grabbedMoving: moving,
+      samples: [{ t: e.timeStamp, x: pos.current.x, y: pos.current.y }],
+    };
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || d.id !== e.pointerId || d.axis === 'scroll') return;
+    const dx = e.clientX - d.startX;
+    const dy = e.clientY - d.startY;
+    if (d.axis === 'none') {
+      if (Math.abs(dx) < TAP && Math.abs(dy) < TAP) return;
+      // A mostly vertical touch scrolls the card's content instead (touch-action: pan-y)
+      if (d.touch && Math.abs(dy) > Math.abs(dx)) { d.axis = 'scroll'; return; }
+      d.axis = 'x';
+      cardRef.current?.setPointerCapture(e.pointerId);
+    }
+    pos.current.x = d.originX + dx;
+    pos.current.y = d.originY + dy;
+    paint();
+    d.samples.push({ t: e.timeStamp, x: pos.current.x, y: pos.current.y });
+    if (d.samples.length > 8) d.samples.shift();
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || d.id !== e.pointerId) return;
+    drag.current = null;
+    if (d.axis === 'scroll') return;
+    if (d.axis === 'none') {
+      if (d.grabbedMoving) springBack();
+      else setIsExpanded(true);
+      return;
+    }
+    // Speed over the last ~80 ms of the drag, in px/ms
+    const recent = d.samples.filter(s => e.timeStamp - s.t < 80);
+    const first = recent[0] ?? d.samples[0];
+    const span = Math.max(1, e.timeStamp - first.t);
+    const vx = (pos.current.x - first.x) / span;
+    const vy = (pos.current.y - first.y) / span;
+    const width = cardRef.current?.offsetWidth ?? 360;
+    if (Math.abs(vx) > 0.5) fling(vx > 0 ? 1 : -1, [vx, vy]);
+    else if (Math.abs(pos.current.x) > width * 0.35) fling(pos.current.x > 0 ? 1 : -1, [vx, vy]);
+    else springBack([vx, vy]);
+  };
+
+  const handlePointerCancel = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || d.id !== e.pointerId) return;
+    drag.current = null;
+    if (d.axis === 'x' || d.grabbedMoving) springBack();
   };
 
   const handleViewDetails = () => {
@@ -118,69 +210,6 @@ const TinderStockCard = ({
       onViewDetails(stock);
     }
   };
-
-  // Taps on buttons/links inside the card (details, tooltips, news, carousel) shouldn't also
-  // count as a tap on the card, which would expand it on top of whatever the button opens
-  const startsOnControl = (target: EventTarget) =>
-    target instanceof Element && !!target.closest('button, a, input, [role="button"]');
-
-  // Mouse events
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (startsOnControl(e.target)) return;
-    e.preventDefault();
-    handleStart(e.clientX, e.clientY);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    handleMove(e.clientX, e.clientY);
-  };
-
-  const handleMouseUp = () => {
-    handleEnd();
-  };
-
-  // Touch events
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (startsOnControl(e.target)) return;
-    const touch = e.touches[0];
-    handleStart(touch.clientX, touch.clientY);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (isDragging) {
-      e.preventDefault(); // Prevent background scrolling while swiping
-    }
-    const touch = e.touches[0];
-    handleMove(touch.clientX, touch.clientY);
-  };
-
-  const handleTouchEnd = () => {
-    handleEnd();
-  };
-
-  useEffect(() => {
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
-        handleMove(e.clientX, e.clientY);
-      }
-    };
-
-    const handleGlobalMouseUp = () => {
-      if (isDragging) {
-        handleEnd();
-      }
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleGlobalMouseMove);
-      document.addEventListener('mouseup', handleGlobalMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleGlobalMouseMove);
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
-    };
-  }, [isDragging, startPos]);
 
   const isUpdate = stock.cardType === 'update' && !!stock.update;
   const primaryCause = stock.cause ?? stock.matchedCauses?.[0]?.cause;
@@ -253,10 +282,6 @@ const TinderStockCard = ({
     </div>
   );
 
-  const rotation = dragOffset.x * 0.1;
-  const opacity = isExiting ? 0 : Math.max(0.7, 1 - Math.abs(dragOffset.x) / 300);
-  const cardScale = isExiting ? 0.8 : scale;
-
   // Tapping the card opens everything, with the meaning of every number spelled out
   const renderExpandedContent = () => (
     <div className="flex flex-col h-full overflow-y-auto">
@@ -295,72 +320,39 @@ const TinderStockCard = ({
         </SheetContent>
       </Sheet>
 
-      <div 
-        className={`absolute inset-0 transition-all duration-500 ease-out ${
-          isVisible ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{ 
+      <div
+        className={`absolute inset-0 card-enter stack-settle ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+        style={{
           zIndex,
-          transform: `scale(${cardScale})`,
+          transform: `scale(${scale})`,
           filter: isActive ? 'none' : 'brightness(0.94)', // only the cards behind are dimmed
         }}
       >
-      {/* Overlay indicators */}
-      {isDragging && (
-        <>
-          <div 
-            className={`absolute inset-0 rounded-3xl flex items-center justify-center z-10 transition-all duration-200 ${
-              dragOffset.x > 50 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-            }`}
-            style={{
-              background: 'linear-gradient(45deg, rgba(181, 74, 34, 0.92), rgba(138, 58, 24, 0.92))'
-            }}
-          >
-            <div className="text-white text-center animate-pulse">
-              {isHighMatch ? (
-                <Heart className="w-16 h-16 mx-auto mb-2 fill-current drop-shadow-lg" />
-              ) : (
-                <ThumbsUp className="w-16 h-16 mx-auto mb-2 drop-shadow-lg" />
-              )}
-              <div className="text-2xl font-bold drop-shadow-md">
-                {isHighMatch ? 'MATCHED!' : 'LIKED!'}
-              </div>
-            </div>
-          </div>
-          
-          <div 
-            className={`absolute inset-0 rounded-3xl flex items-center justify-center z-10 transition-all duration-200 ${
-              dragOffset.x < -50 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-            }`}
-            style={{
-              background: 'linear-gradient(45deg, rgba(31, 26, 21, 0.82), rgba(70, 60, 50, 0.82))'
-            }}
-          >
-            <div className="text-white text-center animate-pulse">
-              <X className="w-16 h-16 mx-auto mb-2 drop-shadow-lg" />
-              <div className="text-2xl font-bold drop-shadow-md">PASS</div>
-            </div>
-          </div>
-        </>
-      )}
-
-      <Card 
+      <Card
         ref={cardRef}
-className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[min(85vw,800px)] xl:max-w-[min(80vw,900px)] mx-auto shadow-[0_18px_40px_rgb(var(--primary-deep)/0.16)] border border-line bg-surface overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
-          isExiting ? 'animate-scale-out' : 'animate-scale-in'
-        } h-full max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh] lg:max-h-[calc(100vh-10rem)] rounded-2xl flex flex-col relative`}
-        style={{
-          transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
-          opacity,
-          transition: isDragging || isExiting ? 'none' : 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-out'
-        }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[min(85vw,800px)] xl:max-w-[min(80vw,900px)] mx-auto shadow-[0_18px_40px_rgb(var(--primary-deep)/0.16)] border border-line bg-surface overflow-hidden cursor-grab active:cursor-grabbing select-none will-change-transform h-full max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh] lg:max-h-[calc(100vh-10rem)] rounded-2xl flex flex-col relative`}
+        style={{ touchAction: 'pan-y' }}
+        data-swipe-card={isActive ? 'top' : 'behind'}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
       >
+        {/* Like / pass labels fade in with the drag distance */}
+        <div ref={likeRef} aria-hidden className="absolute inset-0 z-10 flex items-center justify-center bg-brand-deep/90 text-white pointer-events-none" style={{ opacity: 0 }}>
+          <div className="text-center">
+            {isHighMatch
+              ? <Heart className="w-16 h-16 mx-auto mb-2 fill-current" />
+              : <ThumbsUp className="w-16 h-16 mx-auto mb-2" />}
+            <div className="text-2xl font-bold">Like</div>
+          </div>
+        </div>
+        <div ref={passRef} aria-hidden className="absolute inset-0 z-10 flex items-center justify-center bg-ink/80 text-white pointer-events-none" style={{ opacity: 0 }}>
+          <div className="text-center">
+            <X className="w-16 h-16 mx-auto mb-2" />
+            <div className="text-2xl font-bold">Pass</div>
+          </div>
+        </div>
         <CardContent className="p-0 flex flex-col h-full overflow-y-auto">
           {/* Story first: who they are and what they work on, then proof, then the numbers */}
           {header()}
@@ -381,6 +373,7 @@ className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[
       </div>
     </>
   );
-};
+});
+TinderStockCard.displayName = 'TinderStockCard';
 
 export default TinderStockCard;

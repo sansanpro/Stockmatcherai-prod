@@ -30,6 +30,14 @@
     --input: var(--border);
     --ring: var(--primary-deep);
     --radius: 0.75rem;
+
+    /* Motion (src/lib/motion.ts has the same values). spring.gentle is nearly critically damped,
+       so in CSS it's the ease-out curve over --dur-slow. */
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --dur-fast: 120ms;
+    --dur-base: 240ms;
+    --dur-slow: 400ms;
+    --dur-reduced: 150ms;
   }
 }
 
@@ -105,14 +113,14 @@
 /* 3D art motion: spins in, then floats and gently tilts; its shadow breathes with it */
 @layer utilities {
   .art-3d {
-    animation: art-in 0.9s cubic-bezier(0.2, 0.9, 0.25, 1.15) both, art-float 4.2s ease-in-out 0.9s infinite;
+    animation: art-in 0.9s var(--ease-out) both, art-float 4.2s ease-in-out 0.9s infinite;
     transform-style: preserve-3d;
     will-change: transform;
   }
   .art-3d-shadow {
-    animation: art-shadow-in 0.9s ease-out both, art-shadow 4.2s ease-in-out 0.9s infinite;
+    animation: art-shadow-in 0.9s var(--ease-out) both, art-shadow 4.2s ease-in-out 0.9s infinite;
   }
-  .art-3d-pop { animation: art-pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+  .art-3d-pop { animation: art-pop var(--dur-slow) var(--ease-out) both; }
 
   @keyframes art-in {
     from { opacity: 0; transform: perspective(700px) translateY(28px) rotateY(-70deg) rotateX(18deg) scale(0.55); }
@@ -137,22 +145,57 @@
   }
 
   /* Question text and answers rise in after the art */
-  .rise-in { animation: rise-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .rise-in { animation: rise-in var(--dur-slow) var(--ease-out) both; }
   @keyframes rise-in {
-    from { opacity: 0; transform: translateY(14px); }
+    from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   /* Recap reel: the current slide's progress bar fills over its time; logos pop in */
   .reel-progress { width: 0; animation: reel-fill linear forwards; }
   @keyframes reel-fill { from { width: 0; } to { width: 100%; } }
-  .reel-pop { animation: reel-pop 0.55s cubic-bezier(0.3, 1.5, 0.5, 1) both; }
+  .reel-pop { animation: reel-pop var(--dur-slow) var(--ease-out) both; }
   @keyframes reel-pop {
     from { opacity: 0; transform: translateY(18px) scale(0.4) rotate(-8deg); }
     to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
   }
 
+  /* The card behind settles forward as the top one leaves (spring.gentle ≈ ease-out over 400 ms) */
+  .stack-settle { transition: transform var(--dur-slow) var(--ease-out), filter var(--dur-slow) var(--ease-out); }
+  /* A new card joins the back of the stack */
+  .card-enter { animation: fade-in var(--dur-base) var(--ease-out) both; }
+  @keyframes fade-in { from { opacity: 0; } }
+
+  /* Like: the heart pops 1 → 1.15 → 1 and a highlight ring spreads from the button */
+  .heart-pop { animation: heart-pop var(--dur-base) var(--ease-out); }
+  @keyframes heart-pop { 40% { transform: scale(1.15); } }
+  .like-ring { animation: like-ring var(--dur-slow) var(--ease-out) forwards; box-shadow: 0 0 0 0 rgb(var(--highlight) / 0.6); }
+  @keyframes like-ring { to { box-shadow: 0 0 0 14px rgb(var(--highlight) / 0); } }
+
+  /* Reduced motion: every change still happens, as a short cross-fade with no movement
+     (docs/phase-0.md, motion storyboard). Delays are kept so content arrives in the same order. */
   @media (prefers-reduced-motion: reduce) {
-    .art-3d, .art-3d-shadow, .art-3d-pop, .rise-in, .reel-pop { animation: none; }
+    .art-3d, .art-3d-shadow, .rise-in, .reel-pop, .card-enter, .animate-fade-in {
+      animation-name: fade-in !important;
+      animation-duration: var(--dur-reduced) !important;
+      animation-iteration-count: 1 !important;
+      animation-timing-function: var(--ease-out) !important;
+    }
+    .art-3d-shadow { opacity: 0.55; }
+    /* Like: color change only */
+    .art-3d-pop, .heart-pop, .like-ring, .animate-bounce, .animate-ping { animation: none !important; }
+    .like-ring { box-shadow: none; }
+    /* Sheets and dialogs (tailwindcss-animate) fade instead of sliding or zooming */
+    .animate-in, .animate-out {
+      --tw-enter-translate-x: 0 !important; --tw-enter-translate-y: 0 !important; --tw-enter-scale: 1 !important; --tw-enter-rotate: 0 !important;
+      --tw-exit-translate-x: 0 !important; --tw-exit-translate-y: 0 !important; --tw-exit-scale: 1 !important; --tw-exit-rotate: 0 !important;
+      animation-duration: var(--dur-reduced) !important;
+    }
+    /* Transitions keep color and opacity changes but drop movement */
+    .transition, .transition-all, .transition-transform {
+      transition-property: color, background-color, border-color, fill, stroke, opacity, box-shadow !important;
+      transition-duration: var(--dur-reduced) !important;
+    }
+    .stack-settle { transition: filter var(--dur-reduced) var(--ease-out); }
   }
 }

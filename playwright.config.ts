@@ -23,6 +23,8 @@ export default defineConfig({
       dependencies: ['setup'],
       use: { ...devices['iPhone 15'], storageState: 'e2e/.auth/test-user.json' },
     },
+    // Swipe performance on a CPU slowed down 4x (WebKit can't throttle). Only the perf spec runs here.
+    { name: 'perf-throttled', testMatch: /motion-perf\.spec\.ts/, use: { ...devices['iPhone 15'], browserName: 'chromium' } },
   ],
   webServer: {
     command: 'npm run dev',

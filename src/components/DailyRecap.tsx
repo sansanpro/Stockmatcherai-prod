@@ -7,6 +7,7 @@ import { causeTone } from '@/components/values/CauseChips';
 import { recapInsights, recapShareText } from '@/lib/recap';
 import { CAUSE_ART, STEP_ART } from '@/lib/art';
 import { track } from '@/lib/analytics';
+import { haptic } from '@/lib/haptics';
 import type { CauseInfo } from '@/lib/matchFeed';
 import type { StockRecommendation } from '@/types/stock-matcher';
 
@@ -55,6 +56,8 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
   }, [at, slide.kind, slides.length]);
 
   const next = () => setAt(i => Math.min(i + 1, slides.length - 1));
+  // A light tap for each new slide (not on the first, which opens with the reel)
+  useEffect(() => { if (at > 0) haptic('light'); }, [at]);
   const prev = () => setAt(i => Math.max(i - 1, 0));
 
   const share = async () => {
@@ -83,7 +86,7 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
       className={`fixed inset-0 z-[95] ${tint} transition-colors duration-500 flex flex-col px-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)]`}
     >
       {/* Warm glow, as in onboarding */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_55%_at_50%_0%,rgba(251,231,220,0.9)_0%,rgba(250,246,239,0)_70%)]" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_55%_at_50%_0%,rgb(var(--primary-tint)/0.9)_0%,rgb(var(--base)/0)_70%)]" aria-hidden />
 
       {/* Progress: one bar per slide; the current one fills over the slide's time */}
       <div className="relative z-20 flex items-center gap-3 h-11 flex-shrink-0">
@@ -137,7 +140,7 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
               Like {slide.index + 1} of {liked.length}
             </p>
             <div className="art-3d">
-              <CompanyLogo src={slide.stock.logoUrl} name={slide.stock.companyName} ticker={slide.stock.ticker} className="w-28 h-28 rounded-3xl shadow-[0_18px_40px_rgba(60,40,20,0.2)]" />
+              <CompanyLogo src={slide.stock.logoUrl} name={slide.stock.companyName} ticker={slide.stock.ticker} className="w-28 h-28 rounded-3xl shadow-[0_18px_40px_rgb(var(--primary-deep)/0.2)]" />
             </div>
             <h2 className="rise-in text-[1.875rem] font-bold text-ink leading-tight tracking-tight mt-8" style={{ animationDelay: '250ms' }}>
               {slide.stock.companyName}

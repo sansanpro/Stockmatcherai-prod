@@ -24,8 +24,8 @@ export function ChoiceList<T extends string>({ options, value, onSelect, name, a
             role="radio"
             aria-checked={selected}
             onClick={() => onSelect(o.id)}
-            style={animated ? { animationDelay: `${260 + i * 70}ms` } : undefined}
-            className={`${animated ? 'rise-in ' : ''}w-full min-h-[56px] px-5 py-3.5 rounded-2xl border text-left text-[1.0625rem] font-medium text-ink shadow-sm transition-all duration-150 flex items-center gap-3 active:scale-[0.98] ${
+            style={animated ? { animationDelay: `${260 + i * 40}ms` } : undefined}
+            className={`${animated ? 'rise-in ' : ''}w-full min-h-[56px] px-5 py-3.5 rounded-2xl border text-left text-[1.0625rem] font-medium text-ink shadow-sm transition-all duration-fast ease-out flex items-center gap-3 motion-safe:active:scale-[0.98] ${
               selected ? 'border-primary bg-clay-tint ring-1 ring-primary' : 'border-line bg-white hover:border-clay-soft'
             }`}
           >
@@ -62,7 +62,7 @@ export function ChipGroup<T extends string>({ options, selected, onToggle, name,
             role={multiple ? 'checkbox' : 'radio'}
             aria-checked={isOn}
             onClick={() => onToggle(o.id)}
-            className={`min-h-[44px] px-4 py-2 rounded-full border text-[0.9375rem] font-medium shadow-sm transition-all duration-150 active:scale-95 ${
+            className={`min-h-[44px] px-4 py-2 rounded-full border text-[0.9375rem] font-medium shadow-sm transition-all duration-fast ease-out motion-safe:active:scale-95 ${
               isOn ? 'border-primary bg-primary text-white' : 'border-line bg-white text-ink-soft hover:border-clay-soft'
             }`}
           >

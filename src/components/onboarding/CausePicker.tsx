@@ -31,13 +31,13 @@ const CausePicker = ({ causes, selected, onChange }: CausePickerProps) => {
             aria-label={`${cause.label}${isOn ? `, pick ${rank}` : ''}`}
             onClick={() => toggle(cause.id)}
             disabled={!isOn && full}
-            className={`w-full min-h-[60px] rounded-2xl border px-3 py-2.5 text-left flex items-center gap-3 shadow-sm transition-all duration-150 active:scale-[0.98] disabled:opacity-40 ${
+            className={`w-full min-h-[60px] rounded-2xl border px-3 py-2.5 text-left flex items-center gap-3 shadow-sm transition-all duration-fast ease-out motion-safe:active:scale-[0.98] disabled:opacity-40 ${
               isOn ? 'border-primary bg-clay-tint ring-1 ring-primary' : 'border-line bg-white hover:border-clay-soft'
             }`}
           >
             {art
               ? <img key={isOn ? 'on' : 'off'} src={art} alt="" aria-hidden draggable={false}
-                  className={`w-9 h-9 flex-shrink-0 drop-shadow-[0_5px_6px_rgba(120,72,40,0.18)] ${isOn ? 'art-3d-pop' : ''}`} />
+                  className={`w-9 h-9 flex-shrink-0 drop-shadow-[0_5px_6px_rgb(var(--primary-deep)/0.18)] ${isOn ? 'art-3d-pop' : ''}`} />
               : <span className="w-9 text-3xl text-center flex-shrink-0" aria-hidden>{cause.icon}</span>}
             <span className="flex-1 min-w-0">
               <span className="block text-ink text-[0.9375rem] font-semibold leading-snug">{cause.label}</span>

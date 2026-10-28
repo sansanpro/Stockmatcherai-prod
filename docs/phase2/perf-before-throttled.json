@@ -1,0 +1,28 @@
+{
+  "measured_on": "Playwright Chromium, iPhone 15 viewport, CPU slowed 4x",
+  "idle": {
+    "frames": 180,
+    "p50": 16.7,
+    "p95": 16.7,
+    "pct_frames_on_time": 100
+  },
+  "frames": 539,
+  "frame_ms": {
+    "p50": 16.7,
+    "p95": 16.7,
+    "p99": 16.8,
+    "max": 33.3
+  },
+  "frames_over_20ms": 1,
+  "pct_frames_on_time": 99.8,
+  "move_to_frame_ms": {
+    "samples": 89,
+    "p50": 16.7,
+    "p95": 17.6,
+    "max": 18.9
+  },
+  "deck_counter": {
+    "before": "7 of 7 matches left today",
+    "after": "7 of 7 matches left today"
+  }
+}
