@@ -1,0 +1,576 @@
+{
+  "_about": "Phase 0 palette directions in OKLCH (L 0-1, C chroma, H hue degrees). Families (primary, semantic, causes, premium, donation) are given as a hue and a deep tone; scripts/palette-check.mjs derives the tint, border and soft tones, maps them into sRGB, and tests them. Light mode only for now (dark mode deprioritized 2026-10-28).",
+  "roles": {
+    "positive": "Proof facts",
+    "info": "Things to know (honest counterpoints)",
+    "caution": "Big swings cautions",
+    "premium": "Premium badges, upgrade screen",
+    "donation": "Optional support ($1.99 tip)"
+  },
+  "directions": {
+    "current": {
+      "name": "Current: cream and burnt orange",
+      "rationale": "What ships today (for comparison only).",
+      "base": [
+        0.976,
+        0.012,
+        80
+      ],
+      "surface": [
+        1,
+        0,
+        0
+      ],
+      "surface2": [
+        0.945,
+        0.018,
+        78
+      ],
+      "border": [
+        0.906,
+        0.022,
+        78
+      ],
+      "text": [
+        0.22,
+        0.012,
+        60
+      ],
+      "text2": [
+        0.45,
+        0.02,
+        60
+      ],
+      "text3": [
+        0.51,
+        0.02,
+        60
+      ],
+      "text4": [
+        0.61,
+        0.02,
+        60
+      ],
+      "primary": {
+        "h": 40,
+        "deep": [
+          0.52,
+          0.15
+        ]
+      },
+      "positive": {
+        "h": 135,
+        "deep": [
+          0.47,
+          0.09
+        ]
+      },
+      "info": {
+        "h": 70,
+        "deep": [
+          0.5,
+          0.1
+        ]
+      },
+      "caution": {
+        "h": 40,
+        "deep": [
+          0.47,
+          0.13
+        ]
+      },
+      "causes": {
+        "beat_cancer": {
+          "h": 5,
+          "deep": [
+            0.48,
+            0.15
+          ]
+        },
+        "live_healthier": {
+          "h": 35,
+          "deep": [
+            0.47,
+            0.14
+          ]
+        },
+        "clean_energy": {
+          "h": 135,
+          "deep": [
+            0.48,
+            0.1
+          ]
+        },
+        "keeping_safe": {
+          "h": 260,
+          "deep": [
+            0.45,
+            0.1
+          ]
+        },
+        "mental_health": {
+          "h": 180,
+          "deep": [
+            0.45,
+            0.07
+          ]
+        },
+        "clean_food": {
+          "h": 85,
+          "deep": [
+            0.47,
+            0.1
+          ]
+        },
+        "clean_water": {
+          "h": 235,
+          "deep": [
+            0.45,
+            0.08
+          ]
+        }
+      },
+      "premium": {
+        "h": 40,
+        "deep": [
+          0.52,
+          0.15
+        ]
+      },
+      "donation": {
+        "h": 40,
+        "deep": [
+          0.52,
+          0.15
+        ]
+      }
+    },
+    "daybreak": {
+      "name": "A. Daybreak: violet sky, coral sun",
+      "rationale": "Hope at the start of something: a dawn palette (violet to coral) that no investing app uses, far from money-green and trading-floor black.",
+      "base": [
+        0.975,
+        0.014,
+        295
+      ],
+      "surface": [
+        1,
+        0,
+        0
+      ],
+      "surface2": [
+        0.948,
+        0.024,
+        295
+      ],
+      "border": [
+        0.905,
+        0.03,
+        295
+      ],
+      "text": [
+        0.23,
+        0.045,
+        285
+      ],
+      "text2": [
+        0.42,
+        0.045,
+        285
+      ],
+      "text3": [
+        0.49,
+        0.04,
+        285
+      ],
+      "text4": [
+        0.52,
+        0.035,
+        285
+      ],
+      "primary": {
+        "h": 288,
+        "deep": [
+          0.49,
+          0.21
+        ]
+      },
+      "highlight": [
+        0.72,
+        0.17,
+        35
+      ],
+      "positive": {
+        "h": 183,
+        "deep": [
+          0.52,
+          0.092
+        ]
+      },
+      "info": {
+        "h": 263,
+        "deep": [
+          0.38,
+          0.13
+        ]
+      },
+      "caution": {
+        "h": 38,
+        "deep": [
+          0.38,
+          0.124
+        ]
+      },
+      "causes": {
+        "beat_cancer": {
+          "h": 350,
+          "deep": [
+            0.4,
+            0.166
+          ]
+        },
+        "live_healthier": {
+          "h": 13,
+          "deep": [
+            0.54,
+            0.18
+          ]
+        },
+        "clean_energy": {
+          "h": 97,
+          "deep": [
+            0.4,
+            0.082
+          ]
+        },
+        "keeping_safe": {
+          "h": 280,
+          "deep": [
+            0.48,
+            0.17
+          ]
+        },
+        "mental_health": {
+          "h": 189,
+          "deep": [
+            0.52,
+            0.09
+          ]
+        },
+        "clean_food": {
+          "h": 122,
+          "deep": [
+            0.48,
+            0.116
+          ]
+        },
+        "clean_water": {
+          "h": 246,
+          "deep": [
+            0.38,
+            0.096
+          ]
+        }
+      },
+      "premium": {
+        "h": 315,
+        "deep": [
+          0.47,
+          0.2
+        ]
+      },
+      "donation": {
+        "h": 15,
+        "deep": [
+          0.55,
+          0.18
+        ]
+      }
+    },
+    "lagoon": {
+      "name": "B. Lagoon: teal water, mango light",
+      "rationale": "Calm and alive: clear teal and warm mango, the colors of healthy water and growing things, so the causes feel like a living world rather than a ticker.",
+      "base": [
+        0.976,
+        0.016,
+        190
+      ],
+      "surface": [
+        1,
+        0,
+        0
+      ],
+      "surface2": [
+        0.948,
+        0.026,
+        190
+      ],
+      "border": [
+        0.905,
+        0.032,
+        190
+      ],
+      "text": [
+        0.24,
+        0.035,
+        215
+      ],
+      "text2": [
+        0.42,
+        0.04,
+        215
+      ],
+      "text3": [
+        0.49,
+        0.035,
+        215
+      ],
+      "text4": [
+        0.52,
+        0.03,
+        215
+      ],
+      "primary": {
+        "h": 192,
+        "deep": [
+          0.49,
+          0.1
+        ]
+      },
+      "highlight": [
+        0.82,
+        0.16,
+        75
+      ],
+      "positive": {
+        "h": 168,
+        "deep": [
+          0.52,
+          0.104
+        ]
+      },
+      "info": {
+        "h": 283,
+        "deep": [
+          0.4,
+          0.15
+        ]
+      },
+      "caution": {
+        "h": 63,
+        "deep": [
+          0.38,
+          0.086
+        ]
+      },
+      "causes": {
+        "beat_cancer": {
+          "h": 349,
+          "deep": [
+            0.38,
+            0.158
+          ]
+        },
+        "live_healthier": {
+          "h": 10,
+          "deep": [
+            0.54,
+            0.17
+          ]
+        },
+        "clean_energy": {
+          "h": 92,
+          "deep": [
+            0.48,
+            0.098
+          ]
+        },
+        "keeping_safe": {
+          "h": 256,
+          "deep": [
+            0.4,
+            0.136
+          ]
+        },
+        "mental_health": {
+          "h": 293,
+          "deep": [
+            0.52,
+            0.15
+          ]
+        },
+        "clean_food": {
+          "h": 117,
+          "deep": [
+            0.38,
+            0.086
+          ]
+        },
+        "clean_water": {
+          "h": 214,
+          "deep": [
+            0.52,
+            0.09
+          ]
+        }
+      },
+      "premium": {
+        "h": 285,
+        "deep": [
+          0.44,
+          0.19
+        ]
+      },
+      "donation": {
+        "h": 10,
+        "deep": [
+          0.55,
+          0.18
+        ]
+      }
+    },
+    "spark": {
+      "name": "C. Spark: electric blue, sunshine pop",
+      "rationale": "Confident energy: a bright, playful blue with sunshine and candy accents, like a learning game, built to make a nervous beginner smile.",
+      "base": [
+        0.984,
+        0.009,
+        255
+      ],
+      "surface": [
+        1,
+        0,
+        0
+      ],
+      "surface2": [
+        0.955,
+        0.02,
+        255
+      ],
+      "border": [
+        0.91,
+        0.028,
+        255
+      ],
+      "text": [
+        0.21,
+        0.045,
+        265
+      ],
+      "text2": [
+        0.42,
+        0.045,
+        265
+      ],
+      "text3": [
+        0.49,
+        0.04,
+        265
+      ],
+      "text4": [
+        0.52,
+        0.035,
+        265
+      ],
+      "primary": {
+        "h": 262,
+        "deep": [
+          0.52,
+          0.22
+        ]
+      },
+      "highlight": [
+        0.87,
+        0.17,
+        95
+      ],
+      "positive": {
+        "h": 173,
+        "deep": [
+          0.52,
+          0.098
+        ]
+      },
+      "info": {
+        "h": 218,
+        "deep": [
+          0.38,
+          0.068
+        ]
+      },
+      "caution": {
+        "h": 30,
+        "deep": [
+          0.4,
+          0.16
+        ]
+      },
+      "causes": {
+        "beat_cancer": {
+          "h": 354,
+          "deep": [
+            0.42,
+            0.172
+          ]
+        },
+        "live_healthier": {
+          "h": 12,
+          "deep": [
+            0.54,
+            0.18
+          ]
+        },
+        "clean_energy": {
+          "h": 84,
+          "deep": [
+            0.4,
+            0.082
+          ]
+        },
+        "keeping_safe": {
+          "h": 287,
+          "deep": [
+            0.38,
+            0.2
+          ]
+        },
+        "mental_health": {
+          "h": 193,
+          "deep": [
+            0.52,
+            0.088
+          ]
+        },
+        "clean_food": {
+          "h": 117,
+          "deep": [
+            0.48,
+            0.11
+          ]
+        },
+        "clean_water": {
+          "h": 242,
+          "deep": [
+            0.42,
+            0.098
+          ]
+        }
+      },
+      "premium": {
+        "h": 300,
+        "deep": [
+          0.47,
+          0.21
+        ]
+      },
+      "donation": {
+        "h": 15,
+        "deep": [
+          0.54,
+          0.19
+        ]
+      }
+    }
+  },
+  "_tuning": "Cause and proof/things-to-know/caution colors tuned 2026-10-28 by a search (hue within 18 degrees of the intended hue, any lightness) that maximizes the smallest color-blind distance while keeping every text pairing at or above 4.6:1."
+}
