@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { openApp } from './helpers';
+import { measureContrast } from './contrast-audit';
 
 // The five screens the design brief compares across palette directions: onboarding, a card,
 // a "Big swings" caution, the recap and the paywall. Runs only when PALETTE_OUT is set:
@@ -7,7 +8,14 @@ import { openApp } from './helpers';
 const out = process.env.PALETTE_OUT;
 test.skip(!out, 'set PALETTE_OUT to capture palette screens');
 
-const shot = (page: Page, name: string) => page.screenshot({ path: `${out}/${name}.png` });
+async function auditContrast(page: Page, name: string) {
+  const { writeFileSync } = await import('node:fs');
+  writeFileSync(`${out}/${name}.contrast.json`, JSON.stringify(await measureContrast(page), null, 2));
+}
+const shot = async (page: Page, name: string) => {
+  await page.screenshot({ path: `${out}/${name}.png` });
+  await auditContrast(page, name);
+};
 const settle = (page: Page) => page.waitForTimeout(1100); // entrance animations
 
 async function signedOut(page: Page, answers?: Record<string, unknown>) {

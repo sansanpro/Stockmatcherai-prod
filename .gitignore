@@ -38,3 +38,7 @@ e2e/screens/
 
 # Intermediate captures from scripts/make-screenshots.mjs
 marketing/raw/
+
+# Design review captures (the comparison sheets are committed, the individual shots are not)
+docs/phase0/screens/*/
+docs/phase1/screens/[0-9]-*.png

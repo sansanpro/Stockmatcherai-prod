@@ -73,7 +73,7 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
     }
   };
 
-  const tint = slide.kind === 'company' ? causeTone(slide.stock.matchedCauses?.[0]?.cause).header : 'bg-cream';
+  const tint = slide.kind === 'company' ? causeTone(slide.stock.matchedCauses?.[0]?.cause).header : 'bg-daybreak';
 
   return (
     <div
@@ -115,10 +115,10 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
         {slide.kind === 'intro' && (
           <>
             <Art3D src={STEP_ART.reveal} size={150} className="mb-7" />
-            <h2 className="rise-in text-[34px] font-bold text-ink leading-[1.1] tracking-tight" style={{ animationDelay: '200ms' }}>
+            <h2 className="rise-in text-[2.125rem] font-bold text-ink leading-[1.1] tracking-tight" style={{ animationDelay: '200ms' }}>
               Your day in values
             </h2>
-            <p className="rise-in text-ink-soft text-[17px] mt-3" style={{ animationDelay: '320ms' }}>
+            <p className="rise-in text-ink-soft text-[1.0625rem] mt-3" style={{ animationDelay: '320ms' }}>
               You liked {liked.length} of {deckSize} {deckSize === 1 ? 'company' : 'companies'} today.
             </p>
             <div className="flex justify-center -space-x-3 mt-8" aria-hidden>
@@ -133,13 +133,13 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
 
         {slide.kind === 'company' && (
           <>
-            <p className="rise-in text-[13px] font-semibold uppercase tracking-wide text-ink-faint mb-6">
+            <p className="rise-in text-[0.8125rem] font-semibold uppercase tracking-wide text-ink-soft mb-6">
               Like {slide.index + 1} of {liked.length}
             </p>
             <div className="art-3d">
               <CompanyLogo src={slide.stock.logoUrl} name={slide.stock.companyName} ticker={slide.stock.ticker} className="w-28 h-28 rounded-3xl shadow-[0_18px_40px_rgba(60,40,20,0.2)]" />
             </div>
-            <h2 className="rise-in text-[30px] font-bold text-ink leading-tight tracking-tight mt-8" style={{ animationDelay: '250ms' }}>
+            <h2 className="rise-in text-[1.875rem] font-bold text-ink leading-tight tracking-tight mt-8" style={{ animationDelay: '250ms' }}>
               {slide.stock.companyName}
             </h2>
             <div className="rise-in flex flex-wrap justify-center gap-1.5 mt-3" style={{ animationDelay: '340ms' }}>
@@ -153,7 +153,7 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
               })}
             </div>
             {(slide.stock.matchedCauses?.[0]?.whyLine || slide.stock.missionStory) && (
-              <p className="rise-in text-ink-soft text-[17px] leading-snug mt-5 max-w-sm" style={{ animationDelay: '440ms' }}>
+              <p className="rise-in text-ink-soft text-[1.0625rem] leading-snug mt-5 max-w-sm" style={{ animationDelay: '440ms' }}>
                 {slide.stock.matchedCauses?.[0]?.whyLine || slide.stock.missionStory}
               </p>
             )}
@@ -162,7 +162,7 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
 
         {slide.kind === 'collage' && (
           <>
-            <h2 className="rise-in text-[28px] font-bold text-ink leading-tight tracking-tight">
+            <h2 className="rise-in text-[1.75rem] font-bold text-ink leading-tight tracking-tight">
               And {slide.stocks.length} more you liked
             </h2>
             <div className="grid grid-cols-3 gap-4 mt-8">
@@ -179,16 +179,16 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
         {slide.kind === 'insight' && (
           <>
             <Art3D src={(insights.topCause && CAUSE_ART[insights.topCause.id]) || STEP_ART.intro} size={120} className="mb-6" />
-            <p className="rise-in text-[13px] font-semibold uppercase tracking-wide text-ink-faint" style={{ animationDelay: '150ms' }}>
+            <p className="rise-in text-[0.8125rem] font-semibold uppercase tracking-wide text-ink-soft" style={{ animationDelay: '150ms' }}>
               What your likes say about you
             </p>
-            <h2 className="rise-in text-[34px] font-bold text-primary leading-[1.1] tracking-tight mt-2" style={{ animationDelay: '260ms' }}>
+            <h2 className="rise-in text-[2.125rem] font-bold text-primary leading-[1.1] tracking-tight mt-2" style={{ animationDelay: '260ms' }}>
               {insights.persona.title}
             </h2>
-            <p className="rise-in text-ink text-[17px] mt-3" style={{ animationDelay: '380ms' }}>{insights.persona.line}</p>
+            <p className="rise-in text-ink text-[1.0625rem] mt-3" style={{ animationDelay: '380ms' }}>{insights.persona.line}</p>
             <ul className="mt-7 space-y-2.5 w-full text-left">
               {insights.facts.map((fact, i) => (
-                <li key={fact} className="rise-in flex gap-3 items-start rounded-2xl bg-white/85 border border-line px-4 py-3 shadow-sm text-[15px] text-ink leading-snug"
+                <li key={fact} className="rise-in flex gap-3 items-start rounded-2xl bg-white/85 border border-line px-4 py-3 shadow-sm text-[0.9375rem] text-ink leading-snug"
                   style={{ animationDelay: `${900 + i * 900}ms` }}>
                   <span className="mt-0.5 w-5 h-5 rounded-full bg-clay-tint text-primary text-xs font-bold flex items-center justify-center flex-shrink-0" aria-hidden>{i + 1}</span>
                   {fact}
@@ -201,21 +201,21 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
         {slide.kind === 'outro' && (
           <>
             <Art3D src={STEP_ART.intro} size={110} className="mb-6" />
-            <h2 className="rise-in text-[30px] font-bold text-ink leading-tight tracking-tight" style={{ animationDelay: '150ms' }}>
+            <h2 className="rise-in text-[1.875rem] font-bold text-ink leading-tight tracking-tight" style={{ animationDelay: '150ms' }}>
               That's your day.
             </h2>
-            <p className="rise-in text-ink-soft text-[17px] mt-3 max-w-xs" style={{ animationDelay: '260ms' }}>
+            <p className="rise-in text-ink-soft text-[1.0625rem] mt-3 max-w-xs" style={{ animationDelay: '260ms' }}>
               New companies arrive tomorrow morning. Your likes are saved in Likes.
             </p>
             <div className="rise-in w-full space-y-3 mt-10" style={{ animationDelay: '380ms' }}>
-              <button onClick={share} className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white text-[17px] font-semibold shadow-lg shadow-[#B54A22]/25 flex items-center justify-center gap-2">
+              <button onClick={share} className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white text-[1.0625rem] font-semibold shadow-lg shadow-brand/25 flex items-center justify-center gap-2">
                 <Share2 className="w-4 h-4" /> Share my day
               </button>
-              <button onClick={onClose} className="w-full h-14 rounded-2xl border border-line bg-white text-ink text-[17px] font-semibold hover:bg-sand">
+              <button onClick={onClose} className="w-full h-14 rounded-2xl border border-line bg-white text-ink text-[1.0625rem] font-semibold hover:bg-sand">
                 Done
               </button>
             </div>
-            <p className="text-ink-faint text-xs mt-6">Educational only, not investment advice.</p>
+            <p className="text-ink-soft text-xs mt-6">Educational only, not investment advice.</p>
           </>
         )}
       </div>

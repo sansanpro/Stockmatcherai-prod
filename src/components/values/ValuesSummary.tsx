@@ -1,48 +1,77 @@
 import { BadgeCheck, Scale } from 'lucide-react';
+import type { ReactNode } from 'react';
 import type { StockRecommendation } from '@/types/stock-matcher';
-import { CautionNote } from '@/components/values/Caution';
+import { CautionNote, CautionStrip } from '@/components/values/Caution';
 
 interface ValuesSummaryProps {
   stock: Pick<StockRecommendation, 'missionStory' | 'proof' | 'proofSourceUrl' | 'thingsToKnow' | 'caution'>;
+  // The swipe card's face: the story, any caution, then proof and things to know side by side,
+  // so both sides are seen together. The full text is one tap away.
+  compact?: boolean;
   className?: string;
 }
 
-// What the company is working on, one checkable fact (with its source), and the honest counterpoints
-const ValuesSummary = ({ stock, className = '' }: ValuesSummaryProps) => {
+// Proof, things to know and cautions share one box design, so the counterpoints are exactly as
+// prominent as the proof (the design brief's rule). Each has its own color, icon and title.
+const TONES = {
+  proof: { box: 'bg-positive-tint border-positive-line', title: 'text-positive', link: 'text-positive' },
+  things: { box: 'bg-info-tint border-info-line', title: 'text-info', link: 'text-info' },
+} as const;
+
+const Box = ({ tone, icon, title, children, clamp }: { tone: keyof typeof TONES; icon: ReactNode; title: string; children: ReactNode; clamp?: boolean }) => (
+  <div className={`rounded-xl border p-3 ${TONES[tone].box}`}>
+    <p className={`text-[0.6875rem] font-semibold uppercase tracking-wide flex items-center gap-1 ${TONES[tone].title}`}>
+      {icon} {title}
+    </p>
+    <div className={`text-sm text-ink mt-1 leading-snug ${clamp ? 'line-clamp-4' : ''}`}>{children}</div>
+  </div>
+);
+
+const ValuesSummary = ({ stock, compact = false, className = '' }: ValuesSummaryProps) => {
   const { missionStory, proof, proofSourceUrl, thingsToKnow = [], caution } = stock;
   if (!missionStory && !proof && thingsToKnow.length === 0 && !caution) return null;
 
+  const proofIcon = <BadgeCheck className="w-3.5 h-3.5" aria-hidden />;
+  const thingsIcon = <Scale className="w-3.5 h-3.5" aria-hidden />;
+  const source = proofSourceUrl && (
+    <a href={proofSourceUrl} target="_blank" rel="noopener noreferrer" className={`font-semibold underline whitespace-nowrap ${TONES.proof.link}`}>
+      Source ↗
+    </a>
+  );
+
+  if (compact) {
+    return (
+      <div className={`space-y-3 ${className}`}>
+        {missionStory && <p className="text-[0.9375rem] leading-snug font-medium text-ink line-clamp-3">{missionStory}</p>}
+        <CautionStrip caution={caution} />
+        {(proof || thingsToKnow.length > 0) && (
+          <div className="grid grid-cols-2 gap-2">
+            {proof ? <Box tone="proof" icon={proofIcon} title="Proof" clamp>{proof}</Box> : <div />}
+            {thingsToKnow.length > 0 ? (
+              <Box tone="things" icon={thingsIcon} title="Things to know" clamp>
+                {thingsToKnow[0]}
+              </Box>
+            ) : <div />}
+          </div>
+        )}
+        {(proof || thingsToKnow.length > 0) && (
+          <p className="text-xs text-ink-soft text-center">Tap the card for the full story, sources and {thingsToKnow.length > 1 ? `all ${thingsToKnow.length} things to know` : 'details'}.</p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={`space-y-3 ${className}`}>
-      {missionStory && (
-        <p className="text-[15px] leading-snug font-medium text-ink">{missionStory}</p>
-      )}
+      {missionStory && <p className="text-[0.9375rem] leading-snug font-medium text-ink">{missionStory}</p>}
       <CautionNote caution={caution} />
-      {proof && (
-        <div className="rounded-xl bg-[#EEF4E6] border border-[#CFE0BC] p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#3B6A2A] flex items-center gap-1">
-            <BadgeCheck className="w-3.5 h-3.5" /> Proof
-          </p>
-          <p className="text-sm text-ink mt-1 leading-snug">
-            {proof}{' '}
-            {proofSourceUrl && (
-              <a href={proofSourceUrl} target="_blank" rel="noopener noreferrer"
-                className="font-semibold text-[#3B6A2A] underline whitespace-nowrap">
-                Source ↗
-              </a>
-            )}
-          </p>
-        </div>
-      )}
+      {proof && <Box tone="proof" icon={proofIcon} title="Proof">{proof}{' '}{source}</Box>}
       {thingsToKnow.length > 0 && (
-        <div className="rounded-xl bg-[#FBF0DC] border border-[#EED9B0] p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#8A5A12] flex items-center gap-1">
-            <Scale className="w-3.5 h-3.5" /> Things to know
-          </p>
-          <ul className="mt-1 space-y-1 text-sm text-ink list-disc pl-4 leading-snug">
+        <Box tone="things" icon={thingsIcon} title="Things to know">
+          <ul className="space-y-1 list-disc pl-4">
             {thingsToKnow.map(t => <li key={t}>{t}</li>)}
           </ul>
-        </div>
+        </Box>
       )}
     </div>
   );

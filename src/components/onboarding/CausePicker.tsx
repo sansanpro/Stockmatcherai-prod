@@ -40,10 +40,10 @@ const CausePicker = ({ causes, selected, onChange }: CausePickerProps) => {
                   className={`w-9 h-9 flex-shrink-0 drop-shadow-[0_5px_6px_rgba(120,72,40,0.18)] ${isOn ? 'art-3d-pop' : ''}`} />
               : <span className="w-9 text-3xl text-center flex-shrink-0" aria-hidden>{cause.icon}</span>}
             <span className="flex-1 min-w-0">
-              <span className="block text-ink text-[15px] font-semibold leading-snug">{cause.label}</span>
+              <span className="block text-ink text-[0.9375rem] font-semibold leading-snug">{cause.label}</span>
               {isOn
-                ? <span className="block text-clay-ink text-[12.5px] font-semibold leading-snug mt-0.5 truncate">{cause.companies} companies match</span>
-                : <span className="block text-ink-faint text-[12.5px] leading-snug mt-0.5 truncate">{cause.tagline}</span>}
+                ? <span className="block text-clay-ink text-[0.78125rem] font-semibold leading-snug mt-0.5 truncate">{cause.companies} companies match</span>
+                : <span className="block text-ink-faint text-[0.78125rem] leading-snug mt-0.5 truncate">{cause.tagline}</span>}
             </span>
             <span className={`w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold transition-colors ${
               isOn ? 'bg-primary text-white' : 'border border-line bg-white'

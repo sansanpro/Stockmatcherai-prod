@@ -28,7 +28,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
           <CompanyLogo src={stock.logoUrl} name={stock.companyName} ticker={stock.ticker} className="w-11 h-11" />
           <div className="min-w-0 flex-1">
             <h3 className="text-lg font-bold leading-tight truncate">{stock.companyName}</h3>
-            <p className="text-sm text-ink-faint truncate">{stock.ticker}{stock.sector ? ` · ${capitalize(stock.sector)}` : ''}</p>
+            <p className="text-sm text-ink-soft truncate">{stock.ticker}{stock.sector ? ` · ${capitalize(stock.sector)}` : ''}</p>
           </div>
           {onViewDetails && (
             <Button
@@ -55,7 +55,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
           )}
           <span>
             Past year{' '}
-            <span className={`font-semibold ${change >= 0 ? 'text-gain' : 'text-loss'}`}>
+            <span className="font-semibold text-foreground">
               {change > 0 ? '+' : ''}{change.toFixed(1)}%
             </span>
           </span>

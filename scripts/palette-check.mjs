@@ -69,7 +69,8 @@ function family({ h, deep: [L, C] }) {
     bright: fit([Math.min(0.72, L + 0.13), C * 1.05, h]),    // graphics, accents
     soft: fit([0.9, Math.min(C * 0.4, 0.08), h]),            // badge fills
     border: fit([0.87, Math.min(C * 0.45, 0.08), h]),
-    tint: fit([0.955, Math.min(C * 0.25, 0.045), h]),         // card headers, boxes
+    tint: fit([0.955, Math.min(C * 0.25, 0.045), h]),         // boxes
+    vivid: fit([0.86, 0.115, h]),                              // bold bands: card headers, celebrations (dark text on top)
   };
 }
 function build(d) {
@@ -104,6 +105,17 @@ for (const [id, d] of Object.entries(directions)) {
     add(`text3 on ${name} tint`, t.text3, f.tint);
     add(`${name} deep on surface`, f.deep, t.surface);
   }
+  // Bolder cause headers: text on the cause's soft fill
+  for (const [name, f] of Object.entries(causes)) {
+    add(`text on ${name} soft`, t.text, f.soft);
+    add(`text on ${name} vivid`, t.text, f.vivid);
+    add(`text2 on ${name} vivid`, t.text2, f.vivid);
+    add(`text2 on ${name} soft`, t.text2, f.soft);
+    add(`${name} ink on surface`, f.ink, t.surface);
+  }
+  add('white on premium', families.premium.deep, t.surface);
+  checks.push({ label: 'white on premium deep', ratio: contrast(white, lin(families.premium.deep)), need: 4.5 });
+  checks.push({ label: 'white on support deep', ratio: contrast(white, lin(families.donation.deep)), need: 4.5 });
   const failing = checks.filter(c => c.ratio < c.need);
 
   // Color blindness: smallest distance in each group that must stay distinct

@@ -1,3 +1,4 @@
+import Disclaimer from '@/components/values/Disclaimer';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -95,7 +96,7 @@ const Auth = () => {
   );
 
   return (
-    <div className="min-h-screen bg-cream bg-[radial-gradient(120%_55%_at_50%_0%,#FBE7DC_0%,rgba(250,246,239,0)_70%)] flex flex-col px-6 pb-8 pt-[env(safe-area-inset-top)]">
+    <div className="min-h-screen bg-daybreak flex flex-col px-6 pb-8 pt-[env(safe-area-inset-top)]">
       <button onClick={() => navigate('/app')} className="flex items-center gap-2 text-ink-soft hover:text-ink transition-colors mt-3 mb-8 min-h-[44px] self-start">
         <ArrowLeft className="w-4 h-4" /> Back
       </button>
@@ -175,6 +176,7 @@ const Auth = () => {
           {' '}and{' '}
           <a href="https://stockmatcherai.com/support" className="text-primary hover:underline">Privacy Policy</a>.
         </p>
+        <Disclaimer className="mt-3" />
       </div>
     </div>
   );

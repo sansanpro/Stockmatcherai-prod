@@ -203,7 +203,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
         
         {profile?.fullTimeEmployees && (
           <div className="bg-white border border-line rounded-xl p-3 text-center">
-            <Users className="w-5 h-5 mx-auto mb-1 text-[#3B6A2A]" />
+            <Users className="w-5 h-5 mx-auto mb-1 text-positive" />
             <p className="text-xs text-ink-faint">Employees</p>
             <p className="font-semibold text-ink text-sm">
               {formatEmployeeCount(profile.fullTimeEmployees)}
@@ -213,7 +213,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
         
         {(profile?.city || profile?.country) && (
           <div className="bg-white border border-line rounded-xl p-3 text-center">
-            <Building2 className="w-5 h-5 mx-auto mb-1 text-[#2C5288]" />
+            <Building2 className="w-5 h-5 mx-auto mb-1 text-info" />
             <p className="text-xs text-ink-faint">Headquarters</p>
             <p className="font-semibold text-ink text-sm truncate">
               {profile.city || profile.state || profile.country || 'N/A'}

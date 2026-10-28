@@ -19,18 +19,19 @@ test('swipe deck loads a values-matched card, story first', async ({ page }) => 
     await page.getByRole('button', { name: 'Pass' }).click();
     await page.waitForTimeout(600);
   }
-  // Card v2 order: values match chips, proof (with its source), things to know, then the numbers
+  // Card face: values match chips, then proof and things to know side by side (equally prominent,
+  // both on screen without scrolling), then the numbers
   const card = page.locator('[class*="cursor-grab"]').first();
   await expect(card.getByText('Values match')).toBeVisible();
   await expect(card.getByText(/· (core business|part of the business)$/).first()).toBeVisible();
-  await expect(card.getByText('Proof', { exact: true })).toBeVisible();
-  await expect(card.getByRole('link', { name: 'Source ↗' })).toHaveAttribute('href', /^https:\/\//);
-  await expect(card.getByText('Things to know')).toBeVisible();
+  await expect(card.getByText('Proof', { exact: true })).toBeInViewport();
+  await expect(card.getByText('Things to know', { exact: true })).toBeInViewport();
   await expect(card.getByText(/(Steadier: a large, established company|Moderate price swings|Bigger price swings)$/)).toBeVisible();
-  const y = async (text: string) => (await card.getByText(text, { exact: true }).first().boundingBox())!.y;
-  expect(await y('Values match')).toBeLessThan(await y('Proof'));
-  expect(await y('Proof')).toBeLessThan(await y('Things to know'));
-  expect(await y('Things to know')).toBeLessThan(await y('The numbers'));
+  const box = async (text: string) => (await card.getByText(text, { exact: true }).first().boundingBox())!;
+  expect((await box('Values match')).y).toBeLessThan((await box('Proof')).y);
+  expect(Math.abs((await box('Proof')).y - (await box('Things to know')).y)).toBeLessThan(4);
+  expect((await box('Proof')).height).toBeCloseTo((await box('Things to know')).height, 0);
+  expect((await box('Things to know')).y).toBeLessThan((await box('The numbers')).y);
   // Profile chips are the user's causes now, not age or sector
   await expect(page.getByText(/^\d+yo$/)).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'View stock details' }).first()).toBeVisible();
@@ -241,8 +242,10 @@ test('details panel shows real returns, real news and no buy/sell ratings', asyn
   await expect(details.getByText(/momentum/i)).toHaveCount(0);
   await expect(details.getByText(/Steadier: a large, established company|Moderate price swings|Bigger price swings/).first()).toBeVisible();
 
-  // Returns tab: real periods from market data, no simulated chart
-  await details.getByRole('tab', { name: /Returns/ }).click();
+  // Proof keeps its source link in the full view
+  await expect(details.getByRole('link', { name: 'Source ↗' }).first()).toHaveAttribute('href', /^https:\/\//);
+  // Price history tab: real periods from market data, no simulated chart, no red/green
+  await details.getByRole('tab', { name: /Price history/ }).click();
   await expect(details.getByText('52-Week Range')).toBeVisible();
   await expect(details.getByText(/Simulated/)).toHaveCount(0);
   await expect(details.getByText('1Y', { exact: true })).toBeVisible();
@@ -262,7 +265,7 @@ test('no ESG scores anywhere (they were unsourced placeholder values)', async ({
   await expect(page.getByText(/\bESG\b|sustainability leader/i)).toHaveCount(0);
   await page.getByRole('button', { name: 'View stock details' }).first().click();
   const details = page.getByRole('dialog');
-  for (const tab of [/Overview/, /Metrics/, /Returns/, /News/]) {
+  for (const tab of [/Overview/, /Metrics/, /Price history/, /News/]) {
     await details.getByRole('tab', { name: tab }).click();
     await expect(details.getByText(/\bESG\b/)).toHaveCount(0);
   }

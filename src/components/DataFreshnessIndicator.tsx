@@ -36,13 +36,13 @@ const DataFreshnessIndicator: React.FC<DataFreshnessIndicatorProps> = ({
     const diffInMinutes = Math.floor((now.getTime() - updated.getTime()) / (1000 * 60));
     
     // Fresh: within 30 minutes - enhanced visibility with stronger colors
-    if (diffInMinutes <= 30) return { status: 'fresh', color: 'text-gain', icon: Wifi };
+    if (diffInMinutes <= 30) return { status: 'fresh', color: 'text-positive', icon: Wifi };
     
     // Stale: 30 minutes to 4 hours - more visible yellow
-    if (diffInMinutes <= 240) return { status: 'stale', color: 'text-[#8A5A12]', icon: Clock };
+    if (diffInMinutes <= 240) return { status: 'stale', color: 'text-caution', icon: Clock };
     
     // Very stale: over 4 hours - enhanced red for visibility
-    return { status: 'very-stale', color: 'text-loss', icon: WifiOff };
+    return { status: 'very-stale', color: 'text-caution', icon: WifiOff };
   };
 
   if (!lastUpdated) {

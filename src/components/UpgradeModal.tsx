@@ -182,6 +182,7 @@ const UpgradeModal = ({ isOpen, onClose, reason = 'settings' }: UpgradeModalProp
           </div>
 
           <div className="text-center text-xs text-ink-faint space-y-1">
+            <p className="font-semibold text-ink-soft">Premium adds more learning and exploring. It doesn't pick stocks for you. Educational only, not investment advice.</p>
             <p>Subscription auto-renews monthly at {applePrice} until cancelled.</p>
             <p>Payment will be charged to your Apple ID account at confirmation of purchase.</p>
             <p>Manage or cancel anytime in Settings → Apple ID → Subscriptions.</p>

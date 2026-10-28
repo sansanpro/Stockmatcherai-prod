@@ -1,3 +1,4 @@
+import Disclaimer from '@/components/values/Disclaimer';
 import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/sheet';
 import { capitalize } from '@/lib/utils';
 import CoachMark from '@/components/CoachMark';
@@ -31,10 +32,10 @@ interface StockDetailsModalProps {
 // Hero tint for companies without a cause (e.g. ones liked before values matching)
 const getRiskTint = (risk: string) => {
   switch (risk) {
-    case 'low':    return 'bg-[#E6EFDB]';
-    case 'medium': return 'bg-[#FBF0DC]';
-    case 'high':   return 'bg-[#FBE4E7]';
-    default:       return 'bg-[#F0E8DD]';
+    case 'low':    return 'bg-positive-tint';
+    case 'medium': return 'bg-info-tint';
+    case 'high':   return 'bg-caution-tint';
+    default:       return 'bg-surface-2';
   }
 };
 
@@ -69,6 +70,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
   if (!stock) return null;
 
   const isPositive = stock.oneYearReturn >= 0;
+  const pastYear = `${isPositive ? 'Up' : 'Down'} ${Math.abs(stock.oneYearReturn).toFixed(1)}% past year`;
   const rangeHigh = performance?.fiftyTwoWeekHigh;
   const rangeLow = performance?.fiftyTwoWeekLow;
   const rangePosition = rangeHigh && rangeLow && rangeHigh > rangeLow
@@ -103,19 +105,18 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                 </h2>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <span className="text-ink-soft font-semibold text-base">{stock.ticker}</span>
-                  <span className="text-ink-faint text-sm">·</span>
-                  <span className="text-ink-faint text-sm">{capitalize(stock.sector)}</span>
+                  <span className="text-ink-soft text-sm">·</span>
+                  <span className="text-ink-soft text-sm">{capitalize(stock.sector)}</span>
                 </div>
               </div>
               <div className="flex-shrink-0 text-right">
                 <p className="text-ink text-xl font-bold">${live.price.toFixed(2)}</p>
-                <div className={`flex items-center justify-end gap-1 mt-0.5 text-sm font-semibold ${
-                  isPositive ? 'text-gain' : 'text-loss'
-                }`}>
+                {/* Past moves in neutral ink: no red/green ticker cues on an educational app */}
+                <div className="flex items-center justify-end gap-1 mt-0.5 text-sm font-semibold text-ink-soft">
                   {isPositive
-                    ? <TrendingUp className="w-4 h-4" />
-                    : <TrendingDown className="w-4 h-4" />}
-                  {isPositive ? '+' : ''}{stock.oneYearReturn.toFixed(1)}% past year
+                    ? <TrendingUp className="w-4 h-4" aria-hidden />
+                    : <TrendingDown className="w-4 h-4" aria-hidden />}
+                  {pastYear}
                 </div>
               </div>
             </div>
@@ -145,7 +146,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
               <DollarSign className="w-3 h-3" />Metrics
             </TabsTrigger>
             <TabsTrigger value="performance" className="rounded-lg text-xs data-[state=active]:shadow-sm gap-1">
-              <BarChart3 className="w-3 h-3" />Returns
+              <BarChart3 className="w-3 h-3" />Price history
             </TabsTrigger>
             <TabsTrigger value="news"        className="rounded-lg text-xs data-[state=active]:shadow-sm gap-1">
               <Newspaper className="w-3 h-3" />News
@@ -164,7 +165,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                   <ValuesSummary stock={stock} />
                   {(stock.matchedCauses ?? []).some(c => c.whyLine) && (
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Why it matches you</p>
+                      <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Why it matches you</p>
                       <ul className="space-y-1 text-sm text-ink">
                         {(stock.matchedCauses ?? []).filter(c => c.whyLine).map(c => (
                           <li key={c.cause}><span aria-hidden>{c.icon}</span> {c.whyLine}</li>
@@ -218,7 +219,6 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                 <MetricTile
                   label="Past year"
                   value={`${isPositive ? '+' : ''}${stock.oneYearReturn.toFixed(1)}%`}
-                  valueClass={isPositive ? 'text-gain' : 'text-loss'}
                   hint="Share price change over 12 months"
                 />
                 <MetricTile
@@ -230,7 +230,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
 
             </TabsContent>
 
-            {/* ── Returns ──────────────────────────────────────────────────── */}
+            {/* ── Price history ──────────────────────────────────────────────────── */}
             <TabsContent value="performance" className="mt-0 px-4 pt-4 space-y-4">
               <div className="bg-muted/40 rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-4">
@@ -238,12 +238,8 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                     <p className="text-xs text-muted-foreground">Current Price</p>
                     <p className="text-2xl font-bold">${live.price.toFixed(2)}</p>
                   </div>
-                  <div className={`px-3 py-1.5 rounded-xl text-sm font-semibold ${
-                    isPositive
-                      ? 'bg-[#E6EFDB] text-gain'
-                      : 'bg-[#FBE4E7] text-loss'
-                  }`}>
-                    {isPositive ? '▲' : '▼'} {Math.abs(stock.oneYearReturn).toFixed(1)}% past year
+                  <div className="px-3 py-1.5 rounded-xl text-sm font-semibold bg-surface-2 text-ink-soft">
+                    {pastYear}
                   </div>
                 </div>
 
@@ -275,7 +271,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                         <Tooltip content={<ReturnTooltip />} cursor={{ fill: 'currentColor', fillOpacity: 0.05 }} />
                         <Bar dataKey="percent" radius={[6, 6, 6, 6]} isAnimationActive={false}>
                           {performance.returns.map((r) => (
-                            <Cell key={r.period} fill={r.percent >= 0 ? '#4D7C3A' : '#C2453B'} />
+                            <Cell key={r.period} fill={r.percent >= 0 ? 'rgb(var(--primary-bright))' : 'rgb(var(--text4))'} />
                           ))}
                         </Bar>
                       </BarChart>
@@ -288,7 +284,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
               {rangePosition !== null && (
                 <div className="bg-muted/40 rounded-2xl p-4">
                   <p className="text-sm font-semibold mb-3">52-Week Range</p>
-                  <div className="relative h-2 bg-gradient-to-r from-[#E9A39A] via-[#EED9B0] to-[#9CC08A] rounded-full">
+                  <div className="relative h-2 bg-gradient-to-r from-brand-soft to-brand-bright rounded-full">
                     <div
                       className="absolute -top-1 w-4 h-4 rounded-full bg-background border-2 border-foreground shadow"
                       style={{ left: `calc(${rangePosition}% - 8px)` }}
@@ -339,7 +335,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
                             {item.text && (
                               <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-2">{item.text}</p>
                             )}
-                            <div className="flex gap-2 mt-2 text-[11px] text-muted-foreground">
+                            <div className="flex gap-2 mt-2 text-[0.6875rem] text-muted-foreground">
                               <span>{item.site}</span>
                               <span>·</span>
                               <span>{timeAgo(item.publishedDate)}</span>
@@ -354,6 +350,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
               </div>
 
             </TabsContent>
+            <Disclaimer className="px-4 pt-6" />
           </div>
         </Tabs>
 
@@ -369,7 +366,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
             </Button>
             <Button
               onClick={() => { onMatch(stock); onClose(); }}
-              className="flex-[2] h-12 rounded-xl font-semibold gap-2 bg-primary hover:bg-primary/90 border-0 shadow-lg shadow-[#B54A22]/25"
+              className="flex-[2] h-12 rounded-xl font-semibold gap-2 bg-primary hover:bg-primary/90 border-0 shadow-lg shadow-brand/25"
             >
               <Heart className="w-4 h-4 fill-white" /> Like
             </Button>
@@ -390,7 +387,7 @@ const MetricTile = ({
   <div className="bg-sand/70 rounded-2xl p-4 border border-line">
     <p className="text-xs text-muted-foreground mb-1">{label}</p>
     <p className={`text-2xl font-bold ${valueClass} leading-none mb-1`}>{value}</p>
-    <p className="text-[10px] text-muted-foreground leading-tight">{hint}</p>
+    <p className="text-[0.625rem] text-muted-foreground leading-tight">{hint}</p>
   </div>
 );
 

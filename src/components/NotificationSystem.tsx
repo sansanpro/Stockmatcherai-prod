@@ -65,7 +65,7 @@ const NotificationSystem = () => {
       >
         <Bell className="w-4 h-4" />
         {notifications.length > 0 && (
-          <Badge className="absolute -top-1.5 -right-1.5 w-5 h-5 p-0 flex items-center justify-center bg-red-500 text-[10px]">
+          <Badge className="absolute -top-1.5 -right-1.5 w-5 h-5 p-0 flex items-center justify-center bg-red-500 text-[0.625rem]">
             {notifications.length}
           </Badge>
         )}

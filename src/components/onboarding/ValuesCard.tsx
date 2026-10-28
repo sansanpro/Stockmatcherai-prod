@@ -32,8 +32,8 @@ const ValuesCard = ({ causes }: { causes: CauseInfo[] }) => {
 
   return (
     // Deep orange so white text stays readable (5:1 or better); this card gets shared
-    <div className="rounded-3xl p-5 bg-gradient-to-br from-clay-deep to-clay-ink shadow-xl shadow-[#8A3A18]/25 text-white">
-      <p className="text-xs uppercase tracking-widest text-white/80 font-semibold">My values card</p>
+    <div className="rounded-3xl p-5 bg-gradient-to-br from-clay-deep to-clay-ink shadow-xl shadow-brand-ink/25 text-white">
+      <p className="text-xs uppercase tracking-widest text-white font-semibold">My values card</p>
       <p className="text-xl font-bold mt-2 leading-snug">I invest in what I believe in:</p>
       <div className="flex flex-wrap gap-2 mt-3">
         {causes.map(c => (
@@ -43,7 +43,7 @@ const ValuesCard = ({ causes }: { causes: CauseInfo[] }) => {
         ))}
       </div>
       <div className="flex items-center justify-between mt-5">
-        <span className="text-sm font-bold text-white/90">StockMatcher</span>
+        <span className="text-sm font-bold text-white">StockMatcher</span>
         <button
           type="button"
           onClick={share}

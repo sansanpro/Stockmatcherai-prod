@@ -1,3 +1,4 @@
+import Disclaimer from '@/components/values/Disclaimer';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -254,10 +255,10 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
         </section>
 
         {/* Danger Zone */}
-        <section className="rounded-2xl overflow-hidden border border-[#F0C2C2] bg-[#FDF3F1]">
-          <div className="px-4 py-3 border-b border-[#F0C2C2] flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-loss" />
-            <h2 className="font-semibold text-sm text-loss">Danger Zone</h2>
+        <section className="rounded-2xl overflow-hidden border border-caution-line bg-caution-tint">
+          <div className="px-4 py-3 border-b border-caution-line flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-caution" />
+            <h2 className="font-semibold text-sm text-caution">Danger Zone</h2>
           </div>
           <div className="p-4">
             <p className="text-xs text-ink-faint mb-4">
@@ -266,7 +267,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive"
-                  className="flex items-center gap-2 rounded-xl h-11 bg-white hover:bg-[#FDECEA] text-loss border border-[#F0C2C2]">
+                  className="flex items-center gap-2 rounded-xl h-11 bg-white hover:bg-caution-soft text-caution border border-caution-line">
                   <Trash2 className="w-4 h-4" />
                   Delete Account
                 </Button>
@@ -298,6 +299,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
             </AlertDialog>
           </div>
         </section>
+        <Disclaimer className="pb-6" />
       </div>
 
       <UpgradeModal

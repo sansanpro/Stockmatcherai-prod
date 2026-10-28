@@ -51,7 +51,7 @@ const AppHeader = ({ currentStep, signedIn, onMatchTab, onLikesTab, onOpenSettin
         <Button
           onClick={onMatchTab}
           variant={currentStep === 'matching' ? 'default' : 'ghost'}
-          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matching' ? 'bg-primary text-white shadow-md shadow-[#B54A22]/20' : 'text-ink-soft'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matching' ? 'bg-primary text-white shadow-md shadow-brand/20' : 'text-ink-soft'}`}
         >
           <Heart className="w-4 h-4" />
           Match
@@ -59,7 +59,7 @@ const AppHeader = ({ currentStep, signedIn, onMatchTab, onLikesTab, onOpenSettin
         <Button
           onClick={onLikesTab}
           variant={currentStep === 'matches' ? 'default' : 'ghost'}
-          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matches' ? 'bg-primary text-white shadow-md shadow-[#B54A22]/20' : 'text-ink-soft'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matches' ? 'bg-primary text-white shadow-md shadow-brand/20' : 'text-ink-soft'}`}
         >
           <Heart className="w-4 h-4 fill-current" />
           Likes
@@ -109,12 +109,12 @@ const BottomNavBar = ({ currentStep, onStepChange, watchlistLength }: BottomNavB
               <div className="relative">
                 <Icon className={`w-5 h-5 mb-0.5 ${active && step === 'matches' ? 'fill-current' : ''}`} />
                 {step === 'matches' && watchlistLength > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 bg-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 bg-primary text-white text-[0.5625rem] font-bold rounded-full flex items-center justify-center px-0.5">
                     {watchlistLength > 99 ? '99+' : watchlistLength}
                   </span>
                 )}
               </div>
-              <span className={`text-[10px] font-semibold ${active ? 'text-primary' : ''}`}>{label}</span>
+              <span className={`text-[0.625rem] font-semibold ${active ? 'text-primary' : ''}`}>{label}</span>
             </button>
           );
         })}

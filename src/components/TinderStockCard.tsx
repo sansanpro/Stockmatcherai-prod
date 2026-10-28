@@ -192,13 +192,13 @@ const TinderStockCard = ({
         <CompanyLogo src={stock.logoUrl} name={stock.companyName} ticker={stock.ticker} className={large ? 'w-14 h-14' : 'w-12 h-12'} />
         <div className="flex-1 min-w-0">
           <h2 className={`${large ? 'text-2xl' : 'text-xl'} font-bold leading-tight truncate`}>{stock.companyName}</h2>
-          <p className="text-ink-faint text-sm">{stock.ticker}{stock.sector ? ` · ${capitalize(stock.sector)}` : ''}</p>
+          <p className="text-ink-soft text-sm">{stock.ticker}{stock.sector ? ` · ${capitalize(stock.sector)}` : ''}</p>
         </div>
         {!large && onViewDetails && (
           <button
             onClick={handleViewDetails}
             aria-label="View stock details"
-            className="bg-white/80 hover:bg-white text-ink-soft border border-black/5 w-10 h-10 flex items-center justify-center rounded-full shadow-sm transition-colors flex-shrink-0"
+            className="bg-surface/85 hover:bg-surface text-ink-soft border border-ink/5 w-10 h-10 flex items-center justify-center rounded-full shadow-sm transition-colors flex-shrink-0"
           >
             <Eye className="w-4 h-4" />
           </button>
@@ -222,7 +222,7 @@ const TinderStockCard = ({
     <div className="space-y-3">
       <CautionNote caution={stock.caution} />
       <div className="rounded-xl bg-sand border border-line p-3">
-        <p className="text-[15px] font-semibold leading-snug text-ink">{stock.update!.headline}</p>
+        <p className="text-[0.9375rem] font-semibold leading-snug text-ink">{stock.update!.headline}</p>
         <p className="text-xs text-muted-foreground mt-1">
           {[stock.update!.source, timeAgo(stock.update!.publishedAt)].filter(Boolean).join(' · ')}
         </p>
@@ -234,7 +234,7 @@ const TinderStockCard = ({
       </div>
       {stock.missionStory && (
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Why you liked it</p>
+          <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted-foreground">Why you liked it</p>
           <p className="text-sm text-ink mt-1 leading-snug">{stock.missionStory}</p>
         </div>
       )}
@@ -244,7 +244,7 @@ const TinderStockCard = ({
   // Each matched cause's one-line reason
   const whyLines = !isUpdate && (stock.matchedCauses ?? []).some(c => c.whyLine) && (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Why it matches you</p>
+      <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Why it matches you</p>
       <ul className="space-y-1 text-sm text-ink">
         {(stock.matchedCauses ?? []).filter(c => c.whyLine).map(c => (
           <li key={c.cause}><span aria-hidden>{c.icon}</span> {c.whyLine}</li>
@@ -346,7 +346,7 @@ const TinderStockCard = ({
 
       <Card 
         ref={cardRef}
-className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[min(85vw,800px)] xl:max-w-[min(80vw,900px)] mx-auto shadow-[0_18px_40px_rgba(60,40,20,0.14)] border border-line bg-white overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
+className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[min(85vw,800px)] xl:max-w-[min(80vw,900px)] mx-auto shadow-[0_18px_40px_rgb(var(--primary-deep)/0.16)] border border-line bg-surface overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
           isExiting ? 'animate-scale-out' : 'animate-scale-in'
         } h-full max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh] lg:max-h-[calc(100vh-10rem)] rounded-2xl flex flex-col relative`}
         style={{
@@ -366,7 +366,7 @@ className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[
           {header()}
           <div className="p-4 space-y-4">
             {updateBody}
-            {!isUpdate && <ValuesSummary stock={stock} />}
+            {!isUpdate && <ValuesSummary stock={stock} compact />}
             <KeyNumbers stock={stock} price={live.price} explain={explain} />
             <div className="flex flex-wrap items-center gap-2">
               <DataFreshnessIndicator lastUpdated={live.lastUpdated} variant="inline" className="bg-muted rounded-full px-2.5 py-1 text-xs" />

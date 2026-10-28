@@ -30,8 +30,8 @@ const STEPS: Record<OnboardingMode, Step[]> = {
 const QUESTION_STEPS: Step[] = ['causes', 'dealbreakers', 'risk', 'experience', 'goal'];
 
 // Cream with a warm glow behind the art
-const BACKDROP = 'bg-cream bg-[radial-gradient(120%_55%_at_50%_0%,#FBE7DC_0%,rgba(250,246,239,0)_70%)]';
-const PRIMARY_BUTTON = 'w-full h-14 text-[17px] font-semibold rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-[#B54A22]/25 disabled:opacity-40 disabled:shadow-none flex items-center justify-center gap-2';
+const BACKDROP = 'bg-daybreak';
+const PRIMARY_BUTTON = 'w-full h-14 text-[1.0625rem] font-semibold rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-brand/25 disabled:opacity-40 disabled:shadow-none flex items-center justify-center gap-2';
 
 interface OnboardingFlowProps {
   mode: OnboardingMode;
@@ -145,11 +145,11 @@ const OnboardingFlow = ({ mode, initial, onComplete, onSignIn }: OnboardingFlowP
   const question = (art: string, title: string, subtitle: string | null, answersEl: React.ReactNode, artSize = 120, compact = false) => (
     <div className="text-center">
       <Art3D src={art} size={compact ? 56 : artSize} className={compact ? 'mb-3' : 'mb-5'} />
-      <h1 className={`rise-in ${compact ? 'text-[24px]' : 'text-[28px]'} leading-[1.15] font-bold text-ink tracking-tight`} style={{ animationDelay: '120ms' }}>
+      <h1 className={`rise-in ${compact ? 'text-[1.5rem]' : 'text-[1.75rem]'} leading-[1.15] font-bold text-ink tracking-tight`} style={{ animationDelay: '120ms' }}>
         {title}
       </h1>
       {subtitle && (
-        <p className="rise-in text-ink-faint text-[15px] mt-2" style={{ animationDelay: '190ms' }}>{subtitle}</p>
+        <p className="rise-in text-ink-faint text-[0.9375rem] mt-2" style={{ animationDelay: '190ms' }}>{subtitle}</p>
       )}
       {answersEl && <div className={`${compact ? 'mt-5' : 'mt-7'} text-left`}>{answersEl}</div>}
     </div>
@@ -165,16 +165,16 @@ const OnboardingFlow = ({ mode, initial, onComplete, onSignIn }: OnboardingFlowP
     return (
       <div className={`min-h-[100dvh] ${BACKDROP} flex flex-col items-center justify-center px-6 text-center pb-[max(env(safe-area-inset-bottom),1.5rem)] pt-[env(safe-area-inset-top)]`}>
         <Art3D src={STEP_ART.hook} size={150} className="mb-8" />
-        <h1 className="rise-in text-[32px] font-bold text-ink leading-[1.12] tracking-tight max-w-sm" style={{ animationDelay: '200ms' }}>
-          Your money is already saying something. <span className="text-clay">Let's make it say what you believe.</span>
+        <h1 className="rise-in text-[2rem] font-bold text-ink leading-[1.12] tracking-tight max-w-sm" style={{ animationDelay: '200ms' }}>
+          Your money is already saying something. <span className="text-brand">Let's make it say what you believe.</span>
         </h1>
-        <p className="rise-in text-ink-soft text-[17px] mt-4 max-w-sm" style={{ animationDelay: '300ms' }}>
+        <p className="rise-in text-ink-soft text-[1.0625rem] mt-4 max-w-sm" style={{ animationDelay: '300ms' }}>
           Find companies working on the things you care about. 60 seconds. No account needed.
         </p>
         <div className="rise-in w-full max-w-sm space-y-2 mt-10" style={{ animationDelay: '400ms' }}>
           <Button onClick={advance} className={PRIMARY_BUTTON}>Find my matches</Button>
           {onSignIn && (
-            <button onClick={onSignIn} className="w-full min-h-[48px] text-ink-soft hover:text-ink text-[15px] font-medium">
+            <button onClick={onSignIn} className="w-full min-h-[48px] text-ink-soft hover:text-ink text-[0.9375rem] font-medium">
               I already have an account
             </button>
           )}

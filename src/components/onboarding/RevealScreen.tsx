@@ -73,7 +73,7 @@ const RevealScreen = ({ answers, causes, onContinue }: RevealScreenProps) => {
                       key={src}
                       src={src}
                       alt=""
-                      className="w-14 h-14 max-w-none rounded-2xl bg-white object-contain p-1.5 shadow-lg shadow-[#7a4a2a]/15 border border-line absolute transition-all ease-out"
+                      className="w-14 h-14 max-w-none rounded-2xl bg-white object-contain p-1.5 shadow-lg shadow-ink/15 border border-line absolute transition-all ease-out"
                       style={{
                         transitionDuration: '600ms',
                         transitionDelay: `${i * 110}ms`,
@@ -90,7 +90,7 @@ const RevealScreen = ({ answers, causes, onContinue }: RevealScreenProps) => {
             </div>
 
             <div className={`transition-all duration-500 ${phase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-              <h2 className="text-[28px] font-bold text-ink leading-[1.15] tracking-tight text-center">
+              <h2 className="text-[1.75rem] font-bold text-ink leading-[1.15] tracking-tight text-center">
                 {preview && preview.count > 0
                   ? <>We found <span className="text-primary">{shownCount}</span> companies working on {labels}.</>
                   : <>Your matches are ready: companies working on {labels}.</>}
@@ -107,7 +107,7 @@ const RevealScreen = ({ answers, causes, onContinue }: RevealScreenProps) => {
       <div className={`pt-4 transition-opacity duration-500 ${phase >= 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <Button
           onClick={onContinue}
-          className="w-full h-14 text-[17px] font-semibold rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-[#B54A22]/25 flex items-center justify-center gap-2"
+          className="w-full h-14 text-[1.0625rem] font-semibold rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-brand/25 flex items-center justify-center gap-2"
         >
           See my first 7 matches <ArrowRight className="w-4 h-4" />
         </Button>

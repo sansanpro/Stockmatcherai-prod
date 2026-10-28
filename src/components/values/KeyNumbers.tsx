@@ -36,7 +36,7 @@ const Stat = ({ label, value, help, explain, valueClass = '' }: {
       <EducationalTooltip content={help.full} label={`What is ${label}?`} />
     </div>
     <p className={`text-lg font-bold mt-0.5 ${valueClass || 'text-ink'}`}>{value}</p>
-    {explain && <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{help.short}</p>}
+    {explain && <p className="text-[0.6875rem] text-muted-foreground leading-tight mt-0.5">{help.short}</p>}
   </div>
 );
 
@@ -46,11 +46,10 @@ const KeyNumbers = ({ stock, price, explain = false }: KeyNumbersProps) => {
   const risk = RISK_WORDS[stock.riskLevel] ?? RISK_WORDS.medium;
   return (
     <div>
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">The numbers</p>
+      <p className="text-[0.6875rem] font-semibold uppercase tracking-wide text-muted-foreground mb-2">The numbers</p>
       <div className="grid grid-cols-2 gap-2">
         <Stat label="Share price" value={formatPrice(price)} help={HELP.price} explain={explain} />
-        <Stat label="Past year" value={`${change > 0 ? '+' : ''}${change.toFixed(1)}%`} help={HELP.pastYear} explain={explain}
-          valueClass={change >= 0 ? 'text-gain' : 'text-loss'} />
+        <Stat label="Past year" value={`${change > 0 ? '+' : ''}${change.toFixed(1)}%`} help={HELP.pastYear} explain={explain} />
         <Stat label="Market Cap" value={stock.marketCap || '—'} help={HELP.marketCap} explain={explain} />
         <Stat label="P/E Ratio" value={stock.peRatio > 0 ? stock.peRatio.toFixed(1) : '—'} help={HELP.pe} explain={explain} />
         {stock.dividendYield > 0 && (
