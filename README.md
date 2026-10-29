@@ -45,6 +45,7 @@ Dealbreakers you can filter out: tobacco, weapons, fossil fuels, gambling and fa
 - **Values first, not stock tips.** Matching is driven by the causes you pick, not by price momentum.
 - **Every claim is sourced.** Each company's story, proof, things to know and caution cites the pages it was checked against, mostly SEC filings, company releases and established news outlets. A script opens every cited page and flags any number or name it can't find, and those get checked by hand.
 - **Honest about risk.** Every card has counterpoints, and stocks with big swings get a dated, explained caution.
+- **Built for everyone.** Follows the iPhone's text size (up to 1.25×), honors Reduce Motion, keeps every tap target at least 44 points, and is checked with axe-core for screen readers.
 - **Curated, not scraped.** Companies must be listed on a major U.S. exchange, be worth at least $1 billion, not be in the middle of being bought out, and have the cause as a real part of their business. Companies with criminal convictions or settlements that would undercut a cause are left out.
 
 ## Business model
@@ -97,6 +98,7 @@ node scripts/test-feed.mjs       # deck composition rules
 node scripts/test-match-feed.mjs # live feed checks (swipes one of the test account's cards)
 node scripts/check-permissions.mjs # row-level security and API checks
 npm run test:chat                # Ask AI end to end
+REDTEAM_OUT=docs/phase5/sweep.json npx playwright test e2e/redteam.spec.ts --project=iphone  # accessibility and battery sweep of every main screen
 ```
 
 Tests use a test account whose credentials live in the git-ignored `.env.test.local`.

@@ -1,6 +1,6 @@
 import Disclaimer from '@/components/values/Disclaimer';
 import { askAI } from '@/lib/askAI';
-import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, keepOpenForAIAssistant } from '@/components/ui/sheet';
 import { capitalize } from '@/lib/utils';
 import CoachMark from '@/components/CoachMark';
 import CauseChips, { causeTone } from '@/components/values/CauseChips';
@@ -99,11 +99,12 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
           </div>
 
           <div className="relative z-10 px-5 pt-2 pb-5">
-            <div className="flex items-start justify-between gap-3">
+            {/* pr-10 keeps the price clear of the sheet's close button */}
+            <div className="flex items-start justify-between gap-3 pr-10">
               <div className="flex-1 min-w-0">
-                <h2 className="text-2xl font-bold text-ink leading-tight truncate">
+                <SheetTitle className="text-2xl font-bold text-ink leading-tight break-words">
                   {stock.companyName}
-                </h2>
+                </SheetTitle>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <span className="text-ink-soft font-semibold text-base">{stock.ticker}</span>
                   <span className="text-ink-soft text-sm">·</span>
@@ -139,17 +140,17 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
 
         {/* ── Tabs ─────────────────────────────────────────────────────────── */}
         <Tabs defaultValue="overview" className="flex-1 flex flex-col overflow-hidden">
-          <TabsList className="grid grid-cols-4 mx-4 mt-3 mb-1 rounded-xl h-10 flex-shrink-0 bg-sand">
-            <TabsTrigger value="overview"    className="rounded-lg text-xs data-[state=active]:shadow-sm gap-1">
+          <TabsList className="grid grid-cols-4 mx-4 mt-3 mb-1 rounded-xl h-[3.25rem] flex-shrink-0 bg-sand">
+            <TabsTrigger value="overview"    className="rounded-lg text-xs h-full data-[state=active]:shadow-sm gap-1">
               <Building2 className="w-3 h-3" />Overview
             </TabsTrigger>
-            <TabsTrigger value="financials"  className="rounded-lg text-xs data-[state=active]:shadow-sm gap-1">
+            <TabsTrigger value="financials"  className="rounded-lg text-xs h-full data-[state=active]:shadow-sm gap-1">
               <DollarSign className="w-3 h-3" />Metrics
             </TabsTrigger>
-            <TabsTrigger value="performance" className="rounded-lg text-xs data-[state=active]:shadow-sm gap-1">
+            <TabsTrigger value="performance" className="rounded-lg text-xs h-full data-[state=active]:shadow-sm gap-1">
               <BarChart3 className="w-3 h-3" />Price history
             </TabsTrigger>
-            <TabsTrigger value="news"        className="rounded-lg text-xs data-[state=active]:shadow-sm gap-1">
+            <TabsTrigger value="news"        className="rounded-lg text-xs h-full data-[state=active]:shadow-sm gap-1">
               <Newspaper className="w-3 h-3" />News
             </TabsTrigger>
           </TabsList>

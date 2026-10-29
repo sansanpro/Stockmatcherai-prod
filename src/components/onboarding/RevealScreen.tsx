@@ -90,11 +90,11 @@ const RevealScreen = ({ answers, causes, onContinue }: RevealScreenProps) => {
             </div>
 
             <div className={`transition-all duration-500 ${phase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-              <h2 className="text-[1.75rem] font-bold text-ink leading-[1.15] tracking-tight text-center">
+              <h1 className="text-[1.75rem] font-bold text-ink leading-[1.15] tracking-tight text-center">
                 {preview && preview.count > 0
                   ? <>We found <span className="text-primary">{shownCount}</span> companies working on {labels}.</>
                   : <>Your matches are ready: companies working on {labels}.</>}
-              </h2>
+              </h1>
               <p className="text-ink-soft mt-3 text-center">Now your money can say what you believe.</p>
               <div className="mt-6">
                 <ValuesCard causes={causes} />

@@ -399,7 +399,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
         >
           {/* Pulsing attention ring for new users */}
           {!hasOpenedWidget && (
-            <span className="absolute inset-0 rounded-full bg-highlight/40 animate-ping pointer-events-none" />
+            <span className="absolute inset-0 rounded-full bg-highlight/40 animate-ping [animation-iteration-count:3] [animation-fill-mode:forwards] pointer-events-none" />
           )}
           <Sparkles className="h-5 w-5 flex-shrink-0" />
           {!hasOpenedWidget && (
@@ -410,7 +410,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
 
       {/* Chat Widget — full height above nav on mobile, floating card on desktop */}
       {isOpen && (
-        <Card data-ai-assistant className="fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4rem)] bottom-[7.5rem] md:inset-x-auto md:top-auto md:left-auto md:bottom-8 md:right-6 md:w-[400px] md:h-[600px] md:max-h-[calc(100vh-5rem)] shadow-2xl z-[76] flex flex-col">
+        <Card data-ai-assistant role="complementary" aria-label="Ask AI" className="fixed inset-x-3 top-[calc(env(safe-area-inset-top)+4rem)] bottom-[7.5rem] md:inset-x-auto md:top-auto md:left-auto md:bottom-8 md:right-6 md:w-[400px] md:h-[600px] md:max-h-[calc(100vh-5rem)] shadow-2xl z-[76] flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-2">
@@ -437,6 +437,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
                 size="icon"
                 onClick={() => setIsOpen(false)}
                 aria-label="Close Ask AI"
+                className="h-11 w-11"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -470,7 +471,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
                     <button
                       key={prompt}
                       onClick={() => setInputValue(prompt)}
-                      className="w-full text-left text-xs px-3 py-2 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-colors text-muted-foreground hover:text-foreground"
+                      className="w-full min-h-[44px] text-left text-xs px-3 py-2 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-colors text-muted-foreground hover:text-foreground"
                     >
                       {prompt}
                     </button>
@@ -531,7 +532,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
                 track('ai_tutor_mode', { on: !tutorMode });
               }}
               aria-pressed={subscribed ? tutorMode : undefined}
-              className={`mb-2 min-h-[32px] px-3 rounded-full border text-xs font-semibold inline-flex items-center gap-1.5 transition-colors ${
+              className={`tap-target mb-2 min-h-[32px] px-3 rounded-full border text-xs font-semibold inline-flex items-center gap-1.5 transition-colors ${
                 tutorMode && subscribed ? 'bg-premium text-white border-premium' : 'bg-premium-tint text-premium-ink border-premium-line'
               }`}
             >
@@ -543,7 +544,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
               // Out of free questions: say so before they type, not after
               <div role="status" className="rounded-xl bg-premium-tint border border-premium-line p-3 text-sm text-ink">
                 <p><span className="font-semibold">You've used today's {freeQuestions} free questions.</span> Each one frees up 24 hours after you asked it.</p>
-                <button onClick={() => { setUpgradeReason('ai'); setShowUpgradeModal(true); }} className="mt-2 font-semibold text-premium-ink underline min-h-[32px]">
+                <button onClick={() => { setUpgradeReason('ai'); setShowUpgradeModal(true); }} className="mt-1 font-semibold text-premium-ink underline min-h-[44px]">
                   See Premium
                 </button>
               </div>
@@ -559,13 +560,14 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
                   autoComplete="off"
                   autoCapitalize="sentences"
                   spellCheck={false}
-                  className="flex-1 text-base"
+                  className="flex-1 h-11 text-base"
                 />
                 <Button
                   onClick={handleSend}
                   disabled={!inputValue.trim() || isStreaming}
                   aria-label="Send message"
                   size="icon"
+                  className="h-11 w-11"
                 >
                   <Send className="h-4 w-4" />
                 </Button>

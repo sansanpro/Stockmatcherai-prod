@@ -276,11 +276,11 @@ const StockMatcher = ({
             className="absolute top-1 left-1/2 -translate-x-1/2 w-[92%]"
           />
           <TooltipProvider>
-            <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className="deck-causes flex flex-wrap items-center justify-center gap-2">
               {myCauses.map(c => (
                 <Tooltip key={c.id}>
                   <TooltipTrigger asChild>
-                    <button onClick={onEditCauses} className="min-h-[32px] px-3 rounded-full bg-white hover:bg-sand border border-line text-ink text-xs font-semibold shadow-sm transition-colors">
+                    <button onClick={onEditCauses} className="tap-target min-h-[32px] px-3 rounded-full bg-white hover:bg-sand border border-line text-ink text-xs font-semibold shadow-sm transition-colors">
                       <span aria-hidden>{c.icon}</span> {c.label}
                     </button>
                   </TooltipTrigger>
@@ -340,7 +340,7 @@ const StockMatcher = ({
               </Button>
             </div>
             {showSwipeHint && (
-              <p className="text-center text-ink-faint text-xs">← Swipe left to pass · Swipe right to like →</p>
+              <p className="hide-when-text-large text-center text-ink-faint text-xs">← Swipe left to pass · Swipe right to like →</p>
             )}
             <p className="text-center text-ink-faint text-xs mt-2">Educational only, not investment advice.</p>
           </div>

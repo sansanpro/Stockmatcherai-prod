@@ -118,8 +118,8 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-cream/85 backdrop-blur-md border-b border-line px-4 pb-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
         <div className="flex items-center gap-3 max-w-2xl mx-auto">
-          <button onClick={onBack}
-            className="w-9 h-9 rounded-full bg-white border border-line hover:bg-sand flex items-center justify-center transition-colors">
+          <button onClick={onBack} aria-label="Back"
+            className="w-11 h-11 rounded-full bg-white border border-line hover:bg-sand flex items-center justify-center transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <h1 className="text-xl font-bold">Settings</h1>
@@ -164,16 +164,16 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
           </div>
           <div className="p-4 space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs text-ink-faint uppercase tracking-wide">Name</Label>
-              <Input value={fullName} onChange={e => setFullName(e.target.value)}
+              <Label htmlFor="settings-name" className="text-xs text-ink-faint uppercase tracking-wide">Name</Label>
+              <Input id="settings-name" value={fullName} onChange={e => setFullName(e.target.value)}
                 placeholder="Your name"
                 autoCorrect="off"
                 autoComplete="name"
                 className="bg-white border-line text-ink placeholder:text-ink-muted focus:border-primary rounded-xl h-11 text-base" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs text-ink-faint uppercase tracking-wide">Email</Label>
-              <Input value={user?.email || ''} disabled
+              <Label htmlFor="settings-email" className="text-xs text-ink-faint uppercase tracking-wide">Email</Label>
+              <Input id="settings-email" value={user?.email || ''} disabled
                 className="bg-sand border-line text-ink-faint rounded-xl h-11 cursor-not-allowed" />
               <p className="text-xs text-ink-faint">Email cannot be changed</p>
             </div>

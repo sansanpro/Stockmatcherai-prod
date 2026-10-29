@@ -61,9 +61,11 @@ const StockNewsPill = ({ ticker, companyName }: StockNewsPillProps) => {
       {/* Compact News Pill */}
       <button
         onClick={handlePillClick}
+        aria-label={isLoading ? 'Loading news' : undefined}
+        aria-busy={isLoading || undefined}
         onMouseDown={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
-        className="group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
+        className="tap-target group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
           bg-clay-tint hover:bg-clay-soft
                               text-clay-ink           border border-clay-soft           transition-all duration-200 hover:scale-105 active:scale-95
           backdrop-blur-sm shadow-sm hover:shadow-md"

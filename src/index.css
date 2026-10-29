@@ -110,15 +110,16 @@
   }
 }
 
-/* 3D art motion: spins in, then floats and gently tilts; its shadow breathes with it */
+/* 3D art motion: spins in, then floats and gently tilts; its shadow breathes with it. The float stops
+   after 3 loops (about 13 s) on its rest pose, so an idle screen doesn't keep animating (battery). */
 @layer utilities {
   .art-3d {
-    animation: art-in 0.9s var(--ease-out) both, art-float 4.2s ease-in-out 0.9s infinite;
+    animation: art-in 0.9s var(--ease-out) both, art-float 4.2s ease-in-out 0.9s 3;
     transform-style: preserve-3d;
     will-change: transform;
   }
   .art-3d-shadow {
-    animation: art-shadow-in 0.9s var(--ease-out) both, art-shadow 4.2s ease-in-out 0.9s infinite;
+    animation: art-shadow-in 0.9s var(--ease-out) both, art-shadow 4.2s ease-in-out 0.9s 3;
   }
   .art-3d-pop { animation: art-pop var(--dur-slow) var(--ease-out) both; }
 
@@ -175,6 +176,21 @@
   /* Tip thank-you: a soft highlight bloom behind the heart, once */
   .support-bloom { animation: support-bloom 600ms var(--ease-out) forwards; background: radial-gradient(circle, rgb(var(--highlight) / 0.55), rgb(var(--highlight) / 0) 70%); }
   @keyframes support-bloom { from { transform: scale(0.6); opacity: 0; } 40% { opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+
+  /* Large iOS text sizes (lib/textSize.ts): keep the deck's card roomy. The cause chips become one
+     sideways-scrolling row, and the swipe hint (the buttons say the same) steps aside. */
+  .text-large .deck-causes { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; margin: 0 -1rem; padding: 0 1rem 0.25rem; }
+  .text-large .deck-causes > * { flex-shrink: 0; }
+  .text-large .hide-when-text-large { display: none; }
+
+  /* Touch target: grows the tappable area to at least 44 x 44 pt (Apple's minimum) around a smaller
+     control, without changing how it looks. Not for elements that are themselves absolutely positioned. */
+  .tap-target { position: relative; }
+  .tap-target::after {
+    content: ''; position: absolute;
+    top: min(0px, calc((100% - 2.875rem) / 2)); bottom: min(0px, calc((100% - 2.875rem) / 2));
+    left: min(0px, calc((100% - 2.875rem) / 2)); right: min(0px, calc((100% - 2.875rem) / 2));
+  }
 
   /* Cause orbit (CauseOrbit.tsx): a ring tipped back by --orbit-tilt; each logo turns around the
      center and counter-turns so it keeps facing you. Same keyframes for all, phase set by a negative delay. */

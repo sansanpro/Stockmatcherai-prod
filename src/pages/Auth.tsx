@@ -89,14 +89,14 @@ const Auth = () => {
       <Input id={id} name="password" type={showPassword ? 'text' : 'password'} placeholder={placeholder} required minLength={minLength}
         className={`${fieldClass} pr-10`} />
       <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}
-        className="absolute inset-y-0 right-3 flex items-center text-ink-muted hover:text-primary transition-colors">
+        className="absolute inset-y-0 right-0 w-11 flex items-center justify-center text-ink-muted hover:text-primary transition-colors">
         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
       </button>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-daybreak flex flex-col px-6 pb-8 pt-[env(safe-area-inset-top)]">
+    <main className="min-h-screen bg-daybreak flex flex-col px-6 pb-8 pt-[env(safe-area-inset-top)]">
       <button onClick={() => navigate('/app')} className="flex items-center gap-2 text-ink-soft hover:text-ink transition-colors mt-3 mb-8 min-h-[44px] self-start">
         <ArrowLeft className="w-4 h-4" /> Back
       </button>
@@ -104,7 +104,7 @@ const Auth = () => {
       <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
         {view === 'signin' ? (
           <>
-            <h2 className="text-3xl font-bold text-ink mb-2">Welcome back</h2>
+            <h1 className="text-3xl font-bold text-ink mb-2">Welcome back</h1>
             <p className="text-ink-soft mb-8">Sign in to see your matches.</p>
             {appleButton}
             {divider('or sign in with email')}
@@ -141,7 +141,7 @@ const Auth = () => {
           </>
         ) : (
           <>
-            <h2 className="text-3xl font-bold text-ink mb-2">{fromSave ? 'Save your matches' : 'Create your free account'}</h2>
+            <h1 className="text-3xl font-bold text-ink mb-2">{fromSave ? 'Save your matches' : 'Create your free account'}</h1>
             <p className="text-ink-soft mb-8">A free account keeps your likes and causes on any device.</p>
             {appleButton}
             {divider('or use email')}
@@ -178,7 +178,7 @@ const Auth = () => {
         </p>
         <Disclaimer className="mt-3" />
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -14,8 +14,9 @@ interface ValuesSummaryProps {
 // Proof, things to know and cautions share one box design, so the counterpoints are exactly as
 // prominent as the proof (the design brief's rule). Each has its own color, icon and title.
 const TONES = {
-  proof: { box: 'bg-positive-tint border-positive-line', title: 'text-positive', link: 'text-positive' },
-  things: { box: 'bg-info-tint border-info-line', title: 'text-info', link: 'text-info' },
+  // Titles and links use the darkest tone: small text on a tint needs the margin (7:1 and up, not 4.5)
+  proof: { box: 'bg-positive-tint border-positive-line', title: 'text-positive-ink', link: 'text-positive-ink' },
+  things: { box: 'bg-info-tint border-info-line', title: 'text-info-ink', link: 'text-info-ink' },
 } as const;
 
 const Box = ({ tone, icon, title, children, clamp }: { tone: keyof typeof TONES; icon: ReactNode; title: string; children: ReactNode; clamp?: boolean }) => (
@@ -34,7 +35,7 @@ const ValuesSummary = ({ stock, compact = false, className = '' }: ValuesSummary
   const proofIcon = <BadgeCheck className="w-3.5 h-3.5" aria-hidden />;
   const thingsIcon = <Scale className="w-3.5 h-3.5" aria-hidden />;
   const source = proofSourceUrl && (
-    <a href={proofSourceUrl} target="_blank" rel="noopener noreferrer" className={`font-semibold underline whitespace-nowrap ${TONES.proof.link}`}>
+    <a href={proofSourceUrl} target="_blank" rel="noopener noreferrer" className={`tap-target font-semibold underline whitespace-nowrap ${TONES.proof.link}`}>
       Source ↗
     </a>
   );

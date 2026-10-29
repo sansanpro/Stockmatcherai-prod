@@ -10,6 +10,8 @@ test('contrast audit flags faint text and passes readable text', async ({ page }
     <div style="background:#C7CDFE"><span style="color:#5E5E77">light gray on a vivid band</span></div>
     <div style="background:#623CCD"><span style="color:rgba(255,255,255,0.6)">white at 60% on violet</span></div>
     <h1 style="color:#8565FF;font-size:28px;font-weight:700">large bright violet</h1>
+    <div style="background-image:linear-gradient(to right,#623CCD,#4720A1)"><span style="color:#fff">white on a violet gradient</span></div>
+    <div style="background-image:linear-gradient(to right,#623CCD,#DCD9FE)"><span style="color:#fff">white on a gradient that ends pale</span></div>
   </body>`);
   const fails = (await measureContrast(page)).map(f => f.text);
   expect(fails).toContain('faint gray on the base');
@@ -17,4 +19,6 @@ test('contrast audit flags faint text and passes readable text', async ({ page }
   expect(fails).toContain('white at 60% on violet');
   expect(fails).not.toContain('ink on the base');
   expect(fails).not.toContain('large bright violet'); // large text needs 3:1
+  expect(fails).not.toContain('white on a violet gradient');
+  expect(fails).toContain('white on a gradient that ends pale'); // the worst stop counts
 });

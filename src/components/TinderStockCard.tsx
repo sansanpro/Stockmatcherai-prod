@@ -227,7 +227,7 @@ const TinderStockCard = forwardRef<SwipeCardHandle, TinderStockCardProps>(({
           <button
             onClick={handleViewDetails}
             aria-label="View stock details"
-            className="bg-surface/85 hover:bg-surface text-ink-soft border border-ink/5 w-10 h-10 flex items-center justify-center rounded-full shadow-sm transition-colors flex-shrink-0"
+            className="bg-surface/85 hover:bg-surface text-ink-soft border border-ink/5 w-11 h-11 flex items-center justify-center rounded-full shadow-sm transition-colors flex-shrink-0"
           >
             <Eye className="w-4 h-4" />
           </button>
@@ -256,7 +256,7 @@ const TinderStockCard = forwardRef<SwipeCardHandle, TinderStockCardProps>(({
           {[stock.update!.source, timeAgo(stock.update!.publishedAt)].filter(Boolean).join(' · ')}
         </p>
         {stock.update!.url && (
-          <a href={stock.update!.url} target="_blank" rel="noopener noreferrer" className="inline-block mt-2 text-sm font-semibold text-primary underline">
+          <a href={stock.update!.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center min-h-[44px] mt-1 text-sm font-semibold text-primary underline">
             Read it{stock.update!.source ? ` on ${stock.update!.source}` : ''} ↗
           </a>
         )}
@@ -356,7 +356,7 @@ const TinderStockCard = forwardRef<SwipeCardHandle, TinderStockCardProps>(({
         <CardContent className="p-0 flex flex-col h-full overflow-y-auto">
           {/* Story first: who they are and what they work on, then proof, then the numbers */}
           {header()}
-          <div className="p-4 space-y-4">
+          <div className="px-4 pt-4 pb-8 space-y-4">
             {updateBody}
             {!isUpdate && <ValuesSummary stock={stock} compact />}
             <KeyNumbers stock={stock} price={live.price} explain={explain} />
@@ -368,6 +368,8 @@ const TinderStockCard = forwardRef<SwipeCardHandle, TinderStockCardProps>(({
               Tap for the full picture · Swipe right if you'd be proud to own a piece
             </p>
           </div>
+          {/* A fade at the bottom while more of the card is below (at the end it covers only the padding above) */}
+          <div aria-hidden className="sticky bottom-0 h-8 -mt-8 flex-shrink-0 bg-gradient-to-t from-surface to-surface/0 pointer-events-none" />
         </CardContent>
       </Card>
       </div>

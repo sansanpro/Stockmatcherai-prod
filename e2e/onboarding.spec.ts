@@ -38,8 +38,8 @@ test('new user: onboarding, reveal, first matches and the save prompt, all witho
   await expect(page.getByText('What do you want your money to fight for?')).toBeVisible();
   await page.getByRole('button', { name: /^Beat cancer & disease/ }).click();
   await page.getByRole('button', { name: /^Clean energy & climate/ }).click();
-  await expect(page.getByRole('button', { name: 'Beat cancer & disease, pick 1' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Clean energy & climate, pick 2' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Beat cancer & disease ?, pick 1/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Clean energy & climate ?, pick 2/ })).toBeVisible();
   await expect(page.getByText(/\d+ companies match/).first()).toBeVisible();
   await page.waitForTimeout(900); // entrance animations
   await page.screenshot({ path: 'e2e/screens/onboarding-3-causes.png' });
@@ -181,7 +181,7 @@ test('saving from the prompt creates an account that keeps the answers and likes
 
   // The answers are on the account: Settings shows the cause and goal picked before sign-up
   await page.getByRole('button', { name: 'Profile' }).click();
-  await expect(page.getByRole('button', { name: 'Live longer & healthier, pick 1' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Live longer & healthier ?, pick 1/ })).toBeVisible();
   await expect(page.getByRole('radio', { name: 'A little extra income' })).toHaveAttribute('aria-checked', 'true');
 
   // Clean up: delete the throwaway account through the app
@@ -276,3 +276,28 @@ test('finishing the day plays a recap reel of the likes and what they say about 
   await page.getByRole('button', { name: "Replay today's recap" }).click();
   await expect(page.getByRole('dialog', { name: 'Your day in values' })).toBeVisible();
 });
+
+// Phase 5: all 7 causes fit above the Continue button at the size the app runs at on an iPhone 15
+// (393 x 759 once the status bar and home indicator are taken out), with each description in full
+for (const [device, width, height] of [['iPhone 15', 393, 759], ['iPhone 15 Pro Max', 430, 839]] as const) {
+  test(`causes screen: every cause visible without scrolling on ${device}`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await freshInstall(page);
+    await page.goto('/app');
+    await page.getByRole('button', { name: 'Find my matches' }).click();
+    const rows = page.getByRole('group', { name: 'Causes' }).getByRole('button');
+    await expect(rows).toHaveCount(7);
+    await page.waitForTimeout(700);
+    // Each row ends inside the visible part of the scrolling area (which ends above the Continue button)
+    const fits = await rows.evaluateAll(els => els.map(el => {
+      let box: Element | null = el.parentElement;
+      while (box && getComputedStyle(box).overflowY !== 'auto') box = box.parentElement;
+      return el.getBoundingClientRect().bottom <= box!.getBoundingClientRect().bottom;
+    }));
+    expect(fits).toEqual(Array(7).fill(true));
+    // Descriptions wrap rather than being cut off
+    const cut = await rows.evaluateAll(els => els.flatMap(el => [...el.querySelectorAll('span')].filter(s => s.scrollWidth > s.clientWidth + 1).map(s => s.textContent)));
+    expect(cut).toEqual([]);
+    if (device === 'iPhone 15') await page.screenshot({ path: 'e2e/screens/onboarding-causes-fit.png' });
+  });
+}

@@ -1,0 +1,397 @@
+{
+  "onboarding-hook": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [
+      {
+        "name": "Terms of Service",
+        "w": 95,
+        "h": 15
+      },
+      {
+        "name": "Privacy Policy",
+        "w": 78,
+        "h": 15
+      }
+    ],
+    "under24": [
+      {
+        "name": "Terms of Service",
+        "w": 95,
+        "h": 15
+      },
+      {
+        "name": "Privacy Policy",
+        "w": 78,
+        "h": 15
+      }
+    ],
+    "foreverAnimations": [],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "onboarding-causes": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [
+      ", pick 1"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        ", pick 1"
+      ],
+      "offRight": []
+    }
+  },
+  "onboarding-dealbreakers": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "onboarding-risk": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "onboarding-reveal": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "deck-first-run": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [
+      "HA Sustainable Infrastructure Capital",
+      "It reports the carbon emissions its investments av",
+      "Borrows to fund its investments, so higher interes",
+      "Finding and drilling new geothermal sites is costl",
+      "It ended 2025 with a record $43.98 billion of cont",
+      "About a fifth of its 2025 revenue ($5.48 billion o"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        "HA Sustainable Infrastructure Capital",
+        "It reports the carbon emissions its investments av",
+        "Borrows to fund its investments, so higher interes",
+        "Generates electricity from the Earth's heat, a ren",
+        "Founded in 1965, it designs and makes its own geot",
+        "Finding and drilling new geothermal sites is costl",
+        "Quanta Services, Inc.",
+        "Builds, upgrades and repairs power lines, substati",
+        "It ended 2025 with a record $43.98 billion of cont",
+        "About a fifth of its 2025 revenue ($5.48 billion o"
+      ],
+      "offRight": [
+        "SPAN "
+      ]
+    }
+  },
+  "auth": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "recap-intro": {
+    "axe": [
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 2,
+        "examples": [
+          "<p data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"p\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"93\" data-componen",
+          "<h2 data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"h2\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"97\" data-compon"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "recap-insight": {
+    "axe": [
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 2,
+        "examples": [
+          "<p data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"p\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"93\" data-componen",
+          "<h2 data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"h2\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"97\" data-compon"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [
+      "orbit-turn on cause-orbit-item"
+    ],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "recap-outro": {
+    "axe": [
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 2,
+        "examples": [
+          "<p data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"p\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"93\" data-componen",
+          "<h2 data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"h2\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"97\" data-compon"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "deck": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [
+      {
+        "name": "Source ↗",
+        "w": 57,
+        "h": 16
+      },
+      {
+        "name": "Read it on Yahoo ↗",
+        "w": 116,
+        "h": 40
+      }
+    ],
+    "under24": [
+      {
+        "name": "Source ↗",
+        "w": 57,
+        "h": 16
+      }
+    ],
+    "foreverAnimations": [],
+    "clipped": [
+      "About 3,235 organizations used SailPoint as of Jan",
+      "Lost about $270 million in its fiscal year ended J",
+      "Lost about $102 million in 2025 under standard acc"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        "Makes identity security software that controls whi",
+        "About 3,235 organizations used SailPoint as of Jan",
+        "Lost about $270 million in its fiscal year ended J",
+        "Lost about $102 million in 2025 under standard acc"
+      ],
+      "offRight": [
+        "BUTTON 🎗️ Beat cancer & disease",
+        "BUTTON ☀️ Clean energy & climate",
+        "SPAN ☀️"
+      ]
+    }
+  },
+  "details": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [
+      {
+        "name": "Source ↗",
+        "w": 57,
+        "h": 16
+      },
+      {
+        "name": "Read it on Yahoo ↗",
+        "w": 116,
+        "h": 40
+      },
+      {
+        "name": "Source ↗",
+        "w": 62,
+        "h": 17
+      },
+      {
+        "name": "Close",
+        "w": 16,
+        "h": 16
+      }
+    ],
+    "under24": [
+      {
+        "name": "Source ↗",
+        "w": 57,
+        "h": 16
+      },
+      {
+        "name": "Source ↗",
+        "w": 62,
+        "h": 17
+      },
+      {
+        "name": "Close",
+        "w": 16,
+        "h": 16
+      }
+    ],
+    "foreverAnimations": [],
+    "clipped": [
+      "About 3,235 organizations used SailPoint as of Jan",
+      "Lost about $270 million in its fiscal year ended J",
+      "Lost about $102 million in 2025 under standard acc",
+      "Close"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        "Makes identity security software that controls whi",
+        "About 3,235 organizations used SailPoint as of Jan",
+        "Lost about $270 million in its fiscal year ended J",
+        "Lost about $102 million in 2025 under standard acc",
+        "Close"
+      ],
+      "offRight": [
+        "BUTTON 🎗️ Beat cancer & disease",
+        "BUTTON ☀️ Clean energy & climate",
+        "SPAN ☀️",
+        "DIV "
+      ]
+    }
+  },
+  "likes": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [
+      "Crowdstrike Holdings Inc"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        "Clear Secure, Inc.",
+        "YOU · Technology",
+        "Runs CLEAR, which confirms who people are using th",
+        "Crowdstrike Holdings Inc",
+        "CRWD · Technology"
+      ],
+      "offRight": []
+    }
+  },
+  "ask-ai": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [
+      "Crowdstrike Holdings Inc"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        "Clear Secure, Inc.",
+        "YOU · Technology",
+        "Runs CLEAR, which confirms who people are using th",
+        "Crowdstrike Holdings Inc",
+        "CRWD · Technology"
+      ],
+      "offRight": []
+    }
+  },
+  "profile": {
+    "axe": [],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [
+      ", pick 2",
+      ", pick 3"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        ", pick 2"
+      ],
+      "offRight": []
+    }
+  }
+}

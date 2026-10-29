@@ -1,0 +1,1284 @@
+{
+  "onboarding-hook": {
+    "axe": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\">"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 3,
+        "examples": [
+          "<h1 data-lov-id=\"src/components/onboa...\" data-lov-name=\"h1\" data-component-path=\"src/components/onboa...\" data-component-line=\"168\" data-co",
+          "<p data-lov-id=\"src/components/onboa...\" data-lov-name=\"p\" data-component-path=\"src/components/onboa...\" data-component-line=\"171\" data-comp",
+          "<p data-lov-id=\"src/components/onboa...\" data-lov-name=\"p\" data-component-path=\"src/components/onboa...\" data-component-line=\"182\" data-comp"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [
+      {
+        "name": "Terms of Service",
+        "w": 95,
+        "h": 15
+      },
+      {
+        "name": "Privacy Policy",
+        "w": 78,
+        "h": 15
+      }
+    ],
+    "under24": [
+      {
+        "name": "Terms of Service",
+        "w": 95,
+        "h": 15
+      },
+      {
+        "name": "Privacy Policy",
+        "w": 78,
+        "h": 15
+      }
+    ],
+    "foreverAnimations": [
+      "art-float on art-3d select-none pointer-events-none d",
+      "art-shadow on art-3d-shadow rounded-[50%] bg-ink/25 bl"
+    ],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "onboarding-causes": {
+    "axe": [
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "help": "Elements must have their visible text as part of their accessible name",
+        "nodes": 7,
+        "examples": [
+          "<button data-lov-id=\"src/components/onboa...\" data-lov-name=\"button\" data-component-path=\"src/components/onboa...\" data-component-line=\"27\" ",
+          "<button data-lov-id=\"src/components/onboa...\" data-lov-name=\"button\" data-component-path=\"src/components/onboa...\" data-component-line=\"27\" ",
+          "<button data-lov-id=\"src/components/onboa...\" data-lov-name=\"button\" data-component-path=\"src/components/onboa...\" data-component-line=\"27\" "
+        ]
+      },
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 3,
+        "examples": [
+          "<h1 data-lov-id=\"src/components/onboa...\" data-lov-name=\"h1\" data-component-path=\"src/components/onboa...\" data-component-line=\"148\" data-co",
+          "<p data-lov-id=\"src/components/onboa...\" data-lov-name=\"p\" data-component-path=\"src/components/onboa...\" data-component-line=\"152\" data-comp",
+          "<div data-lov-id=\"src/components/onboa...\" data-lov-name=\"div\" data-component-path=\"src/components/onboa...\" data-component-line=\"154\" data-"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [
+      "art-float on art-3d select-none pointer-events-none d",
+      "art-shadow on art-3d-shadow rounded-[50%] bg-ink/25 bl"
+    ],
+    "clipped": [
+      "Cancer care, early detection and vaccines",
+      "Prevention, medical devices and longevity",
+      "Water treatment, testing and infrastructure"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        "Cancer care, early detection and vaccines",
+        "Prevention, medical devices and longevity"
+      ],
+      "offRight": []
+    }
+  },
+  "onboarding-dealbreakers": {
+    "axe": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 3,
+        "examples": [
+          "<h1 data-lov-id=\"src/components/onboa...\" data-lov-name=\"h1\" data-component-path=\"src/components/onboa...\" data-component-line=\"148\" data-co",
+          "<p data-lov-id=\"src/components/onboa...\" data-lov-name=\"p\" data-component-path=\"src/components/onboa...\" data-component-line=\"152\" data-comp",
+          "<div data-lov-id=\"src/components/onboa...\" data-lov-name=\"div\" data-component-path=\"src/components/onboa...\" data-component-line=\"154\" data-"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [
+      "art-float on art-3d select-none pointer-events-none d",
+      "art-shadow on art-3d-shadow rounded-[50%] bg-ink/25 bl"
+    ],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "auth": {
+    "axe": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\">"
+        ]
+      },
+      {
+        "id": "page-has-heading-one",
+        "impact": "moderate",
+        "help": "Page should contain a level-one heading",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\">"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 10,
+        "examples": [
+          "<h2 data-lov-id=\"src/pages/Auth.tsx:1...\" data-lov-name=\"h2\" data-component-path=\"src/pages/Auth.tsx\" data-component-line=\"144\" data-compone",
+          "<p data-lov-id=\"src/pages/Auth.tsx:1...\" data-lov-name=\"p\" data-component-path=\"src/pages/Auth.tsx\" data-component-line=\"145\" data-component",
+          "<div data-lov-id=\"src/pages/Auth.tsx:8...\" data-lov-name=\"div\" data-component-path=\"src/pages/Auth.tsx\" data-component-line=\"80\" data-compon"
+        ]
+      },
+      {
+        "id": "target-size",
+        "impact": "serious",
+        "help": "All touch targets must be 24px large, or leave sufficient space",
+        "nodes": 1,
+        "examples": [
+          "<button data-lov-id=\"src/pages/Auth.tsx:9...\" data-lov-name=\"button\" data-component-path=\"src/pages/Auth.tsx\" data-component-line=\"91\" data-"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [
+      {
+        "name": "Show password",
+        "w": 16,
+        "h": 48
+      }
+    ],
+    "under24": [
+      {
+        "name": "Show password",
+        "w": 16,
+        "h": 48
+      }
+    ],
+    "foreverAnimations": [],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "recap-intro": {
+    "axe": [
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 2,
+        "examples": [
+          "<p data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"p\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"93\" data-componen",
+          "<h2 data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"h2\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"97\" data-compon"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [
+      "art-float on art-3d select-none pointer-events-none d",
+      "art-shadow on art-3d-shadow rounded-[50%] bg-ink/25 bl"
+    ],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "recap-insight": {
+    "axe": [
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 2,
+        "examples": [
+          "<p data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"p\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"93\" data-componen",
+          "<h2 data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"h2\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"97\" data-compon"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [
+      "art-float on art-3d w-full h-full select-none drop-sh",
+      "orbit-turn on cause-orbit-item"
+    ],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "recap-outro": {
+    "axe": [
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 2,
+        "examples": [
+          "<p data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"p\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"93\" data-componen",
+          "<h2 data-lov-id=\"src/lab/OrbitLab.tsx...\" data-lov-name=\"h2\" data-component-path=\"src/lab/OrbitLab.tsx\" data-component-line=\"97\" data-compon"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [
+      "art-float on art-3d select-none pointer-events-none d",
+      "art-shadow on art-3d-shadow rounded-[50%] bg-ink/25 bl"
+    ],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "deck": {
+    "axe": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\">"
+        ]
+      },
+      {
+        "id": "page-has-heading-one",
+        "impact": "moderate",
+        "help": "Page should contain a level-one heading",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\">"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 20,
+        "examples": [
+          "<p data-lov-id=\"src/components/Stock...\" data-lov-name=\"p\" data-component-path=\"src/components/Stock...\" data-component-line=\"292\" data-comp",
+          "<div data-lov-id=\"src/components/value...\" data-lov-name=\"div\" data-component-path=\"src/components/value...\" data-component-line=\"17\" data-c",
+          "<div data-lov-id=\"src/components/Tinde...\" data-lov-name=\"div\" data-component-path=\"src/components/Tinde...\" data-component-line=\"222\" data-"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [
+      {
+        "name": "🛡️ Keeping people safe",
+        "w": 166,
+        "h": 32
+      },
+      {
+        "name": "🎗️ Beat cancer & disease",
+        "w": 177,
+        "h": 32
+      },
+      {
+        "name": "☀️ Clean energy & climate",
+        "w": 182,
+        "h": 32
+      },
+      {
+        "name": "View stock details",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "name": "What is Share price?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Past year?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "How is this decided?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "Source ↗",
+        "w": 57,
+        "h": 16
+      },
+      {
+        "name": "Read it on Yahoo ↗",
+        "w": 116,
+        "h": 18
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      }
+    ],
+    "under24": [
+      {
+        "name": "What is Share price?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Past year?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "How is this decided?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "Source ↗",
+        "w": 57,
+        "h": 16
+      },
+      {
+        "name": "Read it on Yahoo ↗",
+        "w": 116,
+        "h": 18
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      }
+    ],
+    "foreverAnimations": [],
+    "clipped": [
+      "About 3,235 organizations used SailPoint as of Jan",
+      "Lost about $270 million in its fiscal year ended J",
+      "Lost about $102 million in 2025 under standard acc"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        "SailPoint, Inc.",
+        "Makes identity security software that controls whi",
+        "About 3,235 organizations used SailPoint as of Jan",
+        "Lost about $270 million in its fiscal year ended J",
+        "Its network runs in more than 330 cities worldwide",
+        "Lost about $102 million in 2025 under standard acc"
+      ],
+      "offRight": []
+    }
+  },
+  "details": {
+    "axe": [
+      {
+        "id": "aria-dialog-name",
+        "impact": "serious",
+        "help": "ARIA dialog and alertdialog nodes should have an accessible name",
+        "nodes": 1,
+        "examples": [
+          "<div role=\"dialog\" id=\"radix-:r2e:\" aria-describedby=\"radix-:r2g:\" aria-labelledby=\"radix-:r2f:\" data-state=\"open\" data-lov-id=\"src/componen"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 19,
+        "examples": [
+          "<p data-lov-id=\"src/components/Stock...\" data-lov-name=\"p\" data-component-path=\"src/components/Stock...\" data-component-line=\"292\" data-comp",
+          "<div data-lov-id=\"src/components/value...\" data-lov-name=\"div\" data-component-path=\"src/components/value...\" data-component-line=\"17\" data-c",
+          "<div data-lov-id=\"src/components/Tinde...\" data-lov-name=\"div\" data-component-path=\"src/components/Tinde...\" data-component-line=\"222\" data-"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [
+      {
+        "name": "🛡️ Keeping people safe",
+        "w": 166,
+        "h": 32
+      },
+      {
+        "name": "🎗️ Beat cancer & disease",
+        "w": 177,
+        "h": 32
+      },
+      {
+        "name": "☀️ Clean energy & climate",
+        "w": 182,
+        "h": 32
+      },
+      {
+        "name": "View stock details",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "name": "What is Share price?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Past year?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "How is this decided?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "Source ↗",
+        "w": 57,
+        "h": 16
+      },
+      {
+        "name": "Read it on Yahoo ↗",
+        "w": 116,
+        "h": 18
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "Overview",
+        "w": 88,
+        "h": 28
+      },
+      {
+        "name": "Metrics",
+        "w": 88,
+        "h": 28
+      },
+      {
+        "name": "Price history",
+        "w": 88,
+        "h": 28
+      },
+      {
+        "name": "News",
+        "w": 88,
+        "h": 28
+      },
+      {
+        "name": "Source ↗",
+        "w": 62,
+        "h": 17
+      },
+      {
+        "name": "Close",
+        "w": 16,
+        "h": 16
+      }
+    ],
+    "under24": [
+      {
+        "name": "What is Share price?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Past year?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "How is this decided?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "Source ↗",
+        "w": 57,
+        "h": 16
+      },
+      {
+        "name": "Read it on Yahoo ↗",
+        "w": 116,
+        "h": 18
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "Source ↗",
+        "w": 62,
+        "h": 17
+      },
+      {
+        "name": "Close",
+        "w": 16,
+        "h": 16
+      }
+    ],
+    "foreverAnimations": [],
+    "clipped": [
+      "About 3,235 organizations used SailPoint as of Jan",
+      "Lost about $270 million in its fiscal year ended J",
+      "Lost about $102 million in 2025 under standard acc",
+      "Close"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        "SailPoint, Inc.",
+        "Makes identity security software that controls whi",
+        "About 3,235 organizations used SailPoint as of Jan",
+        "Lost about $270 million in its fiscal year ended J",
+        "Its network runs in more than 330 cities worldwide",
+        "Lost about $102 million in 2025 under standard acc",
+        "SailPoint, Inc.",
+        "Close"
+      ],
+      "offRight": [
+        "DIV "
+      ]
+    }
+  },
+  "likes": {
+    "axe": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "page-has-heading-one",
+        "impact": "moderate",
+        "help": "Page should contain a level-one heading",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 53,
+        "examples": [
+          "<div data-lov-id=\"src/components/Matches.tsx:59:8\" data-lov-name=\"div\" data-component-path=\"src/components/Matches.tsx\" data-component-line=",
+          "<div data-lov-id=\"src/components/value...\" data-lov-name=\"div\" data-component-path=\"src/components/value...\" data-component-line=\"17\" data-c",
+          "<div data-lov-id=\"src/components/Stock...\" data-lov-name=\"div\" data-component-path=\"src/components/Stock...\" data-component-line=\"29\" data-c"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [
+      {
+        "name": "View Clear Secure, Inc. details",
+        "w": 91,
+        "h": 36
+      },
+      {
+        "name": "2 updates",
+        "w": 116,
+        "h": 26
+      },
+      {
+        "name": "View Crowdstrike Holdings Inc details",
+        "w": 91,
+        "h": 36
+      }
+    ],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [
+      "Crowdstrike Holdings Inc"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        "Clear Secure, Inc.",
+        "YOU · Technology",
+        "Runs CLEAR, which confirms who people are using th"
+      ],
+      "offRight": []
+    }
+  },
+  "ask-ai": {
+    "axe": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "page-has-heading-one",
+        "impact": "moderate",
+        "help": "Page should contain a level-one heading",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 57,
+        "examples": [
+          "<div data-lov-id=\"src/components/Matches.tsx:59:8\" data-lov-name=\"div\" data-component-path=\"src/components/Matches.tsx\" data-component-line=",
+          "<div data-lov-id=\"src/components/value...\" data-lov-name=\"div\" data-component-path=\"src/components/value...\" data-component-line=\"17\" data-c",
+          "<div data-lov-id=\"src/components/Stock...\" data-lov-name=\"div\" data-component-path=\"src/components/Stock...\" data-component-line=\"29\" data-c"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [
+      {
+        "name": "View Clear Secure, Inc. details",
+        "w": 91,
+        "h": 36
+      },
+      {
+        "name": "2 updates",
+        "w": 116,
+        "h": 26
+      },
+      {
+        "name": "View Crowdstrike Holdings Inc details",
+        "w": 91,
+        "h": 36
+      },
+      {
+        "name": "Close Ask AI",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "name": "How does Clear Secure, Inc. connect to my causes?",
+        "w": 319,
+        "h": 34
+      },
+      {
+        "name": "Explain P/E ratio in simple terms",
+        "w": 319,
+        "h": 34
+      },
+      {
+        "name": "Step by step",
+        "w": 120,
+        "h": 32
+      },
+      {
+        "name": "INPUT",
+        "w": 287,
+        "h": 40
+      },
+      {
+        "name": "Send message",
+        "w": 40,
+        "h": 40
+      }
+    ],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [
+      "Crowdstrike Holdings Inc"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        "Clear Secure, Inc.",
+        "YOU · Technology",
+        "Runs CLEAR, which confirms who people are using th"
+      ],
+      "offRight": []
+    }
+  },
+  "profile": {
+    "axe": [
+      {
+        "id": "button-name",
+        "impact": "critical",
+        "help": "Buttons must have discernible text",
+        "nodes": 1,
+        "examples": [
+          "<button data-lov-id=\"src/components/Setti...\" data-lov-name=\"button\" data-component-path=\"src/components/Setti...\" data-component-line=\"121\""
+        ]
+      },
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "help": "Elements must have their visible text as part of their accessible name",
+        "nodes": 7,
+        "examples": [
+          "<button data-lov-id=\"src/components/onboa...\" data-lov-name=\"button\" data-component-path=\"src/components/onboa...\" data-component-line=\"27\" ",
+          "<button data-lov-id=\"src/components/onboa...\" data-lov-name=\"button\" data-component-path=\"src/components/onboa...\" data-component-line=\"27\" ",
+          "<button data-lov-id=\"src/components/onboa...\" data-lov-name=\"button\" data-component-path=\"src/components/onboa...\" data-component-line=\"27\" "
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "help": "Form elements must have labels",
+        "nodes": 1,
+        "examples": [
+          "<input data-lov-id=\"src/components/Setti...\" data-lov-name=\"Input\" data-component-path=\"src/components/Setti...\" data-component-line=\"176\" d"
+        ]
+      },
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 15,
+        "examples": [
+          "<h1 data-lov-id=\"src/components/Setti...\" data-lov-name=\"h1\" data-component-path=\"src/components/Setti...\" data-component-line=\"125\" data-co",
+          "<span data-lov-id=\"src/components/Setti...\" data-lov-name=\"span\" data-component-path=\"src/components/Setti...\" data-component-line=\"127\" dat",
+          "<h2 data-lov-id=\"src/components/Setti...\" data-lov-name=\"h2\" data-component-path=\"src/components/Setti...\" data-component-line=\"163\" data-co"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [
+      {
+        "name": "BUTTON",
+        "w": 36,
+        "h": 36
+      }
+    ],
+    "under24": [],
+    "foreverAnimations": [],
+    "clipped": [
+      "Prevention, medical devices and longevity"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "onboarding-risk": {
+    "axe": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 3,
+        "examples": [
+          "<h1 data-lov-id=\"src/components/onboa...\" data-lov-name=\"h1\" data-component-path=\"src/components/onboa...\" data-component-line=\"148\" data-co",
+          "<p data-lov-id=\"src/components/onboa...\" data-lov-name=\"p\" data-component-path=\"src/components/onboa...\" data-component-line=\"152\" data-comp",
+          "<div data-lov-id=\"src/components/onboa...\" data-lov-name=\"div\" data-component-path=\"src/components/onboa...\" data-component-line=\"154\" data-"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [
+      "art-float on art-3d select-none pointer-events-none d",
+      "art-shadow on art-3d-shadow rounded-[50%] bg-ink/25 bl"
+    ],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "onboarding-reveal": {
+    "axe": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "page-has-heading-one",
+        "impact": "moderate",
+        "help": "Page should contain a level-one heading",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 7,
+        "examples": [
+          "<h2 data-lov-id=\"src/components/onboa...\" data-lov-name=\"h2\" data-component-path=\"src/components/onboa...\" data-component-line=\"93\" data-com",
+          "<p data-lov-id=\"src/components/onboa...\" data-lov-name=\"p\" data-component-path=\"src/components/onboa...\" data-component-line=\"98\" data-compo",
+          "<p data-lov-id=\"src/components/onboa...\" data-lov-name=\"p\" data-component-path=\"src/components/onboa...\" data-component-line=\"36\" data-compo"
+        ]
+      }
+    ],
+    "contrast": [
+      "My values card (1.08)",
+      "I invest in what I believe in: (1.08)",
+      "Clean energy & climate (1.07)",
+      "StockMatcher (1.08)"
+    ],
+    "smallTargets": [],
+    "under24": [],
+    "foreverAnimations": [
+      "art-float on art-3d select-none pointer-events-none d",
+      "art-shadow on art-3d-shadow rounded-[50%] bg-ink/25 bl"
+    ],
+    "clipped": [],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [],
+      "offRight": []
+    }
+  },
+  "deck-first-run": {
+    "axe": [
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "help": "Document should have one main landmark",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "page-has-heading-one",
+        "impact": "moderate",
+        "help": "Page should contain a level-one heading",
+        "nodes": 1,
+        "examples": [
+          "<html lang=\"en\" style=\"\">"
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "help": "All page content should be contained by landmarks",
+        "nodes": 20,
+        "examples": [
+          "<p data-lov-id=\"src/components/Stock...\" data-lov-name=\"p\" data-component-path=\"src/components/Stock...\" data-component-line=\"292\" data-comp",
+          "<div data-lov-id=\"src/components/value...\" data-lov-name=\"div\" data-component-path=\"src/components/value...\" data-component-line=\"17\" data-c",
+          "<div data-lov-id=\"src/components/Tinde...\" data-lov-name=\"div\" data-component-path=\"src/components/Tinde...\" data-component-line=\"222\" data-"
+        ]
+      }
+    ],
+    "contrast": [],
+    "smallTargets": [
+      {
+        "name": "Got it",
+        "w": 37,
+        "h": 36
+      },
+      {
+        "name": "☀️ Clean energy & climate",
+        "w": 182,
+        "h": 32
+      },
+      {
+        "name": "View stock details",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "name": "What is Share price?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Past year?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 15,
+        "h": 15
+      }
+    ],
+    "under24": [
+      {
+        "name": "What is Share price?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Past year?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 16,
+        "h": 16
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Share price?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Past year?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is Market Cap?",
+        "w": 15,
+        "h": 15
+      },
+      {
+        "name": "What is P/E Ratio?",
+        "w": 15,
+        "h": 15
+      }
+    ],
+    "foreverAnimations": [
+      "ping on absolute inset-0 rounded-full bg-highlig"
+    ],
+    "clipped": [
+      "HA Sustainable Infrastructure Capital",
+      "It reports the carbon emissions its investments av",
+      "Borrows to fund its investments, so higher interes",
+      "Finding and drilling new geothermal sites is costl",
+      "It ended 2025 with a record $43.98 billion of cont",
+      "About a fifth of its 2025 revenue ($5.48 billion o"
+    ],
+    "sidewaysScroll": false,
+    "large": {
+      "sidewaysScroll": false,
+      "clipped": [
+        "HA Sustainable Infrastructure Capital",
+        "Invests in and lends to clean energy and climate p",
+        "It reports the carbon emissions its investments av",
+        "Borrows to fund its investments, so higher interes",
+        "Ormat Technologies",
+        "Generates electricity from the Earth's heat, a ren",
+        "Founded in 1965, it designs and makes its own geot",
+        "Finding and drilling new geothermal sites is costl",
+        "Quanta Services, Inc.",
+        "Builds, upgrades and repairs power lines, substati",
+        "It ended 2025 with a record $43.98 billion of cont",
+        "About a fifth of its 2025 revenue ($5.48 billion o"
+      ],
+      "offRight": [
+        "SPAN "
+      ]
+    }
+  }
+}

@@ -132,7 +132,7 @@ const OnboardingFlow = ({ mode, initial, onComplete, onSignIn }: OnboardingFlowP
         </div>
         <div key={step} className="flex-1 overflow-y-auto -mx-6 px-6">
           <div className="min-h-full max-w-md mx-auto flex flex-col">
-            <div className="my-auto py-6">{content}</div>
+            <div className="my-auto py-4">{content}</div>
           </div>
         </div>
         {footer && <div className="max-w-md w-full mx-auto pt-4 flex-shrink-0">{footer}</div>}
@@ -142,16 +142,17 @@ const OnboardingFlow = ({ mode, initial, onComplete, onSignIn }: OnboardingFlowP
 
   // One question: its 3D art, the question, a short line under it, then the answers
   // compact: smaller art and title, for the screen with the longest list of answers
-  const question = (art: string, title: string, subtitle: string | null, answersEl: React.ReactNode, artSize = 120, compact = false) => (
+  // art null: no art, for the causes list, whose rows carry their own (so all 7 fit on one screen)
+  const question = (art: string | null, title: string, subtitle: string | null, answersEl: React.ReactNode, artSize = 120, compact = false) => (
     <div className="text-center">
-      <Art3D src={art} size={compact ? 56 : artSize} className={compact ? 'mb-3' : 'mb-5'} />
+      {art && <Art3D src={art} size={compact ? 56 : artSize} className={compact ? 'mb-3' : 'mb-5'} />}
       <h1 className={`rise-in ${compact ? 'text-[1.5rem]' : 'text-[1.75rem]'} leading-[1.15] font-bold text-ink tracking-tight`} style={{ animationDelay: '120ms' }}>
         {title}
       </h1>
       {subtitle && (
         <p className="rise-in text-ink-faint text-[0.9375rem] mt-2" style={{ animationDelay: '190ms' }}>{subtitle}</p>
       )}
-      {answersEl && <div className={`${compact ? 'mt-5' : 'mt-7'} text-left`}>{answersEl}</div>}
+      {answersEl && <div className={`${compact ? 'mt-4' : 'mt-7'} text-left`}>{answersEl}</div>}
     </div>
   );
 
@@ -205,7 +206,7 @@ const OnboardingFlow = ({ mode, initial, onComplete, onSignIn }: OnboardingFlowP
   if (step === 'causes') {
     return shell(
       question(
-        STEP_ART.causes,
+        null,
         'What do you want your money to fight for?',
         'Pick up to 3. Your first pick matters most.',
         causes ? (

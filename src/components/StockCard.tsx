@@ -36,7 +36,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
               variant="secondary"
               onClick={() => onViewDetails(stock)}
               aria-label={`View ${stock.companyName} details`}
-              className="flex-shrink-0 gap-1 bg-white/80 hover:bg-white text-ink border border-black/5 shadow-sm h-9 px-3"
+              className="flex-shrink-0 gap-1 bg-white/80 hover:bg-white text-ink border border-black/5 shadow-sm h-11 px-3"
             >
               <Eye className="w-4 h-4" />
               Details

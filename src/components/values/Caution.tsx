@@ -3,7 +3,7 @@ import type { StockCaution } from '@/types/stock-matcher';
 
 // Caution colors (Daybreak tokens): deep on tint 6.2:1+, ink on soft 7.7:1, on white 10:1+.
 // Same box design as Proof and Things to know, so a caution is never less visible than the proof.
-const TONE = { box: 'bg-caution-tint border-caution-line', title: 'text-caution', chip: 'bg-caution-soft border-caution-line text-caution-ink' };
+const TONE = { box: 'bg-caution-tint border-caution-line', title: 'text-caution-ink', chip: 'bg-caution-soft border-caution-line text-caution-ink' };
 
 // Small tag on a card header: this stock swings a lot
 export const CautionChip = ({ caution }: { caution?: StockCaution }) => {
@@ -42,7 +42,7 @@ export const CautionNote = ({ caution }: { caution?: StockCaution }) => {
       <p className="text-sm text-ink mt-1 leading-snug">
         {caution.reason ?? "We haven't confirmed why yet. Moves this big can come from news that's still unfolding."}{' '}
         {caution.sourceUrl && (
-          <a href={caution.sourceUrl} target="_blank" rel="noopener noreferrer" className={`font-semibold underline whitespace-nowrap ${TONE.title}`}>
+          <a href={caution.sourceUrl} target="_blank" rel="noopener noreferrer" className={`tap-target font-semibold underline whitespace-nowrap ${TONE.title}`}>
             Source ↗
           </a>
         )}

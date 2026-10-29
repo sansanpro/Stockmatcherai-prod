@@ -316,13 +316,15 @@ const IndexContent = () => {
 
   if (gate === 'onboarding') {
     return (
-      <OnboardingFlow
-        key={onboardingMode}
-        mode={onboardingMode}
-        initial={onboardingMode === 'new' ? loadAnswers() : answers}
-        onComplete={handleOnboardingComplete}
-        onSignIn={() => navigate('/auth?mode=signin')}
-      />
+      <main>
+        <OnboardingFlow
+          key={onboardingMode}
+          mode={onboardingMode}
+          initial={onboardingMode === 'new' ? loadAnswers() : answers}
+          onComplete={handleOnboardingComplete}
+          onSignIn={() => navigate('/auth?mode=signin')}
+        />
+      </main>
     );
   }
 
@@ -331,11 +333,13 @@ const IndexContent = () => {
   if (currentStep === 'settings') {
     return (
       <ProtectedRoute>
+        <main>
         <Settings
           onBack={() => setCurrentStep('matching')}
           answers={myAnswers}
           onCausesSaved={handleCausesSaved}
         />
+        </main>
       </ProtectedRoute>
     );
   }
@@ -356,6 +360,8 @@ const IndexContent = () => {
         />
       )}
 
+      <main>
+      <h1 className="sr-only">StockMatcherAI</h1>
       {/* Matching tab — hidden but mounted when not active */}
       <div
         aria-hidden={currentStep !== 'matching'}
@@ -384,6 +390,7 @@ const IndexContent = () => {
           </div>
         </div>
       </div>
+      </main>
 
       <StockDetailsModal
         stock={selectedStockForDetails}
