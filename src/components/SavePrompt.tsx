@@ -45,7 +45,7 @@ const SavePrompt = ({ open, likes, onClose, reason = 'save' }: SavePromptProps) 
     <Sheet open={open} onOpenChange={o => { if (!o) { act('dismiss'); onClose(); } }}>
       <SheetContent side="bottom" className="rounded-t-3xl border-line bg-cream text-ink px-6 pt-8 pb-[max(env(safe-area-inset-bottom),1.5rem)]">
         <div className="max-w-md mx-auto">
-          <img src={heart3d} alt="" aria-hidden className="w-14 h-14 mb-3 art-3d-pop drop-shadow-[0_8px_10px_rgb(var(--primary-deep)/0.2)]" />
+          <img src={heart3d} alt="" aria-hidden className="w-14 h-14 mb-3 art-3d-pop drop-shadow-[0_8px_10px_rgb(var(--shadow)/0.2)]" />
           <SheetTitle className="text-2xl font-bold text-ink">
             {reason === 'ai' ? 'Ask AI with a free account' : required ? 'Keep your matches' : 'Save your matches?'}
           </SheetTitle>

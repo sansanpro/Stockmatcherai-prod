@@ -394,7 +394,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
           aria-label="Open Ask AI"
           data-ai-assistant
           className="fixed bottom-[7.5rem] right-4 md:bottom-8 md:right-6 z-[75] flex items-center gap-2 h-14 rounded-full px-4
-            bg-primary hover:bg-primary/90 shadow-[0_10px_26px_rgb(var(--primary-deep)/0.35)]
+            bg-primary hover:bg-clay-ink shadow-[0_10px_26px_rgb(var(--shadow)/0.35)]
             text-white transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none"
         >
           {/* Pulsing attention ring for new users */}

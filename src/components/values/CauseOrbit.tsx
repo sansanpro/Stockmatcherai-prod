@@ -37,7 +37,7 @@ const CauseOrbit = ({ emblem, items, size = 300, className = '' }: CauseOrbitPro
       <div className="cause-orbit-plane">
         <div className="cause-orbit-ring" />
         <div className="cause-orbit-emblem" style={{ width: size * 0.42, height: size * 0.42 }}>
-          <img src={emblem} alt="" draggable={false} className="art-3d w-full h-full select-none drop-shadow-[0_14px_18px_rgb(var(--primary-deep)/0.18)]" />
+          <img src={emblem} alt="" draggable={false} className="art-3d w-full h-full select-none drop-shadow-[0_14px_18px_rgb(var(--shadow)/0.18)]" />
         </div>
         {shown.map((s, i) => (
           <div

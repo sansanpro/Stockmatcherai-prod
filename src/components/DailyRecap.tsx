@@ -94,7 +94,7 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
     }
   };
 
-  const tint = slide.kind === 'company' ? causeTone(slide.stock.matchedCauses?.[0]?.cause).header : 'bg-daybreak';
+  const tint = slide.kind === 'company' ? causeTone(slide.stock.matchedCauses?.[0]?.cause).header : 'bg-cream';
 
   return (
     <div
@@ -158,7 +158,7 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
               Like {slide.index + 1} of {liked.length}
             </p>
             <div className="art-3d">
-              <CompanyLogo src={slide.stock.logoUrl} name={slide.stock.companyName} ticker={slide.stock.ticker} className="w-28 h-28 rounded-3xl shadow-[0_18px_40px_rgb(var(--primary-deep)/0.2)]" />
+              <CompanyLogo src={slide.stock.logoUrl} name={slide.stock.companyName} ticker={slide.stock.ticker} className="w-28 h-28 rounded-3xl shadow-[0_18px_40px_rgb(var(--shadow)/0.2)]" />
             </div>
             <h2 className="rise-in text-[1.875rem] font-bold text-ink leading-tight tracking-tight mt-8" style={{ animationDelay: '250ms' }}>
               {slide.stock.companyName}
@@ -231,7 +231,7 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
               New companies arrive tomorrow morning. Your likes are saved in Likes.
             </p>
             <div className="rise-in w-full space-y-3 mt-10" style={{ animationDelay: '380ms' }}>
-              <button onClick={share} className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white text-[1.0625rem] font-semibold shadow-lg shadow-brand/25 flex items-center justify-center gap-2">
+              <button onClick={share} className="w-full h-14 rounded-2xl bg-primary hover:bg-clay-ink text-white text-[1.0625rem] font-semibold shadow-lg shadow-brand/25 flex items-center justify-center gap-2">
                 <Share2 className="w-4 h-4" /> Share my day
               </button>
               <button onClick={onClose} className="w-full h-14 rounded-2xl border border-line bg-white text-ink text-[1.0625rem] font-semibold hover:bg-sand">

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Button } from '@/components/ui/button';
 import { StockRecommendation } from '@/types/stock-matcher';
-import TinderStockCard, { type SwipeCardHandle } from '@/components/TinderStockCard';
+import TinderStockCard from '@/components/TinderStockCard';
 import UpgradeModal from '@/components/UpgradeModal';
 import CoachMark from '@/components/CoachMark';
 import { useApp } from '@/contexts/AppContext';
@@ -44,15 +45,13 @@ const StockMatcher = ({
   const [likedCards, setLikedCards] = useState<StockRecommendation[]>([]); // companies liked today, in order
   const [showRecap, setShowRecap] = useState(false);
   const [status, setStatus] = useState<Status>('loading');
-  const [likePops, setLikePops] = useState(0); // replays the like button's pop
+  const [animatingCard, setAnimatingCard] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [causeInfo, setCauseInfo] = useState<CauseInfo[]>([]);
   const finishedTracked = useRef(false);
   const handleMatchRef = useRef<() => void>(() => {});
   const handlePassRef = useRef<() => void>(() => {});
-  const topCard = useRef<SwipeCardHandle>(null);
-  const swipedTicker = useRef<string>();
   const loadedCausesVersion = useRef<number>();
 
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
@@ -118,8 +117,8 @@ const StockMatcher = ({
 
   const swipe = (liked: boolean) => {
     const card = cards[0];
-    if (!card || swipedTicker.current === card.ticker) return;
-    swipedTicker.current = card.ticker;
+    if (animatingCard || !card) return;
+    setAnimatingCard(true);
     const position = deckSize - cards.length;
 
     if (signedIn) {
@@ -147,16 +146,17 @@ const StockMatcher = ({
     }
     updateSwipeStats(liked);
 
-    // The card has already flown off screen
-    setCards(prev => prev.slice(1));
+    // Let the card's exit animation play first
+    setTimeout(() => {
+      setCards(prev => prev.slice(1));
+      setAnimatingCard(false);
+    }, 400);
   };
   const handleMatch = () => swipe(true);
   const handlePass = () => swipe(false);
-  // Buttons and the details modal send the top card off the same way a swipe does
-  const advance = (liked: boolean) => (topCard.current ? topCard.current.fling(liked) : swipe(liked));
 
-  useEffect(() => { handleMatchRef.current = () => advance(true); });
-  useEffect(() => { handlePassRef.current = () => advance(false); });
+  useEffect(() => { handleMatchRef.current = handleMatch; });
+  useEffect(() => { handlePassRef.current = handlePass; });
 
   const isFinished = status === 'ready' && deckSize > 0 && cards.length === 0;
   useEffect(() => {
@@ -299,17 +299,15 @@ const StockMatcher = ({
             return (
               <TinderStockCard
                 key={stock.ticker}
-                ref={isActiveCard ? topCard : undefined}
                 stock={stock}
                 onMatch={isActiveCard ? handleMatch : () => {}}
                 onPass={isActiveCard ? handlePass : () => {}}
-                onRelease={(liked) => { if (liked) setLikePops(n => n + 1); }}
                 onViewDetails={isActiveCard && onViewDetails
                   ? (s) => onViewDetails(s, (liked) => liked ? handleMatchRef.current() : handlePassRef.current())
                   : undefined}
                 isVisible
                 zIndex={visibleCards.length - stackIndex}
-                scale={1 - stackIndex * 0.04}
+                scale={1 - stackIndex * 0.05}
                 isHighMatch={isActiveCard && (stock.matchedCauses?.length ?? 0) > 1}
                 isActive={isActiveCard}
                 explain={answers.experience === 'never'}
@@ -323,20 +321,20 @@ const StockMatcher = ({
           <div className="flex-shrink-0 px-4 pb-[max(env(safe-area-inset-bottom),6rem)]">
             <div className="flex justify-center gap-10 mb-2">
               <Button
-                onClick={() => advance(false)}
+                onClick={() => { Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); handlePass(); }}
+                disabled={animatingCard}
                 aria-label="Pass"
-                className="w-16 h-16 rounded-full bg-white hover:bg-white border border-line text-ink-soft shadow-[0_8px_24px_rgb(var(--primary-deep)/0.14)] motion-safe:active:scale-90 transition-transform duration-fast ease-out"
+                className="w-16 h-16 rounded-full bg-white hover:bg-white border border-line text-ink-soft shadow-[0_8px_24px_rgba(60,40,20,0.14)] transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
               >
                 <X className="w-8 h-8" strokeWidth={2.5} />
               </Button>
               <Button
-                onClick={() => advance(true)}
+                onClick={() => { Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {}); handleMatch(); }}
+                disabled={animatingCard}
                 aria-label={currentStock.cardType === 'update' ? 'Interested' : 'Like this company'}
-                className={`relative w-16 h-16 rounded-full bg-primary hover:bg-primary border-0 text-white shadow-[0_10px_26px_rgb(var(--primary-deep)/0.35)] motion-safe:active:scale-90 transition-transform duration-fast ease-out`}
+                className="w-16 h-16 rounded-full bg-primary hover:bg-primary border-0 text-white shadow-[0_10px_26px_rgba(181,74,34,0.35)] transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
               >
-                {/* Keyed so each like replays the pop and the ring, without remounting the button */}
-                {likePops > 0 && <span key={`ring-${likePops}`} aria-hidden className="like-ring absolute inset-0 rounded-full pointer-events-none" />}
-                <Heart key={`heart-${likePops}`} className={`w-8 h-8 fill-current ${likePops ? 'heart-pop' : ''}`} />
+                <Heart className="w-8 h-8 fill-current" />
               </Button>
             </div>
             {showSwipeHint && (

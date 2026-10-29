@@ -118,7 +118,7 @@ const Auth = () => {
                 {passwordField('signin-password', 'Your password')}
               </div>
               <Button type="submit" disabled={isLoading}
-                className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl text-base font-semibold mt-2">
+                className="w-full h-12 bg-primary hover:bg-clay-ink text-white rounded-xl text-base font-semibold mt-2">
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
@@ -159,7 +159,7 @@ const Auth = () => {
                 {passwordField('signup-password', 'Min. 6 characters', 6)}
               </div>
               <Button type="submit" disabled={isLoading}
-                className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl text-base font-semibold mt-2">
+                className="w-full h-12 bg-primary hover:bg-clay-ink text-white rounded-xl text-base font-semibold mt-2">
                 {isLoading ? 'Creating account...' : fromSave ? 'Save my matches' : 'Create account'}
               </Button>
             </form>

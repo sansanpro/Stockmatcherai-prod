@@ -376,7 +376,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
             </Button>
             <Button
               onClick={() => { onMatch(stock); onClose(); }}
-              className="flex-[2] h-12 rounded-xl font-semibold gap-2 bg-primary hover:bg-primary/90 border-0 shadow-lg shadow-brand/25"
+              className="flex-[2] h-12 rounded-xl font-semibold gap-2 bg-primary hover:bg-clay-ink border-0 shadow-lg shadow-brand/25"
             >
               <Heart className="w-4 h-4 fill-white" /> Like
             </Button>

@@ -31,7 +31,7 @@ const QUESTION_STEPS: Step[] = ['causes', 'dealbreakers', 'risk', 'experience', 
 
 // Cream with a warm glow behind the art
 const BACKDROP = 'bg-daybreak';
-const PRIMARY_BUTTON = 'w-full h-14 text-[1.0625rem] font-semibold rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-brand/25 disabled:opacity-40 disabled:shadow-none flex items-center justify-center gap-2';
+const PRIMARY_BUTTON = 'w-full h-14 text-[1.0625rem] font-semibold rounded-2xl bg-primary hover:bg-clay-ink text-white shadow-lg shadow-brand/25 disabled:opacity-40 disabled:shadow-none flex items-center justify-center gap-2';
 
 interface OnboardingFlowProps {
   mode: OnboardingMode;

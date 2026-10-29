@@ -43,11 +43,11 @@ async function audit(page: Page, name: string) {
     return { targets, forever: [...new Set(forever)], clipped, offRight, sidewaysScroll: document.documentElement.scrollWidth > innerWidth };
   });
   const normal = await scan();
-  await page.screenshot({ path: `docs/phase5/screens/${name}.png` });
+  await page.screenshot({ path: `${process.env.REDTEAM_SCREENS ?? 'docs/phase5/screens'}/${name}.png` });
   await page.evaluate((size) => { document.documentElement.style.fontSize = size; document.documentElement.classList.add('text-large'); }, LARGE_ROOT);
   await page.waitForTimeout(400);
   const large = await scan();
-  await page.screenshot({ path: `docs/phase5/screens/${name}-large.png` });
+  await page.screenshot({ path: `${process.env.REDTEAM_SCREENS ?? 'docs/phase5/screens'}/${name}-large.png` });
   await page.evaluate(() => { document.documentElement.style.fontSize = ''; document.documentElement.classList.remove('text-large'); });
   results[name] = {
     axe: axe.violations.map(v => ({ id: v.id, impact: v.impact, help: v.help, nodes: v.nodes.length, examples: v.nodes.slice(0, 3).map(n => n.html.slice(0, 140)) })),

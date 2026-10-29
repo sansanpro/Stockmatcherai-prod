@@ -36,7 +36,7 @@ const CausePicker = ({ causes, selected, onChange }: CausePickerProps) => {
           >
             {art
               ? <img key={isOn ? 'on' : 'off'} src={art} alt="" aria-hidden draggable={false}
-                  className={`w-8 h-8 flex-shrink-0 drop-shadow-[0_5px_6px_rgb(var(--primary-deep)/0.18)] ${isOn ? 'art-3d-pop' : ''}`} />
+                  className={`w-8 h-8 flex-shrink-0 drop-shadow-[0_5px_6px_rgb(var(--shadow)/0.18)] ${isOn ? 'art-3d-pop' : ''}`} />
               : <span className="w-8 text-2xl text-center flex-shrink-0" aria-hidden>{cause.icon}</span>}
             <span className="flex-1 min-w-0">
               <span className="block text-ink text-[0.9375rem] font-semibold leading-snug">{cause.label}{isOn && <span className="sr-only">, pick {rank}</span>}</span>

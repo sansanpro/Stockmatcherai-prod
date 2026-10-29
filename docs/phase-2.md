@@ -1,5 +1,7 @@
 # Phase 2: motion system
 
+> **Reverted 2026-10-28 (owner):** the new swipe (pointer events, springs, fling, like pop and ring) was rolled back; `TinderStockCard.tsx` and `StockMatcher.tsx` are the original swipe again (touch and mouse events), with only later accessibility fixes re-applied. Its tests were removed from `e2e/motion.spec.ts`. The shared motion values, haptics helper and reduced-motion CSS remain.
+
 Built from the storyboard in `docs/phase-0.md` (section 5). Measured in Playwright only, as the owner decided (no real device yet).
 
 ## What changed

@@ -220,7 +220,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
               </div>
             </div>
             <Button onClick={handleValuesSave} disabled={loading || !changed || values.causes.length === 0}
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold flex items-center justify-center gap-2">
+              className="w-full h-12 bg-primary hover:bg-clay-ink text-white rounded-xl font-semibold flex items-center justify-center gap-2">
               <Save className="w-4 h-4" />
               {loading ? 'Saving...' : 'Save Changes'}
             </Button>

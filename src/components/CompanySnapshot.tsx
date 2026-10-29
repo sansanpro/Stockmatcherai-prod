@@ -229,7 +229,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
           target="_blank" 
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors mb-4"
+          className="inline-flex items-center gap-2 bg-primary hover:bg-clay-ink text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors mb-4"
         >
           <Globe className="w-4 h-4" />
           Visit Website

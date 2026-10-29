@@ -44,7 +44,7 @@ const Support = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             <a
               href="mailto:support@stockmatcherai.com"
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground px-6 py-3 text-sm font-medium min-h-[44px] hover:bg-primary/90 transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground px-6 py-3 text-sm font-medium min-h-[44px] hover:bg-clay-ink transition-colors"
             >
               <Mail className="h-4 w-4" />
               Email Support

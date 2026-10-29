@@ -37,7 +37,7 @@ const ValuesCard = ({ causes }: { causes: CauseInfo[] }) => {
       <p className="text-xl font-bold mt-2 leading-snug">I invest in what I believe in:</p>
       <div className="flex flex-wrap gap-2 mt-3">
         {causes.map(c => (
-          <span key={c.id} className="px-3 py-1.5 rounded-full bg-white/15 border border-white/25 text-sm font-semibold">
+          <span key={c.id} className="px-3 py-1.5 rounded-full bg-black/10 border border-white/25 text-sm font-semibold">
             <span aria-hidden>{c.icon}</span> {c.label}
           </span>
         ))}

@@ -95,7 +95,7 @@ const BottomNavBar = ({ currentStep, onStepChange, watchlistLength }: BottomNavB
       className="fixed bottom-0 left-0 w-full z-50 pb-safe-area-inset-bottom"
       style={{ fontFamily: 'SF Pro Text, SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif' }}
     >
-      <div className="mx-3 mb-3 rounded-2xl bg-white/90 backdrop-blur-xl border border-line shadow-[0_8px_30px_rgb(var(--primary-deep)/0.12)] flex justify-around items-center py-2 px-2">
+      <div className="mx-3 mb-3 rounded-2xl bg-white/90 backdrop-blur-xl border border-line shadow-[0_8px_30px_rgb(var(--shadow)/0.12)] flex justify-around items-center py-2 px-2">
         {navItems.map(({ step, icon: Icon, label }) => {
           const active = currentStep === step;
           return (
@@ -114,7 +114,7 @@ const BottomNavBar = ({ currentStep, onStepChange, watchlistLength }: BottomNavB
                   </span>
                 )}
               </div>
-              <span className={`text-[0.625rem] font-semibold ${active ? 'text-primary' : ''}`}>{label}</span>
+              <span className={`text-[0.625rem] font-semibold ${active ? 'text-clay-ink' : ''}`}>{label}</span>
             </button>
           );
         })}

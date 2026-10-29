@@ -107,7 +107,7 @@ const RevealScreen = ({ answers, causes, onContinue }: RevealScreenProps) => {
       <div className={`pt-4 transition-opacity duration-500 ${phase >= 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <Button
           onClick={onContinue}
-          className="w-full h-14 text-[1.0625rem] font-semibold rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-lg shadow-brand/25 flex items-center justify-center gap-2"
+          className="w-full h-14 text-[1.0625rem] font-semibold rounded-2xl bg-primary hover:bg-clay-ink text-white shadow-lg shadow-brand/25 flex items-center justify-center gap-2"
         >
           See my first 7 matches <ArrowRight className="w-4 h-4" />
         </Button>
