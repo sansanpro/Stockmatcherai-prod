@@ -12,6 +12,7 @@ import DailyRecap from '@/components/DailyRecap';
 import Art3D from '@/components/onboarding/Art3D';
 import { STEP_ART } from '@/lib/art';
 import { toast } from 'sonner';
+import { markDeckFinished } from '@/components/deckDone';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { track, trackLike } from '@/lib/analytics';
 import type { OnboardingAnswers } from '@/lib/onboarding';
@@ -25,6 +26,9 @@ interface StockMatcherProps {
   signedIn: boolean;
   // Changes when the user's causes change; reloads (and, signed in, rebuilds) today's deck
   causesVersion: number;
+  // The causes version today's deck was last loaded for. The parent owns it because Profile
+  // replaces this screen, and a fresh mount must still see that the causes changed meanwhile.
+  loadedCausesVersion: { current: number | undefined };
   onEditCauses: () => void;
   onNeedsCauses?: () => void;
   // Signed out: called after each like; returns true if it opened the save prompt
@@ -37,7 +41,7 @@ interface StockMatcherProps {
 type Status = 'loading' | 'ready' | 'error';
 
 const StockMatcher = ({
-  answers, signedIn, causesVersion, onEditCauses, onNeedsCauses, onLikedOnDevice, onSaveMatches, onViewDetails,
+  answers, signedIn, causesVersion, loadedCausesVersion, onEditCauses, onNeedsCauses, onLikedOnDevice, onSaveMatches, onViewDetails,
 }: StockMatcherProps) => {
   const [cards, setCards] = useState<StockRecommendation[]>([]); // still to swipe today, in order
   const [deckSize, setDeckSize] = useState(0);
@@ -49,10 +53,11 @@ const StockMatcher = ({
   const [showSwipeHint, setShowSwipeHint] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [causeInfo, setCauseInfo] = useState<CauseInfo[]>([]);
+  // Causes were changed after today's deck was finished, so they start with tomorrow's
+  const [causesWaitForTomorrow, setCausesWaitForTomorrow] = useState(false);
   const finishedTracked = useRef(false);
   const handleMatchRef = useRef<() => void>(() => {});
   const handlePassRef = useRef<() => void>(() => {});
-  const loadedCausesVersion = useRef<number>();
 
   const { addToWatchlist, isInWatchlist, updateSwipeStats } = useApp();
   const { subscribed } = useSubscription();
@@ -94,9 +99,9 @@ const StockMatcher = ({
       setStatus('ready');
       track('deck_loaded', { cards: deck.cards.length, remaining: remaining.length, signed_in: signedIn });
       if (rebuild && signedIn) {
-        toast.success(deck.rebuilt
-          ? "Today's remaining matches now follow your new picks."
-          : "You've seen today's matches. Your new picks start with tomorrow's deck.");
+        // A finished deck says this on screen instead of in a toast that disappears
+        if (deck.rebuilt) toast.success("Today's remaining matches now follow your new picks.");
+        else setCausesWaitForTomorrow(true);
       }
     } catch (error) {
       if (error instanceof FeedError && error.status === 409) {
@@ -164,6 +169,7 @@ const StockMatcher = ({
       finishedTracked.current = true;
       track('deck_finished', { cards: deckSize, liked: likedToday, signed_in: signedIn });
     }
+    if (isFinished && signedIn) markDeckFinished();
   }, [isFinished]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The day's highlight reel plays once, when the last card is swiped (if anything was liked)
@@ -234,6 +240,11 @@ const StockMatcher = ({
           {likedToday > 0 ? `You liked ${likedToday} ${likedToday === 1 ? 'company' : 'companies'} today. ` : ''}
           New matches arrive every morning.
         </p>
+        {signedIn && causesWaitForTomorrow && (
+          <p role="status" className="mt-4 rounded-xl bg-clay-tint border border-clay-soft text-clay-ink text-sm font-medium px-4 py-3">
+            Your new causes are saved. You've already seen today's matches, so they start with tomorrow's.
+          </p>
+        )}
         {likedCards.length > 0 && (
           <button onClick={() => setShowRecap(true)} className="mt-4 inline-flex items-center gap-2 min-h-[44px] px-4 rounded-full bg-clay-tint text-clay-ink text-sm font-semibold border border-clay-soft">
             <Play className="w-4 h-4 fill-current" /> Replay today's recap
@@ -253,6 +264,9 @@ const StockMatcher = ({
           <Button onClick={onEditCauses} variant="outline" className="w-full h-12 rounded-xl bg-white border-line text-ink hover:bg-sand">
             <Pencil className="w-4 h-4 mr-2" /> Change my causes
           </Button>
+          {signedIn && !causesWaitForTomorrow && (
+            <p className="text-xs text-ink-faint">Changes start with tomorrow's matches.</p>
+          )}
         </div>
         <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} reason="deck" />
         {showRecap && (

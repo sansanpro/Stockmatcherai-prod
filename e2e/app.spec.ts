@@ -361,3 +361,58 @@ test('an account from before values matching is asked for causes once', async ({
   await page.getByRole('button', { name: 'Show my matches' }).click();
   await expect(page.getByText('P/E Ratio').first()).toBeVisible();
 });
+
+test('changing causes after the last card says they start tomorrow, and a deck with cards left is rebuilt', async ({ page }) => {
+  // Today's deck as if every card were already passed; rebuilds can't refill a finished day
+  const rebuilds: boolean[] = [];
+  let finished = true;
+  await page.route(/\/functions\/v1\/match-feed/, async (route) => {
+    const post = route.request().postData() ?? '';
+    if (route.request().method() !== 'POST' || !post.includes('"deck"')) return route.continue();
+    const rebuild = JSON.parse(post).rebuild === true;
+    if (rebuild) rebuilds.push(finished);
+    const body = await (await route.fetch()).json();
+    const swiped = finished ? (body.cards ?? []).map((c: { ticker: string }) => ({ ticker: c.ticker, liked: false })) : [];
+    await route.fulfill({
+      status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify({ ...body, swiped, ...(rebuild ? { rebuilt: !finished } : {}) }),
+    });
+  });
+  // Don't really change the test account's causes
+  await page.route(/\/rest\/v1\/user_profiles/, (route) => route.request().method() === 'POST'
+    ? route.fulfill({ status: 201, headers: { 'access-control-allow-origin': '*' }, body: '' })
+    : route.continue());
+  const changeACause = async () => {
+    const group = page.getByRole('group', { name: 'Causes' });
+    await expect(group.getByRole('button')).toHaveCount(7);
+    const unpicked = group.getByRole('button').filter({ hasNotText: /pick \d/ });
+    const picked = group.getByRole('button', { name: /pick \d/ });
+    if (await picked.count() < 3) await unpicked.first().click();
+    else await picked.first().click();
+    await page.getByRole('button', { name: 'Save Changes' }).click();
+  };
+
+  await openApp(page);
+  await expect(page.getByRole('heading', { name: "That's today's matches" })).toBeVisible();
+  await expect(page.getByText("Changes start with tomorrow's matches.")).toBeVisible();
+  await page.getByRole('button', { name: 'Change my causes' }).click();
+  await expect(page.getByText("You've seen all of today's matches, so changes here start with tomorrow's.")).toBeVisible();
+  await changeACause();
+  await expect(page.getByText("Saved. Your new picks start with tomorrow's matches.")).toBeVisible();
+  await page.getByRole('button', { name: 'Back' }).click();
+  await expect(page.getByText("Your new causes are saved. You've already seen today's matches, so they start with tomorrow's.")).toBeVisible();
+  await page.screenshot({ path: 'e2e/screens/causes-wait-for-tomorrow.png' });
+
+  // With cards left, saving new causes rebuilds the rest of today's deck
+  finished = false;
+  await page.evaluate(() => Object.keys(localStorage).filter(k => k.startsWith('deck_finished_')).forEach(k => localStorage.removeItem(k)));
+  await page.reload();
+  await expect(page.locator('[data-swipe-card="top"]')).toBeVisible();
+  await page.getByRole('button', { name: 'Profile' }).click();
+  await expect(page.getByText("You've seen all of today's matches")).toHaveCount(0);
+  await changeACause();
+  await expect(page.getByText('Saved.', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Back' }).click();
+  await expect(page.getByText("Today's remaining matches now follow your new picks.")).toBeVisible();
+  expect(rebuilds).toEqual([true, false]);
+});

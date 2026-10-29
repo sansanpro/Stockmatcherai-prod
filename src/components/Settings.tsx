@@ -20,6 +20,7 @@ import { Capacitor } from '@capacitor/core';
 import { fetchCauses, type CauseInfo } from '@/lib/matchFeed';
 import { DEALBREAKERS, GOAL_OPTIONS, RISK_OPTIONS, toProfileRow, type OnboardingAnswers } from '@/lib/onboarding';
 import { track } from '@/lib/analytics';
+import { deckFinishedToday } from '@/components/deckDone';
 import { restoreApplePurchases } from '@/services/appleIAPService';
 import {
   AlertDialog,
@@ -91,6 +92,8 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
   }, []);
 
   const changed = JSON.stringify(values) !== JSON.stringify(answers);
+  // Read once: today's deck can't refill after its last card, so changes wait for tomorrow
+  const [finishedToday] = useState(deckFinishedToday);
 
   const handleValuesSave = async () => {
     if (!user?.id || values.causes.length === 0) return;
@@ -100,7 +103,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
       if (error) throw error;
       track('causes_updated', { source: 'settings', causes: values.causes });
       onCausesSaved(values);
-      toast.success('Saved.');
+      toast.success(finishedToday ? "Saved. Your new picks start with tomorrow's matches." : 'Saved.');
     } catch {
       toast.error("Couldn't save. Please try again.");
     } finally {
@@ -219,6 +222,11 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
                 <ChoiceList name="Goal" options={GOAL_OPTIONS} value={values.goal} onSelect={id => setValues(v => ({ ...v, goal: id }))} />
               </div>
             </div>
+            {finishedToday && (
+              <p className="rounded-xl bg-clay-tint border border-clay-soft text-clay-ink text-sm px-4 py-3">
+                You've seen all of today's matches, so changes here start with tomorrow's.
+              </p>
+            )}
             <Button onClick={handleValuesSave} disabled={loading || !changed || values.causes.length === 0}
               className="w-full h-12 bg-primary hover:bg-clay-ink text-white rounded-xl font-semibold flex items-center justify-center gap-2">
               <Save className="w-4 h-4" />

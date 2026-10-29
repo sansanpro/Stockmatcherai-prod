@@ -153,6 +153,7 @@ const IndexContent = () => {
   const [answers, setAnswers] = useState<OnboardingAnswers | null>(null);
   const [currentStep, setCurrentStep] = useState<MainStep>('matching');
   const [causesVersion, setCausesVersion] = useState(0);
+  const deckCausesVersion = useRef<number>();
   const [savePromptOpen, setSavePromptOpen] = useState(false);
   const [savePromptReason, setSavePromptReason] = useState<'save' | 'ai'>('save');
   const [deviceLikes, setDeviceLikes] = useState(() => loadDeviceFeed().liked.length);
@@ -371,6 +372,7 @@ const IndexContent = () => {
           answers={myAnswers}
           signedIn={signedIn}
           causesVersion={causesVersion}
+          loadedCausesVersion={deckCausesVersion}
           onEditCauses={() => (signedIn ? setCurrentStep('settings') : openSavePrompt())}
           onNeedsCauses={() => { setOnboardingMode('causes_only'); setGate('onboarding'); }}
           onLikedOnDevice={handleLikedOnDevice}
