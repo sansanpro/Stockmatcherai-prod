@@ -3,6 +3,7 @@ import { X, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Art3D from '@/components/onboarding/Art3D';
 import CompanyLogo from '@/components/values/CompanyLogo';
+import CauseOrbit from '@/components/values/CauseOrbit';
 import { causeTone } from '@/components/values/CauseChips';
 import { recapInsights, recapShareText } from '@/lib/recap';
 import { CAUSE_ART, STEP_ART } from '@/lib/art';
@@ -47,6 +48,13 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
   }, [liked]);
   const [at, setAt] = useState(0);
   const slide = slides[at];
+  // The insight slide's orbit: likes for the top cause first, circling that cause's emblem
+  const topArt = (insights.topCause && CAUSE_ART[insights.topCause.id]) || STEP_ART.intro;
+  const orbiting = useMemo(() => {
+    const top = insights.topCause?.id;
+    const first = liked.filter(s => s.matchedCauses?.some(c => c.cause === top));
+    return [...first, ...liked.filter(s => !first.includes(s))].map(s => ({ ticker: s.ticker, name: s.companyName, logoUrl: s.logoUrl }));
+  }, [liked, insights.topCause]);
 
   useEffect(() => { track('recap_shown', { likes: liked.length, persona: insights.persona.title }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -191,7 +199,9 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
 
         {slide.kind === 'insight' && (
           <>
-            <Art3D src={(insights.topCause && CAUSE_ART[insights.topCause.id]) || STEP_ART.intro} size={120} className="mb-6" />
+            {orbiting.length >= 2
+              ? <CauseOrbit emblem={topArt} items={orbiting} size={248} className="mb-1" />
+              : <Art3D src={topArt} size={120} className="mb-6" />}
             <p className="rise-in text-[0.8125rem] font-semibold uppercase tracking-wide text-ink-soft" style={{ animationDelay: '150ms' }}>
               What your likes say about you
             </p>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +17,9 @@ import NotFound from "./pages/NotFound";
 import { track } from '@/lib/analytics';
 
 const queryClient = new QueryClient();
+
+// Phase 4 lab (prototypes and measurements); left out of normal production builds
+const OrbitLab = import.meta.env.DEV || import.meta.env.VITE_LAB === '1' ? lazy(() => import('./lab/OrbitLab')) : null;
 
 const App = () => {
   // Detect if running on native mobile platform (iOS/Android)
@@ -55,6 +58,7 @@ const App = () => {
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/app" element={<Index />} />
+                  {OrbitLab && <Route path="/lab/orbit" element={<Suspense fallback={null}><OrbitLab /></Suspense>} />}
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </>

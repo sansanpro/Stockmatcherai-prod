@@ -1,0 +1,86 @@
+{
+  "static": {
+    "variant": "static",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1",
+    "dpr": 3,
+    "renderDpr": null,
+    "ttffMs": 32,
+    "frames": {
+      "count": 600,
+      "p50": 16.7,
+      "p95": 16.7,
+      "max": 16.8,
+      "late": 0
+    },
+    "workMs": {
+      "p50": 0,
+      "p95": 0
+    },
+    "mainThreadBusyPct": 3.1,
+    "scriptPct": 0.3,
+    "cpuSlowdown": 1
+  },
+  "css": {
+    "variant": "css",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1",
+    "dpr": 3,
+    "renderDpr": null,
+    "ttffMs": 28,
+    "frames": {
+      "count": 600,
+      "p50": 16.7,
+      "p95": 16.8,
+      "max": 16.8,
+      "late": 0
+    },
+    "workMs": {
+      "p50": 0,
+      "p95": 0
+    },
+    "mainThreadBusyPct": 4.7,
+    "scriptPct": 0.3,
+    "cpuSlowdown": 1
+  },
+  "lottie": {
+    "variant": "lottie",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1",
+    "dpr": 3,
+    "renderDpr": null,
+    "ttffMs": 27,
+    "frames": {
+      "count": 600,
+      "p50": 16.7,
+      "p95": 16.7,
+      "max": 16.8,
+      "late": 0
+    },
+    "workMs": {
+      "p50": 0.3,
+      "p95": 0.5
+    },
+    "mainThreadBusyPct": 7.7,
+    "scriptPct": 2,
+    "cpuSlowdown": 1
+  },
+  "three": {
+    "variant": "three",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1",
+    "dpr": 3,
+    "renderDpr": 2,
+    "ttffMs": 82,
+    "frames": {
+      "count": 600,
+      "p50": 16.7,
+      "p95": 16.7,
+      "max": 16.8,
+      "late": 0
+    },
+    "workMs": {
+      "p50": 0.4,
+      "p95": 0.6
+    },
+    "mainThreadBusyPct": 6.7,
+    "scriptPct": 2.9,
+    "cpuSlowdown": 1
+  }
+}

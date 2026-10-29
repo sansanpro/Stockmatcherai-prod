@@ -263,6 +263,7 @@ test('finishing the day plays a recap reel of the likes and what they say about 
   await expect(reel.getByText('What your likes say about you')).toBeVisible();
   await expect(reel.getByRole('heading', { name: 'The Clean Power Backer' })).toBeVisible();
   await expect(reel.getByText('All 3 of your likes work on Clean energy & climate.')).toBeVisible();
+  await expect(reel.locator('.cause-orbit-item')).toHaveCount(3); // the three likes circle the cause's emblem
   await page.waitForTimeout(3200); // facts appear one by one
   await page.screenshot({ path: 'e2e/screens/recap-3-insight.png' });
   await reel.getByRole('button', { name: 'Next' }).click();

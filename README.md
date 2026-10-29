@@ -21,7 +21,7 @@ People in their 20s and 30s who are new to investing, are put off by jargon and 
    - "things to know": honest counterpoints such as losses, lawsuits, recalls or debt;
    - a **"Big swings"** caution when the stock has moved sharply, with the move, why it happened and a source;
    - the key numbers, explained in plain words if you're new.
-4. **Likes, news and a daily recap.** Liked companies go to your list. Later decks include news about companies you liked, and finishing the day's deck plays a short recap of your likes and what they say about you.
+4. **Likes, news and a daily recap.** Liked companies go to your list. Later decks include news about companies you liked, and finishing the day's deck plays a short recap of your likes and what they say about you, with your liked companies circling the emblem of your top cause.
 5. **Ask AI.** A chat assistant answers questions about companies and investing basics, using your causes and the app's reviewed research. It never gives personal investment or medical advice.
 
 ## The causes

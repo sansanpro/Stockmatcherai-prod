@@ -1,0 +1,86 @@
+{
+  "static": {
+    "variant": "static",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1",
+    "dpr": 3,
+    "renderDpr": null,
+    "ttffMs": 54,
+    "frames": {
+      "count": 600,
+      "p50": 16.7,
+      "p95": 16.8,
+      "max": 16.8,
+      "late": 0
+    },
+    "workMs": {
+      "p50": 0,
+      "p95": 0
+    },
+    "mainThreadBusyPct": 1.3,
+    "scriptPct": 0.1,
+    "cpuSlowdown": 4
+  },
+  "css": {
+    "variant": "css",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1",
+    "dpr": 3,
+    "renderDpr": null,
+    "ttffMs": 34,
+    "frames": {
+      "count": 600,
+      "p50": 16.7,
+      "p95": 16.8,
+      "max": 16.8,
+      "late": 0
+    },
+    "workMs": {
+      "p50": 0,
+      "p95": 0
+    },
+    "mainThreadBusyPct": 2.9,
+    "scriptPct": 0.1,
+    "cpuSlowdown": 4
+  },
+  "lottie": {
+    "variant": "lottie",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1",
+    "dpr": 3,
+    "renderDpr": null,
+    "ttffMs": 64,
+    "frames": {
+      "count": 600,
+      "p50": 16.7,
+      "p95": 16.8,
+      "max": 16.8,
+      "late": 0
+    },
+    "workMs": {
+      "p50": 0.1,
+      "p95": 0.5
+    },
+    "mainThreadBusyPct": 6,
+    "scriptPct": 1,
+    "cpuSlowdown": 4
+  },
+  "three": {
+    "variant": "three",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1",
+    "dpr": 3,
+    "renderDpr": 2,
+    "ttffMs": 129,
+    "frames": {
+      "count": 600,
+      "p50": 16.7,
+      "p95": 16.8,
+      "max": 16.8,
+      "late": 0
+    },
+    "workMs": {
+      "p50": 0.1,
+      "p95": 0.6
+    },
+    "mainThreadBusyPct": 3.3,
+    "scriptPct": 1.1,
+    "cpuSlowdown": 4
+  }
+}

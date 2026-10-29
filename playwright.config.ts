@@ -25,6 +25,12 @@ export default defineConfig({
     },
     // Swipe performance on a CPU slowed down 4x (WebKit can't throttle). Only the perf spec runs here.
     { name: 'perf-throttled', testMatch: /motion-perf\.spec\.ts/, use: { ...devices['iPhone 15'], browserName: 'chromium' } },
+    // Phase 4 3D prototypes: Chromium on the Mac's real GPU (headless Chromium otherwise draws WebGL in software)
+    {
+      name: 'orbit-gpu',
+      testMatch: /orbit-perf\.spec\.ts/,
+      use: { ...devices['iPhone 15'], browserName: 'chromium', launchOptions: { args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] } },
+    },
   ],
   webServer: {
     command: 'npm run dev',

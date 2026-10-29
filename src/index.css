@@ -176,6 +176,27 @@
   .support-bloom { animation: support-bloom 600ms var(--ease-out) forwards; background: radial-gradient(circle, rgb(var(--highlight) / 0.55), rgb(var(--highlight) / 0) 70%); }
   @keyframes support-bloom { from { transform: scale(0.6); opacity: 0; } 40% { opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
 
+  /* Cause orbit (CauseOrbit.tsx): a ring tipped back by --orbit-tilt; each logo turns around the
+     center and counter-turns so it keeps facing you. Same keyframes for all, phase set by a negative delay. */
+  .cause-orbit { perspective: 900px; }
+  .cause-orbit-plane { position: absolute; inset: 0; transform-style: preserve-3d; transform: rotateX(var(--orbit-tilt)); }
+  .cause-orbit-ring {
+    position: absolute; left: 50%; top: 50%;
+    width: calc(var(--orbit-r) * 2); height: calc(var(--orbit-r) * 2);
+    margin: calc(var(--orbit-r) * -1);
+    border-radius: 50%; border: 2px dashed rgb(var(--primary) / 0.3);
+  }
+  .cause-orbit-emblem { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotateX(calc(var(--orbit-tilt) * -1)); transform-style: preserve-3d; }
+  .cause-orbit-item {
+    position: absolute; left: 50%; top: 50%; width: 3rem; height: 3rem; margin: -1.5rem;
+    transform: rotateZ(var(--a)) translateX(var(--orbit-r)) rotateZ(calc(var(--a) * -1)) rotateX(calc(var(--orbit-tilt) * -1));
+    animation: orbit-turn var(--orbit-period) linear infinite;
+  }
+  @keyframes orbit-turn {
+    from { transform: rotateZ(0deg) translateX(var(--orbit-r)) rotateZ(0deg) rotateX(calc(var(--orbit-tilt) * -1)); }
+    to { transform: rotateZ(360deg) translateX(var(--orbit-r)) rotateZ(-360deg) rotateX(calc(var(--orbit-tilt) * -1)); }
+  }
+
   /* Reduced motion: every change still happens, as a short cross-fade with no movement
      (docs/phase-0.md, motion storyboard). Delays are kept so content arrives in the same order. */
   @media (prefers-reduced-motion: reduce) {
@@ -187,7 +208,7 @@
     }
     .art-3d-shadow { opacity: 0.55; }
     /* Like: color change only */
-    .art-3d-pop, .heart-pop, .like-ring, .support-bloom, .animate-bounce, .animate-ping { animation: none !important; }
+    .art-3d-pop, .heart-pop, .like-ring, .support-bloom, .animate-bounce, .animate-ping, .cause-orbit-item { animation: none !important; }
     .support-bloom { opacity: 0; }
     .like-ring { box-shadow: none; }
     /* Sheets and dialogs (tailwindcss-animate) fade instead of sliding or zooming */
