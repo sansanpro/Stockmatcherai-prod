@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import UpgradeModal from '@/components/UpgradeModal';
+import SupportSheet from '@/components/support/SupportSheet';
+import heart3d from '@/assets/3d/red-heart.png';
+import { tipsAvailable, TIP_PRICE } from '@/lib/support';
 import { PLAN_LIMITS } from '@/contexts/SubscriptionContext';
 import CausePicker from '@/components/onboarding/CausePicker';
 import { ChipGroup, ChoiceList } from '@/components/onboarding/Choices';
@@ -11,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { User, Save, ArrowLeft, Trash2, AlertTriangle, RotateCcw, Crown, Heart, Shield } from 'lucide-react';
+import { User, Save, ArrowLeft, Trash2, AlertTriangle, RotateCcw, Crown, Heart, Shield, ChevronRight } from 'lucide-react';
 import { AI_CONSENT_KEY } from '@/components/AIDataConsentDialog';
 import { Capacitor } from '@capacitor/core';
 import { fetchCauses, type CauseInfo } from '@/lib/matchFeed';
@@ -50,6 +53,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showSupport, setShowSupport] = useState(false);
   const [aiSharing, setAiSharing] = useState(() => {
     try { return localStorage.getItem(AI_CONSENT_KEY) === 'true'; } catch { return false; }
   });
@@ -120,7 +124,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
           </button>
           <h1 className="text-xl font-bold">Settings</h1>
           {subscribed && (
-            <span className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-clay-ink bg-clay-tint px-2.5 py-1 rounded-full border border-clay-soft">
+            <span className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-premium-ink bg-premium-tint px-2.5 py-1 rounded-full border border-premium-line">
               <Crown className="w-3 h-3" /> Premium
             </span>
           )}
@@ -130,21 +134,21 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
       <div className="max-w-2xl mx-auto p-4 space-y-4 pb-24">
         {/* Upgrade banner — only shown to free users */}
         {!subscribed && (
-          <section className="rounded-2xl overflow-hidden border border-clay-soft bg-clay-tint">
+          <section className="rounded-2xl overflow-hidden border border-premium-line bg-premium-tint">
             <div className="p-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-premium flex items-center justify-center flex-shrink-0">
                 <Crown className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-ink">Upgrade to Premium</p>
-                <p className="text-xs text-ink-soft">{PLAN_LIMITS.premium.dailyMatches} matches a day and unlimited Ask AI</p>
+                <p className="text-sm font-semibold text-ink">Go deeper with Premium</p>
+                <p className="text-xs text-ink-soft">{PLAN_LIMITS.premium.dailyMatches} matches a day, unlimited Ask AI, side-by-side compare</p>
               </div>
               <Button
                 size="sm"
                 onClick={() => setShowUpgradeModal(true)}
-                className="flex-shrink-0 bg-primary hover:bg-primary/90 text-white font-semibold border-0"
+                className="flex-shrink-0 bg-premium hover:bg-premium/90 text-white font-semibold border-0"
               >
-                Upgrade
+                See Premium
               </Button>
             </div>
           </section>
@@ -254,6 +258,20 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
           </div>
         </section>
 
+        {/* Optional tip to StockMatcherAI: always here, never asked for elsewhere except once a week on the recap */}
+        {tipsAvailable() && (
+          <section className="rounded-2xl overflow-hidden border border-support-line bg-support-tint">
+            <button onClick={() => setShowSupport(true)} className="w-full p-4 flex items-center gap-4 text-left">
+              <img src={heart3d} alt="" aria-hidden className="w-10 h-10 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-ink">Support StockMatcherAI</p>
+                <p className="text-xs text-ink-soft">An optional {TIP_PRICE} tip that helps keep the app going. It doesn't unlock anything.</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-ink-soft flex-shrink-0" aria-hidden />
+            </button>
+          </section>
+        )}
+
         {/* Danger Zone */}
         <section className="rounded-2xl overflow-hidden border border-caution-line bg-caution-tint">
           <div className="px-4 py-3 border-b border-caution-line flex items-center gap-2">
@@ -302,6 +320,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
         <Disclaimer className="pb-6" />
       </div>
 
+      <SupportSheet isOpen={showSupport} onClose={() => setShowSupport(false)} source="profile" />
       <UpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}

@@ -8,6 +8,9 @@ import { recapInsights, recapShareText } from '@/lib/recap';
 import { CAUSE_ART, STEP_ART } from '@/lib/art';
 import { track } from '@/lib/analytics';
 import { haptic } from '@/lib/haptics';
+import SupportSheet from '@/components/support/SupportSheet';
+import heart3d from '@/assets/3d/red-heart.png';
+import { dismissTipOffer, markTipOfferShown, shouldOfferTipOnRecap, TIP_PRICE } from '@/lib/support';
 import type { CauseInfo } from '@/lib/matchFeed';
 import type { StockRecommendation } from '@/types/stock-matcher';
 
@@ -59,6 +62,13 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
   // A light tap for each new slide (not on the first, which opens with the reel)
   useEffect(() => { if (at > 0) haptic('light'); }, [at]);
   const prev = () => setAt(i => Math.max(i - 1, 0));
+
+  // The tip card on the last slide: decided once per recap, at most weekly (lib/support.ts)
+  const [offerTip] = useState(() => shouldOfferTipOnRecap());
+  const [tipCard, setTipCard] = useState(true);
+  const [showSupport, setShowSupport] = useState(false);
+  const onLast = slides[at]?.kind === 'outro';
+  useEffect(() => { if (offerTip && onLast) markTipOfferShown(); }, [offerTip, onLast]);
 
   const share = async () => {
     const text = recapShareText(liked, insights.persona);
@@ -218,7 +228,26 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
                 Done
               </button>
             </div>
+            {offerTip && tipCard && (
+              <div className="rise-in w-full mt-6 rounded-2xl border border-support-line bg-support-tint p-4 text-left" style={{ animationDelay: '520ms' }}>
+                <div className="flex items-start gap-3">
+                  <img src={heart3d} alt="" aria-hidden className="w-9 h-9 flex-shrink-0" />
+                  <p className="text-sm text-ink leading-snug">
+                    <span className="font-semibold">Enjoying StockMatcherAI?</span> An optional {TIP_PRICE} tip helps us keep finding companies working on causes like yours.
+                  </p>
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <button onClick={() => setShowSupport(true)} className="flex-1 min-h-[44px] rounded-xl bg-support hover:bg-support/90 text-white text-sm font-semibold">
+                    Tip {TIP_PRICE}
+                  </button>
+                  <button onClick={() => { dismissTipOffer(); setTipCard(false); }} className="flex-1 min-h-[44px] rounded-xl border border-line bg-white text-ink text-sm font-semibold">
+                    Not now
+                  </button>
+                </div>
+              </div>
+            )}
             <p className="text-ink-soft text-xs mt-6">Educational only, not investment advice.</p>
+            <SupportSheet isOpen={showSupport} onClose={() => { setShowSupport(false); setTipCard(false); }} source="recap" />
           </>
         )}
       </div>

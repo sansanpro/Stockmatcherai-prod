@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Sparkles, Send, X, Minimize2, Crown } from 'lucide-react';
+import { Sparkles, Send, X, RotateCcw, Crown, GraduationCap } from 'lucide-react';
 import AIDataConsentDialog, { AI_CONSENT_KEY } from '@/components/AIDataConsentDialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,6 +13,8 @@ import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/integrations/supabase/client';
 import { track } from '@/lib/analytics';
+import Disclaimer from '@/components/values/Disclaimer';
+import { ASK_AI_EVENT, tutorPrompt } from '@/lib/askAI';
 
 interface Message {
   id: string;
@@ -47,6 +49,8 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
   const [inputValue, setInputValue] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeReason, setUpgradeReason] = useState<'ai' | 'tutor'>('ai');
+  const [tutorMode, setTutorMode] = useState(false); // Premium: step-by-step answers
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [freeMessageCount, setFreeMessageCount] = useState(0);
   const [currentStatus, setCurrentStatus] = useState<string>('');
@@ -60,9 +64,23 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
   const { subscribed } = useSubscription();
   const { watchlist } = useApp();
   const freeQuestions = PLAN_LIMITS.free.aiQuestionsPer24h;
+  const outOfQuestions = !subscribed && freeMessageCount >= freeQuestions;
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const timeoutRef = useRef<number | null>(null);
+
+  // "Ask AI about this company" elsewhere in the app opens the chat with the question filled in
+  useEffect(() => {
+    const onAsk = (e: Event) => {
+      const prompt = (e as CustomEvent<{ prompt: string }>).detail?.prompt;
+      if (!user) { onNeedAccount?.(); return; }
+      setIsOpen(true);
+      if (prompt) setInputValue(prompt);
+      track('ai_prefilled_question');
+    };
+    window.addEventListener(ASK_AI_EVENT, onAsk);
+    return () => window.removeEventListener(ASK_AI_EVENT, onAsk);
+  }, [user, onNeedAccount]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -171,7 +189,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
             'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxzd3VzdW9pd3l4dHN3bmJsbGdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwNjU1MjgsImV4cCI6MjA2NjY0MTUyOH0.g7DgedllsJSFJyGYHfeYq_r9YWSjzCYXdHC7F4SL6Ao'
           },
           body: JSON.stringify({
-            message: userMessage,
+            message: tutorMode && subscribed ? tutorPrompt(userMessage) : userMessage,
             conversationId
           }),
           signal: abortControllerRef.current.signal
@@ -183,6 +201,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
         // Free user hit the limit: remove the placeholder message; the upgrade sheet explains why
         setMessages(prev => prev.filter(m => m.id !== assistantMsgId && m.id !== userMsg.id));
         setFreeMessageCount(data.freeMessagesSent ?? freeQuestions);
+        setUpgradeReason('ai');
         setShowUpgradeModal(true);
         setIsStreaming(false);
         return;
@@ -380,7 +399,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
         >
           {/* Pulsing attention ring for new users */}
           {!hasOpenedWidget && (
-            <span className="absolute inset-0 rounded-full bg-clay/40 animate-ping pointer-events-none" />
+            <span className="absolute inset-0 rounded-full bg-highlight/40 animate-ping pointer-events-none" />
           )}
           <Sparkles className="h-5 w-5 flex-shrink-0" />
           {!hasOpenedWidget && (
@@ -398,7 +417,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
               <Sparkles className="h-5 w-5 text-primary" />
               <h3 className="font-semibold">Ask AI</h3>
               {subscribed && (
-                <Crown className="h-4 w-4 text-clay" />
+                <Crown className="h-4 w-4 text-premium" aria-label="Premium" />
               )}
             </div>
             <div className="flex gap-2">
@@ -408,14 +427,16 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
                   size="icon"
                   onClick={handleNewChat}
                   disabled={isStreaming}
+                  aria-label="Start a new chat"
                 >
-                  <Minimize2 className="h-4 w-4" />
+                  <RotateCcw className="h-4 w-4" />
                 </Button>
               )}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsOpen(false)}
+                aria-label="Close Ask AI"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -425,8 +446,8 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
           {/* Messages */}
           <ScrollArea className="flex-1 p-4" ref={scrollRef}>
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center gap-4 p-4">
-                <Sparkles className="h-10 w-10 text-primary opacity-50" />
+              <div className="flex flex-col items-center text-center gap-3 px-2 py-2">
+                <Sparkles className="h-8 w-8 text-primary opacity-50" aria-hidden />
                 <div>
                   <p className="font-semibold mb-1">
                     Ask about any company or term
@@ -434,14 +455,16 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
                   <p className="text-xs text-muted-foreground mb-4">
                     {subscribed
                       ? 'What a company does, how it connects to your causes, or what a number means.'
-                      : `You get ${freeQuestions} free questions a day. Try one below.`}
+                      : outOfQuestions
+                        ? 'Your free questions for today are used. They come back one by one, 24 hours after each was asked.'
+                        : `You get ${freeQuestions} free questions a day. Try one below.`}
                   </p>
                 </div>
                 {/* Suggested prompts */}
-                <div className="w-full space-y-2">
+                {!outOfQuestions && <div className="w-full space-y-2">
                   {[
                     `How does ${watchlist[0]?.companyName ?? 'Merck'} connect to my causes?`,
-                    "What should I know before buying my first stock?",
+                    "How do people research a company before investing?",
                     "Explain P/E ratio in simple terms",
                   ].map((prompt) => (
                     <button
@@ -452,7 +475,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
                       {prompt}
                     </button>
                   ))}
-                </div>
+                </div>}
               </div>
             ) : (
               <div className="space-y-4">
@@ -500,40 +523,67 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
 
           {/* Input */}
           <div className="p-4 border-t">
-            <div className="flex gap-2">
-              <Input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask about a company or term…"
-                disabled={isStreaming}
-                autoCorrect="off"
-                autoComplete="off"
-                autoCapitalize="sentences"
-                spellCheck={false}
-                className="flex-1 text-base"
-              />
-              <Button
-                onClick={handleSend}
-                disabled={!inputValue.trim() || isStreaming}
-                aria-label="Send message"
-                size="icon"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-            {!subscribed && (
-              <p className="text-xs text-muted-foreground mt-2 text-center">
-                Free plan: {Math.max(0, freeQuestions - freeMessageCount)} of {freeQuestions} questions left (each frees up after 24 hours)
+            {/* Tutor mode: Premium; free users see what it is and where it comes from */}
+            <button
+              onClick={() => {
+                if (!subscribed) { setUpgradeReason('tutor'); setShowUpgradeModal(true); return; }
+                setTutorMode(on => !on);
+                track('ai_tutor_mode', { on: !tutorMode });
+              }}
+              aria-pressed={subscribed ? tutorMode : undefined}
+              className={`mb-2 min-h-[32px] px-3 rounded-full border text-xs font-semibold inline-flex items-center gap-1.5 transition-colors ${
+                tutorMode && subscribed ? 'bg-premium text-white border-premium' : 'bg-premium-tint text-premium-ink border-premium-line'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5" aria-hidden />
+              Step by step{tutorMode && subscribed ? ': on' : ''}
+              {!subscribed && <Crown className="w-3 h-3" aria-label="Premium" />}
+            </button>
+            {outOfQuestions ? (
+              // Out of free questions: say so before they type, not after
+              <div role="status" className="rounded-xl bg-premium-tint border border-premium-line p-3 text-sm text-ink">
+                <p><span className="font-semibold">You've used today's {freeQuestions} free questions.</span> Each one frees up 24 hours after you asked it.</p>
+                <button onClick={() => { setUpgradeReason('ai'); setShowUpgradeModal(true); }} className="mt-2 font-semibold text-premium-ink underline min-h-[32px]">
+                  See Premium
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask about a company or term…"
+                  disabled={isStreaming}
+                  autoCorrect="off"
+                  autoComplete="off"
+                  autoCapitalize="sentences"
+                  spellCheck={false}
+                  className="flex-1 text-base"
+                />
+                <Button
+                  onClick={handleSend}
+                  disabled={!inputValue.trim() || isStreaming}
+                  aria-label="Send message"
+                  size="icon"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            {!subscribed && freeMessageCount < freeQuestions && (
+              <p className="text-xs text-ink-soft mt-2 text-center">
+                {freeQuestions - freeMessageCount} of {freeQuestions} free questions left today (each frees up after 24 hours)
               </p>
             )}
+            <Disclaimer className="mt-1" />
           </div>
         </Card>
       )}
 
       {/* Upgrade Modal */}
       <UpgradeModal
-        reason="ai"
+        reason={upgradeReason}
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
       />

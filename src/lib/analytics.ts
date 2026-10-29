@@ -28,7 +28,14 @@ export type AnalyticsEvent =
   | 'recap_shared'
   | 'paywall_shown'
   | 'purchase_started'
-  | 'purchase_completed';
+  | 'purchase_completed'
+  | 'ai_prefilled_question'
+  | 'ai_tutor_mode'
+  | 'compare_tapped'
+  | 'compare_opened'
+  | 'tip_shown'
+  | 'tip_started'
+  | 'tip_completed';
 
 // These also go to Meta App Events, to compare ad angles
 const META_EVENTS: AnalyticsEvent[] = ['onboarding_complete', 'first_like'];

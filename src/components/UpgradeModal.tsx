@@ -3,9 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { PLAN_LIMITS, useSubscription } from '@/contexts/SubscriptionContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Check, Apple } from 'lucide-react';
-import Art3D from '@/components/onboarding/Art3D';
-import { STEP_ART } from '@/lib/art';
+import { Apple, Columns2, Crown, GraduationCap, Layers, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Capacitor } from '@capacitor/core';
@@ -15,8 +13,9 @@ import { track } from '@/lib/analytics';
 interface UpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // What brought the user here: finishing today's deck, running out of free questions, or Settings
-  reason?: 'deck' | 'ai' | 'settings';
+  // What brought the user here: finishing today's deck, running out of free questions, a Premium
+  // feature (compare, tutor mode), or Settings
+  reason?: 'deck' | 'ai' | 'compare' | 'tutor' | 'settings';
 }
 
 const { free, premium } = PLAN_LIMITS;
@@ -24,22 +23,32 @@ const { free, premium } = PLAN_LIMITS;
 const HEADLINES: Record<NonNullable<UpgradeModalProps['reason']>, { title: string; text: string }> = {
   deck: {
     title: `You've seen today's ${free.dailyMatches} matches`,
-    text: `Premium shows you ${premium.dailyMatches} companies a day. New matches arrive every morning either way.`,
+    text: `Premium shows you ${premium.dailyMatches} companies a day for your causes. New matches arrive every morning either way.`,
   },
   ai: {
     title: `You've used your ${free.aiQuestionsPer24h} free questions`,
     text: 'Each one frees up again 24 hours after you asked it. With Premium, ask as many as you like.',
   },
+  compare: {
+    title: 'Compare side by side',
+    text: 'Put two companies you liked next to each other, so the differences are easy to see.',
+  },
+  tutor: {
+    title: 'Learn step by step',
+    text: 'Tutor mode walks through any company or term one step at a time and explains each word as it comes up.',
+  },
   settings: {
-    title: 'More to explore every day',
-    text: 'Premium gives you more companies working on your causes, and unlimited questions.',
+    title: 'Go deeper on the causes you care about',
+    text: 'Premium adds more learning and more exploring.',
   },
 };
 
-// Only features that exist; the limits are enforced on the server
+// Only features that exist today; the limits are enforced on the server. Never "better picks".
 const PERKS = [
-  `${premium.dailyMatches} matches a day instead of ${free.dailyMatches}`,
-  `Unlimited Ask AI questions instead of ${free.aiQuestionsPer24h} a day`,
+  { icon: Layers, title: `${premium.dailyMatches} matches a day`, text: `Instead of ${free.dailyMatches}, all for your causes` },
+  { icon: MessageCircle, title: 'Unlimited Ask AI', text: `Instead of ${free.aiQuestionsPer24h} questions a day` },
+  { icon: GraduationCap, title: 'Tutor mode', text: 'Step-by-step explanations for beginners' },
+  { icon: Columns2, title: 'Compare side by side', text: 'Two liked companies: story, proof, things to know, cautions' },
 ];
 
 const UpgradeModal = ({ isOpen, onClose, reason = 'settings' }: UpgradeModalProps) => {
@@ -121,44 +130,44 @@ const UpgradeModal = ({ isOpen, onClose, reason = 'settings' }: UpgradeModalProp
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       {/* Scrolls on small phones so the title and the required Privacy/Terms links stay reachable */}
-      <DialogContent className="max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto bg-cream border-line">
-        <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold text-ink">
-            Upgrade to Premium
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto bg-surface border-premium-line p-0 gap-0 rounded-3xl duration-slow ease-out">
+        <div className="bg-premium-tint border-b border-premium-line px-6 pt-7 pb-5 text-center">
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-premium-ink bg-white/80 border border-premium-line rounded-full px-2.5 py-1">
+            <Crown className="w-3.5 h-3.5" aria-hidden /> Premium
+          </span>
+          <DialogHeader className="mt-3">
+            <DialogTitle className="text-center text-2xl font-bold text-ink leading-tight">
+              {HEADLINES[reason].title}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-ink-soft mt-2">{HEADLINES[reason].text}</p>
+        </div>
 
-        <div className="space-y-6 p-4">
-          <div className="text-center">
-            <Art3D src={STEP_ART.intro} size={76} className="mb-4" />
-            <h3 className="text-lg font-semibold text-ink mb-2">{HEADLINES[reason].title}</h3>
-            <p className="text-ink-faint">{HEADLINES[reason].text}</p>
-          </div>
+        <div className="space-y-5 p-6">
+          <ul className="space-y-3">
+            {PERKS.map(({ icon: Icon, title, text }) => (
+              <li key={title} className="flex items-start gap-3">
+                <span className="w-9 h-9 rounded-xl bg-premium-tint border border-premium-line flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-4 h-4 text-premium" aria-hidden />
+                </span>
+                <span className="text-sm leading-snug">
+                  <span className="block font-semibold text-ink">{title}</span>
+                  <span className="block text-ink-soft">{text}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
 
-          <div className="bg-white border border-line rounded-2xl shadow-sm p-4">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-lg font-semibold text-ink">Premium Plan</span>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-ink">{price}</div>
-                <div className="text-sm text-ink-faint">/month</div>
-              </div>
-            </div>
-
-            <ul className="space-y-2">
-              {PERKS.map(perk => (
-                <li key={perk} className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-primary flex-shrink-0" strokeWidth={2.5} />
-                  <span className="text-sm text-ink">{perk}</span>
-                </li>
-              ))}
-            </ul>
+          <div className="flex items-baseline justify-center gap-1">
+            <span className="text-3xl font-bold text-ink">{price}</span>
+            <span className="text-ink-soft">/month</span>
           </div>
 
           <div className="space-y-3">
             <Button
               onClick={handleApplePurchase}
               disabled={isProcessing || !appleProductAvailable}
-              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold"
+              className="w-full h-12 rounded-xl bg-premium hover:bg-premium/90 text-white font-semibold"
             >
               {isProcessing ? (
                 <>
@@ -175,13 +184,13 @@ const UpgradeModal = ({ isOpen, onClose, reason = 'settings' }: UpgradeModalProp
             <Button
               onClick={handleClose}
               variant="outline"
-              className="w-full h-12 rounded-xl border-line bg-white text-ink hover:bg-sand"
+              className="w-full h-12 rounded-xl border-line bg-white text-ink hover:bg-surface-2 font-semibold"
             >
-              Maybe Later
+              Maybe later
             </Button>
           </div>
 
-          <div className="text-center text-xs text-ink-faint space-y-1">
+          <div className="text-center text-xs text-ink-soft space-y-1">
             <p className="font-semibold text-ink-soft">Premium adds more learning and exploring. It doesn't pick stocks for you. Educational only, not investment advice.</p>
             <p>Subscription auto-renews monthly at {applePrice} until cancelled.</p>
             <p>Payment will be charged to your Apple ID account at confirmation of purchase.</p>

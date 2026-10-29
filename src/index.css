@@ -172,6 +172,10 @@
   .like-ring { animation: like-ring var(--dur-slow) var(--ease-out) forwards; box-shadow: 0 0 0 0 rgb(var(--highlight) / 0.6); }
   @keyframes like-ring { to { box-shadow: 0 0 0 14px rgb(var(--highlight) / 0); } }
 
+  /* Tip thank-you: a soft highlight bloom behind the heart, once */
+  .support-bloom { animation: support-bloom 600ms var(--ease-out) forwards; background: radial-gradient(circle, rgb(var(--highlight) / 0.55), rgb(var(--highlight) / 0) 70%); }
+  @keyframes support-bloom { from { transform: scale(0.6); opacity: 0; } 40% { opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+
   /* Reduced motion: every change still happens, as a short cross-fade with no movement
      (docs/phase-0.md, motion storyboard). Delays are kept so content arrives in the same order. */
   @media (prefers-reduced-motion: reduce) {
@@ -183,7 +187,8 @@
     }
     .art-3d-shadow { opacity: 0.55; }
     /* Like: color change only */
-    .art-3d-pop, .heart-pop, .like-ring, .animate-bounce, .animate-ping { animation: none !important; }
+    .art-3d-pop, .heart-pop, .like-ring, .support-bloom, .animate-bounce, .animate-ping { animation: none !important; }
+    .support-bloom { opacity: 0; }
     .like-ring { box-shadow: none; }
     /* Sheets and dialogs (tailwindcss-animate) fade instead of sliding or zooming */
     .animate-in, .animate-out {

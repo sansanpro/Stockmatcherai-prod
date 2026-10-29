@@ -1,4 +1,5 @@
 import Disclaimer from '@/components/values/Disclaimer';
+import { askAI } from '@/lib/askAI';
 import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/sheet';
 import { capitalize } from '@/lib/utils';
 import CoachMark from '@/components/CoachMark';
@@ -11,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StockRecommendation } from '@/types/stock-matcher';
 import {
   TrendingUp, TrendingDown, Globe, Heart, X,
-  Building2, DollarSign, BarChart3, Newspaper, ExternalLink,
+  Building2, DollarSign, BarChart3, Newspaper, ExternalLink, Sparkles,
 } from 'lucide-react';
 import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import CompanySnapshot from '@/components/CompanySnapshot';
@@ -350,6 +351,14 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
               </div>
 
             </TabsContent>
+            <div className="px-4 pt-6">
+              <button
+                onClick={() => askAI(`What does ${stock.companyName} (${stock.ticker}) do, and how does it connect to my causes?`)}
+                className="w-full min-h-[48px] rounded-2xl border border-line bg-white text-ink text-sm font-semibold flex items-center justify-center gap-2 hover:bg-surface-2"
+              >
+                <Sparkles className="w-4 h-4 text-primary" aria-hidden /> Ask AI about {stock.companyName}
+              </button>
+            </div>
             <Disclaimer className="px-4 pt-6" />
           </div>
         </Tabs>

@@ -49,7 +49,7 @@ Dealbreakers you can filter out: tobacco, weapons, fossil fuels, gambling and fa
 
 ## Business model
 
-Free users get 7 matches a day and 5 Ask AI questions per 24 hours. Premium, sold through Apple in-app purchase, adds 12 matches a day and unlimited Ask AI.
+Free users get 7 matches a day and 5 Ask AI questions per 24 hours. Premium, sold through Apple in-app purchase, adds 12 matches a day, unlimited Ask AI, a step-by-step tutor mode in Ask AI, and side-by-side comparison of two liked companies. Premium adds learning and exploring; it never claims better picks. An optional $1.99 tip to StockMatcherAI is designed (`src/components/support/`) but stays hidden until its In-App Purchase is approved and set up.
 
 ---
 

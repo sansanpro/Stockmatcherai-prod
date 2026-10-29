@@ -102,11 +102,14 @@ test('running out of free questions explains why and lists only real Premium per
   await page.getByRole('button', { name: 'Send message' }).click();
   const sheet = page.getByRole('dialog');
   await expect(sheet.getByText("You've used your 5 free questions")).toBeVisible();
-  await expect(sheet.getByText('12 matches a day instead of 7')).toBeVisible();
-  await expect(sheet.getByText('Unlimited Ask AI questions instead of 5 a day')).toBeVisible();
-  await expect(sheet.getByText(/unlimited (daily )?swipes|portfolio tracking|advanced filtering/i)).toHaveCount(0);
+  await expect(sheet.getByText('12 matches a day')).toBeVisible();
+  await expect(sheet.getByText('Instead of 7, all for your causes')).toBeVisible();
+  await expect(sheet.getByText('Unlimited Ask AI')).toBeVisible();
+  await expect(sheet.getByText('Instead of 5 questions a day')).toBeVisible();
+  await expect(sheet.getByText(/unlimited (daily )?swipes|portfolio tracking|advanced filtering|better (picks|returns)/i)).toHaveCount(0);
   await page.waitForTimeout(500); // let the sheet finish opening
-  await expect(sheet.getByRole('heading', { name: 'Upgrade to Premium' })).toBeInViewport();
+  await expect(sheet.getByRole('heading', { name: "You've used your 5 free questions" })).toBeInViewport();
+  await expect(sheet.getByRole('button', { name: 'Maybe later' })).toBeVisible();
   await page.screenshot({ path: 'e2e/screens/upgrade-ai.png' });
   // Apple requires the subscription screen to link the privacy policy and terms
   for (const name of ['Privacy Policy', 'Terms of Service']) {
