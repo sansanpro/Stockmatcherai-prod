@@ -1,5 +1,5 @@
 import Disclaimer from '@/components/values/Disclaimer';
-import { askAI } from '@/lib/askAI';
+import { askAI, companyQuestion } from '@/lib/askAI';
 import { Sheet, SheetContent, SheetTitle, keepOpenForAIAssistant } from '@/components/ui/sheet';
 import { capitalize } from '@/lib/utils';
 import CoachMark from '@/components/CoachMark';
@@ -90,8 +90,8 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
         {/* ── Hero: a soft tint of the company's cause ─────────────────────── */}
         <div className={`${stock.cause || stock.matchedCauses?.length ? causeTone(stock.cause ?? stock.matchedCauses?.[0]?.cause).header : getRiskTint(stock.riskLevel)} flex-shrink-0 relative overflow-hidden`}>
           {/* Decorative circles */}
-          <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/35 rounded-full" />
-          <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-white/35 rounded-full" />
+          <div className="absolute -top-8 -right-8 w-32 h-32 bg-surface/35 rounded-full" />
+          <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-surface/35 rounded-full" />
 
           {/* Drag handle */}
           <div className="flex justify-center pt-3 pb-1">
@@ -125,7 +125,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
 
             {/* Risk in plain words */}
             <div className="flex gap-2 mt-3 flex-wrap">
-              <Badge className="bg-white/80 hover:bg-white/80 text-ink border border-black/5 text-xs font-semibold px-3 py-1">
+              <Badge className="bg-surface/80 hover:bg-surface/80 text-ink border border-ink/10 text-xs font-semibold px-3 py-1">
                 {(RISK_WORDS[stock.riskLevel] ?? RISK_WORDS.medium).emoji} {(RISK_WORDS[stock.riskLevel] ?? RISK_WORDS.medium).text}
               </Badge>
             </div>
@@ -354,8 +354,8 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
             </TabsContent>
             <div className="px-4 pt-6">
               <button
-                onClick={() => askAI(`What does ${stock.companyName} (${stock.ticker}) do, and how does it connect to my causes?`)}
-                className="w-full min-h-[48px] rounded-2xl border border-line bg-white text-ink text-sm font-semibold flex items-center justify-center gap-2 hover:bg-surface-2"
+                onClick={() => askAI(companyQuestion(stock.companyName, stock.ticker))}
+                className="w-full min-h-[48px] rounded-2xl border border-line bg-surface text-ink text-sm font-semibold flex items-center justify-center gap-2 hover:bg-surface-2"
               >
                 <Sparkles className="w-4 h-4 text-primary" aria-hidden /> Ask AI about {stock.companyName}
               </button>
@@ -370,7 +370,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
             <Button
               onClick={() => { onPass(stock); onClose(); }}
               variant="outline"
-              className="flex-1 h-12 rounded-xl border border-line bg-white text-ink hover:bg-sand font-semibold gap-2"
+              className="flex-1 h-12 rounded-xl border border-line bg-surface text-ink hover:bg-sand font-semibold gap-2"
             >
               <X className="w-4 h-4" /> Pass
             </Button>
@@ -378,7 +378,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
               onClick={() => { onMatch(stock); onClose(); }}
               className="flex-[2] h-12 rounded-xl font-semibold gap-2 bg-primary hover:bg-clay-ink border-0 shadow-lg shadow-brand/25"
             >
-              <Heart className="w-4 h-4 fill-white" /> Like
+              <Heart className="w-4 h-4 fill-current" /> Like
             </Button>
           </div>
         </div>

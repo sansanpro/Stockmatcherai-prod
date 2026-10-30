@@ -54,7 +54,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
     return (
       <div className="relative flex-shrink-0">
         {!imageLoaded && initials}
-        <div className={`${sizeClasses} rounded-xl overflow-hidden bg-white shadow-sm border border-line ${imageLoaded ? '' : 'absolute inset-0 opacity-0'}`}>
+        <div className={`${sizeClasses} rounded-xl overflow-hidden bg-surface shadow-sm border border-line ${imageLoaded ? '' : 'absolute inset-0 opacity-0'}`}>
           <img
             src={currentImageUrl}
             alt={`${companyName} logo`}
@@ -192,7 +192,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
       {/* Facts Grid */}
       <div className="grid grid-cols-3 gap-3 mb-4">
         {profile?.ipoDate && (
-          <div className="bg-white border border-line rounded-xl p-3 text-center">
+          <div className="bg-surface border border-line rounded-xl p-3 text-center">
             <Calendar className="w-5 h-5 mx-auto mb-1 text-primary" />
             <p className="text-xs text-ink-faint">Went Public</p>
             <p className="font-semibold text-ink text-sm">
@@ -202,7 +202,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
         )}
         
         {profile?.fullTimeEmployees && (
-          <div className="bg-white border border-line rounded-xl p-3 text-center">
+          <div className="bg-surface border border-line rounded-xl p-3 text-center">
             <Users className="w-5 h-5 mx-auto mb-1 text-positive" />
             <p className="text-xs text-ink-faint">Employees</p>
             <p className="font-semibold text-ink text-sm">
@@ -212,7 +212,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
         )}
         
         {(profile?.city || profile?.country) && (
-          <div className="bg-white border border-line rounded-xl p-3 text-center">
+          <div className="bg-surface border border-line rounded-xl p-3 text-center">
             <Building2 className="w-5 h-5 mx-auto mb-1 text-info" />
             <p className="text-xs text-ink-faint">Headquarters</p>
             <p className="font-semibold text-ink text-sm truncate">
@@ -229,7 +229,7 @@ const CompanySnapshot = ({ ticker, companyName, sector, variant = 'compact' }: C
           target="_blank" 
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-clay-ink text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors mb-4"
+          className="inline-flex items-center gap-2 bg-primary hover:bg-clay-ink text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium transition-colors mb-4"
         >
           <Globe className="w-4 h-4" />
           Visit Website

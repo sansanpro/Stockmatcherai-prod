@@ -122,7 +122,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
       <div className="sticky top-0 z-10 bg-cream/85 backdrop-blur-md border-b border-line px-4 pb-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
         <div className="flex items-center gap-3 max-w-2xl mx-auto">
           <button onClick={onBack} aria-label="Back"
-            className="w-11 h-11 rounded-full bg-white border border-line hover:bg-sand flex items-center justify-center transition-colors">
+            className="w-11 h-11 rounded-full bg-surface border border-line hover:bg-sand flex items-center justify-center transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <h1 className="text-xl font-bold">Settings</h1>
@@ -140,7 +140,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
           <section className="rounded-2xl overflow-hidden border border-premium-line bg-premium-tint">
             <div className="p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-premium flex items-center justify-center flex-shrink-0">
-                <Crown className="w-5 h-5 text-white" />
+                <Crown className="w-5 h-5 text-primary-foreground" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-ink">Go deeper with Premium</p>
@@ -149,7 +149,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
               <Button
                 size="sm"
                 onClick={() => setShowUpgradeModal(true)}
-                className="flex-shrink-0 bg-premium hover:bg-premium/90 text-white font-semibold border-0"
+                className="flex-shrink-0 bg-premium hover:bg-premium/90 text-primary-foreground font-semibold border-0"
               >
                 See Premium
               </Button>
@@ -158,7 +158,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
         )}
 
         {/* Account section */}
-        <section className="rounded-2xl overflow-hidden border border-line bg-white shadow-sm">
+        <section className="rounded-2xl overflow-hidden border border-line bg-surface shadow-sm">
           <div className="px-4 py-3 border-b border-line flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-clay-tint flex items-center justify-center">
               <User className="w-3.5 h-3.5 text-primary" />
@@ -172,7 +172,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
                 placeholder="Your name"
                 autoCorrect="off"
                 autoComplete="name"
-                className="bg-white border-line text-ink placeholder:text-ink-muted focus:border-primary rounded-xl h-11 text-base" />
+                className="bg-surface border-line text-ink placeholder:text-ink-muted focus:border-primary rounded-xl h-11 text-base" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="settings-email" className="text-xs text-ink-faint uppercase tracking-wide">Email</Label>
@@ -191,7 +191,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
         </section>
 
         {/* What you care about (drives matching) */}
-        <section className="rounded-2xl overflow-hidden border border-line bg-white shadow-sm">
+        <section className="rounded-2xl overflow-hidden border border-line bg-surface shadow-sm">
           <div className="px-4 py-3 border-b border-line flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-clay-tint flex items-center justify-center">
               <Heart className="w-3.5 h-3.5 text-primary" />
@@ -228,7 +228,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
               </p>
             )}
             <Button onClick={handleValuesSave} disabled={loading || !changed || values.causes.length === 0}
-              className="w-full h-12 bg-primary hover:bg-clay-ink text-white rounded-xl font-semibold flex items-center justify-center gap-2">
+              className="w-full h-12 bg-primary hover:bg-clay-ink text-primary-foreground rounded-xl font-semibold flex items-center justify-center gap-2">
               <Save className="w-4 h-4" />
               {loading ? 'Saving...' : 'Save Changes'}
             </Button>
@@ -236,7 +236,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
         </section>
 
         {/* Privacy */}
-        <section className="rounded-2xl overflow-hidden border border-line bg-white shadow-sm">
+        <section className="rounded-2xl overflow-hidden border border-line bg-surface shadow-sm">
           <div className="px-4 py-3 border-b border-line flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-clay-tint flex items-center justify-center">
               <Shield className="w-3.5 h-3.5 text-primary" />
@@ -255,7 +255,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
               </div>
               {aiSharing && (
                 <Button size="sm" variant="outline" onClick={turnOffAiSharing}
-                  className="flex-shrink-0 rounded-xl border-line bg-white text-ink hover:bg-sand">
+                  className="flex-shrink-0 rounded-xl border-line bg-surface text-ink hover:bg-sand">
                   Turn off
                 </Button>
               )}
@@ -293,7 +293,7 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive"
-                  className="flex items-center gap-2 rounded-xl h-11 bg-white hover:bg-caution-soft text-caution border border-caution-line">
+                  className="flex items-center gap-2 rounded-xl h-11 bg-surface hover:bg-caution-soft text-caution border border-caution-line">
                   <Trash2 className="w-4 h-4" />
                   Delete Account
                 </Button>

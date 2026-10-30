@@ -41,7 +41,7 @@ const UserMenu = ({ onOpenSettings }: UserMenuProps) => {
           className="flex items-center gap-1 sm:gap-2 hover:bg-sand transition-colors px-2 sm:px-3"
         >
           <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-white" />
+            <User className="w-4 h-4 text-primary-foreground" />
           </div>
           <span className="text-xs sm:text-sm font-medium text-ink-soft">
             {getDisplayName()}

@@ -51,7 +51,7 @@ const AppHeader = ({ currentStep, signedIn, onMatchTab, onLikesTab, onOpenSettin
         <Button
           onClick={onMatchTab}
           variant={currentStep === 'matching' ? 'default' : 'ghost'}
-          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matching' ? 'bg-primary text-white shadow-md shadow-brand/20' : 'text-ink-soft'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matching' ? 'bg-primary text-primary-foreground shadow-md shadow-brand/20' : 'text-ink-soft'}`}
         >
           <Heart className="w-4 h-4" />
           Match
@@ -59,7 +59,7 @@ const AppHeader = ({ currentStep, signedIn, onMatchTab, onLikesTab, onOpenSettin
         <Button
           onClick={onLikesTab}
           variant={currentStep === 'matches' ? 'default' : 'ghost'}
-          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matches' ? 'bg-primary text-white shadow-md shadow-brand/20' : 'text-ink-soft'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 min-h-[44px] text-sm rounded-xl ${currentStep === 'matches' ? 'bg-primary text-primary-foreground shadow-md shadow-brand/20' : 'text-ink-soft'}`}
         >
           <Heart className="w-4 h-4 fill-current" />
           Likes
@@ -95,26 +95,26 @@ const BottomNavBar = ({ currentStep, onStepChange, watchlistLength }: BottomNavB
       className="fixed bottom-0 left-0 w-full z-50 pb-safe-area-inset-bottom"
       style={{ fontFamily: 'SF Pro Text, SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif' }}
     >
-      <div className="mx-3 mb-3 rounded-2xl bg-white/90 backdrop-blur-xl border border-line shadow-[0_8px_30px_rgb(var(--shadow)/0.12)] flex justify-around items-center py-2 px-2">
+      <div className="mx-3 mb-3 rounded-2xl bg-surface/90 backdrop-blur-xl border border-line shadow-[0_8px_30px_rgb(var(--shadow)/0.12)] flex justify-around items-center py-2 px-2">
         {navItems.map(({ step, icon: Icon, label }) => {
           const active = currentStep === step;
           return (
             <button
               key={step}
               onClick={() => onStepChange(step)}
-              className={`flex flex-col items-center min-h-[44px] min-w-[52px] justify-center rounded-xl transition-all duration-200 ${
-                active ? 'bg-clay-tint text-primary scale-105' : 'text-ink-faint hover:text-ink'
+              className={`flex flex-col items-center min-h-[48px] min-w-[64px] px-4 py-1 justify-center rounded-xl transition-all duration-200 ${
+                active ? 'bg-brand-tint text-brand' : 'text-ink-faint hover:text-ink'
               }`}
             >
               <div className="relative">
                 <Icon className={`w-5 h-5 mb-0.5 ${active && step === 'matches' ? 'fill-current' : ''}`} />
                 {step === 'matches' && watchlistLength > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 bg-primary text-white text-[0.5625rem] font-bold rounded-full flex items-center justify-center px-0.5">
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 bg-primary text-primary-foreground text-[0.5625rem] font-bold rounded-full flex items-center justify-center px-0.5">
                     {watchlistLength > 99 ? '99+' : watchlistLength}
                   </span>
                 )}
               </div>
-              <span className={`text-[0.625rem] font-semibold ${active ? 'text-clay-ink' : ''}`}>{label}</span>
+              <span className="text-xs font-semibold">{label}</span>
             </button>
           );
         })}
@@ -154,6 +154,7 @@ const IndexContent = () => {
   const [currentStep, setCurrentStep] = useState<MainStep>('matching');
   const [causesVersion, setCausesVersion] = useState(0);
   const deckCausesVersion = useRef<number>();
+  const [deckCardsShowing, setDeckCardsShowing] = useState(false);
   const [savePromptOpen, setSavePromptOpen] = useState(false);
   const [savePromptReason, setSavePromptReason] = useState<'save' | 'ai'>('save');
   const [deviceLikes, setDeviceLikes] = useState(() => loadDeviceFeed().liked.length);
@@ -373,6 +374,7 @@ const IndexContent = () => {
           signedIn={signedIn}
           causesVersion={causesVersion}
           loadedCausesVersion={deckCausesVersion}
+          onCardsShowing={setDeckCardsShowing}
           onEditCauses={() => (signedIn ? setCurrentStep('settings') : openSavePrompt())}
           onNeedsCauses={() => { setOnboardingMode('causes_only'); setGate('onboarding'); }}
           onLikedOnDevice={handleLikedOnDevice}
@@ -408,7 +410,10 @@ const IndexContent = () => {
           watchlistLength={watchlist.length}
         />
       )}
-      <AIAssistantWidget onNeedAccount={() => { setSavePromptReason('ai'); setSavePromptOpen(true); }} />
+      <AIAssistantWidget
+        hideLauncher={currentStep === 'matching' && deckCardsShowing}
+        onNeedAccount={() => { setSavePromptReason('ai'); setSavePromptOpen(true); }}
+      />
       {!signedIn && <SavePrompt open={savePromptOpen} likes={deviceLikes} reason={savePromptReason} onClose={() => setSavePromptOpen(false)} />}
     </>
   );

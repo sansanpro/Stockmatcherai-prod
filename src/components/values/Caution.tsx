@@ -1,15 +1,15 @@
 import { AlertTriangle } from 'lucide-react';
 import type { StockCaution } from '@/types/stock-matcher';
 
-// Caution colors (Daybreak tokens): deep on tint 6.2:1+, ink on soft 7.7:1, on white 10:1+.
+// Caution colors (plum palette; every pairing is checked in light and dark by scripts/build-plum-tokens.mjs).
 // Same box design as Proof and Things to know, so a caution is never less visible than the proof.
 const TONE = { box: 'bg-caution-tint border-caution-line', title: 'text-caution-ink', chip: 'bg-caution-soft border-caution-line text-caution-ink' };
 
 // Small tag on a card header: this stock swings a lot
-export const CautionChip = ({ caution }: { caution?: StockCaution }) => {
+export const CautionChip = ({ caution, onPlum = false }: { caution?: StockCaution; onPlum?: boolean }) => {
   if (!caution) return null;
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold border ${TONE.chip}`}>
+    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold border ${onPlum ? 'bg-white/10 border-white/30 text-white' : TONE.chip}`}>
       <AlertTriangle className="w-3.5 h-3.5" aria-hidden /> Big swings
     </span>
   );

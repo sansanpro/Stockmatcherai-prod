@@ -119,7 +119,7 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
             </div>
           ))}
         </div>
-        <button onClick={onClose} aria-label="Close recap" className="w-11 h-11 -mr-2 flex items-center justify-center rounded-full text-ink-soft hover:bg-white/60">
+        <button onClick={onClose} aria-label="Close recap" className="w-11 h-11 -mr-2 flex items-center justify-center rounded-full text-ink-soft hover:bg-surface/60">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -167,7 +167,7 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
               {(slide.stock.matchedCauses ?? []).map(c => {
                 const tone = causeTone(c.cause);
                 return (
-                  <span key={c.cause} className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold bg-white border ${tone.border} ${tone.text}`}>
+                  <span key={c.cause} className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold bg-surface border ${tone.border} ${tone.text}`}>
                     <span aria-hidden>{c.icon}</span> {c.label}
                   </span>
                 );
@@ -211,7 +211,7 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
             <p className="rise-in text-ink text-[1.0625rem] mt-3" style={{ animationDelay: '380ms' }}>{insights.persona.line}</p>
             <ul className="mt-7 space-y-2.5 w-full text-left">
               {insights.facts.map((fact, i) => (
-                <li key={fact} className="rise-in flex gap-3 items-start rounded-2xl bg-white/85 border border-line px-4 py-3 shadow-sm text-[0.9375rem] text-ink leading-snug"
+                <li key={fact} className="rise-in flex gap-3 items-start rounded-2xl bg-surface/85 border border-line px-4 py-3 shadow-sm text-[0.9375rem] text-ink leading-snug"
                   style={{ animationDelay: `${900 + i * 900}ms` }}>
                   <span className="mt-0.5 w-5 h-5 rounded-full bg-clay-tint text-primary text-xs font-bold flex items-center justify-center flex-shrink-0" aria-hidden>{i + 1}</span>
                   {fact}
@@ -231,10 +231,10 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
               New companies arrive tomorrow morning. Your likes are saved in Likes.
             </p>
             <div className="rise-in w-full space-y-3 mt-10" style={{ animationDelay: '380ms' }}>
-              <button onClick={share} className="w-full h-14 rounded-2xl bg-primary hover:bg-clay-ink text-white text-[1.0625rem] font-semibold shadow-lg shadow-brand/25 flex items-center justify-center gap-2">
+              <button onClick={share} className="w-full h-14 rounded-2xl bg-primary hover:bg-clay-ink text-primary-foreground text-[1.0625rem] font-semibold shadow-lg shadow-brand/25 flex items-center justify-center gap-2">
                 <Share2 className="w-4 h-4" /> Share my day
               </button>
-              <button onClick={onClose} className="w-full h-14 rounded-2xl border border-line bg-white text-ink text-[1.0625rem] font-semibold hover:bg-sand">
+              <button onClick={onClose} className="w-full h-14 rounded-2xl border border-line bg-surface text-ink text-[1.0625rem] font-semibold hover:bg-sand">
                 Done
               </button>
             </div>
@@ -247,10 +247,10 @@ const DailyRecap = ({ liked, deckSize, myCauses, onClose }: DailyRecapProps) => 
                   </p>
                 </div>
                 <div className="flex gap-2 mt-3">
-                  <button onClick={() => setShowSupport(true)} className="flex-1 min-h-[44px] rounded-xl bg-support hover:bg-support/90 text-white text-sm font-semibold">
+                  <button onClick={() => setShowSupport(true)} className="flex-1 min-h-[44px] rounded-xl bg-support hover:bg-support/90 text-primary-foreground text-sm font-semibold">
                     Tip {TIP_PRICE}
                   </button>
-                  <button onClick={() => { dismissTipOffer(); setTipCard(false); }} className="flex-1 min-h-[44px] rounded-xl border border-line bg-white text-ink text-sm font-semibold">
+                  <button onClick={() => { dismissTipOffer(); setTipCard(false); }} className="flex-1 min-h-[44px] rounded-xl border border-line bg-surface text-ink text-sm font-semibold">
                     Not now
                   </button>
                 </div>

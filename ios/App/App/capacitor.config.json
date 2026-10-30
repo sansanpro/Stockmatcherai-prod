@@ -2,10 +2,6 @@
 	"appId": "com.hassanomar.stockmatcherai",
 	"appName": "StockMatcherAI",
 	"webDir": "dist",
-	"backgroundColor": "#FAF6EF",
-	"ios": {
-		"backgroundColor": "#FAF6EF"
-	},
 	"packageClassList": [
 		"SignInWithApple",
 		"CAPBrowserPlugin",

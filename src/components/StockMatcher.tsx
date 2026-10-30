@@ -7,7 +7,9 @@ import UpgradeModal from '@/components/UpgradeModal';
 import CoachMark from '@/components/CoachMark';
 import { useApp } from '@/contexts/AppContext';
 import { PLAN_LIMITS, useSubscription } from '@/contexts/SubscriptionContext';
-import { Heart, X, RefreshCw, Crown, Pencil, Play } from 'lucide-react';
+import { Heart, X, RefreshCw, Crown, Pencil, Play, Sparkles } from 'lucide-react';
+import { CauseIcon, causeTone } from '@/components/values/CauseChips';
+import { askAI, companyQuestion } from '@/lib/askAI';
 import DailyRecap from '@/components/DailyRecap';
 import Art3D from '@/components/onboarding/Art3D';
 import { STEP_ART } from '@/lib/art';
@@ -34,6 +36,8 @@ interface StockMatcherProps {
   // Signed out: called after each like; returns true if it opened the save prompt
   onLikedOnDevice?: (likesOnDevice: number) => boolean;
   onSaveMatches?: () => void;
+  // Whether cards are on screen (the deck then shows its own Ask AI button)
+  onCardsShowing?: (showing: boolean) => void;
   // advance(liked) is called by the details modal's buttons so the card moves on without a swipe
   onViewDetails?: (stock: StockRecommendation, advance: (liked: boolean) => void) => void;
 }
@@ -41,7 +45,7 @@ interface StockMatcherProps {
 type Status = 'loading' | 'ready' | 'error';
 
 const StockMatcher = ({
-  answers, signedIn, causesVersion, loadedCausesVersion, onEditCauses, onNeedsCauses, onLikedOnDevice, onSaveMatches, onViewDetails,
+  answers, signedIn, causesVersion, loadedCausesVersion, onCardsShowing, onEditCauses, onNeedsCauses, onLikedOnDevice, onSaveMatches, onViewDetails,
 }: StockMatcherProps) => {
   const [cards, setCards] = useState<StockRecommendation[]>([]); // still to swipe today, in order
   const [deckSize, setDeckSize] = useState(0);
@@ -164,6 +168,8 @@ const StockMatcher = ({
   useEffect(() => { handlePassRef.current = handlePass; });
 
   const isFinished = status === 'ready' && deckSize > 0 && cards.length === 0;
+  const cardsShowing = status === 'ready' && cards.length > 0;
+  useEffect(() => { onCardsShowing?.(cardsShowing); }, [cardsShowing]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (isFinished && !finishedTracked.current) {
       finishedTracked.current = true;
@@ -189,7 +195,7 @@ const StockMatcher = ({
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center" role="status">
+      <div className="min-h-screen bg-daybreak flex items-center justify-center" role="status">
         <div className="text-center space-y-6">
           <Art3D src={STEP_ART.causes} size={96} />
           <div className="space-y-2">
@@ -202,7 +208,7 @@ const StockMatcher = ({
   }
 
   const centered = (content: React.ReactNode) => (
-    <div className="min-h-screen bg-cream p-6 flex items-center justify-center" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <div className="min-h-screen bg-daybreak p-6 flex items-center justify-center" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <div className="max-w-md w-full text-center text-ink pb-24">{content}</div>
     </div>
   );
@@ -262,7 +268,7 @@ const StockMatcher = ({
               <Crown className="w-4 h-4 mr-2" /> Get {PLAN_LIMITS.premium.dailyMatches} matches a day with Premium
             </Button>
           )}
-          <Button onClick={onEditCauses} variant="outline" className="w-full h-12 rounded-xl bg-white border-line text-ink hover:bg-sand">
+          <Button onClick={onEditCauses} variant="outline" className="w-full h-12 rounded-xl bg-surface border-line text-ink hover:bg-sand">
             <Pencil className="w-4 h-4 mr-2" /> Change my causes
           </Button>
           {signedIn && !causesWaitForTomorrow && (
@@ -281,7 +287,7 @@ const StockMatcher = ({
   const currentStock = cards[0];
 
   return (
-    <div className="w-full h-full flex flex-col bg-cream" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <div className="w-full h-full flex flex-col bg-daybreak" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto flex flex-col flex-1 min-h-0 px-4 lg:px-2">
         {/* Header: the user's causes, in rank order (the one-time hint sits on top of it) */}
         <div className="relative text-center mb-2 pt-3 flex-shrink-0">
@@ -295,8 +301,8 @@ const StockMatcher = ({
               {myCauses.map(c => (
                 <Tooltip key={c.id}>
                   <TooltipTrigger asChild>
-                    <button onClick={onEditCauses} className="tap-target min-h-[32px] px-3 rounded-full bg-white hover:bg-sand border border-line text-ink text-xs font-semibold shadow-sm transition-colors">
-                      <span aria-hidden>{c.icon}</span> {c.label}
+                    <button onClick={onEditCauses} className="tap-target inline-flex items-center gap-1.5 min-h-[32px] px-3 rounded-full bg-surface hover:bg-surface-2 border border-line text-ink text-xs font-semibold shadow-sm transition-colors">
+                      <CauseIcon cause={c.id} className={`w-3.5 h-3.5 ${causeTone(c.id).text}`} /> {c.label}
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>Tap to change your causes</TooltipContent>
@@ -333,24 +339,31 @@ const StockMatcher = ({
 
         {/* Pass / like */}
         {currentStock && (
-          <div className="flex-shrink-0 px-4 pb-[max(env(safe-area-inset-bottom),6rem)]">
-            <div className="flex justify-center gap-10 mb-2">
+          <div className="flex-shrink-0 px-4 pb-[max(env(safe-area-inset-bottom),6.75rem)]">
+            {/* Pass, Like in the middle, and Ask AI about this company (the floating Ask AI button is hidden here) */}
+            <div className="grid grid-cols-3 items-center mb-2">
               <Button
                 onClick={() => { Haptics.impact({ style: ImpactStyle.Light }).catch(() => {}); handlePass(); }}
                 disabled={animatingCard}
                 aria-label="Pass"
-                className="w-16 h-16 rounded-full bg-white hover:bg-white border border-line text-ink-soft shadow-[0_8px_24px_rgba(60,40,20,0.14)] transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+                className="justify-self-end mr-3 w-14 h-14 rounded-full bg-surface hover:bg-surface border border-line text-ink shadow-[0_8px_24px_rgb(var(--shadow)/0.12)] transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
               >
-                <X className="w-8 h-8" strokeWidth={2.5} />
+                <X className="w-7 h-7" strokeWidth={2.25} />
               </Button>
               <Button
                 onClick={() => { Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {}); handleMatch(); }}
                 disabled={animatingCard}
                 aria-label={currentStock.cardType === 'update' ? 'Interested' : 'Like this company'}
-                className="w-16 h-16 rounded-full bg-primary hover:bg-primary border-0 text-white shadow-[0_10px_26px_rgba(181,74,34,0.35)] transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
+                className="btn-like justify-self-center w-[4.5rem] h-[4.5rem] rounded-full border-0 shadow-[0_12px_28px_rgb(var(--primary-bright)/0.4)] transform hover:scale-110 active:scale-90 transition-all duration-200 disabled:opacity-50 disabled:transform-none"
               >
                 <Heart className="w-8 h-8 fill-current" />
               </Button>
+              <button
+                onClick={() => askAI(companyQuestion(currentStock.companyName, currentStock.ticker))}
+                className="justify-self-start ml-3 inline-flex items-center gap-1.5 h-12 px-4 rounded-full whitespace-nowrap bg-brand-tint border border-brand-line text-brand font-semibold text-[0.9375rem] active:scale-95 transition-transform"
+              >
+                <Sparkles className="w-4 h-4" aria-hidden /> Ask AI
+              </button>
             </div>
             {showSwipeHint && (
               <p className="hide-when-text-large text-center text-ink-faint text-xs">← Swipe left to pass · Swipe right to like →</p>

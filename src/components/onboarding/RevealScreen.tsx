@@ -78,7 +78,7 @@ const RevealScreen = ({ answers, causes, onContinue }: RevealScreenProps) => {
                       key={src}
                       src={src}
                       alt=""
-                      className="w-14 h-14 max-w-none rounded-2xl bg-white object-contain p-1.5 shadow-lg shadow-ink/15 border border-line absolute transition-all ease-out"
+                      className="w-14 h-14 max-w-none rounded-2xl bg-surface object-contain p-1.5 shadow-lg shadow-ink/15 border border-line absolute transition-all ease-out"
                       style={{
                         transitionDuration: '600ms',
                         transitionDelay: `${i * 110}ms`,
@@ -112,7 +112,7 @@ const RevealScreen = ({ answers, causes, onContinue }: RevealScreenProps) => {
       <div className={`pt-4 transition-opacity duration-500 ${phase >= 2 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <Button
           onClick={onContinue}
-          className="w-full h-14 text-[1.0625rem] font-semibold rounded-2xl bg-primary hover:bg-clay-ink text-white shadow-lg shadow-brand/25 flex items-center justify-center gap-2"
+          className="w-full h-14 text-[1.0625rem] font-semibold rounded-2xl bg-primary hover:bg-clay-ink text-primary-foreground shadow-lg shadow-brand/25 flex items-center justify-center gap-2"
         >
           {promiseCount ? `See my first ${firstDeck} matches` : 'See my first matches'} <ArrowRight className="w-4 h-4" />
         </Button>

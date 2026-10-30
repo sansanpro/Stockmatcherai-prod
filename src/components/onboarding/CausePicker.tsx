@@ -31,7 +31,7 @@ const CausePicker = ({ causes, selected, onChange }: CausePickerProps) => {
             onClick={() => toggle(cause.id)}
             disabled={!isOn && full}
             className={`w-full min-h-[52px] rounded-2xl border px-3 py-2 text-left flex items-center gap-3 shadow-sm transition-all duration-fast ease-out motion-safe:active:scale-[0.98] disabled:opacity-40 ${
-              isOn ? 'border-primary bg-clay-tint ring-1 ring-primary' : 'border-line bg-white hover:border-clay-soft'
+              isOn ? 'border-primary bg-clay-tint ring-1 ring-primary' : 'border-line bg-surface hover:border-clay-soft'
             }`}
           >
             {art
@@ -45,7 +45,7 @@ const CausePicker = ({ causes, selected, onChange }: CausePickerProps) => {
                 : <span className="block text-ink-faint text-[0.78125rem] leading-snug mt-0.5">{cause.tagline}</span>}
             </span>
             <span className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold transition-colors ${
-              isOn ? 'bg-primary text-white' : 'border border-line bg-white'
+              isOn ? 'bg-primary text-primary-foreground' : 'border border-line bg-surface'
             }`} aria-hidden>
               {isOn ? rank : ''}
             </span>

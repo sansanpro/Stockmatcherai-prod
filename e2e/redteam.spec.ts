@@ -6,12 +6,15 @@ import { measureContrast } from './contrast-audit';
 
 // Phase 5 red-team sweep: every main screen, checked by outside instruments. Runs only when REDTEAM_OUT is set:
 //   REDTEAM_OUT=docs/phase5/sweep.json npx playwright test e2e/redteam.spec.ts --project=iphone
+// (REDTEAM_SCREENS sets the screenshot folder, REDTEAM_SCHEME=dark checks dark mode)
 // Per screen: axe-core (WCAG 2.2 A/AA plus best practices), our contrast audit, touch targets under 44 pt
 // (Apple) and 24 px (WCAG 2.5.8), animations that never stop (battery), sideways overflow, and the same
 // screen at the largest iOS text size the app follows (root 20 px, see src/lib/textSize.ts) for overflow and clipped text.
 const out = process.env.REDTEAM_OUT;
 test.skip(!out, 'set REDTEAM_OUT to run the red-team sweep');
 const LARGE_ROOT = process.env.REDTEAM_ROOT ?? '20px';
+// REDTEAM_SCHEME=dark runs the sweep in dark mode (the app follows the system setting)
+test.use({ colorScheme: process.env.REDTEAM_SCHEME === 'dark' ? 'dark' : 'light' });
 const results: Record<string, unknown> = fs.existsSync(out ?? '') ? JSON.parse(fs.readFileSync(out!, 'utf8')) : {};
 
 async function audit(page: Page, name: string) {

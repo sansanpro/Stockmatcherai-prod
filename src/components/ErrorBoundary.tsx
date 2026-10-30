@@ -32,7 +32,7 @@ class ErrorBoundary extends Component<Props, State> {
           </p>
           <Button
             onClick={() => window.location.reload()}
-            className="bg-primary hover:bg-clay-ink text-white rounded-xl px-8"
+            className="bg-primary hover:bg-clay-ink text-primary-foreground rounded-xl px-8"
           >
             Refresh App
           </Button>

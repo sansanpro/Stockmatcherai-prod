@@ -60,14 +60,14 @@ const SavePrompt = ({ open, likes, onClose, reason = 'save' }: SavePromptProps) 
             <button
               onClick={apple}
               disabled={appleLoading}
-              className="w-full h-14 bg-black hover:bg-black/85 text-white font-semibold rounded-2xl flex items-center justify-center gap-3 disabled:opacity-60"
+              className="w-full h-14 bg-black hover:bg-black/85 text-white dark:bg-white dark:hover:bg-white/90 dark:text-black font-semibold rounded-2xl flex items-center justify-center gap-3 disabled:opacity-60"
             >
-              {appleLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <AppleIcon />}
+              {appleLoading ? <div className="w-5 h-5 border-2 border-current/30 border-t-current rounded-full animate-spin" /> : <AppleIcon />}
               Continue with Apple
             </button>
             <button
               onClick={() => { act('email'); navigate('/auth?mode=save'); }}
-              className="w-full h-14 rounded-2xl border border-line bg-white text-ink font-semibold hover:bg-sand"
+              className="w-full h-14 rounded-2xl border border-line bg-surface text-ink font-semibold hover:bg-sand"
             >
               Use email
             </button>

@@ -41,9 +41,11 @@ function describeToolCall(tool: { name: string; args?: Record<string, unknown> }
 interface AIAssistantWidgetProps {
   // Signed out: the button stays visible and asks for a free account instead of opening the chat
   onNeedAccount?: () => void;
+  // The swipe deck has its own Ask AI button, so the floating one steps aside there
+  hideLauncher?: boolean;
 }
 
-export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetProps = {}) {
+export default function AIAssistantWidget({ onNeedAccount, hideLauncher = false }: AIAssistantWidgetProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -381,7 +383,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
   return (
     <>
       {/* Floating Button — sits above the nav bar */}
-      {!isOpen && (
+      {!isOpen && !hideLauncher && (
         <button
           onClick={() => {
             if (!user) { track('ai_widget_signed_out_tap'); onNeedAccount?.(); return; }
@@ -395,7 +397,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
           data-ai-assistant
           className="fixed bottom-[7.5rem] right-4 md:bottom-8 md:right-6 z-[75] flex items-center gap-2 h-14 rounded-full px-4
             bg-primary hover:bg-clay-ink shadow-[0_10px_26px_rgb(var(--shadow)/0.35)]
-            text-white transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none"
+            text-primary-foreground transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none"
         >
           {/* Pulsing attention ring for new users */}
           {!hasOpenedWidget && (
@@ -533,7 +535,7 @@ export default function AIAssistantWidget({ onNeedAccount }: AIAssistantWidgetPr
               }}
               aria-pressed={subscribed ? tutorMode : undefined}
               className={`tap-target mb-2 min-h-[32px] px-3 rounded-full border text-xs font-semibold inline-flex items-center gap-1.5 transition-colors ${
-                tutorMode && subscribed ? 'bg-premium text-white border-premium' : 'bg-premium-tint text-premium-ink border-premium-line'
+                tutorMode && subscribed ? 'bg-premium text-primary-foreground border-premium' : 'bg-premium-tint text-premium-ink border-premium-line'
               }`}
             >
               <GraduationCap className="w-3.5 h-3.5" aria-hidden />

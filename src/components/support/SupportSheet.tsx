@@ -58,7 +58,7 @@ const SupportSheet = ({ isOpen, onClose, source }: SupportSheetProps) => {
             </div>
             <DialogTitle className="text-2xl font-bold text-ink">Thank you</DialogTitle>
             <DialogDescription className="text-ink-soft text-[1.0625rem] mt-2 leading-snug">{TIP_COPY.thanks}</DialogDescription>
-            <button onClick={onClose} className="mt-7 w-full h-12 rounded-xl bg-support hover:bg-support/90 text-white font-semibold">
+            <button onClick={onClose} className="mt-7 w-full h-12 rounded-xl bg-support hover:bg-support/90 text-primary-foreground font-semibold">
               Done
             </button>
           </div>
@@ -69,10 +69,10 @@ const SupportSheet = ({ isOpen, onClose, source }: SupportSheetProps) => {
             <DialogDescription className="text-ink text-[0.9375rem] mt-3 leading-snug text-left">{TIP_COPY.body}</DialogDescription>
             <div className="mt-6 space-y-3">
               <button onClick={tip} disabled={state === 'paying'}
-                className="w-full h-12 rounded-xl bg-support hover:bg-support/90 text-white font-semibold disabled:opacity-70">
+                className="w-full h-12 rounded-xl bg-support hover:bg-support/90 text-primary-foreground font-semibold disabled:opacity-70">
                 {state === 'paying' ? 'One moment…' : `Tip ${TIP_PRICE}`}
               </button>
-              <button onClick={onClose} className="w-full h-12 rounded-xl border border-line bg-white text-ink font-semibold hover:bg-surface-2">
+              <button onClick={onClose} className="w-full h-12 rounded-xl border border-line bg-surface text-ink font-semibold hover:bg-surface-2">
                 Not now
               </button>
             </div>

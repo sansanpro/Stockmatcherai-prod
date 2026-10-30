@@ -22,7 +22,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
   const story = stock.missionStory || stock.whyItFits;
 
   return (
-    <Card className="w-full overflow-hidden border border-line shadow-[0_8px_24px_rgb(var(--shadow)/0.08)] bg-white">
+    <Card className="w-full overflow-hidden border border-line shadow-[0_8px_24px_rgb(var(--shadow)/0.08)] bg-surface">
       <div className={`${causeTone(stock.matchedCauses?.[0]?.cause).header} text-ink p-4 space-y-3`}>
         <div className="flex items-center gap-3">
           <CompanyLogo src={stock.logoUrl} name={stock.companyName} ticker={stock.ticker} className="w-11 h-11" />
@@ -36,7 +36,7 @@ const StockCard = ({ stock, onViewDetails }: StockCardProps) => {
               variant="secondary"
               onClick={() => onViewDetails(stock)}
               aria-label={`View ${stock.companyName} details`}
-              className="flex-shrink-0 gap-1 bg-white/80 hover:bg-white text-ink border border-black/5 shadow-sm h-11 px-3"
+              className="flex-shrink-0 gap-1 bg-surface/80 hover:bg-surface text-ink border border-ink/10 shadow-sm h-11 px-3"
             >
               <Eye className="w-4 h-4" />
               Details

@@ -49,7 +49,7 @@ const EmailInput = ({ id, name = 'email', placeholder, className }: EmailInputPr
               onPointerDown={e => e.preventDefault()}
               onMouseDown={e => e.preventDefault()}
               onClick={() => setValue(v => `${v}${ending}`)}
-              className="min-h-[36px] px-3 rounded-full border border-line bg-white text-sm font-medium text-ink-soft hover:border-clay-soft active:scale-95 transition-transform"
+              className="min-h-[36px] px-3 rounded-full border border-line bg-surface text-sm font-medium text-ink-soft hover:border-clay-soft active:scale-95 transition-transform"
             >
               {ending}
             </button>

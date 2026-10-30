@@ -54,7 +54,7 @@ const Matches = ({ onViewDetails, signedIn = true, onSaveMatches }: MatchesProps
       {/* Header */}
       <div className="flex items-center gap-3 pt-4 px-1">
         <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center shadow-md shadow-brand/25">
-          <Heart className="w-5 h-5 text-white fill-white" />
+          <Heart className="w-5 h-5 text-primary-foreground fill-current" />
         </div>
         <div>
           <h2 className="text-xl font-bold">Your Likes</h2>
@@ -80,7 +80,7 @@ const Matches = ({ onViewDetails, signedIn = true, onSaveMatches }: MatchesProps
       )}
 
       {!signedIn && watchlist.length > 0 && onSaveMatches && waiting === 0 && (
-        <button onClick={onSaveMatches} className="w-full text-left rounded-2xl border border-line bg-white shadow-sm p-4 text-sm text-ink">
+        <button onClick={onSaveMatches} className="w-full text-left rounded-2xl border border-line bg-surface shadow-sm p-4 text-sm text-ink">
           <span className="font-semibold">Saved on this device only.</span>{' '}
           <span className="text-ink-soft">Create a free account to keep your likes on any device.</span>
         </button>
@@ -108,7 +108,7 @@ const Matches = ({ onViewDetails, signedIn = true, onSaveMatches }: MatchesProps
                     aria-label={`Compare ${stock.companyName}`}
                     className={`absolute inset-0 rounded-xl border-2 transition-colors ${isPicked ? 'border-premium bg-premium/10' : 'border-transparent'}`}
                   >
-                    <span className={`absolute top-3 right-3 w-8 h-8 rounded-full border-2 flex items-center justify-center ${isPicked ? 'bg-premium border-premium text-white' : 'bg-white border-premium-line'}`}>
+                    <span className={`absolute top-3 right-3 w-8 h-8 rounded-full border-2 flex items-center justify-center ${isPicked ? 'bg-premium border-premium text-primary-foreground' : 'bg-surface border-premium-line'}`}>
                       {isPicked && <Check className="w-4 h-4" strokeWidth={3} aria-hidden />}
                     </span>
                   </button>
@@ -117,14 +117,14 @@ const Matches = ({ onViewDetails, signedIn = true, onSaveMatches }: MatchesProps
             );
           })}
           {waiting > 0 && (
-            <div className="rounded-2xl border-2 border-dashed border-clay-soft bg-white p-6 flex flex-col items-center justify-center text-center text-ink">
+            <div className="rounded-2xl border-2 border-dashed border-clay-soft bg-surface p-6 flex flex-col items-center justify-center text-center text-ink">
               <Lock className="w-8 h-8 mb-3 opacity-80" />
               <p className="font-semibold">
                 {waiting} more {waiting === 1 ? 'like is' : 'likes are'} waiting
               </p>
               <p className="text-sm opacity-70 mt-1 mb-4">Create a free account to keep them all.</p>
               {onSaveMatches && (
-                <button onClick={onSaveMatches} className="min-h-[44px] px-5 rounded-full bg-primary text-white font-semibold text-sm">
+                <button onClick={onSaveMatches} className="min-h-[44px] px-5 rounded-full bg-primary text-primary-foreground font-semibold text-sm">
                   Keep my likes
                 </button>
               )}

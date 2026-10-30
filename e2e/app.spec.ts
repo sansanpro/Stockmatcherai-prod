@@ -1,8 +1,16 @@
 import { test, expect, type Page } from '@playwright/test';
 import { openApp } from './helpers';
 
+// The deck has its own Ask AI button (it fills in a question about the card's company); elsewhere
+// the floating button opens the chat
 const openChat = async (page: Page) => {
-  await page.getByRole('button', { name: 'Open Ask AI' }).click();
+  const deckButton = page.getByRole('button', { name: 'Ask AI', exact: true });
+  if (await deckButton.isVisible().catch(() => false)) {
+    await deckButton.click();
+    await page.getByPlaceholder('Ask about a company or term…').fill('');
+  } else {
+    await page.getByRole('button', { name: 'Open Ask AI' }).click();
+  }
   await expect(chatPanel(page).getByRole('heading', { name: 'Ask AI' })).toBeVisible();
 };
 
@@ -11,6 +19,7 @@ const chatInput = (page: Page) => page.getByPlaceholder('Ask about a company or 
 const chatPanel = (page: Page) => page.locator('div[data-ai-assistant].fixed');
 
 test('swipe deck loads a values-matched card, story first', async ({ page }) => {
+  await page.setViewportSize({ width: 393, height: 759 }); // the app's own screen on an iPhone 15 (no Safari bars)
   await openApp(page);
   await expect(page.getByText('P/E Ratio').first()).toBeVisible();
   await expect(page.getByText(/matches left today/)).toBeVisible();
@@ -25,13 +34,13 @@ test('swipe deck loads a values-matched card, story first', async ({ page }) => 
   await expect(card.getByText('Values match')).toBeVisible();
   await expect(card.getByText(/· (core business|part of the business)$/).first()).toBeVisible();
   await expect(card.getByText('Proof', { exact: true })).toBeInViewport();
-  await expect(card.getByText('Things to know', { exact: true })).toBeInViewport();
+  await expect(card.getByText('To know', { exact: true })).toBeInViewport();
   await expect(card.getByText(/(Steadier: a large, established company|Moderate price swings|Bigger price swings)$/)).toBeVisible();
   const box = async (text: string) => (await card.getByText(text, { exact: true }).first().boundingBox())!;
   expect((await box('Values match')).y).toBeLessThan((await box('Proof')).y);
-  expect(Math.abs((await box('Proof')).y - (await box('Things to know')).y)).toBeLessThan(4);
-  expect((await box('Proof')).height).toBeCloseTo((await box('Things to know')).height, 0);
-  expect((await box('Things to know')).y).toBeLessThan((await box('The numbers')).y);
+  expect(Math.abs((await box('Proof')).y - (await box('To know')).y)).toBeLessThan(4);
+  expect((await box('Proof')).height).toBeCloseTo((await box('To know')).height, 0);
+  expect((await box('To know')).y).toBeLessThan((await box('The numbers')).y);
   // Profile chips are the user's causes now, not age or sector
   await expect(page.getByText(/^\d+yo$/)).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'View stock details' }).first()).toBeVisible();
@@ -147,7 +156,8 @@ test('AI data sharing can be turned off in Settings', async ({ page }) => {
 test('chat input accepts typing while stock details are open', async ({ page }) => {
   await openApp(page);
   await page.getByRole('button', { name: 'View stock details' }).first().click();
-  await openChat(page);
+  await page.getByRole('dialog').getByRole('button', { name: /^Ask AI about / }).click();
+  await chatInput(page).fill('');
   await chatInput(page).click();
   await page.keyboard.type('typing works');
   await expect(chatInput(page)).toHaveValue('typing works');
@@ -167,9 +177,9 @@ test('details button opens only the details panel, not the expanded card too', a
 test('tapping a "?" on the card explains the number and does not expand the card', async ({ page }) => {
   await openApp(page);
   await page.getByRole('button', { name: 'View stock details' }).first().waitFor();
-  await page.getByRole('button', { name: 'What is Share price?' }).first().click();
+  await page.getByRole('button', { name: 'What is Market Cap?' }).first().click();
   // Opens on tap (hover tooltips never open on a phone)
-  await expect(page.getByText('What one share costs right now.', { exact: false })).toBeVisible();
+  await expect(page.getByText('What the whole company is worth on the stock market', { exact: false })).toBeVisible();
   await page.waitForTimeout(600);
   await expect(page.getByRole('heading', { name: 'Stock Details' })).toHaveCount(0);
   await page.screenshot({ path: 'e2e/screens/number-explained.png' });

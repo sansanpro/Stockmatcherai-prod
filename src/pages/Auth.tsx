@@ -13,7 +13,7 @@ import { AppleIcon } from '@/components/SavePrompt';
 // and their answers are saved to the account right after sign-in.
 type View = 'account' | 'signin';
 
-const fieldClass = 'h-12 bg-white border-line text-ink placeholder:text-ink-muted focus:border-primary rounded-xl';
+const fieldClass = 'h-12 bg-surface border-line text-ink placeholder:text-ink-muted focus:border-primary rounded-xl';
 
 const Auth = () => {
   const { user, signIn, signUp, signInWithApple, resetPassword, loading } = useAuth();
@@ -68,9 +68,9 @@ const Auth = () => {
 
   const appleButton = (
     <button onClick={handleAppleSignIn} disabled={isAppleLoading}
-      className="w-full h-14 bg-black hover:bg-black/85 text-white font-semibold rounded-2xl flex items-center justify-center gap-3 transition-all disabled:opacity-60 mb-4">
+      className="w-full h-14 bg-black hover:bg-black/85 text-white dark:bg-white dark:hover:bg-white/90 dark:text-black font-semibold rounded-2xl flex items-center justify-center gap-3 transition-all disabled:opacity-60 mb-4">
       {isAppleLoading
-        ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        ? <div className="w-5 h-5 border-2 border-current/30 border-t-current rounded-full animate-spin" />
         : <AppleIcon />}
       Continue with Apple
     </button>
@@ -118,7 +118,7 @@ const Auth = () => {
                 {passwordField('signin-password', 'Your password')}
               </div>
               <Button type="submit" disabled={isLoading}
-                className="w-full h-12 bg-primary hover:bg-clay-ink text-white rounded-xl text-base font-semibold mt-2">
+                className="w-full h-12 bg-primary hover:bg-clay-ink text-primary-foreground rounded-xl text-base font-semibold mt-2">
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
@@ -129,7 +129,7 @@ const Auth = () => {
               <form onSubmit={handleResetPassword} className="mt-2 space-y-3">
                 <EmailInput placeholder="Enter your email" className={fieldClass} />
                 <Button type="submit" variant="outline" disabled={isLoading}
-                  className="w-full h-11 border-line bg-white text-ink hover:bg-sand rounded-xl">
+                  className="w-full h-11 border-line bg-surface text-ink hover:bg-sand rounded-xl">
                   {isLoading ? 'Sending...' : 'Send Reset Email'}
                 </Button>
               </form>
@@ -159,7 +159,7 @@ const Auth = () => {
                 {passwordField('signup-password', 'Min. 6 characters', 6)}
               </div>
               <Button type="submit" disabled={isLoading}
-                className="w-full h-12 bg-primary hover:bg-clay-ink text-white rounded-xl text-base font-semibold mt-2">
+                className="w-full h-12 bg-primary hover:bg-clay-ink text-primary-foreground rounded-xl text-base font-semibold mt-2">
                 {isLoading ? 'Creating account...' : fromSave ? 'Save my matches' : 'Create account'}
               </Button>
             </form>

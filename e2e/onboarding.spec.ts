@@ -217,7 +217,7 @@ test('signed out, Ask AI is on screen and asks for a free account', async ({ pag
   });
   await page.goto('/app');
   await page.getByRole('button', { name: 'View stock details' }).first().waitFor();
-  await page.getByRole('button', { name: 'Open Ask AI' }).click();
+  await page.getByRole('button', { name: 'Ask AI', exact: true }).click(); // the deck's own Ask AI button
   const sheet = page.getByRole('dialog');
   await expect(sheet.getByText('Ask AI with a free account')).toBeVisible();
   await expect(sheet.getByRole('button', { name: 'Continue with Apple' })).toBeVisible();

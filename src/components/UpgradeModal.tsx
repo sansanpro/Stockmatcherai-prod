@@ -132,7 +132,7 @@ const UpgradeModal = ({ isOpen, onClose, reason = 'settings' }: UpgradeModalProp
       {/* Scrolls on small phones so the title and the required Privacy/Terms links stay reachable */}
       <DialogContent className="max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto bg-surface border-premium-line p-0 gap-0 rounded-3xl duration-slow ease-out">
         <div className="bg-premium-tint border-b border-premium-line px-6 pt-7 pb-5 text-center">
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-premium-ink bg-white/80 border border-premium-line rounded-full px-2.5 py-1">
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-premium-ink bg-surface/80 border border-premium-line rounded-full px-2.5 py-1">
             <Crown className="w-3.5 h-3.5" aria-hidden /> Premium
           </span>
           <DialogHeader className="mt-3">
@@ -167,11 +167,11 @@ const UpgradeModal = ({ isOpen, onClose, reason = 'settings' }: UpgradeModalProp
             <Button
               onClick={handleApplePurchase}
               disabled={isProcessing || !appleProductAvailable}
-              className="w-full h-12 rounded-xl bg-premium hover:bg-premium/90 text-white font-semibold"
+              className="w-full h-12 rounded-xl bg-premium hover:bg-premium/90 text-primary-foreground font-semibold"
             >
               {isProcessing ? (
                 <>
-                  <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2" />
+                  <div className="animate-spin w-4 h-4 border-2 border-current/30 border-t-current rounded-full mr-2" />
                   Processing...
                 </>
               ) : (
@@ -184,7 +184,7 @@ const UpgradeModal = ({ isOpen, onClose, reason = 'settings' }: UpgradeModalProp
             <Button
               onClick={handleClose}
               variant="outline"
-              className="w-full h-12 rounded-xl border-line bg-white text-ink hover:bg-surface-2 font-semibold"
+              className="w-full h-12 rounded-xl border-line bg-surface text-ink hover:bg-surface-2 font-semibold"
             >
               Maybe later
             </Button>

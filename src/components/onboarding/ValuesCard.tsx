@@ -31,8 +31,8 @@ const ValuesCard = ({ causes }: { causes: CauseInfo[] }) => {
   };
 
   return (
-    // Deep orange so white text stays readable (5:1 or better); this card gets shared
-    <div className="rounded-3xl p-5 bg-gradient-to-br from-clay-deep to-clay-ink shadow-xl shadow-brand-ink/25 text-white">
+    // The plum of the card headers, the same in light and dark, so white text stays readable; this card gets shared
+    <div className="card-plum rounded-3xl p-5 shadow-xl shadow-plum-1/25 text-white">
       <p className="text-xs uppercase tracking-widest text-white font-semibold">My values card</p>
       <p className="text-xl font-bold mt-2 leading-snug">I invest in what I believe in:</p>
       <div className="flex flex-wrap gap-2 mt-3">
@@ -48,7 +48,7 @@ const ValuesCard = ({ causes }: { causes: CauseInfo[] }) => {
           type="button"
           onClick={share}
           disabled={sharing}
-          className="min-h-[44px] px-4 rounded-full bg-white text-clay-ink font-semibold text-sm flex items-center gap-2 active:scale-95 transition-transform disabled:opacity-60"
+          className="min-h-[44px] px-4 rounded-full bg-white text-plum-1 font-semibold text-sm flex items-center gap-2 active:scale-95 transition-transform disabled:opacity-60"
         >
           <Share2 className="w-4 h-4" /> Share
         </button>

@@ -10,10 +10,10 @@ import { Sheet, SheetContent, keepOpenForAIAssistant } from '@/components/ui/she
 import StockNewsPill from '@/components/StockNewsPill';
 import CompanySnapshot from '@/components/CompanySnapshot';
 import CompanyLogo from '@/components/values/CompanyLogo';
-import CauseChips, { causeTone } from '@/components/values/CauseChips';
+import CauseChips, { CauseIcon, causeTone } from '@/components/values/CauseChips';
 import ValuesSummary from '@/components/values/ValuesSummary';
 import { CautionChip, CautionNote } from '@/components/values/Caution';
-import KeyNumbers from '@/components/values/KeyNumbers';
+import KeyNumbers, { formatPrice } from '@/components/values/KeyNumbers';
 
 
 const timeAgo = (iso?: string) => {
@@ -185,34 +185,60 @@ const TinderStockCard = ({
   const isUpdate = stock.cardType === 'update' && !!stock.update;
   const primaryCause = stock.cause ?? stock.matchedCauses?.[0]?.cause;
 
-  // Logo, name and the causes it matches, on a soft tint of the cause's color
+  // The plum header: logo, name, the share price and past year (card face only), and the causes it
+  // matches, with the top cause's symbol faint in the corner. The same plum in light and dark.
+  const change = stock.oneYearReturn;
+  const gained = change > 0;
   const header = (large = false) => (
-    <div className={`${causeTone(primaryCause).header} text-ink ${large ? 'p-5' : 'p-4'} flex-shrink-0`}>
-      <div className="flex items-start gap-3">
-        <CompanyLogo src={stock.logoUrl} name={stock.companyName} ticker={stock.ticker} className={large ? 'w-14 h-14' : 'w-12 h-12'} />
+    <div className={`card-plum relative overflow-hidden text-white ${large ? 'p-5' : 'p-4'} flex-shrink-0`}>
+      {primaryCause && (
+        <CauseIcon cause={primaryCause} className={`absolute -right-6 top-8 w-44 h-44 opacity-[0.14] pointer-events-none ${causeTone(primaryCause).symbol}`} />
+      )}
+      <div className="relative flex items-start gap-3">
+        <CompanyLogo src={stock.logoUrl} name={stock.companyName} ticker={stock.ticker} className="w-14 h-14" />
         <div className="flex-1 min-w-0">
-          <h2 className={`${large ? 'text-2xl' : 'text-xl'} font-bold leading-tight truncate`}>{stock.companyName}</h2>
-          <p className="text-ink-soft text-sm">{stock.ticker}{stock.sector ? ` · ${capitalize(stock.sector)}` : ''}</p>
+          <h2 className={`${large ? 'text-2xl' : 'text-[1.375rem]'} font-bold leading-tight truncate`}>{stock.companyName}</h2>
+          <p className="mt-1 flex items-center gap-2 text-sm text-white/85">
+            <span className="rounded-md bg-white/15 px-1.5 py-0.5 text-xs font-bold text-white">{stock.ticker}</span>
+            {stock.sector && <span className="truncate">{capitalize(stock.sector)}</span>}
+          </p>
         </div>
         {!large && onViewDetails && (
           <button
             onClick={handleViewDetails}
             aria-label="View stock details"
-            className="bg-surface/85 hover:bg-surface text-ink-soft border border-ink/5 w-11 h-11 flex items-center justify-center rounded-full shadow-sm transition-colors flex-shrink-0"
+            className="bg-white/10 hover:bg-white/20 text-white border border-white/25 w-11 h-11 flex items-center justify-center rounded-full transition-colors flex-shrink-0"
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="w-5 h-5" />
           </button>
         )}
       </div>
-      <div className="mt-3">
+      {!large && !isUpdate && (
+        <div className="relative mt-4">
+          <p className="text-xs text-white/75">
+            Share price{explain && <span> · Cost of one share</span>}
+          </p>
+          <div className="flex items-center gap-3 mt-0.5">
+            <span className="text-[2.25rem] leading-none font-bold tracking-tight">{formatPrice(live.price)}</span>
+            {/* Green only for gains; a fall is shown plainly, never in red */}
+            <span className="inline-flex items-center gap-1.5 rounded-xl bg-black/25 px-2.5 py-1.5 text-sm">
+              <span className={`font-bold ${gained ? 'text-gain-on-plum' : 'text-white/85'}`}>
+                {gained ? '↑' : change < 0 ? '↓' : ''} {gained ? '+' : ''}{change.toFixed(1)}%
+              </span>
+              <span className="text-[0.6875rem] leading-tight text-white/85">past<br />year</span>
+            </span>
+          </div>
+        </div>
+      )}
+      <div className="relative mt-4">
         {isUpdate ? (
-          <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-white border border-line text-ink">
+          <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold bg-white/10 border border-white/30 text-white">
             📰 News on a company you liked
           </span>
         ) : (
-          <CauseChips causes={stock.matchedCauses} />
+          <CauseChips causes={stock.matchedCauses} onPlum />
         )}
-        {stock.caution && <div className="mt-2"><CautionChip caution={stock.caution} /></div>}
+        {stock.caution && <div className="mt-2"><CautionChip caution={stock.caution} onPlum /></div>}
       </div>
     </div>
   );
@@ -313,10 +339,10 @@ const TinderStockCard = ({
               dragOffset.x > 50 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             style={{
-              background: 'linear-gradient(45deg, rgba(181, 74, 34, 0.92), rgba(138, 58, 24, 0.92))'
+              background: 'linear-gradient(45deg, rgb(var(--primary-bright) / 0.92), rgb(var(--primary-deep) / 0.92))'
             }}
           >
-            <div className="text-white text-center animate-pulse">
+            <div className="text-primary-foreground text-center animate-pulse">
               {isHighMatch ? (
                 <Heart className="w-16 h-16 mx-auto mb-2 fill-current drop-shadow-lg" />
               ) : (
@@ -333,7 +359,7 @@ const TinderStockCard = ({
               dragOffset.x < -50 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             style={{
-              background: 'linear-gradient(45deg, rgba(31, 26, 21, 0.82), rgba(70, 60, 50, 0.82))'
+              background: 'linear-gradient(45deg, rgb(var(--plum-1) / 0.88), rgb(var(--plum-2) / 0.88))'
             }}
           >
             <div className="text-white text-center animate-pulse">
@@ -349,7 +375,7 @@ const TinderStockCard = ({
         data-swipe-card={isActive ? 'top' : 'behind'}
 className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[min(85vw,800px)] xl:max-w-[min(80vw,900px)] mx-auto shadow-[0_18px_40px_rgb(var(--shadow)/0.16)] border border-line bg-surface overflow-hidden cursor-grab active:cursor-grabbing transform-gpu ${
           isExiting ? 'animate-scale-out' : 'animate-scale-in'
-        } h-full max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh] lg:max-h-[calc(100vh-10rem)] rounded-2xl flex flex-col relative`}
+        } h-full max-h-[70vh] sm:max-h-[75vh] md:max-h-[80vh] lg:max-h-[calc(100vh-10rem)] rounded-3xl flex flex-col relative`}
         style={{
           transform: `translateX(${dragOffset.x}px) translateY(${dragOffset.y}px) rotate(${rotation}deg)`,
           opacity,
@@ -368,7 +394,7 @@ className={`w-full max-w-[min(95vw,400px)] md:max-w-[min(90vw,600px)] lg:max-w-[
           <div className="px-4 pt-4 pb-8 space-y-4">
             {updateBody}
             {!isUpdate && <ValuesSummary stock={stock} compact />}
-            <KeyNumbers stock={stock} price={live.price} explain={explain} />
+            <KeyNumbers stock={stock} price={live.price} explain={explain} hidePriceAndReturn={!isUpdate} />
             <div className="flex flex-wrap items-center gap-2">
               <DataFreshnessIndicator lastUpdated={live.lastUpdated} variant="inline" className="bg-muted rounded-full px-2.5 py-1 text-xs" />
               <StockNewsPill ticker={stock.ticker} companyName={stock.companyName} />

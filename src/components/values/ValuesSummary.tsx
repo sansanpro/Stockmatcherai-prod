@@ -1,4 +1,4 @@
-import { BadgeCheck, Scale } from 'lucide-react';
+import { Check } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { StockRecommendation } from '@/types/stock-matcher';
 import { CautionNote, CautionStrip } from '@/components/values/Caution';
@@ -11,20 +11,21 @@ interface ValuesSummaryProps {
   className?: string;
 }
 
-// Proof, things to know and cautions share one box design, so the counterpoints are exactly as
-// prominent as the proof (the design brief's rule). Each has its own color, icon and title.
+// Proof and things to know share one tile design (light peach, dark plum in dark mode), so the
+// counterpoints are exactly as prominent as the proof (the design brief's rule). Each has its own
+// round icon in its color, and its title.
 const TONES = {
-  // Titles and links use the darkest tone: small text on a tint needs the margin (7:1 and up, not 4.5)
-  proof: { box: 'bg-positive-tint border-positive-line', title: 'text-positive-ink', link: 'text-positive-ink' },
-  things: { box: 'bg-info-tint border-info-line', title: 'text-info-ink', link: 'text-info-ink' },
+  proof: { badge: 'bg-positive-soft text-positive-deep', link: 'text-positive-deep' },
+  things: { badge: 'bg-info-soft text-info-deep', link: 'text-info-deep' },
 } as const;
 
 const Box = ({ tone, icon, title, children, clamp }: { tone: keyof typeof TONES; icon: ReactNode; title: string; children: ReactNode; clamp?: boolean }) => (
-  <div className={`rounded-xl border p-3 ${TONES[tone].box}`}>
-    <p className={`text-[0.6875rem] font-semibold uppercase tracking-wide flex items-center gap-1 ${TONES[tone].title}`}>
-      {icon} {title}
+  <div className="rounded-2xl bg-surface-2 border border-line/60 p-3">
+    <p className="text-[0.6875rem] font-semibold uppercase tracking-wide flex items-center gap-2 text-ink-soft">
+      <span aria-hidden className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${TONES[tone].badge}`}>{icon}</span>
+      <span>{title}</span>
     </p>
-    <div className={`text-sm text-ink mt-1 leading-snug ${clamp ? 'line-clamp-4' : ''}`}>{children}</div>
+    <div className={`text-sm text-ink mt-2 leading-snug ${clamp ? 'line-clamp-4' : ''}`}>{children}</div>
   </div>
 );
 
@@ -32,8 +33,8 @@ const ValuesSummary = ({ stock, compact = false, className = '' }: ValuesSummary
   const { missionStory, proof, proofSourceUrl, thingsToKnow = [], caution } = stock;
   if (!missionStory && !proof && thingsToKnow.length === 0 && !caution) return null;
 
-  const proofIcon = <BadgeCheck className="w-3.5 h-3.5" aria-hidden />;
-  const thingsIcon = <Scale className="w-3.5 h-3.5" aria-hidden />;
+  const proofIcon = <Check className="w-3.5 h-3.5" strokeWidth={3} />;
+  const thingsIcon = <span className="text-[0.8125rem] font-extrabold leading-none">!</span>;
   const source = proofSourceUrl && (
     <a href={proofSourceUrl} target="_blank" rel="noopener noreferrer" className={`tap-target font-semibold underline whitespace-nowrap ${TONES.proof.link}`}>
       Source ↗
@@ -49,7 +50,8 @@ const ValuesSummary = ({ stock, compact = false, className = '' }: ValuesSummary
           <div className="grid grid-cols-2 gap-2">
             {proof ? <Box tone="proof" icon={proofIcon} title="Proof" clamp>{proof}</Box> : <div />}
             {thingsToKnow.length > 0 ? (
-              <Box tone="things" icon={thingsIcon} title="Things to know" clamp>
+              // "To know" fits one line on the half-width tile, so both tiles line up (the full view says "Things to know")
+              <Box tone="things" icon={thingsIcon} title="To know" clamp>
                 {thingsToKnow[0]}
               </Box>
             ) : <div />}
