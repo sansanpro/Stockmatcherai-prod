@@ -256,7 +256,8 @@ const StockMatcher = ({
               Save my matches
             </Button>
           )}
-          {signedIn && !subscribed && (
+          {/* Not after a first-day deck, which is already bigger than Premium's */}
+          {signedIn && !subscribed && deckSize < PLAN_LIMITS.premium.dailyMatches && (
             <Button onClick={() => setShowUpgradeModal(true)} className="w-full h-12 rounded-xl font-semibold">
               <Crown className="w-4 h-4 mr-2" /> Get {PLAN_LIMITS.premium.dailyMatches} matches a day with Premium
             </Button>

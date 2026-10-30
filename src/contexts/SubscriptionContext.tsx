@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 // What each plan gets. Enforced on the server (match-feed builds the daily deck,
 // stock-assistant counts questions); these values are only for the copy.
 export const PLAN_LIMITS = {
-  free: { dailyMatches: 7, aiQuestionsPer24h: 5 },
+  free: { dailyMatches: 7, firstDayMatches: 20, aiQuestionsPer24h: 5 },
   premium: { dailyMatches: 12 },
 } as const;
 

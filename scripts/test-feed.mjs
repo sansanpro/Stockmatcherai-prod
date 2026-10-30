@@ -78,6 +78,28 @@ const adjacentClashes = deck => {
   check('mostly one sector: no two cards in a row share a cause', causeRepeats === 0, cards.map(c => c.cause).join(' > '));
 }
 
+// 1c. Bigger decks (Premium's 12, a new user's first 20): too big to search every order, still spread out
+for (const size of [12, 20]) {
+  const prefs = { causes: ['beat_cancer', 'clean_energy', 'keeping_safe'], dealbreakers: [], risk: 'medium', goal: 'growth' };
+  const deck = buildDeck(candidates, prefs, emptyHistory(), [], { size, updateCards: 2 });
+  const cards = companyCards(deck);
+  const causeRepeats = cards.slice(1).filter((c, i) => c.cause === cards[i].cause).length;
+  check(`${size} cards: full deck`, deck.length === size, `got ${deck.length}`);
+  check(`${size} cards: no duplicate companies`, new Set(cards.map(c => c.ticker)).size === cards.length);
+  check(`${size} cards: no two in a row share a cause`, causeRepeats === 0, cards.map(c => c.cause).join(' > '));
+  check(`${size} cards: no two in a row share a sector either`, adjacentClashes(deck) === 0, `${adjacentClashes(deck)} clashes: ${cards.map(c => byTicker.get(c.ticker).sector).join(' > ')}`);
+  const healthOnly = candidates.map(c => c.missions.some(m => m.cause === 'beat_cancer' || m.cause === 'live_healthier') ? { ...c, sector: 'healthcare' } : c);
+  const health = companyCards(buildDeck(healthOnly, { ...prefs, causes: ['beat_cancer', 'live_healthier', 'keeping_safe'] }, emptyHistory(), [], { size, updateCards: 0 }));
+  check(`${size} cards, mostly one sector: no two in a row share a cause`, health.slice(1).every((c, i) => c.cause !== health[i].cause), health.map(c => c.cause).join(' > '));
+}
+// One small cause can't fill 20: the deck is shorter, never off-cause
+{
+  const prefs = { causes: ['clean_energy'], dealbreakers: [], risk: 'medium', goal: 'growth' };
+  const cards = companyCards(buildDeck(candidates, prefs, emptyHistory(), [], { size: 20, updateCards: 0 }));
+  const onCause = candidates.filter(c => passesHardFilters(c, prefs)).length; // 12 of its own plus a dual-cause company
+  check('20 cards, one small cause: shorter deck, all on-cause', cards.length === onCause && onCause < 20 && cards.every(c => byTicker.get(c.ticker).missions.some(m => m.cause === 'clean_energy')), `got ${cards.length} of ${onCause}`);
+}
+
 // 2. Dealbreakers and low risk
 {
   const prefs = { causes: ['beat_cancer', 'keeping_safe'], dealbreakers: ['animal_testing', 'weapons'], risk: 'low', goal: 'income' };

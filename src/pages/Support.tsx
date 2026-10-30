@@ -81,7 +81,8 @@ const Support = () => {
             <AccordionItem value="free">
               <AccordionTrigger>Is StockMatcherAI free to use?</AccordionTrigger>
               <AccordionContent>
-                Yes. The free plan includes {PLAN_LIMITS.free.dailyMatches} matches a day and{' '}
+                Yes. The free plan includes {PLAN_LIMITS.free.firstDayMatches} matches on your first day, then{' '}
+                {PLAN_LIMITS.free.dailyMatches} a day, and{' '}
                 {PLAN_LIMITS.free.aiQuestionsPer24h} Ask AI questions a day. Premium gives you{' '}
                 {PLAN_LIMITS.premium.dailyMatches} matches a day and unlimited Ask AI questions.
               </AccordionContent>

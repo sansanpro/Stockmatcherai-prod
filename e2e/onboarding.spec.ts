@@ -70,19 +70,19 @@ test('new user: onboarding, reveal, first matches and the save prompt, all witho
   await expect(page.getByRole('button', { name: 'Share' })).toBeVisible();
   await page.waitForTimeout(3500); // let the build animation and the count finish
   await page.screenshot({ path: 'e2e/screens/onboarding-7-reveal.png' });
-  await page.getByRole('button', { name: 'See my first 7 matches' }).click();
+  await page.getByRole('button', { name: 'See my first 20 matches' }).click();
 
   // First deck: values-matched cards and the one-time coach mark
   await expect(page.getByText('P/E Ratio').first()).toBeVisible();
   await expect(page.getByText("Swipe right if you'd be proud to own a piece of this company.")).toBeVisible();
-  await expect(page.getByText('7 of 7 matches left today')).toBeVisible();
+  await expect(page.getByText('20 of 20 matches left today')).toBeVisible();
   // Never bought a stock: each number also says what it means
   await expect(page.getByText('Cost of one share').first()).toBeVisible();
   await expect(page.getByText('What the whole company is worth').first()).toBeVisible();
   await page.screenshot({ path: 'e2e/screens/onboarding-8-first-card.png' });
   const deck = await page.evaluate(() => JSON.parse(localStorage.getItem('device_feed_v1') ?? '{}'));
   const tickers: string[] = deck.deck.cards.map((c: { ticker: string }) => c.ticker);
-  expect(tickers.length).toBe(7);
+  expect(tickers.length).toBe(20); // a new user's first deck
   expect(tickers.filter(t => FOSSIL_FLAGGED.includes(t))).toEqual([]);
   await page.getByRole('button', { name: 'Got it' }).click();
 
@@ -93,11 +93,11 @@ test('new user: onboarding, reveal, first matches and the save prompt, all witho
   await page.waitForTimeout(600); // sheet slide-in
   await page.screenshot({ path: 'e2e/screens/onboarding-9-save-prompt.png' });
   await page.getByRole('button', { name: 'Not now' }).click();
-  await expect(page.getByText('6 of 7 matches left today')).toBeVisible();
+  await expect(page.getByText('19 of 20 matches left today')).toBeVisible();
 
   // Third like: keeping the list needs an account
   await like(page);
-  await expect(page.getByText('5 of 7 matches left today')).toBeVisible();
+  await expect(page.getByText('18 of 20 matches left today')).toBeVisible();
   await like(page);
   await expect(page.getByRole('dialog').getByText('Keep your matches')).toBeVisible();
   await page.waitForTimeout(600); // sheet slide-in
@@ -112,7 +112,7 @@ test('new user: onboarding, reveal, first matches and the save prompt, all witho
 
   // The day's deck and answers survive a reload
   await page.reload();
-  await expect(page.getByText('3 of 7 matches left today')).toBeVisible();
+  await expect(page.getByText('16 of 20 matches left today')).toBeVisible();
 
   await expect.poll(() => events.map(e => e.event), { timeout: 10_000 })
     .toEqual(expect.arrayContaining(['onboarding_started', 'onboarding_complete', 'deck_loaded', 'first_like', 'save_prompt_shown']));
@@ -140,7 +140,7 @@ test('saving from the prompt creates an account that keeps the answers and likes
   await page.getByRole('radio', { name: 'Wait it out.' }).click();
   await page.getByRole('radio', { name: 'A few times' }).click();
   await page.getByRole('radio', { name: 'A little extra income' }).click();
-  await page.getByRole('button', { name: 'See my first 7 matches' }).click();
+  await page.getByRole('button', { name: 'See my first 20 matches' }).click();
   await page.getByRole('button', { name: 'Got it' }).click();
 
   // Like two companies on the device
@@ -150,7 +150,7 @@ test('saving from the prompt creates an account that keeps the answers and likes
     liked.push((await page.locator('h2').first().innerText()).trim());
     await like(page);
     if (i === 0) await page.getByRole('button', { name: 'Not now' }).click();
-    await expect(page.getByText(`${6 - i} of 7 matches left today`)).toBeVisible();
+    await expect(page.getByText(`${19 - i} of 20 matches left today`)).toBeVisible();
   }
 
   // Save them: Profile tab -> save prompt -> email sign-up
@@ -163,8 +163,8 @@ test('saving from the prompt creates an account that keeps the answers and likes
   await page.locator('#signup-password').fill(`Pw-${Math.random().toString(36).slice(2, 12)}!`);
   await page.getByRole('button', { name: 'Save my matches' }).click();
 
-  // Signed in: the account's own (free) deck, without the companies liked before signing up
-  await expect(page.getByText(/of 7 matches left today/)).toBeVisible({ timeout: 30_000 });
+  // Signed in: the account's own first-day deck (20 cards), without the companies liked before signing up
+  await expect(page.getByText(/of 20 matches left today/)).toBeVisible({ timeout: 30_000 });
   const device = await page.evaluate(() => ({
     answers: localStorage.getItem('onboarding_v2_answers'),
     feed: localStorage.getItem('device_feed_v1'),
@@ -248,7 +248,7 @@ test('finishing the day plays a recap reel of the likes and what they say about 
   }
 
   const reel = page.getByRole('dialog', { name: 'Your day in values' });
-  await expect(reel.getByText('You liked 3 of 7 companies today.')).toBeVisible();
+  await expect(reel.getByText('You liked 3 of 20 companies today.')).toBeVisible();
   await page.waitForTimeout(1200);
   await page.screenshot({ path: 'e2e/screens/recap-1-intro.png' });
   await reel.getByRole('button', { name: 'Next' }).click();

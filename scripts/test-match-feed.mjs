@@ -40,6 +40,10 @@ const call = async (body, token = anonKey) => {
   check('signed out: every card matches a chosen cause', cards.length > 0 && cards.every(c => c.matchedCauses?.some(m => prefs.causes.includes(m.cause))));
   check('signed out: dealbreaker-flagged companies are excluded', cards.every(c => c.ticker !== 'NEE'), JSON.stringify(cards.map(c => c.ticker)));
   check('signed out: cards include display data', cards.every(c => c.companyName && c.pricePerShare > 0 && c.matchedCauses[0].label));
+  check('signed out: the first deck after onboarding has 20 cards', cards.length === 20, `got ${cards.length}`);
+  check('signed out: no two cards in a row share a cause', cards.slice(1).every((c, i) => c.cause !== cards[i].cause), cards.map(c => c.cause).join(' > '));
+  const later = await call({ action: 'deck', prefs, seen: cards.slice(0, 3).map(c => c.ticker) });
+  check('signed out: a later deck (swipes on the device) has 7', later.body.cards?.length === 7, `got ${later.body.cards?.length}`);
   const { status: s2 } = await call({ action: 'deck', prefs: { causes: [] } });
   check('signed out: no causes -> 400', s2 === 400);
   const { status: s3 } = await call({ action: 'swipe', ticker: 'MRK', liked: true });
@@ -61,6 +65,7 @@ const token = auth.access_token;
     check('signed in: profile has causes (set them on the test profile first)', false, JSON.stringify(body));
   } else {
     check('signed in: deck builds', status === 200 && body.cards?.length > 0, `${status} ${JSON.stringify(body).slice(0, 200)}`);
+    check("signed in: an account with earlier days doesn't get the first-day 20", body.cards?.length <= 12, `got ${body.cards?.length}`);
     const again = await call({ action: 'deck' }, token);
     check('signed in: same deck all day', JSON.stringify(again.body.cards?.map(c => c.ticker)) === JSON.stringify(body.cards?.map(c => c.ticker)));
 
@@ -78,7 +83,9 @@ const token = auth.access_token;
 
     // Changing causes refills the unswiped part of today's deck; swiped cards stay and the deck doesn't grow
     const rebuilt = await call({ action: 'deck', rebuild: true }, token);
-    const swipedNow = new Set((rebuilt.body.swiped ?? []).map(s => s.ticker));
+    // Only swiped deck cards: imported device swipes (an earlier run's ZS and PFE) were never in a deck
+    const deckBefore = new Set(after.body.cards.map(c => c.ticker));
+    const swipedNow = new Set((rebuilt.body.swiped ?? []).map(s => s.ticker).filter(t => deckBefore.has(t)));
     const rebuiltTickers = (rebuilt.body.cards ?? []).map(c => c.ticker);
     check('signed in: rebuild keeps the cards already swiped today',
       [...swipedNow].every(t => rebuiltTickers.includes(t)), JSON.stringify(rebuiltTickers));

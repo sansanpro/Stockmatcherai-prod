@@ -22,7 +22,7 @@ const { free, premium } = PLAN_LIMITS;
 
 const HEADLINES: Record<NonNullable<UpgradeModalProps['reason']>, { title: string; text: string }> = {
   deck: {
-    title: `You've seen today's ${free.dailyMatches} matches`,
+    title: "You've seen today's matches",
     text: `Premium shows you ${premium.dailyMatches} companies a day for your causes. New matches arrive every morning either way.`,
   },
   ai: {

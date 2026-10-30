@@ -18,6 +18,8 @@ const corsHeaders = {
 
 const FREE_DECK_SIZE = 7;
 const PREMIUM_DECK_SIZE = 12;
+// A new user's first day, signed out (the deck right after onboarding) and signed in
+const FIRST_DAY_DECK_SIZE = 20;
 const UPDATE_CARDS = 2;
 const UPDATE_MAX_AGE_DAYS = 3;
 const MAX_IMPORT = 200;
@@ -288,7 +290,9 @@ Deno.serve(async (req) => {
       const seen = new Set<string>((Array.isArray(body.seen) ? body.seen : []).map(String));
       const liked = new Set<string>((Array.isArray(body.liked) ? body.liked : []).map(String));
       const { candidates, stocks } = await loadCandidates(db, prefs.causes);
-      const cards = buildDeck(candidates, prefs, { liked, recentlySeen: seen, passedLongAgo: new Set() }, [], { size: FREE_DECK_SIZE, updateCards: 0 });
+      // Nothing swiped on this device yet: this is their first deck
+      const size = seen.size === 0 ? FIRST_DAY_DECK_SIZE : FREE_DECK_SIZE;
+      const cards = buildDeck(candidates, prefs, { liked, recentlySeen: seen, passedLongAgo: new Set() }, [], { size, updateCards: 0 });
       return json({ deckDate: today, cards: await enrichCards(db, cards, stocks), swiped: [], signedIn: false });
     }
 
@@ -300,8 +304,12 @@ Deno.serve(async (req) => {
     const { data: existing } = await db.from('daily_decks').select('cards').eq('user_id', user.id).eq('deck_date', today).maybeSingle();
     let cards = existing?.cards as DeckCard[] | undefined;
     let stocks = new Map<string, Record<string, unknown>>();
-    const { data: sub } = await db.from('subscribers').select('subscribed').eq('user_id', user.id).maybeSingle();
-    const size = sub?.subscribed ? PREMIUM_DECK_SIZE : FREE_DECK_SIZE;
+    const [{ data: sub }, { count: earlierDecks }] = await Promise.all([
+      db.from('subscribers').select('subscribed').eq('user_id', user.id).maybeSingle(),
+      db.from('daily_decks').select('deck_date', { count: 'exact', head: true }).eq('user_id', user.id).lt('deck_date', today),
+    ]);
+    // No deck before today: the account's first day, which gets at least 20 cards
+    const size = Math.max(sub?.subscribed ? PREMIUM_DECK_SIZE : FREE_DECK_SIZE, earlierDecks === 0 ? FIRST_DAY_DECK_SIZE : 0);
     const buildFor = async (slots: number, updateCards: number) => {
       const [loaded, history] = await Promise.all([loadCandidates(db, prefs.causes), loadHistory(db, user.id)]);
       stocks = loaded.stocks;

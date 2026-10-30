@@ -156,12 +156,12 @@ function causeQuotas(causes: string[], companyCards: number): Map<string, number
 }
 
 // Orders cards so no two in a row share a cause or a sector. Searches for a clash-free order
-// (decks are small: 7 cards is at most 5,040 orders), keeping the score order where it can.
+// (a free deck is small: 7 cards is at most 5,040 orders), keeping the score order where it can.
 // When clashes are unavoidable (e.g. most cards are healthcare), back-to-back causes cost more
 // than back-to-back sectors, so causes still alternate.
 function spreadOut<T extends { cause?: string; sector?: string }>(cards: T[]): T[] {
   const clash = (a: T, b: T) => (a.cause === b.cause ? 2 : 0) + (a.sector === b.sector ? 1 : 0);
-  if (cards.length > 9) return cards; // larger decks: keep score order (not used today)
+  if (cards.length > 9) return spreadGreedy(cards, clash);
 
   let best: T[] = cards;
   let bestClashes = Infinity;
@@ -190,8 +190,41 @@ function spreadOut<T extends { cause?: string; sector?: string }>(cards: T[]): T
   return best;
 }
 
+// Larger decks (Premium's 12, a new user's first 20) have too many orders to search. Each next
+// card is the best-scoring one that clashes least with the card before, except that a cause with
+// cards for every other remaining slot goes next, so it never ends up back to back at the end.
+// Then any swap of two cards that removes a clash is made, until none is left to find.
+function spreadGreedy<T extends { cause?: string }>(cards: T[], clash: (a: T, b: T) => number): T[] {
+  const left = [...cards];
+  const out: T[] = [];
+  while (left.length) {
+    const prev = out[out.length - 1];
+    const counts = new Map<string | undefined, number>();
+    for (const c of left) counts.set(c.cause, (counts.get(c.cause) ?? 0) + 1);
+    const urgent = [...counts].find(([cause, n]) => n * 2 > left.length && cause !== prev?.cause)?.[0];
+    const options = left.map((c, i) => ({ c, i })).filter(({ c }) => urgent === undefined || c.cause === urgent);
+    let pick = options[0];
+    for (const o of options) {
+      if (prev && clash(prev, o.c) < clash(prev, pick.c)) pick = o;
+    }
+    out.push(left.splice(pick.i, 1)[0]);
+  }
+  const cost = (order: T[]) => order.slice(1).reduce((sum, c, i) => sum + clash(order[i], c), 0);
+  for (let improved = true; improved;) {
+    improved = false;
+    for (let i = 0; i < out.length && !improved; i++) {
+      for (let j = i + 1; j < out.length && !improved; j++) {
+        const swapped = [...out];
+        [swapped[i], swapped[j]] = [swapped[j], swapped[i]];
+        if (cost(swapped) < cost(out)) { out.splice(0, out.length, ...swapped); improved = true; }
+      }
+    }
+  }
+  return out;
+}
+
 export interface DeckOptions {
-  size: number;          // total cards (7 free)
+  size: number;          // total cards (7 free, 12 Premium, 20 on a new user's first day)
   updateCards: number;   // target update cards (~2)
 }
 

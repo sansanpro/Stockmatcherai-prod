@@ -6,6 +6,7 @@ import ValuesCard from '@/components/onboarding/ValuesCard';
 import { previewMatches, type CauseInfo } from '@/lib/matchFeed';
 import type { OnboardingAnswers } from '@/lib/onboarding';
 import { CAUSE_ART } from '@/lib/art';
+import { PLAN_LIMITS } from '@/contexts/SubscriptionContext';
 
 const joinLabels = (labels: string[]) =>
   labels.length <= 1 ? labels.join('')
@@ -49,6 +50,10 @@ const RevealScreen = ({ answers, causes, onContinue }: RevealScreenProps) => {
     return () => clearInterval(timer);
   }, [phase, preview, reduceMotion]);
 
+  // The first deck has up to 20 cards. Only promise the number when there's clearly enough to fill
+  // it (low risk also drops small companies, which this count doesn't know about)
+  const firstDeck = PLAN_LIMITS.free.firstDayMatches;
+  const promiseCount = (preview?.count ?? 0) >= firstDeck && answers.risk !== 'low';
   const labels = joinLabels(causes.map(c => c.label));
   const logos = preview?.logos ?? [];
 
@@ -109,7 +114,7 @@ const RevealScreen = ({ answers, causes, onContinue }: RevealScreenProps) => {
           onClick={onContinue}
           className="w-full h-14 text-[1.0625rem] font-semibold rounded-2xl bg-primary hover:bg-clay-ink text-white shadow-lg shadow-brand/25 flex items-center justify-center gap-2"
         >
-          See my first 7 matches <ArrowRight className="w-4 h-4" />
+          {promiseCount ? `See my first ${firstDeck} matches` : 'See my first matches'} <ArrowRight className="w-4 h-4" />
         </Button>
         <p className="text-center text-ink-faint text-xs mt-3">Educational only, not investment advice.</p>
       </div>
