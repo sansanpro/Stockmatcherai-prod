@@ -11,6 +11,7 @@ import { Heart, X, RefreshCw, Crown, Pencil, Play, Sparkles } from 'lucide-react
 import { CauseIcon, causeTone } from '@/components/values/CauseChips';
 import { askAI, companyQuestion } from '@/lib/askAI';
 import DailyRecap from '@/components/DailyRecap';
+import DailyQuote from '@/components/DailyQuote';
 import Art3D from '@/components/onboarding/Art3D';
 import { STEP_ART } from '@/lib/art';
 import { toast } from 'sonner';
@@ -207,9 +208,10 @@ const StockMatcher = ({
     );
   }
 
+  // Scrolls when the content is taller than the screen (the end-of-day screen with its quote)
   const centered = (content: React.ReactNode) => (
-    <div className="min-h-screen bg-daybreak p-6 flex items-center justify-center" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-      <div className="max-w-md w-full text-center text-ink pb-24">{content}</div>
+    <div className="h-full min-h-0 overflow-y-auto bg-daybreak px-6 flex flex-col" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1.5rem)' }}>
+      <div className="max-w-md w-full mx-auto my-auto text-center text-ink pb-28">{content}</div>
     </div>
   );
 
@@ -238,9 +240,11 @@ const StockMatcher = ({
   }
 
   if (isFinished) {
+    // Today's thought appears once the recap is over (straight away when nothing was liked)
+    const showQuote = !showRecap;
     return centered(
       <>
-        <Art3D src={STEP_ART.reveal} size={112} className="mb-5" />
+        {!showQuote && <Art3D src={STEP_ART.reveal} size={112} className="mb-5" />}
         <h1 className="text-3xl font-bold mb-2">That's today's matches</h1>
         <p className="text-ink-soft">
           {likedToday > 0 ? `You liked ${likedToday} ${likedToday === 1 ? 'company' : 'companies'} today. ` : ''}
@@ -250,6 +254,15 @@ const StockMatcher = ({
           <p role="status" className="mt-4 rounded-xl bg-clay-tint border border-clay-soft text-clay-ink text-sm font-medium px-4 py-3">
             Your new causes are saved. You've already seen today's matches, so they start with tomorrow's.
           </p>
+        )}
+        {showQuote && (
+          <div className="mt-6">
+            <DailyQuote
+              likedCauses={likedCards.map(c => c.cause ?? c.matchedCauses?.[0]?.cause).filter((c): c is string => !!c)}
+              answers={answers}
+              causeLabel={id => causeInfo.find(c => c.id === id)?.label}
+            />
+          </div>
         )}
         {likedCards.length > 0 && (
           <button onClick={() => setShowRecap(true)} className="mt-4 inline-flex items-center gap-2 min-h-[44px] px-4 rounded-full bg-clay-tint text-clay-ink text-sm font-semibold border border-clay-soft">
@@ -275,6 +288,7 @@ const StockMatcher = ({
             <p className="text-xs text-ink-faint">Changes start with tomorrow's matches.</p>
           )}
         </div>
+        <p className="text-xs text-ink-faint mt-6">Educational only, not investment advice.</p>
         <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} reason="deck" />
         {showRecap && (
           <DailyRecap liked={likedCards} deckSize={deckSize} myCauses={myCauses} onClose={() => setShowRecap(false)} />

@@ -269,8 +269,25 @@ test('finishing the day plays a recap reel of the likes and what they say about 
   await reel.getByRole('button', { name: 'Next' }).click();
   await expect(reel.getByText("That's your day.")).toBeVisible();
   await expect(reel.getByRole('button', { name: 'Share my day' })).toBeVisible();
+  // Not before the replay is over
+  await expect(page.getByText("Today's thought")).toHaveCount(0);
   await reel.getByRole('button', { name: 'Done' }).click();
   await expect(reel).toHaveCount(0);
+
+  // Then today's thought: a sourced quote tied to the day's likes, with what it teaches
+  const thought = page.locator('figure', { hasText: "Today's thought" });
+  await expect(thought).toBeVisible();
+  const quote = (await thought.locator('blockquote').innerText()).trim();
+  expect(quote.length).toBeGreaterThan(20);
+  await expect(thought.getByText(/^You liked 3 companies today/)).toBeVisible();
+  await expect(thought.locator('figcaption')).toContainText(/\(\d{4}|\d{4}\)/); // the source, with its year
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: 'e2e/screens/recap-4-thought.png', fullPage: true });
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('quote_history') ?? '[]').length)).toBe(1);
+
+  // The same quote all day, even after a reload
+  await page.reload();
+  await expect(page.locator('figure', { hasText: "Today's thought" }).locator('blockquote')).toHaveText(quote);
 
   // It played once; the finished screen can replay it
   await page.getByRole('button', { name: "Replay today's recap" }).click();
