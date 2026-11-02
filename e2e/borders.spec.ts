@@ -23,6 +23,7 @@ const DEVICES = [
   { name: 'iPhone-16e', w: 390, h: 844, top: 47, bottom: 34 },
   { name: 'iPhone-16', w: 393, h: 852, top: 59, bottom: 34 },
   { name: 'iPhone-17-Pro-Max', w: 440, h: 956, top: 62, bottom: 34 },
+  { name: 'iPad-13', w: 1024, h: 1366, top: 24, bottom: 20 },
 ];
 type Device = (typeof DEVICES)[number];
 type Finding = { kind: string; at: string; text: string; rect: number[]; by?: string };
@@ -44,6 +45,14 @@ async function phone(page: Page, d: Device) {
     });
     return route.fulfill({ response, body });
   });
+}
+
+// Phones have a Profile tab; on iPad, Settings is in the account menu in the top bar
+async function openProfile(page: Page) {
+  const tab = page.getByRole('button', { name: 'Profile', exact: true });
+  if (await tab.isVisible().catch(() => false)) return tab.click();
+  await page.getByRole('button', { name: /claude-test/ }).click();
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
 }
 
 const inspectInPage = ({ top, bottom, at, checks }: { top: number; bottom: number; at: string; checks: string[] }) => {
@@ -286,7 +295,7 @@ for (const d of DEVICES) {
         : route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ subscribed: false, subscription_tier: 'free', subscription_end: null }) }));
       await phone(page, d);
       await openApp(page);
-      await page.getByRole('button', { name: 'Profile' }).click();
+      await openProfile(page);
       await page.getByRole('button', { name: 'See Premium' }).click();
       await expect(page.getByRole('dialog')).toBeVisible();
       await sweep(page, d, 'paywall');
@@ -324,7 +333,7 @@ for (const d of DEVICES) {
       await page.waitForTimeout(800);
       await sweep(page, d, 'ask-ai');
       await page.getByRole('button', { name: 'Close Ask AI' }).click();
-      await page.getByRole('button', { name: 'Profile' }).click();
+      await openProfile(page);
       await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
       await sweep(page, d, 'profile');
       const premium = page.getByRole('button', { name: 'See Premium' });

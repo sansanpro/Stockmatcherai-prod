@@ -102,5 +102,31 @@
     "likes": [],
     "ask-ai": [],
     "profile": []
+  },
+  "iPad-13": {
+    "onboarding-hook": [],
+    "onboarding-causes": [],
+    "onboarding-dealbreakers": [],
+    "onboarding-risk": [],
+    "onboarding-experience": [],
+    "onboarding-goal": [],
+    "onboarding-reveal": [],
+    "deck-first-run": [],
+    "auth-signin": [],
+    "auth-signup": [],
+    "deck-explained": [],
+    "save-prompt": [],
+    "recap-intro": [],
+    "recap-company": [],
+    "recap-insight": [],
+    "recap-outro": [],
+    "end-of-day": [],
+    "deck": [],
+    "expanded-card": [],
+    "details": [],
+    "likes": [],
+    "ask-ai": [],
+    "paywall": [],
+    "profile": []
   }
 }
