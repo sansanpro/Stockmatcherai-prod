@@ -112,20 +112,23 @@ const shot = async (page, name) => {
       await page.reload();
       await page.getByRole('button', { name: 'View stock details' }).first().waitFor({ timeout: 30_000 });
     }
-    await page.getByRole('button', { name: 'Open Ask AI' }).click();
+    await page.getByRole('button', { name: 'Ask AI', exact: true }).click(); // the deck's own button
     await page.getByPlaceholder('Ask about a company or term…').fill('How does First Solar connect to my causes?');
     await page.getByRole('button', { name: 'Send message' }).click();
-    answered = await panel.getByText(/not investment advice/i).last()
+    // The panel always shows one disclaimer; a finished answer adds its own
+    answered = await panel.getByText(/not investment advice/i).nth(1)
       .waitFor({ timeout: 60_000 }).then(() => true, () => false);
   }
   if (answered) {
     // Start of the answer in view
     await panel.getByText('How does First Solar connect to my causes?').last().evaluate(el => el.scrollIntoView({ block: 'start' }));
+    await page.waitForTimeout(4500); // the sign-in toast clears
     await shot(page, '7-ask-ai');
   } else {
     console.log('Ask AI did not answer (Gemini busy); capturing the empty chat instead');
     await page.reload();
-    await page.getByRole('button', { name: 'Open Ask AI' }).click();
+    await page.getByRole('button', { name: 'Ask AI', exact: true }).click();
+    await page.getByPlaceholder('Ask about a company or term…').fill('');
     await shot(page, '7-ask-ai');
   }
   await page.context().close();
@@ -150,12 +153,12 @@ const statusBar = `
 const frameHtml = (img, a, b, topColor, glyphs) => `<!doctype html><html><head><style>
   * { margin: 0; box-sizing: border-box; }
   body { width: 1320px; height: 2868px; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: radial-gradient(1100px 800px at 50% 0%, #FBE7DC 0%, rgba(251,231,220,0) 70%), radial-gradient(1000px 900px at 50% 75%, #F6D3C1 0%, rgba(246,211,193,0) 65%), #FAF6EF; }
-  h1 { position: absolute; top: 150px; width: 100%; text-align: center; color: #1F1A15; font-size: 116px; line-height: 1.08;
+    background: radial-gradient(1100px 800px at 50% 0%, #FEEEE6 0%, rgba(254,238,230,0) 70%), radial-gradient(1000px 900px at 50% 75%, #F9D2C2 0%, rgba(249,210,194,0) 65%), #FFF8F4; }
+  h1 { position: absolute; top: 150px; width: 100%; text-align: center; color: #1E1418; font-size: 116px; line-height: 1.08;
     font-weight: 700; letter-spacing: -2px; }
-  h1 span { display: block; color: #B54A22; }
+  h1 span { display: block; color: #B8441F; }
   .phone { position: absolute; left: 50%; top: 610px; transform: translateX(-50%); width: 1034px; height: 2200px;
-    background: #1F1A15; border-radius: 150px; padding: 20px; box-shadow: 0 0 0 4px #3a322b, 0 40px 120px rgba(120,72,40,.28); }
+    background: #1E1418; border-radius: 150px; padding: 20px; box-shadow: 0 0 0 4px #33212B, 0 40px 120px rgba(59,24,48,.28); }
   .screen { position: relative; width: 994px; height: 2160px; border-radius: 132px; overflow: hidden; background: ${topColor}; }
   .screen img { position: absolute; left: 0; top: ${Math.round(2160 * STATUS_H / SCREEN_H)}px; width: 994px; }
   .status { position: absolute; top: 0; left: 0; right: 0; height: ${Math.round(2160 * STATUS_H / SCREEN_H)}px; z-index: 2;
@@ -186,7 +189,7 @@ for (const [raw, a, b, slug] of FRAMES) {
   });
   await probe.close();
   // Dark status bar glyphs on light screens, as iOS draws them
-  const glyphs = (0.299 * topColor[0] + 0.587 * topColor[1] + 0.114 * topColor[2]) > 150 ? '#1F1A15' : '#FFFFFF';
+  const glyphs = (0.299 * topColor[0] + 0.587 * topColor[1] + 0.114 * topColor[2]) > 150 ? '#1E1418' : '#FFFFFF';
   const html = frameHtml(dataUrl, a, b, `rgb(${topColor.join(',')})`, glyphs);
   // JPEG: App Store Connect rejects screenshots with an alpha channel, and it keeps the site light
   for (const [ctx, out, quality] of [[framer, `marketing/app-store/${raw}-${slug}.jpg`, 92], [landing, `src/assets/showcase-${slug}.jpg`, 82]]) {

@@ -342,7 +342,7 @@ do $$ declare c int; begin
   if c <> 1 then raise exception 'GILD: expected 1 row for %, got %', 'Its Kite unit makes the CAR T-cell therapies Yescarta and Tecartus for blood cancers.', c; end if;
 end $$;
 do $$ declare c int; begin
-  update public.causes set tagline = 'Solar, wind, batteries, the grid and electric cars' where id = 'clean_energy' and tagline = 'Solar, wind, batteries, the grid and EVs';
+  update public.causes set tagline = 'Solar, wind, batteries and electric cars' where id = 'clean_energy' and tagline = 'Solar, wind, batteries, the grid and EVs';
   get diagnostics c = row_count; if c <> 1 then raise exception 'clean_energy tagline: got %', c; end if;
 end $$;
 commit;

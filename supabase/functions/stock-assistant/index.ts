@@ -56,11 +56,13 @@ class StockDataService {
   async getProfile(symbol: string) {
     const sym = symbol.toUpperCase();
     return this.cached(`profile_${sym}`, async () => {
-      const [stored, { data: missions }] = await Promise.all([
+      const [stored, { data: missions }, { data: flags }] = await Promise.all([
         this.getStoredStock(sym),
         // The causes it works on (reviewed tags), with how central each is to the business
         this.db.from('stock_missions').select('exposure, why_line, causes(label)')
           .eq('ticker', sym).eq('status', 'approved').neq('exposure', 'peripheral'),
+        // The dealbreakers it's flagged for (the same flags that keep it out of a user's deck)
+        this.db.from('stock_flags').select('dealbreaker').eq('ticker', sym),
       ]);
       // stocks already holds Finnhub's static fields once synced; only call it otherwise
       const profile = stored?.finnhub_synced_at ? null : await this.finnhub.getProfile(sym).catch(() => null);
@@ -73,6 +75,7 @@ class StockDataService {
           howCentral: m.exposure === 'core' ? 'core business' : 'part of the business',
           why: m.why_line,
         })),
+        dealbreakerFlags: (flags ?? []).map((f: any) => String(f.dealbreaker).replace(/_/g, ' ')),
         proof: stored?.proof ? { fact: stored.proof, source: stored.proof_source_url } : undefined,
         thingsToKnow: stored?.things_to_know ?? undefined,
         symbol: sym,
@@ -471,6 +474,7 @@ VALUES
 - When a company comes up, get_company_profile includes its reviewed research: whatItWorksOn, the causes it works on, a proof fact with its source, and thingsToKnow. Use those facts (and only those) to explain how it relates to the user's causes, and mention a thing to know when it matters.
 - Name the user's causes without ranking words ("top", "main", "first") unless that cause is their #1.
 - A company matches a cause only if that cause is in its causes list. Never link it to any other cause, even one the user cares about; if asked, say StockMatcher hasn't matched it to that cause.
+- A company conflicts with one of the user's dealbreakers only if that dealbreaker is in its dealbreakerFlags from get_company_profile. Never claim a conflict from anything else. If it isn't listed, say StockMatcher hasn't flagged the company for that, and don't say the company has no such ties.
 - Never call a company a good or bad investment, and never recommend buying, selling or how much to put in.
 - Never give medical advice. Describe what a company's medicines or devices are for, not whether a treatment is right for anyone; for health questions, suggest asking a doctor.
 

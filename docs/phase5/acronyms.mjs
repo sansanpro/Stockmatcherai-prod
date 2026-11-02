@@ -54,7 +54,7 @@ for (const [t, from, to] of edits) {
 end $$;\n`;
 }
 sql += `do $$ declare c int; begin
-  update public.causes set tagline = 'Solar, wind, batteries, the grid and electric cars' where id = 'clean_energy' and tagline = 'Solar, wind, batteries, the grid and EVs';
+  update public.causes set tagline = 'Solar, wind, batteries and electric cars' where id = 'clean_energy' and tagline = 'Solar, wind, batteries, the grid and EVs';
   get diagnostics c = row_count; if c <> 1 then raise exception 'clean_energy tagline: got %', c; end if;
 end $$;\n`;
 fs.writeFileSync('docs/phase5/acronyms.sql', sql + 'commit;\n');
