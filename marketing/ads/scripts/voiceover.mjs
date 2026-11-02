@@ -16,7 +16,7 @@ const C = JSON.parse(readFileSync(`${DIR}/concepts.json`, 'utf8'));
 const client = new ElevenLabsClient();
 mkdirSync(`${DIR}/vo`, { recursive: true });
 
-const script = (hook) => [hook.say, ...C.bodies[hook.cat].map(s => s.say), C.cta].join(' ');
+const script = (hook) => [hook.say, ...C.bodies[hook.body ?? hook.cat].map(s => s.say), C.cta].join(' ');
 
 const toWords = (alignment) => {
   const words = [];

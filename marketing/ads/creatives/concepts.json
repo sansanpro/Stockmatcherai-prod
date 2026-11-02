@@ -115,6 +115,51 @@
         "head": "Then you decide",
         "screen": "likes"
       }
+    ],
+    "e1": [
+      {
+        "say": "This app gives you a place to start.",
+        "head": "A place to start",
+        "screen": "hook"
+      },
+      {
+        "say": "Pick the causes you care about.",
+        "head": "Pick your causes",
+        "screen": "causes"
+      },
+      {
+        "say": "Get matched with real companies working on them.",
+        "head": "Matched to real companies",
+        "screen": "reveal",
+        "zoom": [
+          0.0,
+          0.22,
+          1.0,
+          0.56
+        ],
+        "zoom_w": 900
+      },
+      {
+        "say": "Every card shows what the company does, the proof, and what to know.",
+        "head": "What it does. Proof. What to know.",
+        "screen": "deck-2-masked",
+        "zoom": [
+          0.0,
+          0.4,
+          1.0,
+          0.72
+        ]
+      },
+      {
+        "say": "Swipe right to save the ones you like.",
+        "head": "Swipe right to save it",
+        "anim": "swipe-right"
+      },
+      {
+        "say": "Stuck on a term? Ask A.I.",
+        "head": "Stuck? Ask AI",
+        "screen": "ask-ai"
+      }
     ]
   },
   "hooks": [
@@ -149,7 +194,8 @@
       "say": "Everyone says just invest. Nobody explains in what.",
       "screen": "deck-1-masked",
       "still_screen": "deck-1-masked",
-      "benefit": "What each company does, the proof, and what to know."
+      "benefit": "What each company does, the proof, and what to know.",
+      "body": "e1"
     },
     {
       "id": "e2-pe-ratio",

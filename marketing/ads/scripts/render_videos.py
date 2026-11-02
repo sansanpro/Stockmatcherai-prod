@@ -176,7 +176,7 @@ class Ad:
         self.words = json.load(open(f'{DIR}/vo/{key}.json'))
         self.end = self.words[-1]['e'] + 2.2
         scenes = [dict(kind='hook', say=self.hook['say'], screen=self.hook['screen'])]
-        scenes += [dict(s, kind='body') for s in C['bodies'][self.hook['cat']]]
+        scenes += [dict(s, kind='body') for s in C['bodies'][self.hook.get('body', self.hook['cat'])]]
         scenes.append(dict(kind='outro', say=C['cta']))
         i = 0
         for s in scenes:
