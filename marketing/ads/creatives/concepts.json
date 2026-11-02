@@ -1,0 +1,203 @@
+{
+  "voices": {
+    "british": "JBFqnCBsd6RMkjVDRZzb",
+    "american": "nPczCjzI2devNBz1zQrb",
+    "female": "EXAVITQu4vr4xnSDxMaL"
+  },
+  "cta": "Download Stock Matcher A.I. free on the App Store.",
+  "bodies": {
+    "g": [
+      {
+        "say": "Swipe right to like.",
+        "head": "Swipe right to like",
+        "anim": "swipe-right"
+      },
+      {
+        "say": "Swipe left to pass.",
+        "head": "Swipe left to pass",
+        "anim": "swipe-left"
+      },
+      {
+        "say": "Every card shows what a company does, the proof, and the things to know.",
+        "head": "Know what you're swiping on",
+        "screen": "deck-3",
+        "zoom": [
+          0.0,
+          0.37,
+          1.0,
+          0.72
+        ]
+      },
+      {
+        "say": "Then see what your likes say about you.",
+        "head": "What your likes say about you",
+        "screen": "recap-insight"
+      }
+    ],
+    "e": [
+      {
+        "say": "Every company starts with one plain sentence on what it does.",
+        "head": "What it does, in plain English",
+        "screen": "details",
+        "zoom": [
+          0.0,
+          0.38,
+          1.0,
+          0.68
+        ]
+      },
+      {
+        "say": "The numbers come in plain words.",
+        "head": "Numbers in plain words",
+        "screen": "metrics",
+        "zoom": [
+          0.0,
+          0.44,
+          1.0,
+          0.59
+        ]
+      },
+      {
+        "say": "Stuck on something? Ask A.I.",
+        "head": "Stuck? Ask AI",
+        "screen": "ask-ai"
+      },
+      {
+        "say": "And the proof comes with a source you can open.",
+        "head": "Proof, with a source",
+        "screen": "details",
+        "zoom": [
+          0.0,
+          0.52,
+          1.0,
+          0.82
+        ]
+      }
+    ],
+    "m": [
+      {
+        "say": "Pick the causes you care about, like beating cancer, clean energy, or clean water.",
+        "head": "Pick your causes",
+        "screen": "causes"
+      },
+      {
+        "say": "See real companies working on them,",
+        "head": "Real companies. Your causes.",
+        "screen": "reveal"
+      },
+      {
+        "say": "with proof and a source you can check.",
+        "head": "Proof, with a source",
+        "screen": "details",
+        "zoom": [
+          0.0,
+          0.38,
+          1.0,
+          0.68
+        ]
+      },
+      {
+        "say": "Then you decide.",
+        "head": "Then you decide",
+        "screen": "likes"
+      }
+    ]
+  },
+  "hooks": [
+    {
+      "id": "g1-tinder",
+      "cat": "g",
+      "say": "It's like Tinder, but for stocks.",
+      "screen": "deck-1",
+      "real": true,
+      "still_screen": "deck-1",
+      "benefit": "Swipe right on companies that match your values."
+    },
+    {
+      "id": "g2-ticker",
+      "cat": "g",
+      "say": "Your next match has a ticker symbol.",
+      "screen": "deck-1-masked",
+      "still_screen": "deck-2-masked",
+      "benefit": "Matches built around your values, with AI to explain every company."
+    },
+    {
+      "id": "g3-swipes",
+      "cat": "g",
+      "say": "Your swipes reveal what kind of investor you are.",
+      "screen": "deck-1-masked",
+      "still_screen": "recap-insight",
+      "benefit": "Like a few companies. See what your likes say about you."
+    },
+    {
+      "id": "e1-just-invest",
+      "cat": "e",
+      "say": "Everyone says just invest. Nobody explains in what.",
+      "screen": "deck-1-masked",
+      "still_screen": "deck-1-masked",
+      "benefit": "What each company does, the proof, and what to know."
+    },
+    {
+      "id": "e2-pe-ratio",
+      "cat": "e",
+      "say": "Nobody ever explained what a P.E. ratio actually means.",
+      "screen": "deck-1",
+      "real": true,
+      "disclaimer": true,
+      "still_screen": "metrics",
+      "benefit": "The numbers, in plain words. Ask AI the rest."
+    },
+    {
+      "id": "e3-degree",
+      "cat": "e",
+      "say": "You don't need a finance degree to understand a stock.",
+      "screen": "deck-1-masked",
+      "still_screen": "ask-ai",
+      "benefit": "Plain English, with AI to explain every company."
+    },
+    {
+      "id": "m1-saying",
+      "cat": "m",
+      "say": "Your money is already saying something. Is it what you believe?",
+      "screen": "hook",
+      "still_screen": "hook",
+      "benefit": "Find companies working on the things you care about."
+    },
+    {
+      "id": "m2-donate",
+      "cat": "m",
+      "say": "You'd donate to fight cancer. Could you name one company working on it?",
+      "screen": "causes",
+      "disclaimer": true,
+      "still_screen": "causes",
+      "benefit": "See real companies working on your causes, with proof."
+    },
+    {
+      "id": "m3-fight",
+      "cat": "m",
+      "say": "What do you want your money to fight for?",
+      "screen": "causes",
+      "still_screen": "reveal",
+      "benefit": "Cancer, clean energy, clean water and more. You pick."
+    }
+  ],
+  "first_batch": [
+    [
+      "g1-tinder",
+      "british"
+    ],
+    [
+      "e1-just-invest",
+      "british"
+    ],
+    [
+      "m2-donate",
+      "british"
+    ]
+  ],
+  "extra_voices": [
+    "g1-tinder",
+    "e1-just-invest",
+    "m2-donate"
+  ]
+}

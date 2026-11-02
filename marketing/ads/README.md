@@ -4,6 +4,20 @@ Draft video and still ads. Nothing here has run as a paid ad or had a legal revi
 
 The videos are built locally from the App Store screenshots with Pillow and ffmpeg. The voiceover comes from the ElevenLabs API. They use the cream design, which the app moved away from on 2026-10-30, so rebuild them from new screenshots before using them.
 
+## New creatives (current app design)
+
+`creatives/` holds the current ads, from captures of the app as it is in the repo.
+
+- `node scripts/capture-ad-shots.mjs` (dev server running) captures `shots/`, light and dark. Not committed. Doesn't touch `marketing/app-store/`.
+- `creatives/concepts.json`: the nine hooks (gamified, educational, values), video scripts, voices, still copy.
+- `creatives/images/`: `*-4x5.png` exported from the editable Canva designs; `*-9x16.png` from `render_videos.py stills`.
+- `scripts/voiceover.mjs`: ElevenLabs voiceovers with word timing, via the SDK. The key is in `.env.local` (gitignored). Spends credits. `FFMPEG=<path> node --env-file=.env.local marketing/ads/scripts/voiceover.mjs first`
+- `scripts/render_videos.py sheet|video|stills`: review frames, videos, 9:16 stills. Works on any OS.
+- Real share price and move on G1 and E2; other card shots use a copy with them hidden. Prices are a snapshot from the capture date.
+- Added disclaimer on E2 and M2 only. Matching is rule-based, so copy says "matches built around your values, with AI to explain every company", not "AI-assisted matching".
+
+Everything below describes the older cream drafts.
+
 ## Layout
 
 - `drafts/`: finished ads. `ad-*.mp4` are the current concepts; `video-believe-*.mp4` are the superseded first drafts, one per voice.
