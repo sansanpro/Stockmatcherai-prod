@@ -31,7 +31,14 @@
       {
         "say": "Then see what your likes say about you.",
         "head": "What your likes say about you",
-        "screen": "recap-insight"
+        "screen": "recap-insight",
+        "zoom": [
+          0,
+          0.27,
+          1,
+          0.68
+        ],
+        "zoom_w": 760
       }
     ],
     "e": [
@@ -83,7 +90,14 @@
       {
         "say": "See real companies working on them,",
         "head": "Real companies. Your causes.",
-        "screen": "reveal"
+        "screen": "reveal",
+        "zoom": [
+          0,
+          0.22,
+          1,
+          0.56
+        ],
+        "zoom_w": 900
       },
       {
         "say": "with proof and a source you can check.",
@@ -193,11 +207,14 @@
     [
       "m2-donate",
       "british"
+    ],
+    [
+      "e1-just-invest",
+      "american"
+    ],
+    [
+      "m2-donate",
+      "female"
     ]
-  ],
-  "extra_voices": [
-    "g1-tinder",
-    "e1-just-invest",
-    "m2-donate"
   ]
 }

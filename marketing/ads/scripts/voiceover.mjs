@@ -2,7 +2,6 @@
 // ElevenLabs credits. The SDK reads ELEVENLABS_API_KEY, which comes from .env.local:
 //
 //   FFMPEG=<path to ffmpeg> node --env-file=.env.local marketing/ads/scripts/voiceover.mjs first
-//   ... voiceover.mjs all               every hook in the British voice, plus the extra voices
 //   ... voiceover.mjs g1-tinder british one ad, one voice
 //
 // Output: marketing/ads/creatives/vo/<id>-<voice>.mp3 and .json. Existing files are kept.
@@ -62,6 +61,5 @@ async function make(hook, voice) {
 const [what, voice] = process.argv.slice(2);
 const byId = Object.fromEntries(C.hooks.map(h => [h.id, h]));
 const jobs = what === 'first' ? C.first_batch
-  : what === 'all' ? [...C.hooks.map(h => [h.id, 'british']), ...C.extra_voices.flatMap(id => [[id, 'american'], [id, 'female']])]
   : [[what, voice ?? 'british']];
 for (const [id, v] of jobs) await make(byId[id], v);

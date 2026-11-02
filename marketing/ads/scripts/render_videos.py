@@ -126,7 +126,7 @@ def card_sprite(theme, name):
         CACHE[k] = im
     return CACHE[k]
 
-def draw_phone(fr, theme, name, top, width, crop=None, card=None):
+def draw_phone(fr, theme, name, top, width, crop=None, card=None, room=0):
     """Draws the phone at `top`. crop = (y0, y1) as shares of the phone: zooms that band to full width.
     card = (sprite name, dx share of the screen width, rotation): a card flying off a deck screen."""
     src = phone_shell(theme, name)
@@ -144,13 +144,17 @@ def draw_phone(fr, theme, name, top, width, crop=None, card=None):
         src.paste(layer, (0, 0), Image.composite(layer.getchannel('A'), Image.new('L', src.size, 0), mask))
     scale = width / PHONE_W
     if crop:
+        # A band of the screen itself, without the phone's edges, centered in the space it's given
         y0, y1 = int(crop[0] * PHONE_H), int(crop[1] * PHONE_H)
-        band = src.crop((0, y0, PHONE_W, y1))
+        band = src.crop((BEZEL, y0, PHONE_W - BEZEL, y1))
+        scale = width / band.width
         im = band.resize((width, int(band.height * scale)), Image.BILINEAR)
-    else:
-        visible = min(PHONE_H, int((H - top) / scale) + 2)
-        band = src.crop((0, 0, PHONE_W, visible))
-        im = band.resize((width, int(visible * scale)), Image.BILINEAR)
+        im.putalpha(rounded_mask(im.size, 36))
+        fr.paste(im, ((W - width) // 2, int(top + max(0, (room - im.height) / 2))), im)
+        return
+    visible = min(PHONE_H, int((H - top) / scale) + 2)
+    band = src.crop((0, 0, PHONE_W, visible))
+    im = band.resize((width, int(visible * scale)), Image.BILINEAR)
     fr.paste(im, ((W - width) // 2, int(top)), im)
 
 
@@ -251,9 +255,10 @@ class Ad:
         elif 'zoom' in s:
             _, a, _, b = s['zoom']
             q = smooth((t - t0 - .05) / .5)
-            top = SAFE_T + 120
-            w = int(760 + 240 * q)
-            draw_phone(fr, th, s['screen'], top, w, crop=(a, b))
+            top = SAFE_T + 110
+            full = s.get('zoom_w', 948)
+            w = int(full * (.86 + .14 * q))
+            draw_phone(fr, th, s['screen'], top, w, crop=(a, b), room=SAFE_B - 110 - top)
         else:
             p2 = ease((t - t0) / .45)
             draw_phone(fr, th, s['screen'], SAFE_T + 118 + (1 - p2) * 90, 680)
