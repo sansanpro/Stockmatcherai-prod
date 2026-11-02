@@ -365,7 +365,7 @@ const StockDetailsModal = ({ stock, isOpen, onClose, onMatch, onPass }: StockDet
         </Tabs>
 
         {/* ── Sticky action bar ─────────────────────────────────────────────── */}
-        <div className="absolute bottom-0 inset-x-0 p-4 pb-safe bg-background/95 backdrop-blur-md border-t border-border/50">
+        <div className="absolute bottom-0 inset-x-0 p-4 pb-[max(env(safe-area-inset-bottom),1rem)] bg-background/95 backdrop-blur-md border-t border-border/50">
           <div className="flex gap-3">
             <Button
               onClick={() => { onPass(stock); onClose(); }}

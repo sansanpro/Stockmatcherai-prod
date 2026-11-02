@@ -21,9 +21,9 @@ const CoachMark = ({ id, text, className = '' }: CoachMarkProps) => {
   };
 
   return (
-    <div role="status" className={`z-30 max-w-xs rounded-2xl bg-surface text-ink border border-line shadow-[0_12px_30px_rgb(var(--shadow)/0.16)] px-4 py-3 animate-fade-in ${className}`}>
-      <p className="text-sm font-medium leading-snug">{text}</p>
-      <button onClick={dismiss} className="mt-1 min-h-[44px] min-w-[44px] text-sm font-semibold text-primary">
+    <div role="status" className={`z-30 max-w-sm flex items-center gap-3 rounded-2xl bg-surface text-ink border border-line shadow-[0_12px_30px_rgb(var(--shadow)/0.16)] pl-4 pr-2 py-1 animate-fade-in ${className}`}>
+      <p className="flex-1 text-left text-[0.8125rem] font-medium leading-snug">{text}</p>
+      <button onClick={dismiss} className="flex-shrink-0 min-h-[44px] min-w-[44px] px-2 whitespace-nowrap text-sm font-semibold text-primary">
         Got it
       </button>
     </div>

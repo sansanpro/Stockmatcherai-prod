@@ -130,7 +130,7 @@ const UpgradeModal = ({ isOpen, onClose, reason = 'settings' }: UpgradeModalProp
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       {/* Scrolls on small phones so the title and the required Privacy/Terms links stay reachable */}
-      <DialogContent className="max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto bg-surface border-premium-line p-0 gap-0 rounded-3xl duration-slow ease-out">
+      <DialogContent className="max-w-md dialog-safe-height overflow-y-auto bg-surface border-premium-line p-0 gap-0 rounded-3xl duration-slow ease-out">
         <div className="bg-premium-tint border-b border-premium-line px-6 pt-7 pb-5 text-center">
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-premium-ink bg-surface/80 border border-premium-line rounded-full px-2.5 py-1">
             <Crown className="w-3.5 h-3.5" aria-hidden /> Premium

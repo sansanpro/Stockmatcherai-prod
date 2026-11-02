@@ -1,3 +1,4 @@
+import StatusBarBackdrop from '@/components/StatusBarBackdrop';
 import Disclaimer from '@/components/values/Disclaimer';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -96,7 +97,8 @@ const Auth = () => {
   );
 
   return (
-    <main className="min-h-screen bg-daybreak flex flex-col px-6 pb-8 pt-[env(safe-area-inset-top)]">
+    <main className="min-h-screen bg-daybreak flex flex-col px-6 pb-[max(calc(env(safe-area-inset-bottom)+0.5rem),2rem)] pt-[env(safe-area-inset-top)]">
+      <StatusBarBackdrop tone="glow" />
       <button onClick={() => navigate('/app')} className="flex items-center gap-2 text-ink-soft hover:text-ink transition-colors mt-3 mb-8 min-h-[44px] self-start">
         <ArrowLeft className="w-4 h-4" /> Back
       </button>

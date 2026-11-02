@@ -98,6 +98,12 @@
       linear-gradient(160deg, rgb(var(--plum-2)) 0%, rgb(var(--plum-1)) 85%);
   }
 
+  /* A centered dialog stays clear of the notch and home indicator: it's centered, so the larger inset counts twice */
+  .dialog-safe-height { max-height: calc(100dvh - 2 * max(env(safe-area-inset-top), env(safe-area-inset-bottom)) - 1rem); }
+
+  /* Behind the floating tab bar: scrolling content fades out, so none shows in the gap beneath it */
+  .nav-fade { background-image: linear-gradient(to top, rgb(var(--base)) 55%, rgb(var(--base) / 0) 100%); }
+
   /* The Like button: a coral gradient (peach in dark, with a dark heart) */
   .btn-like {
     background-image: linear-gradient(160deg, rgb(var(--primary-bright)) 0%, rgb(var(--primary-deep)) 100%);

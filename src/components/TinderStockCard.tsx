@@ -285,7 +285,7 @@ const TinderStockCard = ({
 
   // Tapping the card opens everything, with the meaning of every number spelled out
   const renderExpandedContent = () => (
-    <div className="flex flex-col h-full overflow-y-auto">
+    <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
       {header(true)}
       <div className="p-5 space-y-5">
         {updateBody}
@@ -298,7 +298,7 @@ const TinderStockCard = ({
         </div>
       </div>
       <CompanySnapshot ticker={stock.ticker} companyName={stock.companyName} sector={stock.sector} variant="expanded" />
-      <p className="text-center text-xs text-muted-foreground py-4">Educational only, not investment advice.</p>
+      <p className="text-center text-xs text-muted-foreground pt-4 pb-[max(env(safe-area-inset-bottom),1rem)]">Educational only, not investment advice.</p>
     </div>
   );
 
@@ -306,7 +306,7 @@ const TinderStockCard = ({
     <>
       {/* Expanded fullscreen sheet */}
       <Sheet open={isExpanded} onOpenChange={setIsExpanded} modal={false}>
-        <SheetContent side="bottom" className="h-[95vh] p-0 rounded-t-3xl z-[65]" onInteractOutside={keepOpenForAIAssistant}>
+        <SheetContent side="bottom" hideClose className="h-[95vh] p-0 gap-0 flex flex-col rounded-t-3xl z-[65]" onInteractOutside={keepOpenForAIAssistant}>
           <div className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-10">
             <h3 className="font-semibold text-lg">Stock Details</h3>
             <button

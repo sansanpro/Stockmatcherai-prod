@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import StockMatcher from '@/components/StockMatcher';
 import Matches from '@/components/Matches';
 import AIAssistantWidget from '@/components/AIAssistantWidget';
+import StatusBarBackdrop from '@/components/StatusBarBackdrop';
 import Settings from '@/components/Settings';
 import NotificationSystem from '@/components/NotificationSystem';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -92,10 +93,10 @@ const BottomNavBar = ({ currentStep, onStepChange, watchlistLength }: BottomNavB
   ];
   return (
     <nav
-      className="fixed bottom-0 left-0 w-full z-50 pb-safe-area-inset-bottom"
+      className="nav-fade fixed bottom-0 left-0 w-full z-50 pb-safe-area-inset-bottom"
       style={{ fontFamily: 'SF Pro Text, SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif' }}
     >
-      <div className="mx-3 mb-3 rounded-2xl bg-surface/90 backdrop-blur-xl border border-line shadow-[0_8px_30px_rgb(var(--shadow)/0.12)] flex justify-around items-center py-2 px-2">
+      <div className="mx-3 mb-3 rounded-2xl bg-surface/95 backdrop-blur-xl border border-line shadow-[0_8px_30px_rgb(var(--shadow)/0.12)] flex justify-around items-center py-2 px-2">
         {navItems.map(({ step, icon: Icon, label }) => {
           const active = currentStep === step;
           return (
@@ -388,7 +389,8 @@ const IndexContent = () => {
         aria-hidden={currentStep !== 'matches'}
         style={{ display: currentStep === 'matches' ? 'block' : 'none' }}
       >
-        <div className="min-h-[100dvh] w-full min-w-0 bg-cream px-4 overflow-auto pb-[max(env(safe-area-inset-bottom),6.5rem)]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <StatusBarBackdrop />
+        <div className="min-h-[100dvh] w-full min-w-0 bg-cream px-4 overflow-auto pb-[11.5rem]" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="w-full pt-4">
             <Matches onViewDetails={handleViewStockDetails} signedIn={signedIn} onSaveMatches={openSavePrompt} />
           </div>

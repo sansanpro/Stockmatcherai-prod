@@ -12,6 +12,7 @@ import { CauseIcon, causeTone } from '@/components/values/CauseChips';
 import { askAI, companyQuestion } from '@/lib/askAI';
 import DailyRecap from '@/components/DailyRecap';
 import DailyQuote from '@/components/DailyQuote';
+import StatusBarBackdrop from '@/components/StatusBarBackdrop';
 import Art3D from '@/components/onboarding/Art3D';
 import { STEP_ART } from '@/lib/art';
 import { toast } from 'sonner';
@@ -211,7 +212,8 @@ const StockMatcher = ({
   // Scrolls when the content is taller than the screen (the end-of-day screen with its quote)
   const centered = (content: React.ReactNode) => (
     <div className="h-full min-h-0 overflow-y-auto bg-daybreak px-6 flex flex-col" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1.5rem)' }}>
-      <div className="max-w-md w-full mx-auto my-auto text-center text-ink pb-28">{content}</div>
+      <StatusBarBackdrop tone="glow" />
+      <div className="max-w-md w-full mx-auto my-auto text-center text-ink pb-[11.5rem]">{content}</div>
     </div>
   );
 

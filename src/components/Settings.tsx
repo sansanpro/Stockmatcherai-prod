@@ -117,9 +117,9 @@ const Settings = ({ onBack, answers, onCausesSaved }: SettingsProps) => {
   }));
 
   return (
-    <div className="min-h-screen w-full bg-cream text-ink overflow-x-hidden">
+    <div className="min-h-screen w-full bg-cream text-ink overflow-x-clip">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-cream/85 backdrop-blur-md border-b border-line px-4 pb-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
+      <div className="sticky top-0 z-10 bg-cream/95 backdrop-blur-md border-b border-line px-4 pb-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
         <div className="flex items-center gap-3 max-w-2xl mx-auto">
           <button onClick={onBack} aria-label="Back"
             className="w-11 h-11 rounded-full bg-surface border border-line hover:bg-sand flex items-center justify-center transition-colors">
