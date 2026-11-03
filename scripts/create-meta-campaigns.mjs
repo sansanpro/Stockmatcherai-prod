@@ -1,5 +1,7 @@
-// Creates the StockMatcherAI app-install campaign on Meta, everything PAUSED. Nothing spends until
+// Creates the StockMatcherAI traffic campaign on Meta, everything PAUSED. Nothing spends until
 // someone turns it on in Ads Manager. Copy and files come from marketing/ads/creatives.
+// It's traffic to the App Store page, not app installs: Meta won't run install campaigns for iOS 15
+// without its SDK in the app, so installs are counted in App Store Connect instead.
 //
 //   node --env-file=.env.local scripts/create-meta-campaigns.mjs            prints the plan, calls nothing
 //   node --env-file=.env.local scripts/create-meta-campaigns.mjs --apply    creates it
@@ -12,13 +14,12 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 const API = 'https://graph.facebook.com/v23.0';
 const ACCOUNT = 'act_1775000777063627';
 const PAGE = '1166306203222793';
-const APP = '2047386062877252';
-const STORE = 'http://itunes.apple.com/app/id6758280940'; // as registered on the Meta app
+const STORE = 'https://www.stockmatcherai.com/download'; // redirects to the App Store (vercel.json); Meta rejects a direct App Store link on a traffic campaign
 const IMAGES = 'marketing/ads/creatives/images';
 const VIDEOS = 'marketing/ads/creatives/videos';
 const LEDGER = 'marketing/ads/meta-created.json';
-const DAILY_CENTS = 1000;
-const CAMPAIGN = 'StockMatcherAI app installs - iOS 15+';
+const DAILY_CENTS = 833; // $25 a day across the 3 ad sets
+const CAMPAIGN = 'StockMatcherAI App Store traffic - iOS 15+';
 const IDENTITY = '1713935727401611'; // the advertiser verified in Ads Manager
 const USER_OS = 'iOS_ver_15.0_and_above'; // the app's minimum
 
@@ -100,10 +101,9 @@ const adSetBody = (set, campaignId) => ({
   status: 'PAUSED',
   daily_budget: DAILY_CENTS,
   billing_event: 'IMPRESSIONS',
-  optimization_goal: 'APP_INSTALLS',
+  optimization_goal: 'LINK_CLICKS',
+  destination_type: 'WEBSITE',
   bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
-  promoted_object: { application_id: APP, object_store_url: STORE },
-  campaign_attribution: 'SKADNETWORK',
   ...(regional && {
     regional_regulated_categories: regional,
     regional_regulation_identities: { universal_beneficiary: IDENTITY, universal_payer: IDENTITY },
@@ -123,7 +123,7 @@ const adSetBody = (set, campaignId) => ({
   },
 });
 const message = (ad) => `${ad.hook} ${ad.more}`;
-const cta = { type: 'DOWNLOAD', value: { link: STORE, application: APP } };
+const cta = { type: 'DOWNLOAD', value: { link: STORE } };
 
 if (!apply) {
   console.log(`Campaign: ${CAMPAIGN} (PAUSED), account ${ACCOUNT}, page ${PAGE}`);
@@ -140,9 +140,7 @@ if (!apply) {
 }
 
 const campaignId = await once('campaign', async () => (await post(`${ACCOUNT}/campaigns`, {
-  name: CAMPAIGN, objective: 'OUTCOME_APP_PROMOTION', status: 'PAUSED', special_ad_categories: [], is_adset_budget_sharing_enabled: false,
-  is_skadnetwork_attribution: true, // can't be changed once published, and without it Meta stops at iOS 14.4
-  promoted_object: { application_id: APP, object_store_url: STORE },
+  name: CAMPAIGN, objective: 'OUTCOME_TRAFFIC', status: 'PAUSED', special_ad_categories: [], is_adset_budget_sharing_enabled: false,
 })).id);
 for (const set of SETS) {
   const adSetId = await once(`adset:${set.key}`, async () => (await post(`${ACCOUNT}/adsets`, adSetBody(set, campaignId))).id);
@@ -162,8 +160,8 @@ for (const set of SETS) {
 }
 
 // Read back what Meta stored
-const camp = await get(campaignId, 'name,status,objective,is_skadnetwork_attribution');
-console.log('\ncampaign', camp.name, camp.status, camp.objective, 'iOS 14+ type:', camp.is_skadnetwork_attribution);
+const camp = await get(campaignId, 'name,status,objective');
+console.log('\ncampaign', camp.name, camp.status, camp.objective);
 for (const set of SETS) {
   const s = await get(done[`adset:${set.key}`], 'name,status,daily_budget,targeting');
   console.log('ad set', s.name, s.status, `$${s.daily_budget / 100}/day`, s.targeting.user_os);
