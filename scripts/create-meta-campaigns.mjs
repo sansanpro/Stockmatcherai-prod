@@ -5,7 +5,8 @@
 //   node --env-file=.env.local scripts/create-meta-campaigns.mjs --apply    creates it
 //
 // Needs META_ACCESS_TOKEN (ads_management). Created IDs go in marketing/ads/meta-created.json, so
-// a re-run after a failure carries on instead of making duplicates.
+// a re-run after a failure carries on instead of making duplicates. If Meta asks for a verified
+// advertiser, add --regional=<categories, comma separated> to attach the verified identity.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 const API = 'https://graph.facebook.com/v23.0';
@@ -17,7 +18,9 @@ const IMAGES = 'marketing/ads/creatives/images';
 const VIDEOS = 'marketing/ads/creatives/videos';
 const LEDGER = 'marketing/ads/meta-created.json';
 const DAILY_CENTS = 1000;
-const CAMPAIGN = 'StockMatcherAI app installs - hook test';
+const CAMPAIGN = 'StockMatcherAI app installs - iOS 15+';
+const IDENTITY = '1713935727401611'; // the advertiser verified in Ads Manager
+const USER_OS = 'iOS_ver_15.0_and_above'; // the app's minimum
 
 const SETS = [
   { key: 'gamified', name: 'Gamified hooks', ads: [
@@ -39,6 +42,7 @@ const SETS = [
 const HEADLINE = 'Download StockMatcherAI free';
 
 const apply = process.argv.includes('--apply');
+const regional = process.argv.find(a => a.startsWith('--regional='))?.slice(11).split(',');
 const token = process.env.META_ACCESS_TOKEN;
 if (!token) throw new Error('META_ACCESS_TOKEN is missing');
 const done = existsSync(LEDGER) ? JSON.parse(readFileSync(LEDGER, 'utf8')) : {};
@@ -99,14 +103,23 @@ const adSetBody = (set, campaignId) => ({
   optimization_goal: 'APP_INSTALLS',
   bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
   promoted_object: { application_id: APP, object_store_url: STORE },
-  is_skadnetwork_attribution: true,
+  campaign_attribution: 'SKADNETWORK',
+  ...(regional && {
+    regional_regulated_categories: regional,
+    regional_regulation_identities: { universal_beneficiary: IDENTITY, universal_payer: IDENTITY },
+  }),
   targeting: {
     geo_locations: { countries: ['US'] },
     age_min: 18,
-    age_max: 44,
+    age_max: 65,
+    age_range: [18, 44], // a suggestion to Advantage+ audience, which may go older
     device_platforms: ['mobile'],
-    user_os: ['iOS_ver_14.0_and_above'],
-    targeting_automation: { advantage_audience: 0 },
+    user_os: [USER_OS],
+    targeting_automation: { advantage_audience: 1 },
+    publisher_platforms: ['facebook', 'instagram', 'threads'],
+    facebook_positions: ['feed', 'instream_video', 'marketplace', 'story', 'search', 'biz_disco_feed', 'facebook_reels', 'facebook_reels_overlay', 'profile_feed'],
+    instagram_positions: ['stream', 'story', 'explore', 'reels', 'explore_home', 'profile_feed', 'ig_search'],
+    threads_positions: ['threads_stream'],
   },
 });
 const message = (ad) => `${ad.hook} ${ad.more}`;
@@ -115,7 +128,7 @@ const cta = { type: 'DOWNLOAD', value: { link: STORE, application: APP } };
 if (!apply) {
   console.log(`Campaign: ${CAMPAIGN} (PAUSED), account ${ACCOUNT}, page ${PAGE}`);
   for (const set of SETS) {
-    console.log(`\nAd set: ${set.name}, $${DAILY_CENTS / 100}/day, US, 18-44, iOS, PAUSED`);
+    console.log(`\nAd set: ${set.name}, $${DAILY_CENTS / 100}/day, US, 18-44 (Advantage+ audience), iOS 15+, PAUSED`);
     for (const ad of set.ads) {
       const files = ad.video ? [`${VIDEOS}/${ad.video}.mp4`] : [`${IMAGES}/${ad.id}-4x5.png`];
       for (const f of files) if (!existsSync(f)) throw new Error(`missing ${f}`);
@@ -128,6 +141,8 @@ if (!apply) {
 
 const campaignId = await once('campaign', async () => (await post(`${ACCOUNT}/campaigns`, {
   name: CAMPAIGN, objective: 'OUTCOME_APP_PROMOTION', status: 'PAUSED', special_ad_categories: [], is_adset_budget_sharing_enabled: false,
+  is_skadnetwork_attribution: true, // can't be changed once published, and without it Meta stops at iOS 14.4
+  promoted_object: { application_id: APP, object_store_url: STORE },
 })).id);
 for (const set of SETS) {
   const adSetId = await once(`adset:${set.key}`, async () => (await post(`${ACCOUNT}/adsets`, adSetBody(set, campaignId))).id);
@@ -147,11 +162,12 @@ for (const set of SETS) {
 }
 
 // Read back what Meta stored
-const camp = await get(campaignId, 'name,status,objective');
-console.log('\ncampaign', camp.name, camp.status, camp.objective);
+const camp = await get(campaignId, 'name,status,objective,is_skadnetwork_attribution');
+console.log('\ncampaign', camp.name, camp.status, camp.objective, 'iOS 14+ type:', camp.is_skadnetwork_attribution);
 for (const set of SETS) {
-  const s = await get(done[`adset:${set.key}`], 'name,status,daily_budget');
-  console.log('ad set', s.name, s.status, `$${s.daily_budget / 100}/day`);
+  const s = await get(done[`adset:${set.key}`], 'name,status,daily_budget,targeting');
+  console.log('ad set', s.name, s.status, `$${s.daily_budget / 100}/day`, s.targeting.user_os);
+  if (s.targeting.user_os?.join() !== USER_OS) throw new Error(`${s.name}: Meta stored ${s.targeting.user_os}, not ${USER_OS}`);
   for (const ad of set.ads) {
     const a = await get(done[`ad:${ad.id}`], 'name,status,effective_status,creative{object_story_spec}');
     const spec = a.creative?.object_story_spec ?? {};
