@@ -1,15 +1,3 @@
 {
-  "redirects": [
-    {
-      "source": "/download",
-      "destination": "https://apps.apple.com/app/id6758280940",
-      "permanent": false
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

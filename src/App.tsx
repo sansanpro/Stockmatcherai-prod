@@ -11,6 +11,7 @@ import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Waitlist from "./pages/Waitlist";
+import Download from "./pages/Download";
 import Support from "./pages/Support";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
@@ -54,6 +55,7 @@ const App = () => {
                 <>
                   <Route path="/" element={<Landing />} />
                   <Route path="/waitlist" element={<Waitlist />} />
+                  <Route path="/download" element={<Download />} />
                   <Route path="/support" element={<Support />} />
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/auth" element={<Auth />} />

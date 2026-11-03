@@ -14,7 +14,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 const API = 'https://graph.facebook.com/v23.0';
 const ACCOUNT = 'act_1775000777063627';
 const PAGE = '1166306203222793';
-const STORE = 'https://www.stockmatcherai.com/download'; // redirects to the App Store (vercel.json); Meta rejects a direct App Store link on a traffic campaign
+const STORE = 'https://www.stockmatcherai.com/download'; // a page on the site: Meta rejects traffic ads that link or redirect to the App Store
 const IMAGES = 'marketing/ads/creatives/images';
 const VIDEOS = 'marketing/ads/creatives/videos';
 const LEDGER = 'marketing/ads/meta-created.json';
