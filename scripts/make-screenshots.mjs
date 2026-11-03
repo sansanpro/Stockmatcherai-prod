@@ -5,10 +5,11 @@
 //   npm run dev            (in another terminal, or let this script find it on :8080)
 //   node scripts/make-screenshots.mjs      (ASK_AI_ATTEMPTS=1 to give up on a busy Gemini sooner)
 //
-// Output: marketing/app-store/*.jpg (upload these) and src/assets/showcase-*.jpg (landing page).
+// Output: marketing/app-store/*.jpg and iphone-6.3/*.jpg (upload these) and src/assets/showcase-*.jpg (landing page).
 // Signed-out screens use a throwaway install marked e2e- so analytics ignore it; the Ask AI
 // screen signs in as the test account from .env.test.local.
 import { webkit } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -16,7 +17,7 @@ const BASE = 'http://localhost:8080';
 const W = 440, SCREEN_H = 956, STATUS_H = 62; // iPhone 17 Pro Max points; status bar drawn later
 const RAW = 'marketing/raw';
 mkdirSync(RAW, { recursive: true });
-mkdirSync('marketing/app-store', { recursive: true });
+mkdirSync('marketing/app-store/iphone-6.3', { recursive: true });
 
 const env = Object.fromEntries(readFileSync('.env.test.local', 'utf8').split('\n')
   .map(l => l.match(/^([A-Z0-9_]+)=(.*)$/)).filter(Boolean).map(m => [m[1], m[2]]));
@@ -199,13 +200,17 @@ for (const [raw, a, b, slug] of FRAMES) {
     await page.screenshot({ path: out, type: 'jpeg', quality });
     await page.close();
   }
+  // The 6.1"/6.3" slot only takes its own sizes
+  execFileSync('sips', ['-z', '2622', '1206', '-s', 'format', 'jpeg', '-s', 'formatOptions', '95',
+    `marketing/app-store/${raw}-${slug}.jpg`, '--out', `marketing/app-store/iphone-6.3/${raw}-${slug}.jpg`], { stdio: 'ignore' });
   console.log('framed', slug);
 }
 writeFileSync('marketing/README.md', `# Screenshots
 
 Made by \`node scripts/make-screenshots.mjs\` from the real app (WebKit at iPhone 17 Pro Max size).
 
-- \`app-store/\`: 1320×2868, the 6.9" size App Store Connect asks for (also used for smaller iPhones).
+- \`app-store/\`: 1320×2868, for the iPhone 6.9" slot in App Store Connect.
+- \`app-store/iphone-6.3/\`: 1206×2622, the same screenshots for the iPhone 6.1"/6.3" slot.
 - \`raw/\` (not committed): the plain captures, before framing.
 
 The landing page copies live in \`src/assets/showcase-*.jpg\`.
