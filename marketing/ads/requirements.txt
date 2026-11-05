@@ -1,2 +1,4 @@
 Pillow
 imageio-ffmpeg
+numpy
+scipy

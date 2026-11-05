@@ -7,7 +7,7 @@
 #   python marketing/ads/scripts/render_videos.py stills [id ...]        # 9:16 image ads, no voice needed
 #
 # Text stays inside Meta's 9:16 safe zone (top 14%, bottom 35%, sides 6%); only the phone runs below it.
-import sys, os, json, glob, subprocess
+import sys, os, json, glob, math, subprocess
 import imageio_ffmpeg
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
@@ -158,6 +158,43 @@ def draw_phone(fr, theme, name, top, width, crop=None, card=None, room=0):
     fr.paste(im, ((W - width) // 2, int(top)), im)
 
 
+# ---------- a hand holding the phone (make_hand_asset.py) ----------
+HAND_SCREEN = (216, 190, 700, 1255)  # the screen's box in hand-phone.png
+HAND_NOTCH = 40    # keeps the app's content below the photo's notch
+HAND_TOP = 160     # the top of the phone in hand-phone.png
+HAND_PIVOT = (560, 1500)  # the wrist end, so the phone turns the way a hand would
+
+def hand_comp(theme, name, card=None):
+    """The hand photo with a screen behind the thumb. card is as in draw_phone."""
+    k = ('hand', theme['shots'], name)
+    if not card and k in CACHE: return CACHE[k]
+    hand = CACHE.setdefault('hand-phone', Image.open(f'{DIR}/hand-phone.png').convert('RGBA'))
+    shot = Image.open(shot_path(theme, name)).convert('RGB') if k + ('shot',) not in CACHE else CACHE[k + ('shot',)]
+    CACHE[k + ('shot',)] = shot
+    x0, y0, x1, y1 = HAND_SCREEN
+    w, h = x1 - x0 + 16, y1 - y0 + 16
+    if card:
+        shot = shot.copy()
+        c = card_sprite(theme, card[0])
+        rot = c.rotate(-card[2], resample=Image.BILINEAR, expand=True)
+        shot.paste(rot, ((SHOT_W - rot.width) // 2 + int(card[1] * SHOT_W), CARD_TOP - (rot.height - c.height) // 2), rot)
+    sized = shot.resize((w, int(SHOT_H * w / SHOT_W)), Image.BILINEAR)
+    screen = Image.new('RGB', (w, h), shot.getpixel((SHOT_W // 2, 4)))
+    screen.paste(sized, (0, HAND_NOTCH))
+    im = Image.new('RGBA', hand.size, (0, 0, 0, 0))
+    im.paste(screen, (x0 - 8, y0 - 8))
+    im.alpha_composite(hand)
+    if not card: CACHE[k] = im
+    return im
+
+def draw_hand(fr, theme, name, top, scale=1.0, dx=0, rot=0, card=None):
+    """Draws it with the phone's top edge at `top`."""
+    im = hand_comp(theme, name, card)
+    if rot: im = im.rotate(-rot, resample=Image.BILINEAR, center=HAND_PIVOT)
+    im = im.resize((int(im.width * scale), int(im.height * scale)), Image.BILINEAR)
+    fr.paste(im, (int((W - im.width) / 2 + dx), int(top - HAND_TOP * scale)), im)
+
+
 # ---------- an ad ----------
 def background(theme):
     bg = Image.new('RGB', (W, H), theme['bg'])
@@ -217,6 +254,21 @@ class Ad:
                     x += f.getlength(w + ' ')
                 return
 
+    def cold_open(self, fr, s, t, top):
+        """Something is already moving on frame one: the phone being picked up, or a card mid-swipe."""
+        th = self.theme
+        sway = math.sin(t * 2.3) * .5
+        if self.hook['opening'] == 'pickup':
+            p = ease(t / .55)
+            draw_hand(fr, th, s['screen'], top + (1 - p) * 760, .95, dx=(1 - p) * 90 + sway * 5, rot=(1 - p) * -16 + sway)
+            return
+        # Two swipes while the hook is spoken; the first is already under way at t=0
+        q1, q2 = smooth((t + .15) / .5), smooth((t - 1.0) / .45)
+        base, card = (self.deck[2], (self.card[1], 1.25 * q2, 16 * q2)) if q1 >= 1 and t >= 1.0 else (self.deck[1], (self.card[0], 1.25 * q1, 16 * q1))
+        if q2 >= 1: card = None
+        nudge = q1 * (1 - q1) + q2 * (1 - q2)  # the hand moves with each swipe
+        draw_hand(fr, th, base, top, .95, dx=nudge * 40 + sway * 5, rot=nudge * 5 + sway, card=card)
+
     def hook_frame(self, fr, s, t):
         th = self.theme
         words = s['say'].split()
@@ -227,10 +279,13 @@ class Ad:
         lh = int(size * 1.14)
         block = len(lines) * lh
         ptop = SAFE_T + block + 46
-        p = ease((t - .02) / .5)
-        draw_phone(fr, th, s['screen'], ptop + (1 - p) * 120, 640)
+        if self.hook.get('opening'):
+            self.cold_open(fr, s, t, ptop)
+        else:
+            p = ease((t - .02) / .5)
+            draw_phone(fr, th, s['screen'], ptop + (1 - p) * 120, 640)
         y = SAFE_T; i = s['a']; f = F(size)
-        n_q = next((n for n, w in enumerate(words) if w[-1] in '.?'), len(words) - 1)
+        n_q = self.hook.get('accent_from', next((n for n, w in enumerate(words) if w[-1] in '.?'), len(words) - 1) + 1) - 1
         for line in lines:
             x = SAFE_X
             for w in line:
@@ -251,7 +306,10 @@ class Ad:
             q = smooth((t - t0 - .15) / .7)
             base, flying = (self.deck[1], self.card[0]) if right else (self.deck[2], self.card[1])
             sign = 1 if right else -1
-            draw_phone(fr, th, base, SAFE_T + 118, 680, card=(flying, sign * 1.25 * q, sign * 16 * q))
+            if self.hook.get('opening'):
+                draw_hand(fr, th, base, SAFE_T + 118, 1.15, dx=q * (1 - q) * 40, rot=q * (1 - q) * 5, card=(flying, sign * 1.25 * q, sign * 16 * q))
+            else:
+                draw_phone(fr, th, base, SAFE_T + 118, 680, card=(flying, sign * 1.25 * q, sign * 16 * q))
         elif 'zoom' in s:
             _, a, _, b = s['zoom']
             q = smooth((t - t0 - .05) / .5)
@@ -261,7 +319,10 @@ class Ad:
             draw_phone(fr, th, s['screen'], top, w, crop=(a, b), room=SAFE_B - 110 - top)
         else:
             p2 = ease((t - t0) / .45)
-            draw_phone(fr, th, s['screen'], SAFE_T + 118 + (1 - p2) * 90, 680)
+            if self.hook.get('opening'):
+                draw_hand(fr, th, s['screen'], SAFE_T + 118 + (1 - p2) * 90, 1.15, rot=math.sin(t * 2.3) * .5)
+            else:
+                draw_phone(fr, th, s['screen'], SAFE_T + 118 + (1 - p2) * 90, 680)
         self.caption(fr, t, s)
 
     def outro_frame(self, fr, s, t):

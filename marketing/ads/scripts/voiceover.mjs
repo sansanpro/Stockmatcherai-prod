@@ -41,7 +41,7 @@ async function make(hook, voice) {
   for (let attempt = 1; attempt <= 3; attempt++) {
     const r = await client.textToSpeech.convertWithTimestamps(C.voices[voice], {
       text, modelId: 'eleven_v4', outputFormat: 'mp3_44100_128', seed: 40 + attempt,
-      voiceSettings: { stability: 0.5, similarityBoost: 0.75 },
+      voiceSettings: { stability: 0.5, similarityBoost: 0.75, ...(hook.speed && { speed: hook.speed }) },
     });
     writeFileSync(`${base}.mp3`, Buffer.from(r.audioBase64, 'base64'));
     const words = toWords(r.alignment);

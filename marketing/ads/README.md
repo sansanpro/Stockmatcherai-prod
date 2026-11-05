@@ -13,6 +13,7 @@ The videos are built locally from the App Store screenshots with Pillow and ffmp
 - `creatives/images/`: `*-4x5.png` exported from the editable Canva designs; `*-9x16.png` from `render_videos.py stills`.
 - `scripts/voiceover.mjs`: ElevenLabs voiceovers with word timing, via the SDK. The key is in `.env.local` (gitignored). Spends credits. `FFMPEG=<path> node --env-file=.env.local marketing/ads/scripts/voiceover.mjs first`
 - `scripts/render_videos.py sheet|video|stills`: review frames, videos, 9:16 stills. Works on any OS.
+- `x1-` and `x2-` are experiments with a cold open (`opening` in concepts.json): something moves on frame one, and George speaks faster. `creatives/hand-phone.png` is an AI-generated photo from Canva, cut out by `scripts/make_hand_asset.py`, with the real app screen placed behind the thumb.
 - Real share price and move on G1 and E2; other card shots use a copy with them hidden. Prices are a snapshot from the capture date.
 - Added disclaimer on E2, E4, M2 and M5 only. Matching is rule-based, so copy says "matches built around your values, with AI to explain every company", not "AI-assisted matching".
 

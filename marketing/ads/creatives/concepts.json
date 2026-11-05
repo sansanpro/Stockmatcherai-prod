@@ -264,6 +264,69 @@
         "head": "Then you decide",
         "screen": "likes"
       }
+    ],
+    "x1": [
+      {
+        "say": "Block what you won't back, like tobacco or fossil fuels.",
+        "head": "Block what you won't back",
+        "screen": "dealbreakers"
+      },
+      {
+        "say": "Pick the causes you do care about.",
+        "head": "Pick your causes",
+        "screen": "causes"
+      },
+      {
+        "say": "See real companies working on them, with proof and a source.",
+        "head": "Proof, with a source",
+        "screen": "details",
+        "zoom": [
+          0.0,
+          0.38,
+          1.0,
+          0.68
+        ]
+      },
+      {
+        "say": "Then you decide.",
+        "head": "Then you decide",
+        "screen": "likes"
+      }
+    ],
+    "x2": [
+      {
+        "say": "Swipe right on real companies working on causes you pick.",
+        "head": "Swipe right to like",
+        "anim": "swipe-right"
+      },
+      {
+        "say": "Every card shows what it does, the proof, and what to know.",
+        "head": "Know what you're swiping on",
+        "screen": "deck-3-masked",
+        "zoom": [
+          0.0,
+          0.37,
+          1.0,
+          0.72
+        ]
+      },
+      {
+        "say": "Stuck on something? Ask A.I.",
+        "head": "Stuck? Ask AI",
+        "screen": "ask-ai"
+      },
+      {
+        "say": "Then see what your likes say about you.",
+        "head": "What your likes say about you",
+        "screen": "recap-insight",
+        "zoom": [
+          0,
+          0.27,
+          1,
+          0.68
+        ],
+        "zoom_w": 760
+      }
     ]
   },
   "hooks": [
@@ -404,6 +467,30 @@
       "disclaimer": true,
       "still_screen": "deck-1-masked",
       "benefit": "Pick a cause. See real companies working on it, with proof."
+    },
+    {
+      "id": "x1-boycott-stock",
+      "cat": "m",
+      "say": "You boycott the brand but you own the stock.",
+      "screen": "dealbreakers",
+      "still_screen": "dealbreakers",
+      "benefit": "Block what you won't back. See who works on your causes.",
+      "body": "x1",
+      "opening": "pickup",
+      "speed": 1.15,
+      "accent_from": 4
+    },
+    {
+      "id": "x2-revenue",
+      "cat": "g",
+      "say": "It's Tinder, except the matches have revenue.",
+      "screen": "deck-2-masked",
+      "still_screen": "deck-2-masked",
+      "benefit": "Swipe right on real companies working on causes you pick.",
+      "body": "x2",
+      "opening": "mid-swipe",
+      "speed": 1.15,
+      "accent_from": 2
     }
   ],
   "first_batch": [
