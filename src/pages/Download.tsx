@@ -8,7 +8,7 @@ const Download = () => (
     <div className="w-full max-w-md space-y-6 text-center">
       <h1 className="text-3xl font-bold">Swipe through real companies working on the causes you care about.</h1>
       <p className="text-lg text-muted-foreground">
-        Pick the causes you care about and swipe through real companies working on them. See what each one does, the proof behind it, and what to watch out for.
+        See what each company does, the proof behind it, and what to watch out for.
       </p>
       <Button asChild size="lg" className="w-full min-h-[44px]">
         <a href={APP_STORE_URL}>Download free on the App Store</a>
