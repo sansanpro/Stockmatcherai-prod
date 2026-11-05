@@ -111,8 +111,7 @@ const adSetBody = (set, campaignId) => ({
   targeting: {
     geo_locations: { countries: ['US'] },
     age_min: 18,
-    age_max: 65,
-    age_range: [18, 44], // a suggestion to Advantage+ audience, which may go older
+    age_max: 65, // fixed at 18-65+ by the special ad category
     device_platforms: ['mobile'],
     user_os: [USER_OS],
     targeting_automation: { advantage_audience: 1 },
@@ -128,7 +127,7 @@ const cta = { type: 'DOWNLOAD', value: { link: STORE } };
 if (!apply) {
   console.log(`Campaign: ${CAMPAIGN} (PAUSED), account ${ACCOUNT}, page ${PAGE}`);
   for (const set of SETS) {
-    console.log(`\nAd set: ${set.name}, $${DAILY_CENTS / 100}/day, US, 18-44 (Advantage+ audience), iOS 15+, PAUSED`);
+    console.log(`\nAd set: ${set.name}, $${DAILY_CENTS / 100}/day, US, 18-65+ (Advantage+ audience), iOS 15+, PAUSED`);
     for (const ad of set.ads) {
       const files = ad.video ? [`${VIDEOS}/${ad.video}.mp4`] : [`${IMAGES}/${ad.id}-4x5.png`];
       for (const f of files) if (!existsSync(f)) throw new Error(`missing ${f}`);
@@ -140,7 +139,7 @@ if (!apply) {
 }
 
 const campaignId = await once('campaign', async () => (await post(`${ACCOUNT}/campaigns`, {
-  name: CAMPAIGN, objective: 'OUTCOME_TRAFFIC', status: 'PAUSED', special_ad_categories: [], is_adset_budget_sharing_enabled: false,
+  name: CAMPAIGN, objective: 'OUTCOME_TRAFFIC', status: 'PAUSED', special_ad_categories: ['FINANCIAL_PRODUCTS_SERVICES'], special_ad_category_country: ['US'], is_adset_budget_sharing_enabled: false,
 })).id);
 for (const set of SETS) {
   const adSetId = await once(`adset:${set.key}`, async () => (await post(`${ACCOUNT}/adsets`, adSetBody(set, campaignId))).id);
