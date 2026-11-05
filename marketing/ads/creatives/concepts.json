@@ -491,6 +491,78 @@
       "opening": "mid-swipe",
       "speed": 1.15,
       "accent_from": 2
+    },
+    {
+      "id": "x3-finance-bros",
+      "cat": "g",
+      "say": "Finance bros made this sound hard on purpose.",
+      "screen": "deck-2-masked",
+      "still_screen": "deck-2-masked",
+      "benefit": "Swipe right on real companies working on causes you pick.",
+      "body": "x2",
+      "opening": "mid-swipe",
+      "speed": 1.15,
+      "accent_from": 5
+    },
+    {
+      "id": "x4-own-makes",
+      "cat": "g",
+      "say": "Nobody can tell you what the company they own actually makes.",
+      "screen": "deck-2-masked",
+      "still_screen": "deck-2-masked",
+      "benefit": "Swipe right on real companies working on causes you pick.",
+      "body": "x2",
+      "opening": "mid-swipe",
+      "speed": 1.15,
+      "accent_from": 4
+    },
+    {
+      "id": "x5-wrapped",
+      "cat": "g",
+      "say": "Spotify Wrapped, but for where your money could go.",
+      "screen": "deck-2-masked",
+      "still_screen": "deck-2-masked",
+      "benefit": "Swipe right on real companies working on causes you pick.",
+      "body": "x2",
+      "opening": "mid-swipe",
+      "speed": 1.15,
+      "accent_from": 2
+    },
+    {
+      "id": "x6-new-year",
+      "cat": "g",
+      "say": "New year, new portfolio. Start with what you actually believe.",
+      "screen": "deck-2-masked",
+      "still_screen": "deck-2-masked",
+      "benefit": "Swipe right on real companies working on causes you pick.",
+      "body": "x2",
+      "opening": "mid-swipe",
+      "speed": 1.15,
+      "accent_from": 4
+    },
+    {
+      "id": "x7-three-years",
+      "cat": "g",
+      "say": "You've been about to start investing for three years now.",
+      "screen": "deck-2-masked",
+      "still_screen": "deck-2-masked",
+      "benefit": "Swipe right on real companies working on causes you pick.",
+      "body": "x2",
+      "opening": "mid-swipe",
+      "speed": 1.15,
+      "accent_from": 6
+    },
+    {
+      "id": "x8-paralysis",
+      "cat": "g",
+      "say": "Analysis paralysis isn't research. It's fear with a spreadsheet.",
+      "screen": "deck-2-masked",
+      "still_screen": "deck-2-masked",
+      "benefit": "Swipe right on real companies working on causes you pick.",
+      "body": "x2",
+      "opening": "mid-swipe",
+      "speed": 1.15,
+      "accent_from": 4
     }
   ],
   "first_batch": [
