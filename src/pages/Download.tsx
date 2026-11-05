@@ -6,7 +6,7 @@ const APP_STORE_URL = "https://apps.apple.com/app/id6758280940";
 const Download = () => (
   <main className="min-h-screen bg-background flex items-center justify-center p-4">
     <div className="w-full max-w-md space-y-6 text-center">
-      <h1 className="text-3xl font-bold">Your money is already saying something.</h1>
+      <h1 className="text-3xl font-bold">Swipe through real companies working on the causes you care about.</h1>
       <p className="text-lg text-muted-foreground">
         Pick the causes you care about and swipe through real companies working on them. See what each one does, the proof behind it, and what to watch out for.
       </p>
