@@ -4,7 +4,7 @@
 #   pip install -r marketing/ads/requirements.txt
 #   python marketing/ads/scripts/render_videos.py sheet [id-voice ...]   # review frames, no video
 #   python marketing/ads/scripts/render_videos.py video [id-voice ...]   # writes creatives/videos/
-#   python marketing/ads/scripts/render_videos.py stills                 # 9:16 image ads, no voice needed
+#   python marketing/ads/scripts/render_videos.py stills [id ...]        # 9:16 image ads, no voice needed
 #
 # Text stays inside Meta's 9:16 safe zone (top 14%, bottom 35%, sides 6%); only the phone runs below it.
 import sys, os, json, glob, subprocess
@@ -334,6 +334,7 @@ mode = sys.argv[1]
 if mode == 'stills':
     os.makedirs(f'{DIR}/images', exist_ok=True)
     for h in C['hooks']:
+        if sys.argv[2:] and h['id'] not in sys.argv[2:]: continue
         still(h).save(f"{DIR}/images/{h['id']}-9x16.png")
         print(h['id'])
     sys.exit()

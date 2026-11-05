@@ -160,6 +160,110 @@
         "head": "Stuck? Ask AI",
         "screen": "ask-ai"
       }
+    ],
+    "g4": [
+      {
+        "say": "Swipe right on the companies you like.",
+        "head": "Swipe right to like",
+        "anim": "swipe-right"
+      },
+      {
+        "say": "Every card shows what a company does, the proof, and the things to know.",
+        "head": "Know what you're swiping on",
+        "screen": "deck-3-masked",
+        "zoom": [
+          0.0,
+          0.37,
+          1.0,
+          0.72
+        ]
+      },
+      {
+        "say": "Then get your recap.",
+        "head": "Your day in values",
+        "screen": "recap-intro"
+      },
+      {
+        "say": "See what your likes say about you.",
+        "head": "What your likes say about you",
+        "screen": "recap-insight",
+        "zoom": [
+          0,
+          0.27,
+          1,
+          0.68
+        ],
+        "zoom_w": 760
+      }
+    ],
+    "g6": [
+      {
+        "say": "Every match is a real company working on a cause you picked.",
+        "head": "Real companies. Your causes.",
+        "screen": "reveal",
+        "zoom": [
+          0,
+          0.22,
+          1,
+          0.56
+        ],
+        "zoom_w": 900
+      },
+      {
+        "say": "Swipe right to like it.",
+        "head": "Swipe right to like",
+        "anim": "swipe-right"
+      },
+      {
+        "say": "Your likes are all in one place.",
+        "head": "All your likes in one place",
+        "screen": "likes"
+      },
+      {
+        "say": "Stuck on something? Ask A.I.",
+        "head": "Stuck? Ask AI",
+        "screen": "ask-ai"
+      }
+    ],
+    "m4": [
+      {
+        "say": "Pick the causes you care about.",
+        "head": "Pick your causes",
+        "screen": "causes"
+      },
+      {
+        "say": "Block what you won't back, like tobacco or fossil fuels.",
+        "head": "Block what you won't back",
+        "screen": "dealbreakers"
+      },
+      {
+        "say": "See real companies working on your causes,",
+        "head": "Real companies. Your causes.",
+        "screen": "reveal",
+        "zoom": [
+          0,
+          0.22,
+          1,
+          0.56
+        ],
+        "zoom_w": 900
+      },
+      {
+        "say": "with proof and a source you can check.",
+        "head": "Proof, with a source",
+        "screen": "details",
+        "zoom": [
+          0.0,
+          0.38,
+          1.0,
+          0.68
+        ]
+      },
+      {
+        "say": "Then you decide.",
+        "head": "Then you decide",
+        "screen": "likes"
+      }
     ]
   },
   "hooks": [
@@ -239,6 +343,67 @@
       "screen": "causes",
       "still_screen": "reveal",
       "benefit": "Cancer, clean energy, clean water and more. You pick."
+    },
+    {
+      "id": "g4-wrapped",
+      "cat": "g",
+      "say": "Spotify Wrapped, but for the companies you like.",
+      "screen": "recap-insight",
+      "still_screen": "recap-insight",
+      "benefit": "Swipe on real companies. See what your likes say about you.",
+      "body": "g4"
+    },
+    {
+      "id": "g5-wall-street",
+      "cat": "g",
+      "say": "Swipe right on Wall Street.",
+      "screen": "deck-1-masked",
+      "still_screen": "deck-3-masked",
+      "benefit": "Swipe right on companies that match your values."
+    },
+    {
+      "id": "g6-ghost",
+      "cat": "g",
+      "say": "Your next match won't ghost you.",
+      "screen": "deck-2-masked",
+      "still_screen": "deck-2-masked",
+      "benefit": "Real companies, matched to the causes you pick.",
+      "body": "g6"
+    },
+    {
+      "id": "e4-stock-tip",
+      "cat": "e",
+      "say": "Everyone has a stock tip. Nobody can tell you what the company does.",
+      "screen": "deck-1-masked",
+      "disclaimer": true,
+      "still_screen": "deck-3-masked",
+      "benefit": "Every company starts with what it does, in plain English."
+    },
+    {
+      "id": "e5-finance-bros",
+      "cat": "e",
+      "say": "Finance bros made this sound hard on purpose.",
+      "screen": "ask-ai",
+      "still_screen": "ask-ai",
+      "benefit": "The numbers in plain words, with AI to explain the rest."
+    },
+    {
+      "id": "m4-boycott",
+      "cat": "m",
+      "say": "You know which brands you'd boycott. Can you name one you'd back?",
+      "screen": "causes",
+      "still_screen": "dealbreakers",
+      "benefit": "Block what you won't back. See real companies working on what you care about.",
+      "body": "m4"
+    },
+    {
+      "id": "m5-cancer",
+      "cat": "m",
+      "say": "I swiped right on a company fighting cancer.",
+      "screen": "deck-1-masked",
+      "disclaimer": true,
+      "still_screen": "deck-1-masked",
+      "benefit": "Pick a cause. See real companies working on it, with proof."
     }
   ],
   "first_batch": [
