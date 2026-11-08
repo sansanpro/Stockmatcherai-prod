@@ -2,7 +2,7 @@
 
 This is the full process behind the video and image ads running on Meta: how a hook is chosen, how the app is captured, how the voiceover is made and checked, how each frame of the video is drawn, how the image ads are built in Canva, and how the ads are put on Meta and swapped. It also records what has worked, what hasn't, and the rules Meta enforces, so the next batch starts from what we already know.
 
-The short version of `README.md` (commands only) is still there. This document explains the why behind each step.
+The short version of `README.md` (commands only) is still there. This document explains the why behind each step. `AD-PLAYBOOK.md` is the general version of this process, for any product, service or software.
 
 ## Contents
 
