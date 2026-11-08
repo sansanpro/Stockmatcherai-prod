@@ -1,6 +1,6 @@
 # Ads
 
-Draft video and still ads. Nothing here has run as a paid ad or had a legal review.
+Video and still ads. The current ones run on Meta; none has had a legal review. `HOW-THE-ADS-ARE-MADE.md` explains the whole process step by step.
 
 The videos are built locally from the App Store screenshots with Pillow and ffmpeg. The voiceover comes from the ElevenLabs API. They use the cream design, which the app moved away from on 2026-10-30, so rebuild them from new screenshots before using them.
 
